@@ -1,9 +1,11 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
 import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js';
+import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
+import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 
 /**
@@ -71,6 +73,43 @@ const bridge = Object.freeze({
       ipcRenderer.removeListener(STUDIO_CHANNELS.event, listener);
     };
   },
+  observatoryGet: (input: { projectId: string; threadId: string | null }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.get, input),
+  createFleetRun: (input: { projectId: string; name: string; instructions: string; role: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.createFleetRun, input),
+  startFleetRun: (input: { projectId: string; runId: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.startFleetRun, input),
+  stopFleetRun: (input: { projectId: string; runId: string }) => ipcRenderer.invoke(AGENT_CHANNELS.stopFleetRun, input),
+  interruptWorker: (input: { projectId: string; workerId: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.interruptWorker, input),
+  cancelAgentRun: (input: { projectId: string; runId: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.cancelAgentRun, input),
+  cancelTask: (input: { projectId: string; taskId: string }) => ipcRenderer.invoke(AGENT_CHANNELS.cancelTask, input),
+  createGoal: (input: { projectId: string; threadId: string; objective: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.createGoal, input),
+  completeGoal: (input: { projectId: string; threadId: string }) =>
+    ipcRenderer.invoke(AGENT_CHANNELS.completeGoal, input),
+  providerGet: (input: { projectId: string; sessionId: string; providerId?: string }) =>
+    ipcRenderer.invoke(PROVIDER_CHANNELS.get, input),
+  providerApplyRoute: (input: {
+    projectId: string;
+    sessionId: string;
+    provider: string;
+    model: string;
+    expectedRevision: string;
+  }) => ipcRenderer.invoke(PROVIDER_CHANNELS.applyRoute, input),
+  providerApplyPermission: (input: {
+    projectId: string;
+    sessionId: string;
+    posture: 'ask' | 'auto-review' | 'full-access';
+    expectedRevision: string;
+  }) => ipcRenderer.invoke(PROVIDER_CHANNELS.applyPermission, input),
+  providerApplyMode: (input: {
+    projectId: string;
+    sessionId: string;
+    mode: 'agent' | 'plan';
+    expectedRevision: string;
+  }) => ipcRenderer.invoke(PROVIDER_CHANNELS.applyMode, input),
   /** The latest Explorer launch, and pushes for new ones. Returns no path to execute. */
   getLaunchState: () => ipcRenderer.invoke(LAUNCH_CHANNELS.state, {}),
   onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {

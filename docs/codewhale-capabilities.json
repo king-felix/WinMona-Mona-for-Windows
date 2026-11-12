@@ -96,14 +96,17 @@
       "cost_implications": "none-by-default",
       "required_arguments": "see help capture",
       "chosen_integration": "Advanced action",
-      "ui_location": "settings → diagnostics",
-      "tests": [],
+      "ui_location": "Settings ? connection diagnostics",
+      "tests": [
+        "apps/desktop/src/main/provider-workbench.test.ts",
+        "docs/evidence/P16-scope.json"
+      ],
       "status": "read-qualified",
-      "gap": "`--probe-api` executed at P01 with no token spend; structural JSON remains unqualified.",
+      "gap": "Offline `doctor --json` is read. `--probe-api` stays an explicit engine action and is never run by this view.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/doctor.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": "docs/evidence/P01-contract.json"
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -168,14 +171,17 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "top context bar / settings → models",
-      "tests": [],
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "packages/adapter/src/configuration.test.ts",
+        "apps/desktop/src/main/provider-workbench.test.ts"
+      ],
       "status": "read-qualified",
-      "gap": "Catalog read via runtime `/v1/providers/{id}/models`; CLI output not exercised.",
+      "gap": "Full provider catalog is read per provider; reasoning levels are shown only when the route reports them.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/models.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": "docs/evidence/P01-contract.json"
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -451,19 +457,23 @@
         "version": "0.10.2+ff466b2ed0bf"
       },
       "platform": "windows-x64",
-      "class": "mixed",
+      "class": "read/write",
       "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "right inspector → agents",
-      "tests": [],
-      "status": "discovered",
-      "gap": "Fleet routes discovered (`/v1/fleet/*`); native execution deferred to P15.",
+      "ui_location": "Agents ? native fleet runs",
+      "tests": [
+        "packages/adapter/src/native.test.ts",
+        "apps/desktop/src/main/agent-observatory.test.ts",
+        "docs/evidence/P15-agent-run.json"
+      ],
+      "status": "read-qualified",
+      "gap": "P15 reads fleet runs, creates one serial run, and returns start/stop receipts. Local start returned execution=scheduled with no worker lease (P15-ISSUE-001). Parallel builders are not offered.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/fleet.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": null
+        "contract_report": "docs/evidence/P15-agent-run.json"
       }
     },
     {
@@ -480,14 +490,16 @@
       "cost_implications": "model",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "right inspector → workflows",
-      "tests": [],
-      "status": "discovered",
-      "gap": null,
+      "ui_location": "Agents ? native fleet runs",
+      "tests": [
+        "apps/desktop/src/main/agent-observatory.test.ts"
+      ],
+      "status": "read-qualified",
+      "gap": "Workflow runs appear through fleet runs. Checked-in workflow lanes remain a validated CLI advanced action until P18.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/workflow.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": null
+        "contract_report": "docs/evidence/P15-agent-run.json"
       }
     },
     {
@@ -768,14 +780,16 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Advanced action",
-      "ui_location": "settings → account",
-      "tests": [],
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "apps/desktop/src/main/provider-workbench.test.ts"
+      ],
       "status": "discovered",
-      "gap": "Credential store; Mona must not read or rewrite keys.",
+      "gap": "Credential presence and state are displayed. Mona never reads, writes, copies or logs a key; entry stays with the engine CLI/credential store.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/auth.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": null
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -864,14 +878,18 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "settings",
-      "tests": [],
-      "status": "read-qualified",
-      "gap": "Effective config read via `/v1/config`; mutation not exposed.",
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "packages/adapter/src/configuration.test.ts",
+        "apps/desktop/src/main/provider-workbench.test.ts",
+        "docs/evidence/P16-scope.json"
+      ],
+      "status": "qualified",
+      "gap": "Read via `/v1/config`; writes go through `codewhale config set` with a hashed backup, revision check and verification. Active threads are untouched.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/config.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": "docs/evidence/P01-contract.json"
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -888,14 +906,17 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "top context bar",
-      "tests": [],
-      "status": "read-qualified",
-      "gap": "Resolved model/deepseek-flash verified through `/v1/config`.",
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "apps/desktop/src/main/provider-workbench.test.ts",
+        "docs/evidence/P16-scope.json"
+      ],
+      "status": "qualified",
+      "gap": "Requested and effective models are displayed separately. A changed default applies to new threads; the active thread kept deepseek-flash in the isolated live probe.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/model.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": "docs/evidence/P01-contract.json"
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -911,15 +932,17 @@
       "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
       "required_arguments": "see help capture",
-      "chosen_integration": "Advanced action",
-      "ui_location": "right inspector → thread",
-      "tests": [],
-      "status": "discovered",
-      "gap": "Runtime thread routes are the primary Mona surface.",
+      "chosen_integration": "Native view",
+      "ui_location": "Studio thread + Agents observatory",
+      "tests": [
+        "packages/adapter/src/native.test.ts"
+      ],
+      "status": "read-qualified",
+      "gap": "Thread lifecycle is the primary Mona surface; thread goal read/create/complete is exposed through the observatory.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/thread.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": null
+        "contract_report": "docs/evidence/P15-agent-run.json"
       }
     },
     {
@@ -1056,14 +1079,17 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Native view",
-      "ui_location": "settings → providers",
-      "tests": [],
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "packages/adapter/src/configuration.test.ts",
+        "apps/desktop/src/main/provider-workbench.test.ts"
+      ],
       "status": "read-qualified",
-      "gap": "Read via `/v1/providers`; route preserved unchanged.",
+      "gap": "Credential state, source and writability are shown. Provider switching is an explicit engine config action, not an automatic fallback.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/providers.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": "docs/evidence/P01-contract.json"
+        "contract_report": "docs/evidence/P16-scope.json"
       }
     },
     {
@@ -1089,6 +1115,114 @@
         "captured_utc": "2026-11-12T01:00:32.823Z",
         "contract_report": null
       }
+    },
+    {
+      "id": "CAP-0044",
+      "upstream": {
+        "name": "goals (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/goals; PUT /v1/threads/{id}/goal",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read/write",
+      "permission_implications": "Uses the authenticated local runtime token; no renderer access.",
+      "cost_implications": "native",
+      "required_arguments": "see route contract",
+      "chosen_integration": "Native view",
+      "ui_location": "Agents observatory",
+      "tests": [
+        "packages/adapter/src/native.test.ts",
+        "apps/desktop/src/main/agent-observatory.test.ts"
+      ],
+      "status": "read-qualified",
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T09:10:00Z",
+        "contract_report": "docs/evidence/P15-agent-run.json"
+      },
+      "gap": "Read, create, complete and block. Creating a goal starts a native goal kickoff turn and becomes the execution owner."
+    },
+    {
+      "id": "CAP-0045",
+      "upstream": {
+        "name": "agent-runs (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/agent-runs; POST /v1/agent-runs/{id}/cancel",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read/write",
+      "permission_implications": "Uses the authenticated local runtime token; no renderer access.",
+      "cost_implications": "native",
+      "required_arguments": "see route contract",
+      "chosen_integration": "Native view",
+      "ui_location": "Agents observatory",
+      "tests": [
+        "packages/adapter/src/native.test.ts",
+        "apps/desktop/src/main/agent-observatory.test.ts"
+      ],
+      "status": "read-qualified",
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T09:10:00Z",
+        "contract_report": "docs/evidence/P15-agent-run.json"
+      },
+      "gap": "Child lifecycle, route, usage and artifacts are read from the engine. Cancel is offered for running children."
+    },
+    {
+      "id": "CAP-0046",
+      "upstream": {
+        "name": "turn artifacts (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/threads/{id}/turns/{turnId}/artifacts",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "Uses the authenticated local runtime token; no renderer access.",
+      "cost_implications": "native",
+      "required_arguments": "see route contract",
+      "chosen_integration": "Native view",
+      "ui_location": "Agents observatory",
+      "tests": [
+        "packages/adapter/src/native.test.ts",
+        "apps/desktop/src/main/agent-observatory.test.ts"
+      ],
+      "status": "read-qualified",
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T09:10:00Z",
+        "contract_report": "docs/evidence/P15-agent-run.json"
+      },
+      "gap": "Turn artifacts are read into the observatory projection; a missing route is a typed failure, not an empty list."
+    },
+    {
+      "id": "CAP-0047",
+      "upstream": {
+        "name": "settings schema (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/settings/schema",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "Authenticated local read; no renderer access.",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "chosen_integration": "Native view",
+      "ui_location": "Settings ? provider and model",
+      "tests": [
+        "packages/adapter/src/configuration.test.ts",
+        "apps/desktop/src/main/provider-workbench.test.ts"
+      ],
+      "status": "read-qualified",
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T09:30:00Z",
+        "contract_report": "docs/evidence/P16-scope.json"
+      },
+      "gap": "Permission options are read from the engine schema; the workbench offers only values the engine reports."
     }
   ],
   "runtime_api": {

@@ -59,6 +59,15 @@ if (!/connect-src 'none'/.test(html)) failures.push('index.html: production CSP 
 const preload = await readFile(path.join(repoRoot, 'apps', 'desktop', 'dist', 'preload', 'preload.cjs'), 'utf8');
 const channels = [...new Set([...preload.matchAll(/mona:[a-z-]+/g)].map((match) => match[0]))].sort();
 const expectedChannels = [
+  'mona:agents-cancel-agent-run',
+  'mona:agents-cancel-task',
+  'mona:agents-complete-goal',
+  'mona:agents-create-fleet-run',
+  'mona:agents-create-goal',
+  'mona:agents-get',
+  'mona:agents-interrupt-worker',
+  'mona:agents-start-fleet-run',
+  'mona:agents-stop-fleet-run',
   'mona:app-info',
   'mona:attention-focus',
   'mona:attention-get',
@@ -80,6 +89,10 @@ const expectedChannels = [
   'mona:launch-event',
   'mona:launch-state',
   'mona:project-spend',
+  'mona:provider-apply-mode',
+  'mona:provider-apply-permission',
+  'mona:provider-apply-route',
+  'mona:provider-get',
   'mona:studio-event',
   'mona:studio-get',
   'mona:studio-interrupt',

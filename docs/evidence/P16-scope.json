@@ -1,0 +1,709 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T08:57:28.662Z",
+  "home": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p16-scope\\1794473848661\\home",
+  "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p16-scope\\1794473848661\\workspace",
+  "checks": [
+    {
+      "name": "active thread starts on the configured Flash route",
+      "ok": true,
+      "detail": {
+        "model": "deepseek-flash",
+        "provider": "deepseek"
+      }
+    },
+    {
+      "name": "engine config CLI reports the new default for new threads",
+      "ok": true,
+      "detail": {
+        "model": "deepseek-chat"
+      }
+    },
+    {
+      "name": "active thread keeps deepseek-flash after the default changes",
+      "ok": true,
+      "detail": {
+        "thread_model": "deepseek-flash",
+        "saved_default": "deepseek-chat"
+      }
+    },
+    {
+      "name": "running runtime still reports its launch route",
+      "ok": true,
+      "detail": {
+        "model": "deepseek-flash"
+      }
+    },
+    {
+      "name": "credential state is reported without a probe",
+      "ok": true,
+      "detail": {
+        "credentialState": "missing",
+        "source": "secret_store"
+      }
+    },
+    {
+      "name": "offline doctor did not probe the provider",
+      "ok": true,
+      "detail": {
+        "status": "not_probed"
+      }
+    }
+  ],
+  "thread_before": {
+    "schema_version": 2,
+    "id": "thr_38f6d24d62f543219e89b4eabda554d3",
+    "created_at": "2026-11-12T08:57:28.983431Z",
+    "updated_at": "2026-11-12T08:57:28.983431Z",
+    "model": "deepseek-flash",
+    "model_provider": "deepseek",
+    "model_provider_id": "deepseek",
+    "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p16-scope\\1794473848661\\workspace",
+    "mode": "agent",
+    "permission_posture": "full_access",
+    "allow_shell": true,
+    "trust_mode": true,
+    "auto_approve": true,
+    "archived": false
+  },
+  "config_set": {
+    "code": 0,
+    "stdout": "set model",
+    "stderr": ""
+  },
+  "thread_after": {
+    "thread": {
+      "schema_version": 2,
+      "id": "thr_38f6d24d62f543219e89b4eabda554d3",
+      "created_at": "2026-11-12T08:57:28.983431Z",
+      "updated_at": "2026-11-12T08:57:28.983431Z",
+      "model": "deepseek-flash",
+      "model_provider": "deepseek",
+      "model_provider_id": "deepseek",
+      "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p16-scope\\1794473848661\\workspace",
+      "mode": "agent",
+      "permission_posture": "full_access",
+      "allow_shell": true,
+      "trust_mode": true,
+      "auto_approve": true,
+      "archived": false
+    },
+    "turns": [],
+    "items": [],
+    "latest_seq": 1,
+    "pending_approvals": [],
+    "pending_user_inputs": [],
+    "pending_dynamic_tool_calls": [],
+    "approval_grants": []
+  },
+  "runtime_config_after": {
+    "model": "deepseek-flash",
+    "model_available": true,
+    "provider": "deepseek",
+    "approval_mode": "suggest",
+    "reasoning_effort": "auto",
+    "auto_compact": false,
+    "cost_currency": "usd",
+    "default_mode": "agent",
+    "default_model": "deepseek-flash",
+    "base_url": "https://api.deepseek.com",
+    "allow_shell": false,
+    "mcp_config_path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p16-scope\\1794473848661\\home\\mcp.json",
+    "subagents_enabled": true,
+    "subagents_max_depth": 4294967295,
+    "show_thinking": false,
+    "thinking_default_expanded": false,
+    "thinking_highlight": true,
+    "show_tool_details": false,
+    "inline_diffs": "full",
+    "locale": "auto",
+    "max_history": 100,
+    "workspace_follow_symlinks": false,
+    "calm_mode": true,
+    "sandbox_mode": "workspace-write",
+    "strict_tool_mode": false,
+    "memory_enabled": false,
+    "search_provider": "firecrawl",
+    "search_provider_source": "default",
+    "prompt_suggestion": false,
+    "notifications": {
+      "completion_sound": "off",
+      "condition": "unfocused",
+      "event_sound.enabled": "false",
+      "event_sound.events": "[\"turn-complete\", \"approval-needed\"]",
+      "event_sound.min_interval_ms": "2000",
+      "event_sound.quiet": "false",
+      "events.approval-needed": "true",
+      "events.elevation-needed": "true",
+      "events.input-needed": "true",
+      "events.model-notify": "true",
+      "events.subagent-terminal": "true",
+      "events.turn-complete": "true",
+      "include_summary": "false",
+      "method": "auto",
+      "quiet": "false",
+      "sound": "legacy",
+      "sound_file": "",
+      "subagent_completion": "final-only",
+      "threshold_secs": "30"
+    }
+  },
+  "providers": {
+    "current": "deepseek",
+    "current_provider_id": "deepseek",
+    "providers": [
+      {
+        "id": "deepseek",
+        "model_provider_id": "deepseek",
+        "display_name": "DeepSeek",
+        "default_model": "deepseek-flash",
+        "has_model_catalog": true,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "deepseek-cn",
+        "model_provider_id": "deepseek-cn",
+        "display_name": "DeepSeek (legacy alias)",
+        "default_model": "deepseek-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "deepseek-anthropic",
+        "model_provider_id": "deepseek-anthropic",
+        "display_name": "DeepSeek (Anthropic API)",
+        "default_model": "deepseek-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "nvidia-nim",
+        "model_provider_id": "nvidia-nim",
+        "display_name": "NVIDIA NIM",
+        "default_model": "deepseek-ai/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "openai",
+        "model_provider_id": "openai",
+        "display_name": "OpenAI-compatible",
+        "default_model": "gpt-5.6",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "atlascloud",
+        "model_provider_id": "atlascloud",
+        "display_name": "AtlasCloud",
+        "default_model": "deepseek-ai/deepseek-v4-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "wanjie-ark",
+        "model_provider_id": "wanjie-ark",
+        "display_name": "Wanjie Ark",
+        "default_model": "deepseek-reasoner",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "volcengine",
+        "model_provider_id": "volcengine",
+        "display_name": "Volcengine Ark",
+        "default_model": "DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "openrouter",
+        "model_provider_id": "openrouter",
+        "display_name": "OpenRouter",
+        "default_model": "deepseek/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "orcarouter",
+        "model_provider_id": "orcarouter",
+        "display_name": "OrcaRouter",
+        "default_model": "deepseek/deepseek-v4.1-flash-1017",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true,
+        "browserConnect": true
+      },
+      {
+        "id": "xiaomi-mimo",
+        "model_provider_id": "xiaomi-mimo",
+        "display_name": "Xiaomi MiMo",
+        "default_model": "mimo-v2.6-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "novita",
+        "model_provider_id": "novita",
+        "display_name": "Novita AI",
+        "default_model": "deepseek/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "fireworks",
+        "model_provider_id": "fireworks",
+        "display_name": "Fireworks AI",
+        "default_model": "accounts/fireworks/models/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "siliconflow",
+        "model_provider_id": "siliconflow",
+        "display_name": "SiliconFlow",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "siliconflow-CN",
+        "model_provider_id": "siliconflow-CN",
+        "display_name": "SiliconFlow (China)",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "arcee",
+        "model_provider_id": "arcee",
+        "display_name": "Arcee AI",
+        "default_model": "trinity-large-thinking",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "moonshot",
+        "model_provider_id": "moonshot",
+        "display_name": "Moonshot/Kimi",
+        "default_model": "kimi-k2.7-code",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "sglang",
+        "model_provider_id": "sglang",
+        "display_name": "SGLang",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "local",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "vllm",
+        "model_provider_id": "vllm",
+        "display_name": "vLLM",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "local",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "ollama",
+        "model_provider_id": "ollama",
+        "display_name": "Ollama",
+        "default_model": "",
+        "has_model_catalog": false,
+        "credentialState": "local",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "ollama-cloud",
+        "model_provider_id": "ollama-cloud",
+        "display_name": "Ollama Cloud",
+        "default_model": "gpt-oss:120b",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "huggingface",
+        "model_provider_id": "huggingface",
+        "display_name": "Hugging Face",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "together",
+        "model_provider_id": "together",
+        "display_name": "Together AI",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "qianfan",
+        "model_provider_id": "qianfan",
+        "display_name": "Baidu Qianfan",
+        "default_model": "ernie-4.0-turbo-8k",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "openai-codex",
+        "model_provider_id": "openai-codex",
+        "display_name": "OpenAI Codex (ChatGPT)",
+        "default_model": "gpt-6.1-sol",
+        "has_model_catalog": false,
+        "credentialState": "login_required",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "anthropic",
+        "model_provider_id": "anthropic",
+        "display_name": "Anthropic",
+        "default_model": "claude-sonnet-5-5",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "openmodel",
+        "model_provider_id": "openmodel",
+        "display_name": "OpenModel",
+        "default_model": "deepseek-v4-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "zai",
+        "model_provider_id": "zai",
+        "display_name": "Zhipu AI / Z.ai",
+        "default_model": "GLM-5.3",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "stepfun",
+        "model_provider_id": "stepfun",
+        "display_name": "StepFun / StepFlash",
+        "default_model": "step-3.7-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "minimax",
+        "model_provider_id": "minimax",
+        "display_name": "MiniMax",
+        "default_model": "MiniMax-M3",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "minimax-anthropic",
+        "model_provider_id": "minimax-anthropic",
+        "display_name": "MiniMax (Anthropic API)",
+        "default_model": "MiniMax-M3",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "deepinfra",
+        "model_provider_id": "deepinfra",
+        "display_name": "DeepInfra",
+        "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "sakana",
+        "model_provider_id": "sakana",
+        "display_name": "Sakana AI (Fugu)",
+        "default_model": "fugu",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "longcat",
+        "model_provider_id": "longcat",
+        "display_name": "Meituan LongCat",
+        "default_model": "LongCat-2.0",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "opencode-go",
+        "model_provider_id": "opencode-go",
+        "display_name": "OpenCode Go",
+        "default_model": "deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "opencode-zen",
+        "model_provider_id": "opencode-zen",
+        "display_name": "OpenCode Zen",
+        "default_model": "gpt-5.6-sol",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "meta",
+        "model_provider_id": "meta",
+        "display_name": "Meta Model API",
+        "default_model": "muse-spark-1.2",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "xai",
+        "model_provider_id": "xai",
+        "display_name": "xAI",
+        "default_model": "grok-4.6",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "mistral",
+        "model_provider_id": "mistral",
+        "display_name": "Mistral AI",
+        "default_model": "mistral-code-latest",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "google",
+        "model_provider_id": "google",
+        "display_name": "Google Gemini",
+        "default_model": "gemini-3.1-pro-preview",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "modelscope",
+        "model_provider_id": "modelscope",
+        "display_name": "ModelScope",
+        "default_model": "Qwen/Qwen3.5-397B-A17B",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "telecomjs",
+        "model_provider_id": "telecomjs",
+        "display_name": "TelecomJS TokenHub",
+        "default_model": "deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "edenai",
+        "model_provider_id": "edenai",
+        "display_name": "Eden AI",
+        "default_model": "deepseek/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "zenmux",
+        "model_provider_id": "zenmux",
+        "display_name": "ZenMux",
+        "default_model": "deepseek/deepseek-v4.1-flash",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "csdn",
+        "model_provider_id": "csdn",
+        "display_name": "CSDN",
+        "default_model": "glm_for_coding",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "concentrate",
+        "model_provider_id": "concentrate",
+        "display_name": "Concentrate",
+        "default_model": "deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "codewhale",
+        "model_provider_id": "codewhale",
+        "display_name": "Codewhale",
+        "default_model": "deepseek/deepseek-v4-pro",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "modelstudio-token-plan",
+        "model_provider_id": "modelstudio-token-plan",
+        "display_name": "Alibaba Cloud Model Studio",
+        "default_model": "qwen3.8-max",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "modelstudio-token-plan-anthropic",
+        "model_provider_id": "modelstudio-token-plan-anthropic",
+        "display_name": "Alibaba Cloud Model Studio (Token Plan, Anthropic API)",
+        "default_model": "qwen3.8-max",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "modelstudio-coding-plan",
+        "model_provider_id": "modelstudio-coding-plan",
+        "display_name": "Alibaba Cloud Model Studio (Coding Plan)",
+        "default_model": "qwen3.8-max",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      },
+      {
+        "id": "modelstudio-coding-plan-anthropic",
+        "model_provider_id": "modelstudio-coding-plan-anthropic",
+        "display_name": "Alibaba Cloud Model Studio (Coding Plan, Anthropic API)",
+        "default_model": "qwen3.8-max",
+        "has_model_catalog": false,
+        "credentialState": "missing",
+        "credentialSource": "secret_store",
+        "credentialWritable": true
+      }
+    ]
+  },
+  "doctor": {
+    "code": 0,
+    "stderr": "",
+    "selected": {
+      "route": {
+        "provider": "deepseek",
+        "provider_source": "config",
+        "provider_config_table": "providers.deepseek",
+        "model": "deepseek-flash",
+        "route_identity": null,
+        "wire_protocol": "model_aware",
+        "base_url": {
+          "redacted": "https://api.deepseek.com",
+          "class": "custom",
+          "fingerprint": "<redacted:ab0d01e9bead8c6b>"
+        },
+        "auth": {
+          "scheme": "bearer",
+          "source": "secret_store_unprobed",
+          "availability": "not_probed"
+        },
+        "context_window": {
+          "tokens": 1000000,
+          "source": "catalog"
+        },
+        "route_error": null
+      },
+      "api_key": {
+        "source": "secret_store_unprobed",
+        "availability": "not_probed"
+      },
+      "api_connectivity": {
+        "checked": false,
+        "status": "not_probed",
+        "note": "JSON doctor is offline; use `codewhale doctor --probe-api` or `--probe-local` for an explicit live check."
+      },
+      "base_url": "https://api.deepseek.com",
+      "default_text_model": "deepseek-flash"
+    }
+  },
+  "finished_utc": "2026-11-12T08:57:29.251Z"
+}

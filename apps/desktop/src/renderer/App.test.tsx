@@ -498,6 +498,89 @@ function bridgeFor(store: Store): Window['mona'] {
         if (index >= 0) handlers.splice(index, 1);
       };
     },
+    observatoryGet: async ({ projectId }: { projectId: string; threadId: string | null }) =>
+      ok({
+        projectId,
+        threadId: null,
+        connected: true,
+        capturedAt: '2026-11-12T00:00:00.000Z',
+        ownership: { owner: 'none', runId: null, detail: 'No execution owner is active.', since: null },
+        spend: {
+          threadCost: { status: 'unknown', reason: 'No thread selected.' },
+          childrenKnownMicros: null,
+          aggregate: { status: 'unknown', reason: 'No thread selected.' },
+          doubleCountAvoided: false,
+          note: 'No native record.',
+        },
+        nodes: [],
+        goals: [],
+        tasks: [],
+        fleetRuns: [],
+        agentRuns: [],
+        artifacts: [],
+        caveats: [],
+        diagnostics: [],
+      }),
+    createFleetRun: async () => ok({ runId: 'fleet_1', detail: 'queued' }),
+    startFleetRun: async ({ runId }: { runId: string }) =>
+      ok({
+        receipt: {
+          action: 'start',
+          execution: 'scheduled',
+          runId,
+          target: 'this_computer',
+          leased: 0,
+          queued: 1,
+          workerIds: [],
+        },
+        observation: { leased: 0, runningTasks: 0, detail: 'no lease' },
+      }),
+    stopFleetRun: async () => ok({ acknowledged: true }),
+    interruptWorker: async () => ok({ acknowledged: true }),
+    cancelAgentRun: async () => ok({ acknowledged: true }),
+    cancelTask: async () => ok({ acknowledged: true }),
+    createGoal: async () => ok({ goalId: 'goal_1', detail: 'started' }),
+    completeGoal: async () => ok({ acknowledged: true }),
+    providerGet: async ({ projectId }: { projectId: string; sessionId: string; providerId?: string }) =>
+      ok({
+        connected: true,
+        capturedAt: '2026-11-12T00:00:00.000Z',
+        providers: [],
+        selectedProviderId: 'deepseek',
+        models: [],
+        requested: { provider: 'deepseek', model: 'deepseek-flash', source: 'engine_config' },
+        effective: {
+          threadId: null,
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          mode: 'agent',
+          permissionPosture: 'full_access',
+          observedAt: '2026-11-12T00:00:00.000Z',
+        },
+        savedDefault: null,
+        reasoning: { supported: false, levels: [], source: null, note: 'No reasoning control.' },
+        permissions: [
+          { value: 'ask', label: 'Ask', description: 'Ask first.' },
+          { value: 'auto-review', label: 'Auto-Review', description: 'Review.' },
+          { value: 'full-access', label: 'Full Access', description: 'No prompts.' },
+        ],
+        maxWorkers: 1,
+        configRevision: 'sha256:test',
+        diagnostics: {
+          status: 'healthy',
+          checkedAt: '2026-11-12T00:00:00.000Z',
+          probed: false,
+          credentialState: 'configured',
+          endpoint: 'https://api.deepseek.com/beta',
+          findings: [],
+          redactedText: 'route: deepseek',
+        },
+        caveats: [],
+        projectId,
+      }),
+    providerApplyRoute: async () => ok({ verified: true }),
+    providerApplyPermission: async () => ok({ verified: true }),
+    providerApplyMode: async () => ok({ verified: true }),
     getLaunchState: async () => ok({ latest: store.launch ?? null, count: store.launch?.seq ?? 0 }),
     onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {
       const list = (store.launchHandlers ??= []);
@@ -653,6 +736,39 @@ describe('Mona shell', () => {
     expect(document.querySelector('[data-testid="connection-detail"]')?.textContent).toContain('No runtime');
     const submit = button('Submit');
     expect(submit.disabled).toBe(true);
+    await act(async () => root.unmount());
+  });
+
+  it('opens the Agents observatory and the provider workbench without starting work', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+    });
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    await act(async () => {
+      (document.querySelector('[data-testid="nav-agents"]') as HTMLButtonElement).dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="ownership-detail"]')?.textContent).toContain('No execution owner');
+    expect(document.querySelector('[data-testid="aggregate-spend"]')?.textContent).toContain('unknown');
+    await act(async () => {
+      (document.querySelector('[data-testid="nav-settings"]') as HTMLButtonElement).dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="provider-select"]')).toBeTruthy();
+    expect(document.querySelector('[data-testid="requested-route"]')?.textContent).toContain('deepseek');
+    expect(document.querySelector('[data-testid="reasoning-note"]')?.textContent).toContain('reasoning control');
     await act(async () => root.unmount());
   });
 

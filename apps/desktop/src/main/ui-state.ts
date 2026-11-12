@@ -26,7 +26,7 @@ type StoredUiState = {
   projects: Record<string, ProjectUiState>;
 };
 
-const VIEWS: readonly ProjectView[] = ['home', 'studio', 'work', 'cost', 'settings'];
+const VIEWS: readonly ProjectView[] = ['home', 'studio', 'work', 'agents', 'cost', 'settings'];
 const LAYOUTS: readonly ProjectLayout[] = ['standard', 'focus'];
 const DENSITIES: readonly Density[] = ['comfortable', 'compact'];
 const MAX_SESSIONS = 20;

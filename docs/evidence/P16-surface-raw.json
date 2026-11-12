@@ -1,0 +1,2649 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T08:33:25.885Z",
+  "observations": {
+    "runtime_info": {
+      "status": 200,
+      "json": {
+        "service": "codewhale-runtime-api",
+        "runtime_api_version": "1.0",
+        "codewhale_version": "0.10.2",
+        "codewhale_commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+        "bind_host": "127.0.0.1",
+        "port": 7898,
+        "auth_required": true,
+        "transports": [
+          "http",
+          "sse"
+        ],
+        "capabilities": {
+          "client_token_intents": true,
+          "account_session": true,
+          "account_model_owner": true,
+          "session_provider_keys": false,
+          "threads": true,
+          "thread_create_idempotency": true,
+          "thread_shell_consent": true,
+          "turns": true,
+          "turn_operation_idempotency": true,
+          "turn_operation_lookup": true,
+          "automation_mutation_preconditions": true,
+          "turn_image_inputs": true,
+          "turn_output_token_limit": true,
+          "profile_constitution": true,
+          "turn_steer": true,
+          "turn_interrupt": true,
+          "event_replay": true,
+          "external_tools": true,
+          "environments": false,
+          "worker_runtime": true,
+          "fleet_run_create": true,
+          "fleet_run_start": true,
+          "fleet_event_replay": true,
+          "fleet_event_stream": true,
+          "fleet_local_target": true,
+          "thread_goals": true,
+          "memory": true,
+          "mcp_server_management": true,
+          "skill_lifecycle": true,
+          "skill_detail": true,
+          "plugin_management": true,
+          "agent_mail": true,
+          "terminal_stream": false,
+          "terminal_input": false,
+          "terminal_resize": false,
+          "terminal_kill": false,
+          "event_stream_resume": true
+        },
+        "account": {
+          "schema_version": 1,
+          "state": "signed_out",
+          "api_base": "https://api.codewhale.net",
+          "scopes": []
+        },
+        "experimental": {
+          "environments": false
+        },
+        "version": "0.10.2"
+      }
+    },
+    "config": {
+      "status": 200,
+      "json": {
+        "model": "deepseek-flash",
+        "model_available": true,
+        "provider": "deepseek",
+        "approval_mode": "suggest",
+        "reasoning_effort": "auto",
+        "auto_compact": false,
+        "cost_currency": "usd",
+        "default_mode": "agent",
+        "default_model": "deepseek-flash",
+        "base_url": "https://api.deepseek.com/beta",
+        "allow_shell": false,
+        "mcp_config_path": "C:\\Users\\victo\\.codewhale\\mcp.json",
+        "subagents_enabled": true,
+        "subagents_max_depth": 4294967295,
+        "show_thinking": false,
+        "thinking_default_expanded": false,
+        "thinking_highlight": true,
+        "show_tool_details": false,
+        "inline_diffs": "full",
+        "locale": "auto",
+        "max_history": 100,
+        "workspace_follow_symlinks": false,
+        "calm_mode": true,
+        "sandbox_mode": "workspace-write",
+        "strict_tool_mode": false,
+        "memory_enabled": false,
+        "search_provider": "firecrawl",
+        "search_provider_source": "default",
+        "prompt_suggestion": false,
+        "notifications": {
+          "completion_sound": "off",
+          "condition": "unfocused",
+          "event_sound.enabled": "false",
+          "event_sound.events": "[\"turn-complete\", \"approval-needed\"]",
+          "event_sound.min_interval_ms": "2000",
+          "event_sound.quiet": "false",
+          "events.approval-needed": "true",
+          "events.elevation-needed": "true",
+          "events.input-needed": "true",
+          "events.model-notify": "true",
+          "events.subagent-terminal": "true",
+          "events.turn-complete": "true",
+          "include_summary": "false",
+          "method": "auto",
+          "quiet": "false",
+          "sound": "legacy",
+          "sound_file": "",
+          "subagent_completion": "final-only",
+          "threshold_secs": "30"
+        }
+      }
+    },
+    "providers": {
+      "status": 200,
+      "json": {
+        "current": "deepseek",
+        "current_provider_id": "deepseek",
+        "providers": [
+          {
+            "id": "deepseek",
+            "model_provider_id": "deepseek",
+            "display_name": "DeepSeek",
+            "default_model": "deepseek-flash",
+            "has_model_catalog": true,
+            "credentialState": "configured",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "deepseek-cn",
+            "model_provider_id": "deepseek-cn",
+            "display_name": "DeepSeek (legacy alias)",
+            "default_model": "deepseek-flash",
+            "has_model_catalog": true,
+            "credentialState": "configured",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "deepseek-anthropic",
+            "model_provider_id": "deepseek-anthropic",
+            "display_name": "DeepSeek (Anthropic API)",
+            "default_model": "deepseek-flash",
+            "has_model_catalog": true,
+            "credentialState": "configured",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "nvidia-nim",
+            "model_provider_id": "nvidia-nim",
+            "display_name": "NVIDIA NIM",
+            "default_model": "deepseek-ai/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "openai",
+            "model_provider_id": "openai",
+            "display_name": "OpenAI-compatible",
+            "default_model": "gpt-5.6",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "atlascloud",
+            "model_provider_id": "atlascloud",
+            "display_name": "AtlasCloud",
+            "default_model": "deepseek-ai/deepseek-v4-flash",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "wanjie-ark",
+            "model_provider_id": "wanjie-ark",
+            "display_name": "Wanjie Ark",
+            "default_model": "deepseek-reasoner",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "volcengine",
+            "model_provider_id": "volcengine",
+            "display_name": "Volcengine Ark",
+            "default_model": "DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "openrouter",
+            "model_provider_id": "openrouter",
+            "display_name": "OpenRouter",
+            "default_model": "deepseek/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "orcarouter",
+            "model_provider_id": "orcarouter",
+            "display_name": "OrcaRouter",
+            "default_model": "deepseek/deepseek-v4.1-flash-1017",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true,
+            "browserConnect": true
+          },
+          {
+            "id": "xiaomi-mimo",
+            "model_provider_id": "xiaomi-mimo",
+            "display_name": "Xiaomi MiMo",
+            "default_model": "mimo-v2.6-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "novita",
+            "model_provider_id": "novita",
+            "display_name": "Novita AI",
+            "default_model": "deepseek/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "fireworks",
+            "model_provider_id": "fireworks",
+            "display_name": "Fireworks AI",
+            "default_model": "accounts/fireworks/models/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "siliconflow",
+            "model_provider_id": "siliconflow",
+            "display_name": "SiliconFlow",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "siliconflow-CN",
+            "model_provider_id": "siliconflow-CN",
+            "display_name": "SiliconFlow (China)",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "arcee",
+            "model_provider_id": "arcee",
+            "display_name": "Arcee AI",
+            "default_model": "trinity-large-thinking",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "moonshot",
+            "model_provider_id": "moonshot",
+            "display_name": "Moonshot/Kimi",
+            "default_model": "kimi-k2.7-code",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "sglang",
+            "model_provider_id": "sglang",
+            "display_name": "SGLang",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "local",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "vllm",
+            "model_provider_id": "vllm",
+            "display_name": "vLLM",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "local",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "ollama",
+            "model_provider_id": "ollama",
+            "display_name": "Ollama",
+            "default_model": "",
+            "has_model_catalog": false,
+            "credentialState": "local",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "ollama-cloud",
+            "model_provider_id": "ollama-cloud",
+            "display_name": "Ollama Cloud",
+            "default_model": "gpt-oss:120b",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "huggingface",
+            "model_provider_id": "huggingface",
+            "display_name": "Hugging Face",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "together",
+            "model_provider_id": "together",
+            "display_name": "Together AI",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "qianfan",
+            "model_provider_id": "qianfan",
+            "display_name": "Baidu Qianfan",
+            "default_model": "ernie-4.0-turbo-8k",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "openai-codex",
+            "model_provider_id": "openai-codex",
+            "display_name": "OpenAI Codex (ChatGPT)",
+            "default_model": "gpt-6.1-sol",
+            "has_model_catalog": false,
+            "credentialState": "login_required",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "anthropic",
+            "model_provider_id": "anthropic",
+            "display_name": "Anthropic",
+            "default_model": "claude-sonnet-5-5",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "openmodel",
+            "model_provider_id": "openmodel",
+            "display_name": "OpenModel",
+            "default_model": "deepseek-v4-flash",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "zai",
+            "model_provider_id": "zai",
+            "display_name": "Zhipu AI / Z.ai",
+            "default_model": "GLM-5.3",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "stepfun",
+            "model_provider_id": "stepfun",
+            "display_name": "StepFun / StepFlash",
+            "default_model": "step-3.7-flash",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "minimax",
+            "model_provider_id": "minimax",
+            "display_name": "MiniMax",
+            "default_model": "MiniMax-M3",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "minimax-anthropic",
+            "model_provider_id": "minimax-anthropic",
+            "display_name": "MiniMax (Anthropic API)",
+            "default_model": "MiniMax-M3",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "deepinfra",
+            "model_provider_id": "deepinfra",
+            "display_name": "DeepInfra",
+            "default_model": "deepseek-ai/DeepSeek-V4-Pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "sakana",
+            "model_provider_id": "sakana",
+            "display_name": "Sakana AI (Fugu)",
+            "default_model": "fugu",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "longcat",
+            "model_provider_id": "longcat",
+            "display_name": "Meituan LongCat",
+            "default_model": "LongCat-2.0",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "opencode-go",
+            "model_provider_id": "opencode-go",
+            "display_name": "OpenCode Go",
+            "default_model": "deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "opencode-zen",
+            "model_provider_id": "opencode-zen",
+            "display_name": "OpenCode Zen",
+            "default_model": "gpt-5.6-sol",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "meta",
+            "model_provider_id": "meta",
+            "display_name": "Meta Model API",
+            "default_model": "muse-spark-1.2",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "xai",
+            "model_provider_id": "xai",
+            "display_name": "xAI",
+            "default_model": "grok-4.6",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "mistral",
+            "model_provider_id": "mistral",
+            "display_name": "Mistral AI",
+            "default_model": "mistral-code-latest",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "google",
+            "model_provider_id": "google",
+            "display_name": "Google Gemini",
+            "default_model": "gemini-3.1-pro-preview",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "modelscope",
+            "model_provider_id": "modelscope",
+            "display_name": "ModelScope",
+            "default_model": "Qwen/Qwen3.5-397B-A17B",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "telecomjs",
+            "model_provider_id": "telecomjs",
+            "display_name": "TelecomJS TokenHub",
+            "default_model": "deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "edenai",
+            "model_provider_id": "edenai",
+            "display_name": "Eden AI",
+            "default_model": "deepseek/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "zenmux",
+            "model_provider_id": "zenmux",
+            "display_name": "ZenMux",
+            "default_model": "deepseek/deepseek-v4.1-flash",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "csdn",
+            "model_provider_id": "csdn",
+            "display_name": "CSDN",
+            "default_model": "glm_for_coding",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "concentrate",
+            "model_provider_id": "concentrate",
+            "display_name": "Concentrate",
+            "default_model": "deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "codewhale",
+            "model_provider_id": "codewhale",
+            "display_name": "Codewhale",
+            "default_model": "deepseek/deepseek-v4-pro",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "modelstudio-token-plan",
+            "model_provider_id": "modelstudio-token-plan",
+            "display_name": "Alibaba Cloud Model Studio",
+            "default_model": "qwen3.8-max",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "modelstudio-token-plan-anthropic",
+            "model_provider_id": "modelstudio-token-plan-anthropic",
+            "display_name": "Alibaba Cloud Model Studio (Token Plan, Anthropic API)",
+            "default_model": "qwen3.8-max",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "modelstudio-coding-plan",
+            "model_provider_id": "modelstudio-coding-plan",
+            "display_name": "Alibaba Cloud Model Studio (Coding Plan)",
+            "default_model": "qwen3.8-max",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          },
+          {
+            "id": "modelstudio-coding-plan-anthropic",
+            "model_provider_id": "modelstudio-coding-plan-anthropic",
+            "display_name": "Alibaba Cloud Model Studio (Coding Plan, Anthropic API)",
+            "default_model": "qwen3.8-max",
+            "has_model_catalog": false,
+            "credentialState": "missing",
+            "credentialSource": "secret_store",
+            "credentialWritable": true
+          }
+        ]
+      }
+    },
+    "deepseek_models": {
+      "status": 200,
+      "json": {
+        "provider": "deepseek",
+        "models": [
+          {
+            "id": "deepseek-chat",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unsupported",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": "catalog"
+          },
+          {
+            "id": "deepseek-chat-v3-0324",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unsupported",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": "catalog"
+          },
+          {
+            "id": "deepseek-chat-v3.1",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-flash",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null,
+            "facts": {
+              "wire_model_id": "deepseek-flash",
+              "canonical_model_id": null,
+              "name": null,
+              "family": null,
+              "status": null,
+              "advertised_limits": null,
+              "effective_limits": {
+                "context_tokens": 1000000,
+                "output_tokens": 384000
+              },
+              "effective_context": {
+                "tokens": 1000000,
+                "source": "catalog"
+              },
+              "capabilities": {
+                "attachments": "supported",
+                "image_input": "supported",
+                "files_api": "supported",
+                "reasoning": "supported",
+                "native_tool_calls": "supported",
+                "structured_output": "supported",
+                "parallel_tool_calls": "supported",
+                "streaming": "supported",
+                "prompt_caching": "supported",
+                "server_side_web_search": "supported"
+              },
+              "reasoning": null,
+              "reasoning_options": [],
+              "modalities": null,
+              "temperature": null,
+              "source": {
+                "kind": "live",
+                "base_url_fingerprint": "812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db",
+                "fetched_at": 1793993432
+              },
+              "fact_sources": {},
+              "pricing_status": null,
+              "pricing": null,
+              "upstream_last_updated": null,
+              "account_access": "unverified"
+            }
+          },
+          {
+            "id": "deepseek-ocr-2",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unsupported",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": "catalog"
+          },
+          {
+            "id": "deepseek-r1",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-r1-0528",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-r1-0528-qwen3-8b",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-r1-distill-qwen-32b",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-reasoner",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v3",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unsupported",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": "catalog"
+          },
+          {
+            "id": "deepseek-v3-0324",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unsupported",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": "catalog"
+          },
+          {
+            "id": "deepseek-v3.1",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v3.2",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-flash",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-flash-0423",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-flash-0731",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-flash-vision-exp",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-pro",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null,
+            "facts": {
+              "wire_model_id": "deepseek-v4-pro",
+              "canonical_model_id": null,
+              "name": null,
+              "family": null,
+              "status": null,
+              "advertised_limits": null,
+              "effective_limits": {
+                "context_tokens": 1000000,
+                "output_tokens": 384000
+              },
+              "effective_context": {
+                "tokens": 1000000,
+                "source": "catalog"
+              },
+              "capabilities": {
+                "attachments": "unsupported",
+                "image_input": "unsupported",
+                "files_api": "unknown",
+                "reasoning": "supported",
+                "native_tool_calls": "supported",
+                "structured_output": "supported",
+                "parallel_tool_calls": "supported",
+                "streaming": "supported",
+                "prompt_caching": "supported",
+                "server_side_web_search": "supported"
+              },
+              "reasoning": null,
+              "reasoning_options": [],
+              "modalities": null,
+              "temperature": null,
+              "source": {
+                "kind": "live",
+                "base_url_fingerprint": "812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db",
+                "fetched_at": 1793993432
+              },
+              "fact_sources": {},
+              "pricing_status": null,
+              "pricing": null,
+              "upstream_last_updated": null,
+              "account_access": "unverified"
+            }
+          },
+          {
+            "id": "deepseek-v4-pro-0423",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4-pro-0813",
+            "image_input": "unsupported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4.1-flash",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          },
+          {
+            "id": "deepseek-v4.1-flash-1017",
+            "image_input": "supported",
+            "output_token_limit": "supported",
+            "reasoning_effort": "unknown",
+            "reasoning_effort_levels": [],
+            "reasoning_effort_source": null
+          }
+        ],
+        "total": 23
+      }
+    },
+    "settings_schema": {
+      "status": 200,
+      "json": {
+        "version": 1,
+        "tabs": [
+          {
+            "id": "appearance",
+            "label": "Appearance"
+          },
+          {
+            "id": "models",
+            "label": "Models"
+          },
+          {
+            "id": "work",
+            "label": "Work"
+          },
+          {
+            "id": "tools",
+            "label": "Tools"
+          },
+          {
+            "id": "trust",
+            "label": "Trust"
+          },
+          {
+            "id": "motion",
+            "label": "Motion"
+          },
+          {
+            "id": "advanced",
+            "label": "Advanced"
+          }
+        ],
+        "settings": [
+          {
+            "key": "theme",
+            "kind": "string",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Theme",
+            "description": "",
+            "default": "underwater",
+            "row": "setting",
+            "value": "underwater",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "locale",
+            "kind": "string",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Language",
+            "description": "",
+            "default": "auto",
+            "row": "setting",
+            "value": "auto",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "background_color",
+            "kind": "string",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Background",
+            "description": "#RRGGBB | default",
+            "default": "",
+            "row": "setting",
+            "value": "",
+            "persisted": false,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "pet_mode",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Pet mode",
+            "description": "Use the animated pet as the main view when Codewhale starts.",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "calm_mode",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Quiet transcript",
+            "description": "quiets the transcript; motion settings stay separate",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "show_thinking",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Model reasoning in chat",
+            "description": "show or hide reasoning; task lists stay short",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off",
+                "description": "Hide reasoning; answers and tools stay visible."
+              },
+              {
+                "value": "true",
+                "label": "On",
+                "description": "Show reasoning in the transcript."
+              }
+            ]
+          },
+          {
+            "key": "thinking_default_expanded",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Thinking Default Expanded",
+            "description": "expand reasoning by default; Space still toggles",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "thinking_preview_lines",
+            "kind": "int",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Thinking Preview Lines",
+            "description": "collapsed completed-thought preview rows (default 2; 0=header-only; 10=older dump)",
+            "default": "2",
+            "row": "setting",
+            "value": "2",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "thinking_highlight",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Thinking background highlight",
+            "description": "fill the model reasoning background; the dashed line remains visible when off",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off",
+                "description": "Keep the dashed reasoning line and italic text without a filled background."
+              },
+              {
+                "value": "true",
+                "label": "On",
+                "description": "Fill reasoning's background."
+              }
+            ]
+          },
+          {
+            "key": "help_expand_groups",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Help Expand Groups",
+            "description": "open Help with every group expanded; default folds the tail",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "contextual_tips",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Contextual tips",
+            "description": "Occasional command suggestions after relevant actions; turn off to hide tips.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "pin_last_prompt",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Pin Last Prompt",
+            "description": "keep your last prompt pinned atop the transcript",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "show_tool_details",
+            "kind": "bool",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Tool detail level",
+            "description": "on/off, true/false, yes/no, 1/0",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "inline_diffs",
+            "kind": "enum",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Inline file changes",
+            "description": "full | summary | off; full change stays in Alt/Option+V",
+            "default": "full",
+            "row": "setting",
+            "value": "full",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "full",
+                "label": "Full diff"
+              },
+              {
+                "value": "summary",
+                "label": "Summary"
+              },
+              {
+                "value": "off",
+                "label": "Off"
+              }
+            ]
+          },
+          {
+            "key": "synchronized_output",
+            "kind": "enum",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Output pacing",
+            "description": "auto | on | off; redraw pacing, not model speed",
+            "default": "auto",
+            "row": "setting",
+            "value": "auto",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "auto"
+              },
+              {
+                "value": "on"
+              },
+              {
+                "value": "off"
+              }
+            ]
+          },
+          {
+            "key": "cost_currency",
+            "kind": "enum",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Cost currency",
+            "description": "usd | cny",
+            "default": "usd",
+            "row": "setting",
+            "value": "usd",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "usd"
+              },
+              {
+                "value": "cny"
+              }
+            ]
+          },
+          {
+            "key": "transcript_spacing",
+            "kind": "enum",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Transcript spacing",
+            "description": "compact | comfortable | spacious",
+            "default": "spacious",
+            "row": "setting",
+            "value": "spacious",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "compact"
+              },
+              {
+                "value": "spacious"
+              }
+            ]
+          },
+          {
+            "key": "tool_collapse",
+            "kind": "enum",
+            "tab": "appearance",
+            "group": "display",
+            "label": "Tool cards",
+            "description": "compact | expanded | calm",
+            "default": "compact",
+            "row": "setting",
+            "value": "compact",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "compact"
+              },
+              {
+                "value": "expanded"
+              },
+              {
+                "value": "calm"
+              }
+            ]
+          },
+          {
+            "key": "provider",
+            "kind": "string",
+            "tab": "models",
+            "group": "provider",
+            "label": "Active provider",
+            "description": "credential, model and endpoint switch together",
+            "default": "",
+            "row": "action",
+            "value": "deepseek",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "model",
+            "kind": "string",
+            "tab": "models",
+            "group": "model",
+            "label": "Active provider model",
+            "description": "this session's model; Enter opens /model",
+            "default": "",
+            "row": "action",
+            "value": "deepseek-flash",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "reasoning_effort",
+            "kind": "enum",
+            "tab": "models",
+            "group": "model",
+            "label": "Thinking level",
+            "description": "default restores the model's own default; always-thinking models skip off",
+            "default": "",
+            "row": "setting",
+            "value": "",
+            "persisted": false,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "auto"
+              },
+              {
+                "value": "off"
+              },
+              {
+                "value": "minimal"
+              },
+              {
+                "value": "low"
+              },
+              {
+                "value": "medium"
+              },
+              {
+                "value": "high"
+              },
+              {
+                "value": "xhigh"
+              },
+              {
+                "value": "ultra"
+              },
+              {
+                "value": "max"
+              }
+            ]
+          },
+          {
+            "key": "fleet.exec.max_spawn_depth",
+            "kind": "int",
+            "tab": "models",
+            "group": "model",
+            "label": "agent depth",
+            "description": "0 blocks nested agents; 3 default; capped at 8",
+            "default": "3",
+            "row": "diagnostic",
+            "value": "4294967295",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "composer_density",
+            "kind": "enum",
+            "tab": "work",
+            "group": "composer",
+            "label": "Composer density",
+            "description": "compact | comfortable | spacious",
+            "default": "comfortable",
+            "row": "setting",
+            "value": "comfortable",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "compact"
+              },
+              {
+                "value": "comfortable"
+              },
+              {
+                "value": "spacious"
+              }
+            ]
+          },
+          {
+            "key": "composer_border",
+            "kind": "bool",
+            "tab": "work",
+            "group": "composer",
+            "label": "Composer border",
+            "description": "on/off, true/false, yes/no, 1/0",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "composer_multiline_mode",
+            "kind": "bool",
+            "tab": "work",
+            "group": "composer",
+            "label": "Composer multiline mode",
+            "description": "off: Enter sends, Shift+Enter adds a line; on: Enter adds a line, Shift+Enter sends",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "paste_burst_detection",
+            "kind": "bool",
+            "tab": "work",
+            "group": "composer",
+            "label": "Paste detection",
+            "description": "on/off, true/false, yes/no, 1/0",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "work_surface_placement",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workbar",
+            "label": "Workbar position",
+            "description": "side placements need Ocean mode and 72+ columns",
+            "default": "bottom",
+            "row": "setting",
+            "value": "bottom",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "top",
+                "label": "Top",
+                "description": "Show Tasks, To-do, and Agents above the transcript."
+              },
+              {
+                "value": "bottom",
+                "label": "Bottom bar",
+                "description": "Show Tasks, To-do, and Agents under the composer."
+              },
+              {
+                "value": "left",
+                "label": "Left workbar",
+                "description": "Show Tasks, To-do, and Agents in a left workbar when the terminal is wide enough."
+              },
+              {
+                "value": "right",
+                "label": "Right workbar",
+                "description": "Show Tasks, To-do, and Agents in a right workbar when the terminal is wide enough."
+              },
+              {
+                "value": "off",
+                "label": "Off",
+                "description": "Hide the workbar entirely."
+              }
+            ]
+          },
+          {
+            "key": "work_surface_top_height",
+            "kind": "int",
+            "tab": "work",
+            "group": "workbar",
+            "label": "Top bar height",
+            "description": "5..=16 rows · or drag the divider",
+            "default": "8",
+            "row": "setting",
+            "value": "8",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "work_surface_side_width",
+            "kind": "int",
+            "tab": "work",
+            "group": "workbar",
+            "label": "Side bar width",
+            "description": "26..=80 columns · or drag the divider",
+            "default": "30",
+            "row": "setting",
+            "value": "30",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "rail_panel",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workbar",
+            "label": "Rail Panel",
+            "description": "which panel the workbar shows",
+            "default": "tasks",
+            "row": "setting",
+            "value": "tasks",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "tasks",
+                "label": "Tasks",
+                "description": "Workbar shows the live Tasks / To-do / Agents list."
+              },
+              {
+                "value": "agents",
+                "label": "Agents",
+                "description": "Workbar shows agents and fan-out state."
+              },
+              {
+                "value": "background"
+              },
+              {
+                "value": "files"
+              },
+              {
+                "value": "notepad"
+              },
+              {
+                "value": "context",
+                "label": "Context",
+                "description": "Workbar shows workspace, token, and cost context."
+              },
+              {
+                "value": "git"
+              },
+              {
+                "value": "price"
+              }
+            ]
+          },
+          {
+            "key": "auto_compact",
+            "kind": "bool",
+            "tab": "work",
+            "group": "history",
+            "label": "Auto compact",
+            "description": "on/off, true/false, yes/no, 1/0",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": false,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "auto_compact_threshold_percent",
+            "kind": "float",
+            "tab": "work",
+            "group": "history",
+            "label": "Compact at",
+            "description": "10..=100 · compaction threshold: percent of the model's context at which older turns are summarized",
+            "default": "80",
+            "row": "setting",
+            "value": "80.0",
+            "persisted": false,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "max_history",
+            "kind": "int",
+            "tab": "work",
+            "group": "history",
+            "label": "Input history",
+            "description": "integer (0 allowed) · number of sent messages kept for recall and history search",
+            "default": "100",
+            "row": "setting",
+            "value": "100",
+            "persisted": true,
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "goal_command",
+            "kind": "string",
+            "tab": "work",
+            "group": "session",
+            "label": "Goal command",
+            "description": "/goal tracks objectives, budgets, and status",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "workflow",
+            "kind": "string",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Workflow",
+            "description": "/workflow runs scripted ops with fan-out",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "notifications.quiet",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Mute notifications",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.sound",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Notification sound",
+            "description": "Whale uses the bundled call. Off silences audio. Legacy keeps previous sound choices.",
+            "default": "legacy",
+            "row": "setting",
+            "value": "legacy",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "legacy",
+                "label": "Keep previous sounds"
+              },
+              {
+                "value": "off",
+                "label": "Off"
+              },
+              {
+                "value": "whale",
+                "label": "Whale"
+              },
+              {
+                "value": "bell",
+                "label": "System bell"
+              },
+              {
+                "value": "beep",
+                "label": "System bell"
+              },
+              {
+                "value": "file",
+                "label": "Custom file"
+              }
+            ]
+          },
+          {
+            "key": "notifications.condition",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workflow",
+            "label": "When to notify",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "unfocused",
+            "row": "setting",
+            "value": "unfocused",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "always",
+                "label": "Always"
+              },
+              {
+                "value": "unfocused",
+                "label": "When away"
+              },
+              {
+                "value": "never",
+                "label": "Never"
+              }
+            ]
+          },
+          {
+            "key": "notifications.method",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Delivery method",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "auto",
+            "row": "setting",
+            "value": "auto",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "auto"
+              },
+              {
+                "value": "off"
+              },
+              {
+                "value": "osc9"
+              },
+              {
+                "value": "bel"
+              },
+              {
+                "value": "kitty"
+              },
+              {
+                "value": "ghostty"
+              }
+            ]
+          },
+          {
+            "key": "notifications.threshold_secs",
+            "kind": "int",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Minimum turn duration (seconds)",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "30",
+            "row": "setting",
+            "value": "30",
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "notifications.include_summary",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Include summary",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.subagent_completion",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Agent notifications",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "final-only",
+            "row": "setting",
+            "value": "final-only",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "off"
+              },
+              {
+                "value": "final-only"
+              },
+              {
+                "value": "always"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.turn-complete",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Turn completed",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.subagent-terminal",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Agent finished",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.approval-needed",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Approval needed",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.input-needed",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Answer needed",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.elevation-needed",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Elevated access needed",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.events.model-notify",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Agent requested notification",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.completion_sound",
+            "kind": "enum",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Previous completion sound",
+            "description": "Used when notification sound is set to legacy.",
+            "default": "off",
+            "row": "setting",
+            "value": "off",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "off",
+                "label": "Off"
+              },
+              {
+                "value": "whale",
+                "label": "Whale"
+              },
+              {
+                "value": "bell",
+                "label": "System bell"
+              },
+              {
+                "value": "beep",
+                "label": "System bell"
+              },
+              {
+                "value": "file",
+                "label": "Custom file"
+              }
+            ]
+          },
+          {
+            "key": "notifications.sound_file",
+            "kind": "string",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Custom sound file",
+            "description": "Whale uses the bundled call. Off silences audio. Legacy keeps previous sound choices.",
+            "default": "",
+            "row": "setting",
+            "value": "",
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "notifications.event_sound.enabled",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Previous event sounds",
+            "description": "Used when notification sound is set to legacy.",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "notifications.event_sound.events",
+            "kind": "string",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Previous sound categories",
+            "description": "Used when notification sound is set to legacy.",
+            "default": "[\"turn-complete\", \"approval-needed\"]",
+            "row": "setting",
+            "value": "[\"turn-complete\", \"approval-needed\"]",
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "notifications.event_sound.min_interval_ms",
+            "kind": "int",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Sound repeat interval (ms)",
+            "description": "Applies immediately. Mute, delivery off, attention, duration and category controls also govern sound.",
+            "default": "2000",
+            "row": "setting",
+            "value": "2000",
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "notifications.event_sound.quiet",
+            "kind": "bool",
+            "tab": "work",
+            "group": "workflow",
+            "label": "Mute previous event sounds",
+            "description": "Used when notification sound is set to legacy.",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "mcp_open",
+            "kind": "string",
+            "tab": "tools",
+            "group": "mcp",
+            "label": "MCP manager",
+            "description": "open the MCP manager · Connect / Reconnect / Re-auth / Diagnose",
+            "default": "",
+            "row": "action",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "mcp_reconnect",
+            "kind": "string",
+            "tab": "tools",
+            "group": "mcp",
+            "label": "Reconnect MCP",
+            "description": "reconnect MCP · /mcp reload",
+            "default": "",
+            "row": "action",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "mcp_diagnose",
+            "kind": "string",
+            "tab": "tools",
+            "group": "mcp",
+            "label": "Diagnose MCP",
+            "description": "diagnose MCP · /mcp validate",
+            "default": "",
+            "row": "action",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "plugins_open",
+            "kind": "string",
+            "tab": "tools",
+            "group": "mcp",
+            "label": "Plugins",
+            "description": "open plugins · trust, enable, or diagnose",
+            "default": "",
+            "row": "action",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "mcp_config_path",
+            "kind": "string",
+            "tab": "tools",
+            "group": "mcp",
+            "label": "MCP config path",
+            "description": "path to mcp.json",
+            "default": "",
+            "row": "setting",
+            "value": "C:\\Users\\victo\\.codewhale\\mcp.json",
+            "editable": true,
+            "visible": true
+          },
+          {
+            "key": "sandbox_details",
+            "kind": "string",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "Permissions",
+            "description": "Trust, sandbox, approval, shell and network policy.",
+            "default": "",
+            "row": "action",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "approval_mode",
+            "kind": "enum",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "This session's permission",
+            "description": "this session only: Ask | Auto-Review | Full Access",
+            "default": "",
+            "row": "session",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "ask",
+                "label": "Ask",
+                "description": "Ask before tools that can make consequential changes."
+              },
+              {
+                "value": "auto-review",
+                "label": "Auto-Review",
+                "description": "Review tool risk automatically and ask when a decision needs you."
+              },
+              {
+                "value": "full-access",
+                "label": "Full Access",
+                "description": "Run tools without approval prompts; workspace rules still apply."
+              }
+            ]
+          },
+          {
+            "key": "permission_posture",
+            "kind": "enum",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "New sessions' permission",
+            "description": "default for new sessions: Ask | Auto-Review | Full Access",
+            "default": "ask",
+            "row": "setting",
+            "value": "full-access",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "ask",
+                "label": "Ask",
+                "description": "Ask before tools that can make consequential changes."
+              },
+              {
+                "value": "auto-review",
+                "label": "Auto-Review",
+                "description": "Review tool risk automatically and ask when a decision needs you."
+              },
+              {
+                "value": "full-access",
+                "label": "Full Access",
+                "description": "Run tools without approval prompts; workspace rules still apply."
+              }
+            ]
+          },
+          {
+            "key": "approval_policy",
+            "kind": "enum",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "New sessions' permission (config)",
+            "description": "choosing Full Access releases the raw config override",
+            "default": "ask",
+            "row": "setting",
+            "value": "suggest",
+            "editable": false,
+            "visible": false,
+            "options": [
+              {
+                "value": "use-tui-default",
+                "label": "Use TUI permission default",
+                "description": "Drop the raw config override; use the saved choice."
+              },
+              {
+                "value": "ask",
+                "label": "Ask",
+                "description": "Ask before tools that can make consequential changes."
+              },
+              {
+                "value": "auto-review",
+                "label": "Auto-Review",
+                "description": "Review tool risk automatically and ask when a decision needs you."
+              },
+              {
+                "value": "full-access",
+                "label": "Full Access",
+                "description": "Run tools without approval prompts; workspace rules still apply."
+              }
+            ]
+          },
+          {
+            "key": "managed_approval_policy",
+            "kind": "string",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "New sessions' permission (managed)",
+            "description": "a project, profile, environment, managed config, or organization requirement controls this value",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": false
+          },
+          {
+            "key": "default_mode",
+            "kind": "enum",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "Startup mode",
+            "description": "work (agent) | plan | operate",
+            "default": "agent",
+            "row": "setting",
+            "value": "agent",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "agent",
+                "label": "Work",
+                "description": "Start ready to work with tools."
+              },
+              {
+                "value": "plan",
+                "label": "Plan (read only)",
+                "description": "Start in a read-only planning workspace."
+              },
+              {
+                "value": "operate",
+                "label": "Operate",
+                "description": "Operate is Work at full strength: each substantive request becomes a goal, runs through workflows and parallel agents, is checked by an independent reviewer, and keeps going until it is verified."
+              }
+            ]
+          },
+          {
+            "key": "allow_shell",
+            "kind": "bool",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "Shell access",
+            "description": "on exposes shell tools in Work mode; permission rules still apply",
+            "default": "true",
+            "row": "setting",
+            "value": "false",
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "managed_allow_shell",
+            "kind": "string",
+            "tab": "trust",
+            "group": "permissions",
+            "label": "Shell access (managed)",
+            "description": "a project, profile, environment, or managed config controls shell access",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": false
+          },
+          {
+            "key": "telemetry",
+            "kind": "bool",
+            "tab": "trust",
+            "group": "network",
+            "label": "Anonymous usage counts",
+            "description": "Aggregate version, session, feature and error counts to Codewhale and PostHog; never content or IP. docs/TELEMETRY.md",
+            "default": "false",
+            "row": "setting",
+            "value": "true",
+            "editable": false,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off"
+              },
+              {
+                "value": "true",
+                "label": "On"
+              }
+            ]
+          },
+          {
+            "key": "low_motion",
+            "kind": "bool",
+            "tab": "motion",
+            "group": "display",
+            "label": "Reduce motion",
+            "description": "on calms live motion; model output is unchanged",
+            "default": "false",
+            "row": "setting",
+            "value": "false",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off",
+                "description": "Lets appearance settings control motion."
+              },
+              {
+                "value": "true",
+                "label": "On",
+                "description": "Calms live motion; model output is unchanged."
+              }
+            ]
+          },
+          {
+            "key": "fancy_animations",
+            "kind": "bool",
+            "tab": "motion",
+            "group": "display",
+            "label": "Live UI motion",
+            "description": "on animates tool, status, and ocean state",
+            "default": "true",
+            "row": "setting",
+            "value": "true",
+            "persisted": true,
+            "editable": true,
+            "visible": true,
+            "options": [
+              {
+                "value": "false",
+                "label": "Off",
+                "description": "Keeps markers and the ocean still."
+              },
+              {
+                "value": "true",
+                "label": "On",
+                "description": "Animates tool, status, and ocean state."
+              }
+            ]
+          },
+          {
+            "key": "base_url",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Provider API URL (DeepSeek route)",
+            "description": "live endpoint receipt (read-only) · switch all three with /provider",
+            "default": "",
+            "row": "diagnostic",
+            "value": "https://api.deepseek.com/beta",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "provider_url",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Provider API URL",
+            "description": "Current provider endpoint; Xiaomi: token plan | pay as you go | custom URL",
+            "default": "",
+            "row": "diagnostic",
+            "value": "https://api.deepseek.com/beta",
+            "editable": false,
+            "visible": false
+          },
+          {
+            "key": "context_window",
+            "kind": "int",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Context Window",
+            "description": "max context length / context size in tokens · set `[providers.<name>] context_window` in config.toml",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "effective_context_window",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Effective Context Window",
+            "description": "resolved max context length / context size · drives compaction, pressure and preflight",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "external_credentials.openai-codex",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Openai Codex",
+            "description": "Which credential file this provider may read, at what access, and how to revoke it.",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "external_credentials.xai",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "provider",
+            "label": "Xai",
+            "description": "Which credential file this provider may read, at what access, and how to revoke it.",
+            "default": "",
+            "row": "diagnostic",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "features.subagents",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "experimental",
+            "label": "Feature: Subagents",
+            "description": "read-only flag; use /fleet setup",
+            "default": "",
+            "row": "diagnostic",
+            "value": "true",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "features.web_search",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "experimental",
+            "label": "Feature: Web Search",
+            "description": "read-only flag for web search tools",
+            "default": "",
+            "row": "diagnostic",
+            "value": "true",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "features.apply_patch",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "experimental",
+            "label": "Feature: Apply Patch",
+            "description": "read-only flag for patch editing tools",
+            "default": "",
+            "row": "diagnostic",
+            "value": "true",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "features.mcp",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "experimental",
+            "label": "Feature: Mcp",
+            "description": "read-only flag for MCP tools",
+            "default": "",
+            "row": "diagnostic",
+            "value": "true",
+            "editable": false,
+            "visible": true
+          },
+          {
+            "key": "features.exec_policy",
+            "kind": "string",
+            "tab": "advanced",
+            "group": "experimental",
+            "label": "Feature: Exec Policy",
+            "description": "read-only feature flag state for execution policy tools",
+            "default": "",
+            "row": "diagnostic",
+            "value": "true",
+            "editable": false,
+            "visible": true
+          }
+        ]
+      }
+    }
+  },
+  "failures": [
+    {
+      "name": "models",
+      "path": "/v1/models",
+      "status": 404,
+      "body": ""
+    },
+    {
+      "name": "diagnostics",
+      "path": "/v1/diagnostics",
+      "status": 400,
+      "body": "Failed to deserialize query string: missing field `path`"
+    },
+    {
+      "name": "auth_keys",
+      "path": "/v1/auth/keys",
+      "status": 404,
+      "body": ""
+    }
+  ]
+}

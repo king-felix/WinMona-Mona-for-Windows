@@ -1,0 +1,388 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T08:30:12.415Z",
+  "engine": {
+    "path": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe"
+  },
+  "inference": {
+    "expected": "none",
+    "mechanism": "only GET routes plus one empty thread create; usage totals compared"
+  },
+  "observations": {
+    "runtime_info": {
+      "service": "codewhale-runtime-api",
+      "runtime_api_version": "1.0",
+      "codewhale_version": "0.10.2",
+      "codewhale_commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+      "bind_host": "127.0.0.1",
+      "port": 7893,
+      "auth_required": true,
+      "transports": [
+        "http",
+        "sse"
+      ],
+      "capabilities": {
+        "client_token_intents": true,
+        "account_session": true,
+        "account_model_owner": true,
+        "session_provider_keys": false,
+        "threads": true,
+        "thread_create_idempotency": true,
+        "thread_shell_consent": true,
+        "turns": true,
+        "turn_operation_idempotency": true,
+        "turn_operation_lookup": true,
+        "automation_mutation_preconditions": true,
+        "turn_image_inputs": true,
+        "turn_output_token_limit": true,
+        "profile_constitution": true,
+        "turn_steer": true,
+        "turn_interrupt": true,
+        "event_replay": true,
+        "external_tools": true,
+        "environments": false,
+        "worker_runtime": true,
+        "fleet_run_create": true,
+        "fleet_run_start": true,
+        "fleet_event_replay": true,
+        "fleet_event_stream": true,
+        "fleet_local_target": true,
+        "thread_goals": true,
+        "memory": true,
+        "mcp_server_management": true,
+        "skill_lifecycle": true,
+        "skill_detail": true,
+        "plugin_management": true,
+        "agent_mail": true,
+        "terminal_stream": false,
+        "terminal_input": false,
+        "terminal_resize": false,
+        "terminal_kill": false,
+        "event_stream_resume": true
+      },
+      "account": {
+        "schema_version": 1,
+        "state": "signed_out",
+        "api_base": "https://api.codewhale.net",
+        "scopes": []
+      },
+      "experimental": {
+        "environments": false
+      },
+      "version": "0.10.2"
+    },
+    "usage_before": {
+      "since": null,
+      "until": null,
+      "group_by": "day",
+      "totals": {
+        "input_tokens": 219685,
+        "output_tokens": 11900,
+        "cached_tokens": 996608,
+        "reasoning_tokens": 3041,
+        "reasoning_replay_tokens": 0,
+        "cache_write_tokens": 0,
+        "cost_usd": 0.04960905,
+        "cost_cny": 0.33072700000000005,
+        "priced_turns": 31,
+        "unpriced_turns": 0,
+        "cny_priced_turns": 31,
+        "cny_unpriced_turns": 0,
+        "cny_unpriced_reasons": [],
+        "nonmetered_turns": 0,
+        "cost_complete": true,
+        "unpriced_reasons": [],
+        "unpriced_classes": [],
+        "pricing_provenances": [
+          "provider_docs"
+        ],
+        "live_pricing_defects": [],
+        "live_pricing_unusable_defects": [],
+        "route_receipts": [
+          "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny",
+          "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny reasoning=yes"
+        ],
+        "dropped_usage_records": 0,
+        "turns": 31
+      },
+      "buckets": [
+        {
+          "key": "2026-11-12",
+          "input_tokens": 219685,
+          "output_tokens": 11900,
+          "cached_tokens": 996608,
+          "reasoning_tokens": 3041,
+          "reasoning_replay_tokens": 0,
+          "cache_write_tokens": 0,
+          "cost_usd": 0.04960905,
+          "cost_cny": 0.33072700000000005,
+          "priced_turns": 31,
+          "unpriced_turns": 0,
+          "cny_priced_turns": 31,
+          "cny_unpriced_turns": 0,
+          "cny_unpriced_reasons": [],
+          "nonmetered_turns": 0,
+          "cost_complete": true,
+          "unpriced_reasons": [],
+          "unpriced_classes": [],
+          "pricing_provenances": [
+            "provider_docs"
+          ],
+          "live_pricing_defects": [],
+          "live_pricing_unusable_defects": [],
+          "route_receipts": [
+            "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny",
+            "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny reasoning=yes"
+          ],
+          "dropped_usage_records": 0,
+          "turns": 31
+        }
+      ]
+    },
+    "thread": {
+      "schema_version": 2,
+      "id": "thr_fc592a10b59a48ceb4db0544218140a9",
+      "created_at": "2026-11-12T08:30:12.773764Z",
+      "updated_at": "2026-11-12T08:30:12.773764Z",
+      "model": "deepseek-flash",
+      "model_provider": "deepseek",
+      "model_provider_id": "deepseek",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p15-surface\\1794472212416",
+      "mode": "agent",
+      "permission_posture": "full_access",
+      "allow_shell": true,
+      "trust_mode": true,
+      "auto_approve": true,
+      "archived": false
+    },
+    "goals_list": {
+      "status": 200,
+      "json": {
+        "goals": []
+      }
+    },
+    "tasks_list": {
+      "status": 200,
+      "json": {
+        "tasks": [],
+        "counts": {
+          "queued": 0,
+          "running": 0,
+          "completed": 0,
+          "failed": 0,
+          "canceled": 0
+        }
+      }
+    },
+    "agent_runs_list": {
+      "status": 200,
+      "json": {
+        "runs": [],
+        "governor": {
+          "launch_slots": 2,
+          "max_launch_slots": 2,
+          "paused": false,
+          "recent_rate_limits": 0
+        }
+      }
+    },
+    "fleet_runs_list": {
+      "status": 200,
+      "json": {
+        "status": {
+          "runs": 0,
+          "queued": 0,
+          "running": 0,
+          "completed": 0,
+          "partial": 0,
+          "failed": 0,
+          "restarted": 0,
+          "escalated": 0,
+          "transport_failed": 0,
+          "task_failed": 0,
+          "verifier_failed": 0,
+          "cancelled": 0,
+          "stale": 0,
+          "workers": {}
+        },
+        "runs": []
+      }
+    },
+    "fleet_profiles": {
+      "status": 200,
+      "json": {
+        "profiles": [
+          {
+            "id": "manager",
+            "display_name": null,
+            "description": "Middle manager for one workflow: decomposes it into bounded tasks, dispatches workers, integrates results, and reports to the operator.",
+            "origin": "built-in"
+          },
+          {
+            "id": "operator",
+            "display_name": null,
+            "description": "The helm of the session — the session's /model selection. Assigns managers to Workflows, routes work between them, arbitrates conflicts, and reviews what comes back.",
+            "origin": "built-in"
+          },
+          {
+            "id": "scout",
+            "display_name": null,
+            "description": "Read-only scouting: find files, map code, gather evidence.",
+            "origin": "built-in"
+          },
+          {
+            "id": "builder",
+            "display_name": null,
+            "description": "Writes code: implements bounded tasks with write and shell access.",
+            "origin": "built-in"
+          },
+          {
+            "id": "reviewer",
+            "display_name": null,
+            "description": "Adversarial code review: assumes the change is broken and tries to prove it — regressions, missing tests, unhandled cases. Read-only.",
+            "origin": "built-in"
+          },
+          {
+            "id": "verifier",
+            "display_name": null,
+            "description": "Runs builds and tests to verify claims; reports evidence, does not patch.",
+            "origin": "built-in"
+          },
+          {
+            "id": "consultant",
+            "display_name": null,
+            "description": "Short-lived, high-reasoning, read-only counsel for difficult decisions and overlooked risks.",
+            "origin": "built-in"
+          },
+          {
+            "id": "synthesizer",
+            "display_name": null,
+            "description": "Read-only synthesis: merge findings into one coherent report.",
+            "origin": "built-in"
+          },
+          {
+            "id": "worker",
+            "display_name": null,
+            "description": "General-purpose worker: full tool access for multi-step tasks. The unnamed dispatch default.",
+            "origin": "built-in"
+          },
+          {
+            "id": "planner",
+            "display_name": null,
+            "description": "Planning: grounded strategy; read-only workspace, network reads, read-only shell probes.",
+            "origin": "built-in"
+          },
+          {
+            "id": "custom",
+            "display_name": null,
+            "description": "Custom tool access: inherits the parent's write/network/shell posture; narrowed by allowed_tools.",
+            "origin": "built-in"
+          }
+        ],
+        "load_error": null
+      }
+    },
+    "thread_jobs": {
+      "status": 200,
+      "json": {
+        "jobs": []
+      }
+    },
+    "usage_after": {
+      "since": null,
+      "until": null,
+      "group_by": "day",
+      "totals": {
+        "input_tokens": 219685,
+        "output_tokens": 11900,
+        "cached_tokens": 996608,
+        "reasoning_tokens": 3041,
+        "reasoning_replay_tokens": 0,
+        "cache_write_tokens": 0,
+        "cost_usd": 0.04960905,
+        "cost_cny": 0.33072700000000005,
+        "priced_turns": 31,
+        "unpriced_turns": 0,
+        "cny_priced_turns": 31,
+        "cny_unpriced_turns": 0,
+        "cny_unpriced_reasons": [],
+        "nonmetered_turns": 0,
+        "cost_complete": true,
+        "unpriced_reasons": [],
+        "unpriced_classes": [],
+        "pricing_provenances": [
+          "provider_docs"
+        ],
+        "live_pricing_defects": [],
+        "live_pricing_unusable_defects": [],
+        "route_receipts": [
+          "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny",
+          "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny reasoning=yes"
+        ],
+        "dropped_usage_records": 0,
+        "turns": 31
+      },
+      "buckets": [
+        {
+          "key": "2026-11-12",
+          "input_tokens": 219685,
+          "output_tokens": 11900,
+          "cached_tokens": 996608,
+          "reasoning_tokens": 3041,
+          "reasoning_replay_tokens": 0,
+          "cache_write_tokens": 0,
+          "cost_usd": 0.04960905,
+          "cost_cny": 0.33072700000000005,
+          "priced_turns": 31,
+          "unpriced_turns": 0,
+          "cny_priced_turns": 31,
+          "cny_unpriced_turns": 0,
+          "cny_unpriced_reasons": [],
+          "nonmetered_turns": 0,
+          "cost_complete": true,
+          "unpriced_reasons": [],
+          "unpriced_classes": [],
+          "pricing_provenances": [
+            "provider_docs"
+          ],
+          "live_pricing_defects": [],
+          "live_pricing_unusable_defects": [],
+          "route_receipts": [
+            "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny",
+            "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny reasoning=yes"
+          ],
+          "dropped_usage_records": 0,
+          "turns": 31
+        }
+      ]
+    }
+  },
+  "failures": [
+    {
+      "name": "fleet_placement",
+      "path": "/v1/fleet/placement",
+      "status": 405,
+      "body": ""
+    },
+    {
+      "name": "thread_goal",
+      "path": "/v1/threads/thr_fc592a10b59a48ceb4db0544218140a9/goal",
+      "status": 404,
+      "body": "{\"error\":{\"message\":\"thread 'thr_fc592a10b59a48ceb4db0544218140a9' has no goal\",\"status\":404}}"
+    },
+    {
+      "name": "thread_agent_mail",
+      "path": "/v1/threads/thr_fc592a10b59a48ceb4db0544218140a9/agent-mail",
+      "status": 400,
+      "body": "{\"error\":{\"message\":\"invalid Agent Mail address: task_id or session_id is required\",\"status\":400}}"
+    },
+    {
+      "name": "thread_todo",
+      "path": "/v1/threads/thr_fc592a10b59a48ceb4db0544218140a9/todo",
+      "status": 404,
+      "body": "{\"error\":{\"message\":\"Thread 'thr_fc592a10b59a48ceb4db0544218140a9' has no todo list\",\"status\":404}}"
+    }
+  ],
+  "zero_inference": true,
+  "finished_utc": "2026-11-12T08:30:12.844Z"
+}

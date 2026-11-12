@@ -12,6 +12,11 @@ import { LaunchDispatcher, type LaunchIntent } from './launch-dispatch.js';
 import { registerLaunchIpc } from './launch-ipc.js';
 import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
+import { AgentObservatoryService } from './agent-observatory.js';
+import { registerAgentIpc } from './agents-ipc.js';
+import { EngineConfigCli } from './engine-config.js';
+import { ProviderWorkbenchService } from './provider-workbench.js';
+import { registerProviderIpc } from './provider-ipc.js';
 import { STUDIO_CHANNELS, type StudioEvent, type StudioRun } from '../shared/studio.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
 import {
@@ -111,6 +116,8 @@ const engineHost = new EngineHost({
 
 let localState: LocalState | null = null;
 let studioService: StudioService | null = null;
+let observatoryService: AgentObservatoryService | null = null;
+let providerService: ProviderWorkbenchService | null = null;
 let uiStateStore: UiStateStore | null = null;
 let briefingService: BriefingService | null = null;
 let tray: Tray | null = null;
@@ -518,6 +525,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         engine: enginePort,
         costs: costLedger,
         attention: raiseAttention,
+        nativeDispatcherActive: (projectId) => observatoryService?.nativeDispatcherActive(projectId) === true,
         emit: (event: StudioEvent) => {
           if (event.type === 'state') {
             latestStudio = {
@@ -541,6 +549,21 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
           const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
           return picked.canceled ? null : picked.filePaths;
         },
+      });
+
+      // The observatory reads engine-owned goals, fleets, runs and agent
+      // children, and is the only component that may hand a start to the
+      // engine. It never schedules a task Mona's queue already owns.
+      observatoryService = new AgentObservatoryService({
+        store: localState.store,
+        engine: enginePort,
+        monaQueueActive: (projectId) => studioService?.activeOwnership(projectId) ?? null,
+      });
+      providerService = new ProviderWorkbenchService({
+        store: localState.store,
+        engine: enginePort,
+        config: new EngineConfigCli({ executable: resolveEngineExecutable() }),
+        backupRoot: path.join(app.getPath('userData'), 'config-backups'),
       });
     }
 
@@ -607,6 +630,16 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: () => studioService,
+    });
+    registerAgentIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => observatoryService,
+    });
+    registerProviderIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => providerService,
     });
     registerLaunchIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
@@ -848,6 +881,8 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
   app.on('will-quit', () => {
     studioService?.close();
     studioService = null;
+    observatoryService = null;
+    providerService = null;
     localState?.close();
     localState = null;
   });

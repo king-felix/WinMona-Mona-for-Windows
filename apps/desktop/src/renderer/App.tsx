@@ -15,6 +15,8 @@ import {
 } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import { StudioPanel } from './StudioPanel.js';
+import { AgentsPanel } from './AgentsPanel.js';
+import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
 import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
@@ -39,6 +41,7 @@ const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'home', label: 'Home', hint: 'Projects, recents, and what needs attention' },
   { id: 'studio', label: 'Studio', hint: 'Project conversation, drafts, and engine connection' },
   { id: 'work', label: 'Work', hint: 'Prompt board and queue' },
+  { id: 'agents', label: 'Agents', hint: 'Native goals, fleets, runs and child agents' },
   { id: 'cost', label: 'Cost', hint: 'Recorded usage and spend' },
   { id: 'settings', label: 'Settings', hint: 'Route, permission, appearance, diagnostics' },
 ];
@@ -617,7 +620,7 @@ export function App(): React.JSX.Element {
     }
   }, []);
 
-  // Keyboard flow: Alt+1…5 for sections, Ctrl+Shift+F for Focus Mode,
+  // Keyboard flow: Alt+1…6 for sections, Ctrl+Shift+F for Focus Mode,
   // Ctrl+Shift+N for a new session, Ctrl+/ for the shortcut list. Interrupting
   // work stays a deliberate click on the execution controls.
   useEffect(() => {
@@ -628,8 +631,9 @@ export function App(): React.JSX.Element {
           '1': 'home',
           '2': 'studio',
           '3': 'work',
-          '4': 'cost',
-          '5': 'settings',
+          '4': 'agents',
+          '5': 'cost',
+          '6': 'settings',
         };
         const target = targets[event.key];
         if (target) {
@@ -671,6 +675,7 @@ export function App(): React.JSX.Element {
       { id: 'action:home', label: 'Go to Home', group: 'Navigate' },
       { id: 'action:studio', label: 'Go to Studio', group: 'Navigate', disabled: !selected },
       { id: 'action:work', label: 'Go to Work board', group: 'Navigate' },
+      { id: 'action:agents', label: 'Go to Agents observatory', group: 'Navigate' },
       { id: 'action:cost', label: 'Go to Cost lens', group: 'Navigate' },
       { id: 'action:settings', label: 'Go to Settings', group: 'Navigate' },
       {
@@ -741,6 +746,7 @@ export function App(): React.JSX.Element {
         case 'action:home':
         case 'action:studio':
         case 'action:work':
+        case 'action:agents':
         case 'action:cost':
         case 'action:settings': {
           const target = id.slice('action:'.length) as ProjectView;
@@ -1152,11 +1158,15 @@ export function App(): React.JSX.Element {
                 />
               ) : screen === 'work' ? (
                 <WorkView project={selected} />
+              ) : screen === 'agents' ? (
+                <AgentsPanel project={selected} sessionId={sessionId} />
               ) : screen === 'cost' ? (
                 <CostView info={info} project={selected} spend={spend} />
               ) : (
                 <SettingsView
                   info={info}
+                  project={selected}
+                  sessionId={sessionId}
                   theme={theme}
                   onTheme={() => setTheme((value) => (value === 'daybreak' ? 'afterglow' : 'daybreak'))}
                   attention={attention}
@@ -1733,6 +1743,8 @@ function CostView({
 
 function SettingsView({
   info,
+  project,
+  sessionId,
   theme,
   onTheme,
   attention,
@@ -1743,6 +1755,8 @@ function SettingsView({
   onQuit,
 }: {
   info: AppInfo | null;
+  project: CatalogProject | null;
+  sessionId: string | null;
   theme: Theme;
   onTheme: () => void;
   attention: AttentionView | null;
@@ -1796,6 +1810,8 @@ function SettingsView({
       <div className="mona-row">
         <Button onClick={onTheme}>Switch to {theme === 'daybreak' ? 'Afterglow' : 'Daybreak'}</Button>
       </div>
+
+      <ProviderWorkbench project={project} sessionId={sessionId} />
 
       <section className="settings-block" aria-labelledby="settings-appearance">
         <h3 id="settings-appearance">Appearance</h3>

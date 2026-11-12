@@ -296,6 +296,15 @@ export class StudioService {
     }
 
     const state = this.stateFor(input.projectId, input.sessionId, project.canonicalPath);
+    if (this.nativeDispatcherActive?.(input.projectId)) {
+      return {
+        ok: false,
+        error: errorResult(
+          'invalid_request',
+          'A native goal, fleet run, or agent currently owns scheduling for this project. Mona will not dispatch a second executor. Stop or finish the native run first.',
+        ),
+      };
+    }
     if (
       state.run.state === 'running' ||
       state.run.state === 'preparing' ||
@@ -458,6 +467,19 @@ export class StudioService {
         thread: state.profile,
         run: state.run,
       },
+    };
+  }
+
+  /** The active Mona-queued turn for this project, if any. */
+  activeOwnership(projectId: string): { runId: string; at: string } | null {
+    const state = this.findState(projectId);
+    if (!state) return null;
+    if (!['preparing', 'running', 'interrupting', 'awaiting_approval', 'reconnecting'].includes(state.run.state)) {
+      return null;
+    }
+    return {
+      runId: state.run.turnId ?? state.run.submission?.submissionId ?? 'mona-turn',
+      at: state.run.startedAt ?? this.now().toISOString(),
     };
   }
 

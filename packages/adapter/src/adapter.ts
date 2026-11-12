@@ -18,8 +18,10 @@ import {
   type UsageEvidence,
 } from '@mona/contracts';
 import { assessCompatibility, type DiscoveryContext, type EngineDiscovery } from './compatibility.js';
+import { EngineConfiguration } from './configuration.js';
 import { fail, isAbortError, ok, type AdapterFailure, type Result } from './errors.js';
 import type { RuntimeTransport } from './http.js';
+import { NativeOrchestration } from './native.js';
 import type { SubmissionJournal } from './journal.js';
 import {
   HistoryWire,
@@ -165,6 +167,16 @@ export class EngineAdapter {
     this.context = options.context;
     this.now = options.now ?? (() => new Date().toISOString());
     this.maxEventBytes = options.maxEventBytes ?? 1024 * 1024;
+  }
+
+  /** Native goals, fleets, runs and agent records over the same transport. */
+  orchestration(): NativeOrchestration {
+    return new NativeOrchestration(this.transport);
+  }
+
+  /** Read-only provider/model/settings projections over the same transport. */
+  configuration(): EngineConfiguration {
+    return new EngineConfiguration(this.transport, () => new Date(this.now()));
   }
 
   async discover(): Promise<Result<EngineDiscovery>> {

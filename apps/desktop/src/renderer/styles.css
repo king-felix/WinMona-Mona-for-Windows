@@ -1152,3 +1152,39 @@ body {
 [data-density='compact'] .favorite-row {
   padding: var(--space-1) var(--space-2);
 }
+
+.agent-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.agent-tree > li {
+  border-left: 2px solid var(--border);
+  padding-left: var(--space-2);
+}
+
+.agent-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.agent-event {
+  margin: var(--space-1) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.diagnostics-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}

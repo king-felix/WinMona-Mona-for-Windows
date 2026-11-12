@@ -1,112 +1,99 @@
 # Mona build handoff
 
-**Current prompt:** P15 — Surface native agents, goals, fleets, and workflows
-**Current status:** P00–P14 completed. State revision 45. Next eligible: P15, P16.
+**Current prompt:** P17 — Make tools and extensions manageable
+**Current status:** P00–P16 completed. State revision 49 after the P16 checkpoint.
+Next eligible: P17.
 
 `last_verified_commit` stays null because a state file cannot contain the hash of
 the commit that contains it. Verify with `node tools/build/cli.mjs validate`
-(expect OK, r45, 0 warnings) before trusting this file.
+(expect OK, r49, 0 warnings) before trusting this file.
 
-## P14 result — daily-use polish with zero inference
+## P15 result — native agents, goals, fleets and workflows
 
-- **Deterministic brief (`packages/project-state/src/briefing.ts`).**
-  `BriefingService` projects `ResumeBrief` and `SinceYouLeft` from the task
-  board, attempt handoff cards, cost totals, test receipts and Git status. It
-  names the current task/step, blockers and exact help needed, last test, changed
-  files or an explicit unknown, and spend confidence. No completion percentage,
-  no model call, no fabricated zero.
-- **Real shell:** Resume Brief and "Since you left" on Home; evidence paths are
-  focusable buttons; prompt favorites fill the composer without sending; project
-  color/monogram identities are curated locally and editable.
-- **Focus Mode** is a saved per-project layout that hides inspector/search/recents
-  while keeping the execution strip, Interrupt now, Stop and Quit reachable.
-  Density is persisted separately.
-- **Attention:** pure `NotificationPlanner` deduplicates a completion/blocker
-  across reconnects, evaluates quiet hours in the configured zone at event time
-  (`local` follows travel/DST), suppresses rather than queues, and keeps project
-  names, prompts and paths out of lock-screen content.
-- **Tray:** real Electron tray with a local icon; tooltip/menu reflect running,
-  blocked, failed, completed, idle; menu offers Show Mona, Interrupt now, Quit and
-  stop work. First close explains that the window hides while work continues.
-- **Notification click** focuses the right project and evidence path; it never
-  creates or starts a task.
-- **P05-area defect found and fixed:** opening an existing database nested the
-  pre-migration backup inside the migration's exclusive barrier and failed with
-  `maintenance already in progress (migrate)`. The backup now runs first under its
-  own snapshot barrier, migrations then run exclusively, and
-  `state.test.ts` opens an existing database twice and verifies the backup.
+- **Adapter.** `packages/adapter/src/native.ts` projects `/v1/goals`,
+  `/v1/threads/{id}/goal`, `/v1/tasks`, `/v1/agent-runs`, `/v1/fleet/runs`,
+  fleet receipts/workers and turn artifacts. Tolerant wire schemas, strict
+  internal contracts; missing usage stays `unknown`.
+- **Observatory.** `apps/desktop/src/main/agent-observatory.ts` builds the
+  thread/goal/agent/fleet/task/worker graph, one explicit ownership record and
+  aggregate spend that uses the parent thread total once. `AgentsPanel.tsx` is a
+  new Agents section (Alt+4) with nine validated IPC channels.
+- **Control without a second scheduler.** `StudioService.submit` refuses while a
+  native owner is active; native starts are refused while Mona's queue owns the
+  turn. Fleet runs are created with one task, one worker and `max_workers: 1`.
+- **Real delegated run.** One parent turn delegated a one-word read-only task
+  through the native `agent` tool. `agent.spawned` seq 2088 and
+  `agent.completed` seq 2095 were observed; child cost 678 µUSD is included in
+  the parent thread total 5,731.872 µUSD, so it is marked `inParent` and not
+  added twice.
+- **Fleet limitation.** `POST /v1/fleet/runs/{id}/start` returned
+  `execution: scheduled`, `leased: 0`, `queued: 1`; no worker lease appeared in
+  180 s and usage did not move. Mona reports exactly that (P15-ISSUE-001).
 
-## Next exact action (P15)
+## P16 result — providers, models and effective settings
 
-Read P15 in `Mona_PROMPTS.md` and its linked capability sections. P15 owns
-MONA-018 (native agents/goals/fleets/workflows surfaced honestly) and MONA-019.
-Reuse the pinned runtime's documented surfaces and version 0.10.2 (ff466b2ed0bf);
-do not invent a parallel orchestrator. P10-ISSUE-003 leaves native execution as
-an owner record only; P15 must either connect a real native dispatcher or keep
-the limitation explicit.
+- **Adapter.** `packages/adapter/src/configuration.ts` maps `/v1/config`,
+  `/v1/providers`, `/v1/providers/{id}/models` and `/v1/settings/schema`.
+- **Workbench.** `provider-workbench.ts` + `ProviderWorkbench.tsx` show the
+  provider catalog, credential state (never a value), per-model capabilities,
+  requested vs effective route, saved default, supported reasoning levels,
+  permission choices and offline diagnostics.
+- **Scoped writes.** `codewhale config set` with a config.toml + settings.toml
+  snapshot, hashed backup, expected-revision check and read-back verification.
+  Route changes affect new threads; the active thread keeps its route.
+- **Live scope proof.** `P16-scope.json`: thread created on `deepseek-flash`;
+  config set model `deepseek-chat`; `getThread` still reports `deepseek-flash`;
+  the runtime still reports its launch route. Isolated `CODEWHALE_HOME`, zero
+  inference.
+- **Diagnostics.** Offline `doctor --json`; missing credential and invalid
+  endpoint are distinct. No `--probe-api` call. Redaction test covers keys,
+  bearer tokens and `token:` values.
+- **Reasoning.** `deepseek-flash` reports `reasoning_effort: "unknown"` with no
+  levels, so no reasoning control is offered and none is sent.
+
+## Next exact action (P17)
+
+Read P17 in `Mona_PROMPTS.md` and spec sections 7 (021), 9.2, 11 extensions and
+13. P17 owns MONA-021 (MCP, skills, plugins, hooks, rules, instructions). Reuse
+the runtime routes already observed: `/v1/skills` exists and P01 tested it;
+MCP/plugin management capabilities are advertised. Do not load every server
+description into model context just to render a settings page.
 
 ## Relevant files and spec sections
 
-- `packages/project-state/src/briefing.ts` (+ `.test.ts`), `costs.ts`
-  (`totalsSince`), `tasks.ts` (`gaps`), `index.ts` (open-state barrier fix),
-  `state.test.ts`
-- `apps/desktop/src/main/{attention,attention-ipc,briefing-ipc,polish-probe}.ts`,
-  `tray-icon.ts`, `ui-state.ts` (schema v2), `studio-service.ts` (attention hook),
-  `main.ts` (tray, notifications, IPS modules, `--polish-test`)
-- `apps/desktop/src/renderer/{App.tsx,BriefingPanel.tsx,StudioPanel.tsx,styles.css}`
-- `apps/desktop/scripts/polish.mjs` — seeded live probe; `npm run polish`
-- Spec 4.3, 5, 8.4, 8.5, 9.1, 12; O3/O5.
+- `packages/adapter/src/{native,configuration,http,adapter}.ts` (+ tests)
+- `packages/contracts/src/{orchestration,configuration}.ts`
+- `apps/desktop/src/main/{agent-observatory,agents-ipc,provider-workbench,provider-ipc,engine-config,main}.ts`
+- `apps/desktop/src/shared/{agents,provider}.ts`
+- `apps/desktop/src/renderer/{AgentsPanel,ProviderWorkbench,App}.tsx`
+- `docs/adr/0001-orchestration-ownership.md`
+- `docs/evidence/P15-*`, `docs/evidence/P16-*`
+- Spec 7 (018/019/020), 9.1, 10.3, 11, 12, 13; O3/O5.
 
 ## Open problem IDs and no-progress counts
 
 No open blocker. `attempts.jsonl` still holds only the closed P02 rows.
 
-Carried forward, relevant to P15/P16:
-- **P01-ISSUE-001** — exec vs runtime endpoint fingerprint drift; P16.
-- **P01-ISSUE-002** — one owned runtime per machine session; a launch for a
-  different workspace opens the project with a caveat instead of stopping the
-  runtime (live-verified by P09).
-- **P01-ISSUE-003** — terminal capability flags false; P18.
-- **P01-ISSUE-004** — cost sample provisional; re-run after routing changes.
-- **P04-ISSUE-002** — tray affordance now exists; P23 still owns packaging.
-- **P05-ISSUE-001** — maintenance barrier is in-process (D-0032). The nested
-  barrier bug is fixed (D-0076); the single-process boundary is unchanged.
-- **P06-ISSUE-002** — no human screen-reader pass yet; P22 owns it.
-- **P07-ISSUE-001** — probe scripts still default to fixed historical paths when
-  prompt-scoped `MONA_*` output variables are absent.
-- **P08-ISSUE-001** — `packages/contracts` models four engine event names; the
-  studio projects the rest by name in the desktop service; revisit at P16/P18.
-- **P08-ISSUE-002** — approval waits are surfaced and interruptible; Mona still
-  has no qualified approval-response route.
-- **P08-ISSUE-003** — the engine writes its own `.codewhale/state/*` into a
-  workspace during a turn; evidence for P22 documentation.
-- **P09-ISSUE-001** — the classic registration names the development Electron
-  binary and repository path until P21/P23 install a packaged executable.
-- **P09-ISSUE-002** — Explorer's own placement ("Show more options") and a human
-  click are not programmatically verifiable.
-- **P10-ISSUE-001** — the task engine has no renderer work-board surface yet.
-- **P10-ISSUE-002** — `runOnce` is not wired to `StudioService`; a queue-only run
-  therefore cannot raise a P14 completion alert yet.
-- **P10-ISSUE-003** — native-workflow execution is recorded as an owner; a real
-  native dispatcher is P15.
-- **P11-ISSUE-001** — engine-internal attempt loops remain cooperative (D-0064).
-- **P12-ISSUE-001** — the cost lens has no renderer surface; the cost screen still
-  shows the P07 aggregate.
-- **P12-ISSUE-002** — budgets gate only Mona's outer dispatch.
-- **P12-ISSUE-003** — `StudioService` does not attribute turn usage to a task id
-  yet; the ledger supports it.
-- **P13-ISSUE-001** — no renderer surface for the change list, diff viewer or
-  test cards.
-- **P13-ISSUE-002** — attributed changes need a persisted per-task tool-touch set.
-- **P13-ISSUE-003** — restore covers HEAD only.
-- **P14-ISSUE-001** — tray state is carried in tooltip/menu text, not a
-  color-coded icon set.
-- **P14-ISSUE-002** — quiet hours suppress rather than queue; a suppressed alert
-  is not delivered later.
-- **P14-ISSUE-003** — a queue-only run cannot raise an attention event until
-  P10-ISSUE-002 is wired.
-- **P14-ISSUE-004** — `lastSeenAt` advances on project activation, so a second
-  digest in the same minute can be legitimately empty.
+Carried forward, relevant to P17+:
+- **P15-ISSUE-001** — local fleet start schedules but no worker lease was
+  observed in the app-server runtime; a foreground supervisor or later build may
+  be required. Re-qualify at P18/P20.
+- **P15-ISSUE-002** — parallel builder runs are not offered; worktrees, branch
+  ownership, budgets and a merge boundary remain unqualified.
+- **P15-ISSUE-003** — agent-run history is engine-owned; Mona keeps a last
+  observed projection, not full child transcripts.
+- **P16-ISSUE-001** — Flash reports reasoning support as unknown; no reasoning
+  control is offered.
+- **P16-ISSUE-002** — diagnostics are offline; live route probes stay explicit.
+- **P16-ISSUE-003** — credential entry remains with the engine.
+- **P16-ISSUE-004** — providers without a model catalog cannot be validated
+  locally; the workbench refuses to pretend.
+- Carried earlier: P01-ISSUE-001 (endpoint fingerprint drift), P01-ISSUE-002
+  (one runtime per machine session), P01-ISSUE-003 (terminal flags false; P18),
+  P01-ISSUE-004 (provisional cost sample), P05-ISSUE-001 (in-process barrier),
+  P06-ISSUE-002 (no human screen-reader pass), P07-ISSUE-001 (probe default
+  paths), P08-ISSUE-001..003, P09-ISSUE-001..002, P10-ISSUE-001..003,
+  P11-ISSUE-001, P12-ISSUE-001..003, P13-ISSUE-001..003, P14-ISSUE-001..004.
 
 ## Blocked dependencies
 
@@ -114,29 +101,30 @@ None.
 
 ## Last relevant validation
 
-- `npm test` → 349 Vitest (34 files) + 13 bootstrap + 12 launch + 8 spike
-  (`docs/evidence/P14-tests.txt`).
+- `npm test` → 381 Vitest (40 files) + 13 bootstrap + 12 launch + 8 spike
+  (`docs/evidence/P15-tests.txt`).
 - `npm run build` → contracts, adapter, project-state, ui, desktop; renderer
-  313.47 kB (gzip 92.93 kB) (`docs/evidence/P14-build.txt`).
+  332.57 kB (gzip 97.06 kB) (`docs/evidence/P15-build.txt`).
 - `npm run typecheck`, `npm run lint`, `npm run format:check`,
-  `npm run check:build -w @mona/desktop` (35 named preload channels), and
-  `node tools/build/cli.mjs validate` → pass (`docs/evidence/P14-checks.txt`).
-- `npm run polish` → 40 live steps, 9 real-Electron screenshots in Daybreak and
-  Afterglow, provider requests 0 (`docs/evidence/P14-polish.json`,
-  `P14-polish-log.txt`, `shots-p14/`).
-- Spend: zero. Every P14 check ran locally without a provider request.
+  `npm run check:build -w @mona/desktop` (48 named preload channels), and
+  `node tools/build/cli.mjs validate` → pass (`docs/evidence/P15-checks.txt`).
+- `node tools/spike/p15-agent-run.mjs` → one real delegated run; 119 events;
+  `docs/evidence/P15-agent-run.json`.
+- `node tools/spike/p16-scope.mjs` → isolated live scope probe, zero inference;
+  `docs/evidence/P16-scope.json`.
+- Spend: P15 delegated run 5,731.872 µUSD; every other P15/P16 check local and
+  offline. P16 spend zero.
 
 ## Human input needed
 
-None to continue P15. One standing human acceptance item for P21/P22: right-click
-a folder and a folder background in Explorer and choose **Start new DS project
-with Mona** (possibly under **Show more options**). The registration currently
-points at the development build; remove it with
-`npm run launch:menu -- unregister` or replace it at install time.
+None to continue P17. Standing acceptance item for P21/P22: right-click a folder
+and a folder background in Explorer and choose **Start new DS project with Mona**
+(possibly under **Show more options**). The registration currently points at the
+development build; remove it with `npm run launch:menu -- unregister` or replace
+it at install time.
 
 Standing caution unchanged: edit source with byte-safe tools. A PowerShell
-`Get-Content`/`Set-Content` round-trip double-encoded `App.tsx` and
-`catalog-probe.ts` in P07 and one test string in P14; Prettier does not repair
-that. `check-build.mjs` fails on mojibake in the renderer bundle. The remaining
-`Â·`/`â€™` sequences in `DECISIONS.md` and older handoff text are quoted examples
-of that incident, not corrupted text.
+`Get-Content`/`Set-Content` round-trip double-encoded `App.tsx` and one test
+string in P14; Prettier does not repair that. `check-build.mjs` fails on mojibake
+in the renderer bundle. The remaining `Â·`/`â€™` sequences in `DECISIONS.md` and
+older handoff text are quoted examples of that incident, not corrupted text.

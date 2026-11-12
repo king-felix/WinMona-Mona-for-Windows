@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 45,
+  "revision": 49,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P15",
+  "current_prompt": "P17",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -111,18 +111,19 @@
           "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
         },
         {
-          "path": "docs/codewhale-capabilities.json",
-          "sha256": "d0b424249095fd8c07453adbaf17a0fee232dbb6fd0fc0d36e10651f0eae57a1",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T01:02:31Z",
-          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
-        },
-        {
           "path": "docs/evidence/P01-tests.txt",
           "sha256": "004a75057de52502cd2a728fbec8c13c3c27670458e236f388169a17452c4d45",
           "kind": "document",
           "recorded_utc": "2026-11-12T01:02:31Z",
           "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/codewhale-capabilities.json",
+          "sha256": "53a44f09eb3eaf737d6c81eb8050bd62afd5b5c1b397b0208d20691346c5e5c7",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:00:16Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34",
+          "note": "P15/P16 refreshed qualification rows; P01 discovery evidence re-hashed."
         }
       ],
       "blocker_ids": []
@@ -1024,25 +1025,138 @@
       "blocker_ids": []
     },
     "P15": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-018",
         "MONA-019"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "native orchestration adapter: goals, tasks, agent runs, fleet runs/receipts/workers, turn artifacts",
+        "agent observatory with parent/child graph, one-owner rule and explicit spend accounting",
+        "Agents section (Alt+4), nine validated IPC channels and serial fleet controls",
+        "one real delegated agent run with agent.spawned/completed and 678 microUSD child usage",
+        "orchestration ownership ADR and P15 evidence"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P15-agents.md",
+          "sha256": "b260f80d4da4be02b0bc8ab0499bffe2ec252117df79ae7999967c2610ab4c72",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:00:21Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P15-surface-raw.json",
+          "sha256": "c73f2fdd7ebfc05d250b2e24e2f3db54407200c79001ea998c3dd7dfaf2fea66",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:00:21Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P15-agent-run.json",
+          "sha256": "4a9d2b89a572d747c104e85fb84ea1dd13ad72da1caa28851b46fecda15b37da",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:00:21Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/adr/0001-orchestration-ownership.md",
+          "sha256": "4f00ea8a27c31f7edbd9eaf6914901e17bcf75c52105dbec752d667f9dbc8aa8",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:00:21Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P15-tests.txt",
+          "sha256": "4c6424f76ac91cf641bdc96a84e574132efbe0f6d010bafc01b397956c5d2a65",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:16Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P15-build.txt",
+          "sha256": "21f846fbbd16f1cadfc1439f1f5ece7380a79656772c351a56fc679137827886",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:17Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P15-checks.txt",
+          "sha256": "55aa81cfb347f537e2ee6c5eb7d8bb52aed5c8fffa99a628ac2c7f5b0af80066",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:17Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        }
+      ],
       "blocker_ids": []
     },
     "P16": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-008",
         "MONA-020"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "configuration adapter: runtime config, provider catalog, per-provider models, settings schema",
+        "provider workbench with requested vs effective route, credential state, model facts and offline diagnostics",
+        "scoped writes through codewhale config set with config/settings backup, revision check and read-back verification",
+        "permission and startup-mode defaults; no change to the active thread",
+        "isolated live scope probe proved a new-thread default leaves the active Flash thread unchanged",
+        "reasoning controls offered only when the route reports levels; Flash offers none"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P16-settings.md",
+          "sha256": "69311d0bb469078d3aa4c393bad73a84f4b8fa512676cc462652609e5fcbd4c9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P16-surface-raw.json",
+          "sha256": "d0932f3ee5c08d6ad0c7c35f535cbcf99d8656d7f94cb98feecfd7c94e9c1bce",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P16-scope.json",
+          "sha256": "6519e22662e658f312316c04a155ad9721a98018677194a114eb436988777ecc",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P16-tests.txt",
+          "sha256": "c4883b96367ac79c7288eebae74bde420a9cfa4166e8d6e8b75e8013374c248d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P16-checks.txt",
+          "sha256": "55aa81cfb347f537e2ee6c5eb7d8bb52aed5c8fffa99a628ac2c7f5b0af80066",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/evidence/P16-build.txt",
+          "sha256": "21f846fbbd16f1cadfc1439f1f5ece7380a79656772c351a56fc679137827886",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        },
+        {
+          "path": "docs/codewhale-capabilities.json",
+          "sha256": "53a44f09eb3eaf737d6c81eb8050bd62afd5b5c1b397b0208d20691346c5e5c7",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T09:05:23Z",
+          "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34"
+        }
+      ],
       "blocker_ids": []
     },
     "P17": {
@@ -1155,8 +1269,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P15",
-    "P16"
+    "P17"
   ],
-  "last_checkpoint_utc": "2026-11-12T08:26:53Z"
+  "last_checkpoint_utc": "2026-11-12T09:05:23Z"
 }

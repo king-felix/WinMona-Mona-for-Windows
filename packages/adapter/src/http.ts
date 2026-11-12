@@ -1,6 +1,6 @@
 import { fail, isAbortError, ok, redact, type Result } from './errors.js';
 
-export type HttpMethod = 'GET' | 'POST';
+export type HttpMethod = 'GET' | 'POST' | 'PUT';
 
 export type TransportResponse = {
   status: number;

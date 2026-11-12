@@ -960,3 +960,31 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   admits concurrent writers before migration, it must take one barrier that
   covers both operations rather than reintroducing the nested lock. A regression
   test opens an existing database twice and verifies the backup.
+
+## D-0077 - Native orchestration has one execution owner
+
+- **Decision:** Mona projects engine goals, fleet runs and child agents but
+  never schedules their internal work. Each project has one active owner
+  (`none | mona_queue | native_goal | native_fleet | native_agent`); Mona's
+  queue and native starts refuse each other while an owner is active.
+- **Why:** spec 10.3 forbids the Mona queue and an engine goal/fleet from
+  independently scheduling the same task. Observing the engine's own records is
+  also the only way to show real child lifecycle and spend.
+- **Constrains:** parallel builder runs stay unavailable until isolated
+  worktrees, branch ownership, aggregate budgets and a merge/review boundary are
+  qualified. A fleet start that returns `scheduled` with no lease is reported as
+  a queued run, never as running work. ADR: docs/adr/0001-orchestration-ownership.md.
+
+## D-0078 - Configuration writes use the engine CLI with a hashed backup
+
+- **Decision:** provider, model, permission and mode defaults are written by
+  `codewhale config set`, after snapshotting `config.toml` and `settings.toml`,
+  checking an expected revision and storing an app-private backup. The key is
+  read back before success is reported.
+- **Why:** the engine owns config.toml and settings.toml semantics, including
+  unknown-key preservation and validation. Hand-editing would silently drop or
+  reorder keys. A revision check detects a concurrent external edit.
+- **Constrains:** a saved default applies to new threads only. Active threads
+  keep the route they were created with; the workbench shows requested and
+  effective values separately. No provider probe and no automatic fallback run
+  from this path.

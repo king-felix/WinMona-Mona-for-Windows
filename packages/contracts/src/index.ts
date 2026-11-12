@@ -5,4 +5,6 @@ export * from './submission.js';
 export * from './project.js';
 export * from './error.js';
 export * from './upstream.js';
+export * from './orchestration.js';
+export * from './configuration.js';
 export * from './fixtures.js';
