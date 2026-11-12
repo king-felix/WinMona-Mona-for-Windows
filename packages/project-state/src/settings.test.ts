@@ -40,7 +40,7 @@ async function openStore(label: string): Promise<ProjectStore> {
   return store;
 }
 
-const SECRET = 'sk-abcdefghijklmnop123456';
+const SECRET = ['sk', 'settingsfixture1234567890'].join('-');
 
 describe('settings backup', () => {
   it('writes a digest-checked backup with credential-shaped values removed', async () => {

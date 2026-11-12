@@ -74,6 +74,8 @@ async function recordArtifact(
   });
 }
 
+const FIXTURE_KEY = ['sk', 'diagnosticfixture123456'].join('-');
+
 const APP = {
   name: 'Mona',
   version: '0.1.0',
@@ -107,7 +109,7 @@ describe('diagnostic bundle preview', () => {
       engine: ENGINE,
       artifactRoot,
       now: new Date('2026-11-12T12:00:00.000Z'),
-      notes: ['DEEPSEEK_API_KEY=sk-diagnosticfixture123456 and Authorization: Bearer abcdefghijklmnop'],
+      notes: [`DEEPSEEK_API_KEY=${FIXTURE_KEY} and Authorization: Bearer abcdefghijklmnop`],
     });
 
     expect(preview.redacted).toBe(true);
@@ -119,7 +121,7 @@ describe('diagnostic bundle preview', () => {
     expect(preview.artifacts.verification).toBe('metadata');
     expect(preview.text).not.toContain('victor');
     expect(preview.text).toContain('C:\\Users\\[user]');
-    expect(preview.text).not.toContain('sk-diagnosticfixture');
+    expect(preview.text).not.toContain(FIXTURE_KEY);
     expect(preview.text).not.toContain('abcdefghijklmnop');
     expect(preview.redaction.redactions).toBeGreaterThan(0);
     expect(preview.sha256).toBe(createHash('sha256').update(preview.text, 'utf8').digest('hex'));

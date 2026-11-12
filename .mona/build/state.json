@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 62,
+  "revision": 64,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P19",
+  "current_prompt": "P20",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -1239,31 +1239,60 @@
           "commit": "678cc279ef1323c427004c839eb0aa3a22a304b8"
         },
         {
-          "path": "docs/evidence/P18-terminal.md",
-          "sha256": "01155f15deb52fe9aad9593778d7b2133808cf0694bc7891d200e01c4f52c32a",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T16:15:33Z",
-          "commit": "678cc279ef1323c427004c839eb0aa3a22a304b8"
-        },
-        {
           "path": "docs/codewhale-capabilities.json",
           "sha256": "00a7e9672b1231b1c2801dd07828884a53b133fabe528a9e5117b4d573bd90a0",
           "kind": "document",
           "recorded_utc": "2026-11-12T16:15:33Z",
           "commit": "678cc279ef1323c427004c839eb0aa3a22a304b8"
+        },
+        {
+          "path": "docs/evidence/P18-terminal.md",
+          "sha256": "08de51b5fb3eaff587a4ae3bfc4b3420d3ecb6cc7ff3826bf1a39cdf60dd6837",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:41:19Z",
+          "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9"
         }
       ],
       "blocker_ids": []
     },
     "P19": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-024",
         "MONA-025"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "migration v7 memory index with deterministic term search, explicit reindex and on-demand file search",
+        "versioned prompt shelf with variables, acceptance, exact preview, pack import/export",
+        "portable handoff/resume packets with digest checks, requalification and safe member paths",
+        "settings backup/restore under the maintenance barrier and a redacted diagnostics preview",
+        "Memory section, ten validated IPC channels and 71 named preload methods",
+        "53 new tests, a 23-check local probe and real-Electron smoke; zero provider requests"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P19-memory.md",
+          "sha256": "bd36dede001cb49b8d079f45dc67c84e35398d17f3e89d0f6bce794f78baf308",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:41:19Z",
+          "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9"
+        },
+        {
+          "path": "docs/evidence/P19-memory.json",
+          "sha256": "9e8c3844de2ecc907786945994c826c7846bbaa1b0b6471575d74103370cef4b",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:41:19Z",
+          "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9"
+        },
+        {
+          "path": "docs/evidence/P19-electron-smoke.json",
+          "sha256": "3ecaec485cd1b6dc053f0c860a3af54a7628395beb3285ceeae9a19c2c26dc9a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:41:19Z",
+          "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9"
+        }
+      ],
       "blocker_ids": []
     },
     "P20": {
@@ -1343,7 +1372,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P19"
+    "P20"
   ],
-  "last_checkpoint_utc": "2026-11-12T16:15:33Z"
+  "last_checkpoint_utc": "2026-11-12T16:41:19Z"
 }

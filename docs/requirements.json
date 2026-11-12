@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 291,
+  "revision": 296,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -2392,20 +2392,20 @@
               "note": "Engine reports terminal flags false and returns HTTP 501 Unix-only. ISSUE-0018 needs Victor's accept-unavailable or native-PTY decision."
             },
             {
-              "path": "docs/evidence/P18-terminal.md",
-              "sha256": "01155f15deb52fe9aad9593778d7b2133808cf0694bc7891d200e01c4f52c32a",
-              "kind": "document",
-              "recorded_utc": "2026-11-12T16:14:13Z",
-              "commit": "678cc279ef1323c427004c839eb0aa3a22a304b8",
-              "note": "A real ConPTY shell in the open project: typing, output, resize, search, copy, reconnect and exit verified in live Electron (18/18 checks)."
-            },
-            {
               "path": "docs/evidence/P18-terminal.json",
               "sha256": "5d2c9a250be4ef7e7c28afb5e7dcb546294896ac522fb9251cda5c97cf4a3e54",
               "kind": "document",
               "recorded_utc": "2026-11-12T16:14:13Z",
               "commit": "678cc279ef1323c427004c839eb0aa3a22a304b8",
               "note": "Probe record: typedVia=keyboard, resize 160x11 to 138x15, clipboard read-back, exit code, zero inference."
+            },
+            {
+              "path": "docs/evidence/P18-terminal.md",
+              "sha256": "08de51b5fb3eaff587a4ae3bfc4b3420d3ecb6cc7ff3826bf1a39cdf60dd6837",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:41:13Z",
+              "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+              "note": "P19 reconciliation: file hash recorded after the final edit; committed content unchanged, probe record remains authoritative."
             }
           ]
         },
@@ -2440,7 +2440,7 @@
           ]
         }
       ],
-      "verified_commit": "678cc279ef1323c427004c839eb0aa3a22a304b8",
+      "verified_commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2453,13 +2453,22 @@
         "P19",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "search",
           "description": "Project history and decisions are searchable locally",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P19-memory.md",
+              "sha256": "bd36dede001cb49b8d079f45dc67c84e35398d17f3e89d0f6bce794f78baf308",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:41:13Z",
+              "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+              "note": "Deterministic local term index over metadata, decisions, task evidence and bounded history; on-demand file search; 23/23 probe checks, zero provider requests."
+            }
+          ]
         },
         {
           "id": "context-preview",
@@ -2487,12 +2496,21 @@
         {
           "id": "resume-packet",
           "description": "A redacted resume packet can be exported and re-imported",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P19-memory.json",
+              "sha256": "9e8c3844de2ecc907786945994c826c7846bbaa1b0b6471575d74103370cef4b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:41:13Z",
+              "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+              "note": "Handoff and resume packet export/import into a clean profile; task/decision/evidence pointers reconstructed inertly with stale evidence reopened."
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -2505,7 +2523,7 @@
         "P20",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "backup-restore",
@@ -2540,18 +2558,36 @@
         {
           "id": "diagnostics",
           "description": "Diagnostics bundles are local and redacted by default",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P19-memory.md",
+              "sha256": "bd36dede001cb49b8d079f45dc67c84e35398d17f3e89d0f6bce794f78baf308",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:41:13Z",
+              "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+              "note": "Local redacted diagnostic preview; home path and credential fixtures removed; export bytes match the preview digest."
+            }
+          ]
         },
         {
           "id": "offline",
           "description": "Projects remain browsable when the runtime is unavailable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P19-memory.json",
+              "sha256": "9e8c3844de2ecc907786945994c826c7846bbaa1b0b6471575d74103370cef4b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:41:14Z",
+              "commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+              "note": "Search, prompt preview, handoff and diagnostics work with the engine never started; renderer tests and Electron smoke run without a runtime."
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {

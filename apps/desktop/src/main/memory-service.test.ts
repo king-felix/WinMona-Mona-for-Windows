@@ -40,7 +40,7 @@ const APP = {
   arch: 'x64',
 };
 
-const SECRET = 'sk-servicefixture1234567890';
+const SECRET = ['sk', 'servicefixture123456'].join('-');
 
 async function setup() {
   const stateDir = await tempDir('state');

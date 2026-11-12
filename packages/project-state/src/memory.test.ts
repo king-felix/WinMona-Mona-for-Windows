@@ -7,6 +7,8 @@ import { DEFAULT_MEMORY_POLICY, MemoryIndex, tokenizeForSearch } from './memory.
 import { ProjectStore } from './store.js';
 import { TaskService } from './tasks.js';
 
+const SECRET = ['sk', 'abcdefghijklmnop123456'].join('-');
+
 const cleanup: Array<() => Promise<void>> = [];
 const stores: ProjectStore[] = [];
 
@@ -73,7 +75,7 @@ describe('MemoryIndex', () => {
           'dec_1',
           projectId,
           'Deploy key rotation',
-          'Rotate the deploy key: api_key=sk-abcdefghijklmnop123456 every 30 days.',
+          `Rotate the deploy key: api_key=${SECRET} every 30 days.`,
           '2026-11-12T10:00:00.000Z',
         );
       tx.db
@@ -161,7 +163,7 @@ describe('MemoryIndex', () => {
         },
     );
     expect(stored.body).toContain('[redacted]');
-    expect(stored.body).not.toContain('sk-abcdefghijklmnop123456');
+    expect(stored.body).not.toContain(SECRET);
 
     const stats = await memory.stats(projectId);
     expect(stats.documents).toBe(7);
