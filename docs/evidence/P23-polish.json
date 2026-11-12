@@ -1,0 +1,281 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "the real shell loaded",
+      "ok": true
+    },
+    {
+      "name": "Resume Brief names the recorded running task",
+      "ok": true,
+      "detail": "Ship the daily-use polishtsk_0e62b478858e42f199ba7b09586ddb8d · running · mona_queue · at read recorded rowsRequirements: MONA-017, MONA-029irunning"
+    },
+    {
+      "name": "Resume Brief reports the recorded spend confidence",
+      "ok": true,
+      "detail": "$0.0025 + 1 unknown record(s)"
+    },
+    {
+      "name": "Resume Brief reports the Git changed-file count",
+      "ok": true,
+      "detail": "4 path(s)"
+    },
+    {
+      "name": "Resume Brief gives a deterministic next step",
+      "ok": true,
+      "detail": "Resume tsk_0e62b478858e42f199ba7b09586ddb8d at: read recorded rows (running)."
+    },
+    {
+      "name": "Since you left reads a prior last-seen window",
+      "ok": true,
+      "detail": "Since 11/11/2026, 12:43:32 PM · 10 event(s) · 0 timeline item(s) · 4 changed path(s)"
+    },
+    {
+      "name": "the bridge returns the same brief projection",
+      "ok": true
+    },
+    {
+      "name": "Daybreak Home captured",
+      "ok": true
+    },
+    {
+      "name": "Daybreak Since-you-left captured",
+      "ok": true
+    },
+    {
+      "name": "Studio opened without a runtime",
+      "ok": true
+    },
+    {
+      "name": "the execution controls are visible",
+      "ok": true
+    },
+    {
+      "name": "Daybreak Studio captured",
+      "ok": true
+    },
+    {
+      "name": "Focus Mode toggled from the topbar",
+      "ok": true
+    },
+    {
+      "name": "Focus Mode hides the inspector",
+      "ok": true,
+      "detail": {
+        "focus": true,
+        "inspector": false,
+        "interrupt": true
+      }
+    },
+    {
+      "name": "Focus Mode keeps the emergency interrupt control",
+      "ok": true
+    },
+    {
+      "name": "Daybreak Focus Mode captured",
+      "ok": true
+    },
+    {
+      "name": "Alt+2 reaches the Studio without a mouse",
+      "ok": true
+    },
+    {
+      "name": "a notification focuses the recorded project",
+      "ok": true,
+      "detail": "polish-project"
+    },
+    {
+      "name": "the matching evidence is marked focused",
+      "ok": true
+    },
+    {
+      "name": "the focus path starts no task",
+      "ok": true
+    },
+    {
+      "name": "Notification focus captured",
+      "ok": true
+    },
+    {
+      "name": "Settings opened",
+      "ok": true
+    },
+    {
+      "name": "quiet hours are shown as saved policy",
+      "ok": true,
+      "detail": {
+        "checked": true,
+        "detail": "Quiet from 22:00 to 07:00 in the current timezone (America/Denver). Work continues; only notification delivery is silenced.",
+        "tray": "Tray: Mona is idle — No runtime is running. Idle Mona makes no request."
+      }
+    },
+    {
+      "name": "quiet hours state that work continues",
+      "ok": true,
+      "detail": "Quiet from 22:00 to 07:00 in the current timezone (America/Denver). Work continues; only notification delivery is silenced."
+    },
+    {
+      "name": "the tray text is present",
+      "ok": true,
+      "detail": "Tray: Mona is idle — No runtime is running. Idle Mona makes no request."
+    },
+    {
+      "name": "a completion notification is planned once",
+      "ok": true
+    },
+    {
+      "name": "a replayed completion is suppressed",
+      "ok": true
+    },
+    {
+      "name": "quiet hours suppress delivery",
+      "ok": true
+    },
+    {
+      "name": "lock-screen content carries no project, prompt or file detail",
+      "ok": true,
+      "detail": {
+        "first": "delivered",
+        "replay": "duplicate",
+        "quiet": "quiet_hours",
+        "title": "Mona finished a run",
+        "body": "Open Mona to review the result. Prompt text, file names, and project names are not shown in this notification.",
+        "privateLabelLeaked": false,
+        "privatePathLeaked": false
+      }
+    },
+    {
+      "name": "quiet hours follow the configured timezone instead of UTC",
+      "ok": true,
+      "detail": {
+        "utcQuietAt2230": true,
+        "tokyoQuietAt2230Utc": false
+      }
+    },
+    {
+      "name": "Afterglow shell loaded",
+      "ok": true
+    },
+    {
+      "name": "Afterglow Home captured",
+      "ok": true
+    },
+    {
+      "name": "Studio opened in Afterglow",
+      "ok": true
+    },
+    {
+      "name": "Afterglow Studio captured",
+      "ok": true
+    },
+    {
+      "name": "Focus Mode toggled in Afterglow",
+      "ok": true
+    },
+    {
+      "name": "Afterglow Focus Mode captured",
+      "ok": true
+    },
+    {
+      "name": "Settings captured in Afterglow",
+      "ok": true
+    },
+    {
+      "name": "Afterglow settings captured",
+      "ok": true
+    },
+    {
+      "name": "no runtime was started by the probe",
+      "ok": true,
+      "detail": "not_started"
+    },
+    {
+      "name": "the tray exists while the window is open",
+      "ok": true
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\01-home-daybreak.png",
+      "label": "home-daybreak",
+      "theme": "daybreak"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\02-digest-daybreak.png",
+      "label": "digest-daybreak",
+      "theme": "daybreak"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\03-studio-daybreak.png",
+      "label": "studio-daybreak",
+      "theme": "daybreak"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\04-focus-daybreak.png",
+      "label": "focus-daybreak",
+      "theme": "daybreak"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\05-notification-focus-daybreak.png",
+      "label": "notification-focus-daybreak",
+      "theme": "daybreak"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\06-home-afterglow.png",
+      "label": "home-afterglow",
+      "theme": "afterglow"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\07-studio-afterglow.png",
+      "label": "studio-afterglow",
+      "theme": "afterglow"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\08-focus-afterglow.png",
+      "label": "focus-afterglow",
+      "theme": "afterglow"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p23-polish\\09-settings-afterglow.png",
+      "label": "settings-afterglow",
+      "theme": "afterglow"
+    }
+  ],
+  "brief": {
+    "current": "Ship the daily-use polishtsk_0e62b478858e42f199ba7b09586ddb8d · running · mona_queue · at read recorded rowsRequirements: MONA-017, MONA-029irunning",
+    "spend": "$0.0025 + 1 unknown record(s)",
+    "changes": "4 path(s)",
+    "next": "Resume tsk_0e62b478858e42f199ba7b09586ddb8d at: read recorded rows (running).",
+    "digest": "Since 11/11/2026, 12:43:32 PM · 10 event(s) · 0 timeline item(s) · 4 changed path(s)"
+  },
+  "attention": {
+    "checked": true,
+    "detail": "Quiet from 22:00 to 07:00 in the current timezone (America/Denver). Work continues; only notification delivery is silenced.",
+    "tray": "Tray: Mona is idle — No runtime is running. Idle Mona makes no request."
+  },
+  "notification": {
+    "first": "delivered",
+    "replay": "duplicate",
+    "quiet": "quiet_hours",
+    "title": "Mona finished a run",
+    "body": "Open Mona to review the result. Prompt text, file names, and project names are not shown in this notification.",
+    "privateLabelLeaked": false,
+    "privatePathLeaked": false
+  },
+  "timezone": {
+    "utcQuietAt2230": true,
+    "tokyoQuietAt2230Utc": false
+  },
+  "engine": {
+    "state": "not_started",
+    "workspace": null
+  },
+  "trayActive": true,
+  "providerRequests": 0,
+  "theme": "afterglow",
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "capturedAt": "2026-11-12T19:44:10.204Z"
+}

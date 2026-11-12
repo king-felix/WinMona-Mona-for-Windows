@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 325,
+  "revision": 337,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -996,6 +996,14 @@
               "recorded_utc": "2026-11-12T04:36:57Z",
               "commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
               "note": "harness keyboard audit re-run after the development-only gate: 14 focus stops per theme/density, focus ring present, no unnamed controls"
+            },
+            {
+              "path": "docs/evidence/P23-a11y-shots.json",
+              "sha256": "90d8b285d18cb106c55c6f8d2d155cf977c5e30dc7bec2822c5d431221bb4524",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:29Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "release candidate re-capture: 34 screenshots, 4 audits clean, 0 duplicate ids, 0 unnamed controls, focus ring on every stop, both themes and densities"
             }
           ]
         },
@@ -1023,7 +1031,7 @@
           ]
         }
       ],
-      "verified_commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
+      "verified_commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1796,6 +1804,14 @@
               "recorded_utc": "2026-11-12T18:58:44Z",
               "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
               "note": "rebuilt release candidate: 20/20 real-Electron steps, 5 screenshots, 0 provider requests; change list against a captured baseline, Git's own diff text, an 8007-line diff as 29 DOM rows with its tail reachable, traversal refused"
+            },
+            {
+              "path": "docs/evidence/P23-changes-installed.json",
+              "sha256": "a1c74b48b82ab3206bff19f49c3dbcbe96521e65218a06c1a2949f31c6efa8b7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:29Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "re-run against the installed release candidate: 20/20 steps, 5 screenshots, 0 provider requests; baseline change list, Git diff text, 8007-line diff as 28 DOM rows with tail reachable, traversal refused"
             }
           ]
         },
@@ -1861,7 +1877,7 @@
           ]
         }
       ],
-      "verified_commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
+      "verified_commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2792,6 +2808,14 @@
               "recorded_utc": "2026-11-12T17:38:10Z",
               "commit": "f1f0f47",
               "note": "Per-user install of 1656 checksummed files into %LOCALAPPDATA%\\Programs\\Mona; atomic replacement; uninstall entry; installed app smoke-launched"
+            },
+            {
+              "path": "docs/evidence/P23-installed-final.json",
+              "sha256": "be0e83693dbe1e5a97b4589941be69cca6176bcec100de19d0415a191c7a25e8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:33Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "release-candidate artifact installs per user: 1672 files, 0 checksum problems, classic menu verified, installed-app smoke ok at 0.1.0; identity package still refused pending the elevated trust step, which is reported not hidden"
             }
           ]
         },
@@ -2809,12 +2833,20 @@
               "note": "Helper implements IExplorerCommand and package is built, but Windows refuses registration without developer mode or a trusted certificate; exact prerequisite recorded"
             },
             {
-              "path": "docs/evidence/P23-clean-install.json",
-              "sha256": "49f0ada0c829adb5b06aaf0274394c41b9b8754fbe2c335482d2c56d52eaaebe",
+              "path": "docs/evidence/P23-trust-verify.json",
+              "sha256": "4f8c627a6460b77237a92909daae372f97f085d96f77d2c62ec9baabad83a866",
               "kind": "document",
-              "recorded_utc": "2026-11-12T18:58:44Z",
-              "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
-              "note": "clean-root install of the rebuilt candidate: 1668 files with 0 checksum problems, app smoke ok, classic menu verified; Windows still refuses the test-signed identity package with 0x800B0109"
+              "recorded_utc": "2026-11-12T19:44:21Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "certificate, package signer, manifest publisher and build record all agree (thumbprint 5C0AD0D7...4C95, EKU code signing, no private key); trust provisioning needs exactly one elevated LocalMachine TrustedPeople import, so nothing is registered yet and the modern menu remains unproven"
+            },
+            {
+              "path": "docs/evidence/P23-clean-install.json",
+              "sha256": "aaf7434aaba53a4fe1b63d8ba94a80065baf2a714f586713e3a6d24269c8af00",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:47:17Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "clean-root install of the rebuilt candidate: 1672 files, 0 checksum problems, app smoke ok, classic menu verified; the identity package is still refused with 0x800B0109 because machine trust is not provisioned. Signer, publisher and thumbprint are verified in P23-trust-verify.json"
             }
           ]
         },
@@ -2830,6 +2862,14 @@
               "recorded_utc": "2026-11-12T17:38:10Z",
               "commit": "f1f0f47",
               "note": "Installed uninstaller removed program files, keys, classic menu and its test certificate; user data and ~/.codewhale unchanged"
+            },
+            {
+              "path": "docs/evidence/P23-clean-uninstall.json",
+              "sha256": "db1e8deb9b16fa0a4aa6c7132f5558d40a3caf2d35af6aa4bccfe461f6d7e4ea",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:33Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "clean-root uninstall of the release candidate: program tree and Mona keys removed, ~/.codewhale untouched; machine-level trust is reported with its exact removal command rather than silently failing"
             }
           ]
         },
@@ -2878,11 +2918,11 @@
             },
             {
               "path": "docs/evidence/P23-gate-ci.txt",
-              "sha256": "1bfca907f24a42415edab42205ee1d0f31bcb92fe12e5e65cf7f3d8436e8226a",
+              "sha256": "20cb8ec094631a1c599b5440a530567212ef273d5ec9a489866104c937d6889f",
               "kind": "document",
-              "recorded_utc": "2026-11-12T18:56:34Z",
-              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
-              "note": "release-candidate gate re-run after the bootstrap CLI fix: npm run ci exit 0 with 546 Vitest (66 files), 14 bootstrap, 12 launch, 14 install, 8 spike, plus typecheck, lint, format and build; native:test 7/7"
+              "recorded_utc": "2026-11-12T19:49:13Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "final gate after the follow-up round: npm run ci exit 0 with 549 Vitest in 67 files, 14 bootstrap, 12 launch, 25 install, 8 spike; format, lint, typecheck across five workspaces and the production build all pass"
             }
           ]
         },
@@ -2898,6 +2938,22 @@
               "recorded_utc": "2026-11-12T18:21:52Z",
               "commit": "7cf416d",
               "note": "Focus trail, keyboard sweep, both themes, densities and 200% zoom captured automatically; Windows screen-reader walkthrough remains human-only"
+            },
+            {
+              "path": "docs/evidence/P23-a11y-installed.json",
+              "sha256": "512f45466a78ef37fecc68e83aa88c17d2d7d172ef1d14d3b395fabe91eb26b5",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:24Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "automated accessibility probe 12/12 on the installed candidate: labelled composer, named controls with honest disabled state, role=log polite timeline, dialog focus trap and restoration, keyboard reveal of older timeline rows, focusable virtualized diff, no horizontal overflow at 200% zoom; Narrator and physical 200% scaling remain human-only"
+            },
+            {
+              "path": "docs/evidence/P23-human-checklist.md",
+              "sha256": "4a2d5f016d654dbd02794949b76bf1262f3d44fbc61590d040652af31cfa83c3",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:47:08Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "human checklist prepared: 21 rows covering modern-menu click after trust, Narrator walkthrough, physical 200% scaling and the conversation export Save dialog, each with expected result and a result column; nothing marked passed without observation"
             }
           ]
         },
@@ -2921,6 +2977,22 @@
               "recorded_utc": "2026-11-12T18:52:28Z",
               "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
               "note": "release-candidate rerun: cold 1093 ms, warm 741 ms, idle CPU 0.04%, idle memory 406.4 MB across 4 processes vs the 350 MB target, engine 256.4 MB separate; frame timing landed on the vsync grid this run"
+            },
+            {
+              "path": "docs/evidence/P23-followup.md",
+              "sha256": "e52bca1e7a504bccbf17051f9a42ac324946ec56b5d03a86ce97e302c38de4a6",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:44:24Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "installed candidate: idle 371.4 MB total working set across 4 processes (down from 404 MB) against the 350 MB target; breakdown Browser 113.9 / GPU 102.6 / Utility 51.1 / Tab 103.8 with JS heaps of 12.0 and 3.4 MB; cold startup 422 ms and warm 738 ms measured on the installed build; engine separate"
+            },
+            {
+              "path": "docs/evidence/P23-startup-installed.json",
+              "sha256": "8f430ea2d433d341a038ecbe56f72bc316606444fc24d66f538a688d4c85879f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T19:47:08Z",
+              "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+              "note": "installed-candidate startup measured: cold 422 ms, warm 738 ms, idle CPU 0.04%, four processes; resolves the earlier development-build ambiguity"
             }
           ]
         },

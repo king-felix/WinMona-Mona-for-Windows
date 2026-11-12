@@ -14,17 +14,20 @@ is verified, what is measured, and what is still waiting on a human decision.
 Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 
 - 27 of 30 product requirements **verified** against recorded evidence.
-- **MONA-028 is partial**: idle memory measured at 404 MB against a 350 MB internal target, and
-  the Windows screen-reader and physical 200% scaling checks need a person.
-- **MONA-027 is blocked**: the Windows 11 modern folder menu is built and test-signed, but
-  Windows will not register the identity package until the machine trusts its signing
-  certificate (or developer mode is enabled). The classic menu works today.
+- **MONA-028 is partial**: idle memory is 371.4 MB on the installed candidate against a 350 MB
+  internal target (down from 404 MB after windowing rendered timeline rows), and the Windows
+  screen-reader and physical 200% scaling checks need a person.
+- **MONA-027 is blocked**: the Windows 11 modern folder menu is built and test-signed, and its
+  signer is verified, but Windows will not register the identity package until this machine
+  trusts the signing certificate — one elevated command. The classic menu works today.
 - Real engine turn through the installed app: 22/22 probe steps, one turn at 596 µUSD.
-- Automated gates green: 546 Vitest tests (66 files), 14 bootstrap, 12 launch, 14 install,
+- Automated gates green: 549 Vitest tests (67 files), 14 bootstrap, 12 launch, 25 install,
   8 spike, 7 native; typecheck, lint, formatting and build all pass.
+- Installed-candidate startup: cold 422 ms, warm 738 ms; idle CPU 0.04%.
 
-The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/release-notes-0.1.0.md)
-and [docs/evidence/P22-product-QA.md](docs/evidence/P22-product-QA.md).
+The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/release-notes-0.1.0.md),
+[docs/evidence/P23-followup.md](docs/evidence/P23-followup.md) and
+[docs/evidence/P22-product-QA.md](docs/evidence/P22-product-QA.md).
 
 ## Requirements
 
@@ -48,8 +51,11 @@ node tools/install/cli.mjs verify --smoke
 
 `install` places the program at `%LOCALAPPDATA%\Programs\Mona`, registers the classic Explorer
 entry, writes the per-user uninstall entry, and preserves `~/.codewhale` and your project
-folders. It reports the identity-package result honestly: on an untrusted-certificate machine
-the modern menu entry reports `0x800B0109` and stays unregistered.
+folders. It reports the identity-package result honestly: on a machine that does not trust the
+test certificate the modern menu entry reports `0x800B0109` and stays unregistered. To enable
+it on a development machine, verify and trust the certificate first — see
+`node tools/install/cli.mjs trust-test-certificate`, which checks the signer, manifest and build
+record before importing anything, and writes only to `LocalMachine\TrustedPeople`.
 
 Uninstall removes Mona-owned files and registration and keeps your projects, the project
 database and the engine's history:
@@ -86,6 +92,9 @@ node tools/install/cli.mjs uninstall
 - [Compatibility](docs/compatibility.md) — engine/version policy and what drift does.
 - [Release notes 0.1.0](docs/release-notes-0.1.0.md) — artifact hashes, provenance, known
   issues, rollback.
+- [P23 follow-up](docs/evidence/P23-followup.md) — trust verification, memory breakdown,
+  accessibility observations, startup measurements.
+- [Human checklist](docs/evidence/P23-human-checklist.md) — the checks that need a person.
 - [Third-party notices](THIRD_PARTY_NOTICES.md), [contributing](CONTRIBUTING.md),
   [security](SECURITY.md).
 - Product specification and build sequence: `Mona_Project.md`, `Mona_PROMPTS.md`.
@@ -100,7 +109,7 @@ packages/project-state/SQLite store, migrations, tasks, costs, changes, memory
 packages/ui/           Design tokens and primitives (Daybreak/Afterglow)
 native/windows-shell/  IExplorerCommand menu helper (COM DLL)
 tools/build/           Bootstrap state/ledger utility (not a product dependency)
-tools/install/         Per-user installer, identity package, signing
+tools/install/         Per-user installer, identity package, signing, certificate trust
 docs/                  Requirements ledger, capability ledger, evidence, ADRs
 .mona/build/           Durable build state, decisions, blockers, attempts, handoffs
 ```

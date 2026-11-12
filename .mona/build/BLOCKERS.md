@@ -28,22 +28,45 @@ Acknowledging a blocker never resets its counter or clears the row.
 - **Afterwards:** right-click a folder and a folder background; the entry must
   appear in the Windows 11 menu, not under **Show more options**.
 - **Requirement:** MONA-027 stays **blocked** until then.
-- **Re-confirmed at P23:** a clean-root install of the release candidate reports
-  the same `0x800B0109` refusal (`docs/evidence/P23-clean-install.json`). This is
-  still a machine-policy gate, not a code defect, and P23 did not attempt a
-  fourth local workaround.
+- **Re-confirmed at P23, then narrowed to one elevated command.** Victor authorized
+  trusting this certificate. The signer, thumbprint, validity, code-signing purpose
+  and manifest Publisher were verified against the build record
+  (`docs/evidence/P23-trust-verify.json`, verdict `ok: true`). The remaining step is
+  a `LocalMachine\TrustedPeople` import, which needs an elevated shell; the current
+  shell is a standard user and AppX deployment will not read a per-user store, so
+  P23 imported nothing and claims nothing. Trust was **absent** in all four stores
+  before this step, so running it will add trust, not find it.
+
+  Exact command (elevated PowerShell):
+
+  ```powershell
+  Import-Certificate -FilePath 'C:\Users\victo\AppData\Local\Mona\artifacts\Mona-test-signing-0.1.0.cer' `
+    -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople'
+  node 'X:\AI_projects\Mona\tools\install\cli.mjs' trust-test-certificate
+  node 'X:\AI_projects\Mona\tools\install\cli.mjs' install --force
+  ```
+
+  Removal (elevated, exact thumbprint). This trusts the certificate for the whole
+  machine, not just one package, so record when it is added and remove it with:
+
+  ```powershell
+  node 'X:\AI_projects\Mona\tools\install\cli.mjs' untrust-test-certificate
+  ```
 
 ### MONA-028 — two human-only checks and one measured memory miss
 
 This is not a three-attempt blocker; it is recorded here because it needs Victor.
 
-- **Memory:** idle 406.4 MB across four processes on the release candidate
-  against the 350 MB target. The target is unchanged (D-0104). Victor either
-  accepts the recorded deviation for 0.1.0 or asks for the heap profile first;
-  either way MONA-028 stays partial until it is resolved.
-- **Screen reader:** a Narrator walkthrough is human-only (P22-ISSUE-004).
+- **Memory:** 404 MB at the start of P23, **371.4 MB** on the installed candidate
+  after two attempts with material progress; the 350 MB target is unchanged
+  (D-0104, D-0107). Two rows in `attempts.jsonl`; the third is reserved for the next
+  evidence-led step in `docs/evidence/P23-followup.md` §2.7. Victor either accepts
+  the recorded progress with the target still unmet, or authorizes that next step.
+- **Screen reader:** a Narrator walkthrough is human-only (P22-ISSUE-004). The
+  automated half is done and recorded: `P23-a11y-installed.json`, 12/12 steps.
 - **Physical 200% scaling:** the harness captures 200% zoom, which is not the
-  same test as a real display at 200%.
+  same test as a real display at 200%. The automated zoom check passed; the
+  physical-display check is still owed.
 
 ## Prerequisites that are not blockers yet
 
@@ -52,7 +75,7 @@ This is not a three-attempt blocker; it is recorded here because it needs Victor
 | Verifiable DeepSeek route | P01 (G0/G1) | **verified** at P01: `doctor --probe-api` passed; model resolved to `deepseek-flash`; live turns priced | nothing; re-probe only if the key is rotated |
 | Native build toolchain | P05+ if a native binary is needed | no MSVC Build Tools; Electron and esbuild prebuilts supply everything used so far | a verified prebuilt for the specific native module, or installing VS Build Tools |
 | Code-signing certificate | P21/P23 release packaging | **No production certificate.** A labelled self-created test certificate exists at `%LOCALAPPDATA%\Mona\signing\test-signing.pfx`; the package is test-signed and reported as such | Victor provides a certificate whose subject matches `CN=Mona Development`, or changes the manifest publisher; sign with `MONA_SIGN_PFX` / `MONA_SIGN_PASSWORD` |
-| Windows 11 modern context-menu qualification | P21 | **Built and verified, not registered.** `MonaMenu.dll` passes 7 native checks including real COM activation; the sparse package is packed and test-signed. Windows refuses it: `0x80073CFF` unsigned, `0x800B0109` test-signed, Root-store import needs interactive consent, developer mode needs administrator | Victor picks one: (A) enable developer mode, (B) accept the test certificate into the current-user Root store once, or (C) supply a trusted signing certificate. Then re-run `node tools/install/cli.mjs install` |
+| Windows 11 modern context-menu qualification | P21 | **Built and verified, not registered.** `MonaMenu.dll` passes 7 native checks including real COM activation; the package is packed and test-signed; signer, publisher and thumbprint verified against the build record. Windows refuses it without machine trust: `0x800B0109` | Victor runs the one elevated `Import-Certificate` command in ISSUE-0023, then `install --force`. No trust exists today, so that step adds it |
 | Human click on the classic menu | P21/P22 acceptance | registered live at P09 and re-registered by the P21 installer against the installed `Mona.exe`; exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
 | Human click on the modern menu | P21/P22 acceptance | cannot be offered until the identity package registers (see above) | after A, B or C: right-click a folder and a folder background and confirm the entry in the Windows 11 menu |
 | Narrator walkthrough | P22/P23 acceptance | not performed; no automated claim is made | with Narrator on, open Mona, tab Home -> Studio -> composer, send nothing, confirm every control announces a name and state |

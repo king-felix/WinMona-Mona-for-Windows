@@ -16,7 +16,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 4,850 | `7795b5877515b3772a5a0a8f276eb9f5d7fb16c95122f55100f552c32f17bc31` |
+| `Mona-0.1.0-x64.msix` | 4,849 | `e9008c1126c8d5607d0abf82c3fcdb83da8f4638e39deeacacc6d458cd4ac202` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -24,8 +24,8 @@ Payload and program identity:
 
 | Artifact | Value |
 |---|---|
-| Install payload | `build/install-stage`, **1,668 files**, 452,401,443 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `38b5ca1a758c2aa90e2a1a8bc660880935f6f1c9a3d617e72ecf57d60a550c62` |
+| Install payload | `build/install-stage`, **1,672 files**, 452,468,362 bytes |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `fb18a76517952f7bebd05daf2a6a056e14012f5554c52007c3344e055bd442a8` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |
@@ -109,6 +109,42 @@ classic menu command reads
   matching the pinned build. An upstream repository check could not run: `api.github.com` did
   not resolve from this machine during P23. That is recorded as a gap, not worked around.
 
+## Follow-up round — trust, memory, accessibility, startup
+
+This round was authorized after the first candidate: verify the certificate before trusting it,
+investigate the memory miss, and finish the automated accessibility and startup work. Full
+detail is `docs/evidence/P23-followup.md`; artifacts below are rebuilt and re-measured.
+
+**Certificate trust — verified, blocked on exactly one elevated step.** The `.cer`, the MSIX's
+own signer, the packaged manifest Publisher and the build signing record all agree
+(`CN=Mona Development`, thumbprint `5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95`, code-signing EKU,
+no private key, valid to 2027-11-12). Trust provisioning is now a checked code path that writes
+only `Cert:\LocalMachine\TrustedPeople`; the previous Root-store import was removed. The import
+needs an elevated shell and none was available, so **P23 imported nothing and claims nothing** —
+no trust existed in any store beforehand. One command remains; it is in `BLOCKERS.md`
+ISSUE-0023 and `P23-human-checklist.md`.
+
+**Memory — 404 MB → 371.4 MB, target still unmet.** The P22 metric was preserved exactly
+(`sum of workingSetSize across app.getAppMetrics()`, 60 s idle, same 20,000-row workload) and
+reproduced at 404.0–404.4 MB before changing anything. The footprint is not Mona's data:
+main JS heap 12.0 MB, renderer JS heap 3.4 MB, and 2,497 DOM nodes. Windowing the rendered
+timeline to the newest 120 rows (with a keyboard-reachable "show earlier" control) cut idle
+working set to **371.4 MB** on the installed candidate; rendering all 500 loaded rows costs
++27.7 MB. The remaining 21.4 MB is Chromium's own process baseline plus a GPU process inflated
+by this host reporting `gpu_compositing: disabled_software`. The 350 MB target is unchanged and
+MONA-028 stays partial.
+
+**Accessibility — automated half done.** `npm run a11y` passes 12/12 against the installed
+candidate: labelled composer, named controls with an honestly disabled Interrupt while idle,
+`role="log"` with `aria-live="polite"`, dialog focus trap and focus restoration, keyboard
+reveal of older timeline rows, a focusable virtualized diff, and no horizontal overflow at
+200% zoom. Narrator and physical 200% scaling remain human-only.
+
+**Startup — measured on the installed build.** Cold 422 ms and warm 738 ms on the installed
+`Mona.exe` (budgets 5 s / 2 s). The earlier report's 418/722 ms came from the development
+build; that ambiguity is corrected. The packaged harness completed this time, so
+P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
+
 ## What this candidate adds over P22
 
 - **Changes section** (MONA-014 `diffs`): a change list from a captured baseline, Git status,
@@ -125,40 +161,44 @@ classic menu command reads
 
 ## Known issues
 
-- **P23-ISSUE-001 / P22-ISSUE-001 — idle memory.** 406.4 MB across four processes against a
-  350 MB internal target. Not adjusted away: see "Memory decision" below.
-- **P23-ISSUE-002 — the modern Windows 11 menu is not registered** (`0x800B0109`, untrusted
-  certificate root). Requires developer mode, an interactive certificate trust decision, or a
-  production certificate. Blocked requirement: MONA-027.
-- **P22-ISSUE-004 — screen-reader walkthrough** is human-only and still outstanding. So is a
-  physical 200% scaling check; the harness captures 200% zoom but that is not the same test.
-- **P22-ISSUE-003 — the packaged measurement harness stalled** in P22. This prompt re-ran the
-  measurement on the development build only, and the packaged app was exercised through the
-  install/verify/`--smoke-test` path instead. Packaged startup timing is therefore still
-  unmeasured.
-- **P22-ISSUE-005 — engine memory under load** is unmeasured; only idle engine memory is known.
+- **P23-ISSUE-002 / ISSUE-0023 — the modern Windows 11 menu is not registered.** The package is
+  test-signed and its signer is verified, but machine trust has not been provisioned because the
+  step needs an elevated shell. Classic menu works; modern menu is unproven.
+- **P23-ISSUE-001 — idle memory 371.4 MB** across four processes against the 350 MB target.
+  Improved from 404 MB by windowing rendered timeline rows; still unmet (D-0107).
+- **P22-ISSUE-004 — screen-reader walkthrough and physical 200% scaling** remain human-only.
+  The automated accessibility probe passes 12/12 and is not a substitute.
+- **P23-ISSUE-004 — conversation export's Save dialog** is unit-tested with a real file write and
+  a stubbed dialog; the OS dialog has not been clicked by any automated run.
+- **P22-ISSUE-005 — engine memory under load** is still unmeasured; only idle engine memory is known.
+- **P22-ISSUE-003 — the packaged QA harness stall** did not reproduce in this round. Recorded as
+  "did not reproduce", not "fixed": the cause remains unknown.
 - **Restore covers HEAD only.** No snapshot engine, no arbitrary-commit restore.
-- **The engine's own terminal routes are unavailable on Windows**; Mona's ConPTY terminal
+- **The engine's own terminal routes are unavailable on Windows**; Mona's own ConPTY terminal
   replaces them and is labelled separately.
-- **The conversation save dialog is not automated.** Export is covered by unit tests with a real
-  file write and a fake dialog; a human click on the real dialog is unverified.
 
+## Superseded notes
+
+The first candidate reported 404–406.4 MB idle memory, a development-build startup timing and
+an unverified Save dialog. The follow-up round above replaces all three: memory is 371.4 MB on
+the installed candidate, startup is 422 ms / 738 ms on the installed build, and the export write
+path is tested with a real file. The original numbers stay here so the change is auditable
+rather than silently rewritten.
 ## Memory decision
 
 The 350 MB target stays. It is an engineering budget from the specification, and lowering the
-number to match the measurement would destroy its only function.
+number to match a measurement would destroy its only function.
 
-The measured 406.4 MB is recorded as a real deviation of +56.4 MB (16%). What is known: four
-processes (browser, GPU, utility, renderer) on Windows 11 with Electron 45; the engine is
-separate at 256.4 MB and excluded from the budget. What is not known: the split between the
-main-process heap, the renderer heap, and Chromium's GPU/utility overhead, because no heap
-profile has been taken.
+Two attempts produced material progress: **404 MB → 371.4 MB** on the installed candidate, by
+bounding rendered timeline rows to 120 with an explicit "show earlier" control (D-0106). What is
+now known: the cost is not Mona's JavaScript heap (12.0 MB main, 3.4 MB renderer) but rendered
+DOM plus Chromium's process baseline, and this host's GPU process is inflated by software
+compositing (`gpu_compositing: disabled_software`). What is still unknown: how much of the
+residue a hardware-accelerated host would not pay.
 
-Decision (D-0102): ship the release candidate with the deviation recorded, and treat a heap
-profile as the first post-0.1.0 performance task rather than blocking the candidate on an
-unprofiled number. MONA-028 stays **partial** until either the footprint drops below 350 MB on
-a presented-window run or Victor records a deliberate change to the target.
-
+Decision (D-0107): ship the release candidate with the improvement recorded and the target
+**still unmet by 21.4 MB**. MONA-028 stays partial. The third attempt is reserved for the next
+evidence-led step in `docs/evidence/P23-followup.md` §2.7 and is not started on speculation.
 ## Rollback
 
 - **Program rollback:** keep the previous stage directory. `tools/install/cli.mjs install`
@@ -175,13 +215,14 @@ a presented-window run or Victor records a deliberate change to the target.
 
 ## Next human actions
 
-1. Decide the modern-menu trust question (developer mode, one-time test-certificate trust, or a
-   production certificate), then right-click a folder and a folder background and confirm the
-   entry appears in the Windows 11 menu.
-2. Right-click a folder and a folder background and choose **Start new DS project with Mona**
-   in the classic menu; confirm the project opens with the composer focused and nothing sent.
-3. With Narrator on, open Mona, tab through Home → Studio → composer and confirm each control
-   announces its name and state.
-4. Set Windows scaling to 200% on a physical display and confirm no horizontal scrolling is
-   needed for the composer and control strip.
-5. Confirm or reject the memory decision above.
+1. Run the one elevated trust command in `BLOCKERS.md` ISSUE-0023, then
+   `node tools/install/cli.mjs install --force`, then right-click a folder and a folder
+   background and confirm the entry appears in the Windows 11 modern menu.
+2. Classic menu by hand: right-click a folder and a folder background, choose
+   **Start new DS project with Mona**, confirm the project opens with the composer focused and
+   nothing sent.
+3. Work through `docs/evidence/P23-human-checklist.md`: Narrator walkthrough, physical 200%
+   scaling, and the conversation export Save dialog (success and cancel).
+4. Decide the memory question: accept 371.4 MB with the target still unmet, or authorize the
+   next evidence-led step in `docs/evidence/P23-followup.md` §2.7.
+5. Decide the license before any public distribution. It remains unresolved on purpose.

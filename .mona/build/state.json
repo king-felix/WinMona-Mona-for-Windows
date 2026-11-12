@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 71,
+  "revision": 75,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1458,12 +1458,20 @@
         "release candidate staged (1668 files), MSIX packed and test-signed, checksums recorded",
         "clean-root install, installed-app smoke, verify and uninstall documented",
         "release documentation: README, user guide, developer guide, compatibility, release notes, changelog, notices, contributing, security",
-        "requirement matrix reconciled: 28 verified, MONA-027 blocked, MONA-028 partial; no 1.0-complete claim"
+        "requirement matrix reconciled: 28 verified, MONA-027 blocked, MONA-028 partial; no 1.0-complete claim",
+        "trust verification: certificate, MSIX signer, manifest publisher and build record agree; provisioning restricted to LocalMachine TrustedPeople with an exact-thumbprint removal command and a policy test suite",
+        "memory: per-process and JS-heap probe, P22 baseline reproduced at 404 MB, windowed timeline rendering shipped, installed candidate measured at 371.4 MB",
+        "accessibility: real-window probe passing 12/12 (names, dialog focus trap and restoration, keyboard reveal, virtualized diff, 200% zoom) plus a 21-row human checklist",
+        "startup measured on the installed candidate: cold 422 ms, warm 738 ms; development-build ambiguity corrected in the release notes",
+        "artifact rebuilt and re-qualified: 1672 files, MSIX e9008c11..., clean-root install/verify/uninstall and all installed probes re-run"
       ],
       "remaining_steps": [
         "modern menu needs Victor's trust decision (developer mode, test-certificate trust, or production certificate) before MONA-027 can move",
         "memory decision: accept 406.4 MB for 0.1.0 or authorise a heap profile; the 350 MB target is unchanged",
-        "human checks: Narrator walkthrough and physical 200% scaling"
+        "human checks: Narrator walkthrough and physical 200% scaling",
+        "Victor runs the one elevated Import-Certificate command, then install --force, then tests the modern menu by right-clicking a folder and a folder background",
+        "human checks: Narrator walkthrough, physical 200% scaling, conversation export through the real Save dialog",
+        "memory decision: accept 371.4 MB with the 350 MB target unmet, or authorize the next evidence-led step"
       ],
       "evidence": [
         {
@@ -1488,11 +1496,53 @@
           "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2"
         },
         {
-          "path": "docs/evidence/P23-clean-install.json",
-          "sha256": "49f0ada0c829adb5b06aaf0274394c41b9b8754fbe2c335482d2c56d52eaaebe",
+          "path": "docs/evidence/P23-followup.md",
+          "sha256": "e52bca1e7a504bccbf17051f9a42ac324946ec56b5d03a86ce97e302c38de4a6",
           "kind": "document",
-          "recorded_utc": "2026-11-12T18:58:47Z",
-          "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2"
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-trust-verify.json",
+          "sha256": "4f8c627a6460b77237a92909daae372f97f085d96f77d2c62ec9baabad83a866",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-memory-installed.json",
+          "sha256": "78b748f1c4e19bdf424c244c4f5bfe304e3b4708fcfd041d7952df00b1feffbc",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-a11y-installed.json",
+          "sha256": "512f45466a78ef37fecc68e83aa88c17d2d7d172ef1d14d3b395fabe91eb26b5",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-human-checklist.md",
+          "sha256": "4a2d5f016d654dbd02794949b76bf1262f3d44fbc61590d040652af31cfa83c3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-startup-installed.json",
+          "sha256": "8f430ea2d433d341a038ecbe56f72bc316606444fc24d66f538a688d4c85879f",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:13Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-clean-install.json",
+          "sha256": "aaf7434aaba53a4fe1b63d8ba94a80065baf2a714f586713e3a6d24269c8af00",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:47:22Z",
+          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
         }
       ],
       "blocker_ids": [
@@ -1501,5 +1551,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-12T18:58:47Z"
+  "last_checkpoint_utc": "2026-11-12T19:49:13Z"
 }

@@ -52,6 +52,17 @@ the notes say so.
 - **Release engineering** — staged payload with a 1,668-file checksum manifest, identity package
   with test signing, artifact checksums, and probes that produce evidence artifacts.
 
+### Changed in the follow-up round
+
+- **Timeline renders a bounded page.** The newest 120 loaded items render, with a keyboard
+  reachable "Show 120 earlier item(s)" control; idle memory dropped from 404 MB to 371.4 MB on
+  the installed candidate. Nothing is dropped from storage, export or search (D-0106).
+- **Certificate trust is a checked action.** `trust-test-certificate` verifies the certificate,
+  the package signer, the manifest Publisher and the build record before importing only into
+  `LocalMachine\TrustedPeople`; the previous Root-store import was removed (D-0105).
+- **Evidence paths are overridable** in the design-system probe, so a later prompt re-captures
+  into its own artifacts instead of overwriting the prompt that first produced them.
+
 ### Fixed during the 0.1.0 build
 
 - Double-encoded UTF-8 in `App.tsx` and one test string (PowerShell round trip), now guarded by

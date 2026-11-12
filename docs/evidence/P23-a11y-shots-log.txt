@@ -1,0 +1,45 @@
+
+load daybreak/comfortable
+shot daybreak-comfortable-viewport 1280x800@1
+shot daybreak-comfortable-home 1280x800@1
+shot daybreak-comfortable-studio 1280x800@1
+shot daybreak-comfortable-work 1280x800@1
+shot daybreak-comfortable-cost 1280x800@1
+shot daybreak-comfortable-blocker 1280x800@1
+shot daybreak-comfortable-settings 1280x800@1
+shot daybreak-comfortable-states 1280x800@1
+load daybreak/compact
+shot daybreak-compact-viewport 1280x800@1
+shot daybreak-compact-home 1280x800@1
+shot daybreak-compact-studio 1280x800@1
+shot daybreak-compact-work 1280x800@1
+shot daybreak-compact-cost 1280x800@1
+shot daybreak-compact-blocker 1280x800@1
+shot daybreak-compact-settings 1280x800@1
+shot daybreak-compact-states 1280x800@1
+load afterglow/comfortable
+shot afterglow-comfortable-viewport 1280x800@1
+shot afterglow-comfortable-home 1280x800@1
+shot afterglow-comfortable-studio 1280x800@1
+shot afterglow-comfortable-work 1280x800@1
+shot afterglow-comfortable-cost 1280x800@1
+shot afterglow-comfortable-blocker 1280x800@1
+shot afterglow-comfortable-settings 1280x800@1
+shot afterglow-comfortable-states 1280x800@1
+load afterglow/compact
+shot afterglow-compact-viewport 1280x800@1
+shot afterglow-compact-home 1280x800@1
+shot afterglow-compact-studio 1280x800@1
+shot afterglow-compact-work 1280x800@1
+shot afterglow-compact-cost 1280x800@1
+shot afterglow-compact-blocker 1280x800@1
+shot afterglow-compact-settings 1280x800@1
+shot afterglow-compact-states 1280x800@1
+shot daybreak-comfortable-1920x1080 1920x1080@1
+shot afterglow-compact-200pct 1280x800@2
+daybreak/comfortable: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+daybreak/compact: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+afterglow/comfortable: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+afterglow/compact: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+captured 34 screenshots; audit failures 0
+mona: applied 7 state migration(s) to version 7

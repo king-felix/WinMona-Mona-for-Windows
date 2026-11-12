@@ -1331,3 +1331,52 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   is not yet known, so a fix now would be guesswork.
 - **Constrains:** no release text may claim the budget is met. A stated target
   change requires Victor's recorded decision, not a builder's convenience.
+
+## D-0105 - Trusting the test certificate is a verified, narrowly scoped action
+
+- **Decision:** `tools/install/trust.mjs` owns trust. It reads the certificate, the
+  package's own Authenticode signer, the manifest Publisher from inside the MSIX, and
+  the build signing record, and refuses to import unless all four agree on subject
+  and thumbprint, the certificate carries the code-signing EKU, has no private key,
+  and is currently valid. The import target is `Cert:\LocalMachine\TrustedPeople`
+  and nothing else. `tools/install/cli.mjs trust-test-certificate` runs the same
+  check before writing; `untrust-test-certificate` removes exactly that thumbprint.
+- **Why:** Victor authorized trusting *this* certificate, not any certificate that
+  accompanies a file. The previous `trust-certificate` action imported into
+  `CurrentUser\Root` and checked nothing; both are now removed, so no caller can
+  reach the Root store and no unverified certificate can be imported.
+- **Constrains:** the import needs an elevated shell, because AppX deployment writes
+  machine state. The CLI refuses the non-elevated attempt with exit code 4 and the
+  exact command rather than producing a confusing duplicate of the machine policy
+  gate. No Developer Mode, no disabled signature validation, no exported private key.
+- **Verified by:** `tests/install/trust.test.mjs` (11 policy tests) and
+  `docs/evidence/P23-trust-verify.json`, which shows `verdict ok: true` with
+  `elevationRequired: true` and all four stores absent before import.
+
+## D-0106 - The timeline renders a bounded page of rows, and says so
+
+- **Decision:** `StudioPanel` renders the newest 120 loaded items and offers
+  "Show 120 earlier item(s)" for the rest. The shell still loads up to 500 items into
+  state; only the DOM is windowed. A new session, project or mode resets to the first
+  page.
+- **Why:** measured, not assumed. Expanding the live DOM from 120 to 500 rendered
+  items cost **+27.7 MB** of working set; windowing cut idle memory from 404 MB to
+  371.4 MB on the installed candidate. Rendered rows, not stored text, hold the cost.
+- **Constrains:** the control must stay keyboard reachable and must state the count,
+  so "older items exist" is never hidden. `StudioPanel.test.tsx` pins the 120-row
+  first page, the +120 reveal, and full rendering for a short history. No item is
+  deleted from the database, export, or search.
+
+## D-0107 - The memory target stays 350 MB; progress is recorded, not converted into a pass
+
+- **Decision:** after two attempts with material progress, idle memory on the
+  installed candidate is **371.4 MB** (from 404 MB). D-0104's 350 MB target stands,
+  MONA-028 stays partial, and the remaining 21.4 MB is left as an explicit unmet
+  target with a named next action (`P23-followup.md` §2.7).
+- **Why:** the residue is Chromium's own process baseline — main JS heap 12.0 MB,
+  renderer JS heap 3.4 MB, and a GPU process inflated by this host reporting
+  `gpu_compositing: disabled_software`. Reaching 350 MB here would mean disabling
+  features to hit a number, which the specification forbids.
+- **Constrains:** attempt 3 is reserved for the next evidence-led step (hardware-GPU
+  host comparison, then the network-service process). No further memory work may
+  claim a pass without a measurement on the installed candidate.

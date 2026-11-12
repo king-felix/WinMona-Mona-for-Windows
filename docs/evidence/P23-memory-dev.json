@@ -1,0 +1,561 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true,
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p23-memory-r3oidp\\memory-project"
+    },
+    {
+      "name": "the P22 history workload is in place and rendered",
+      "ok": true,
+      "detail": {
+        "historyRows": 10000,
+        "rendered": 120
+      }
+    },
+    {
+      "name": "the idle window produced samples with a per-process breakdown",
+      "ok": true,
+      "detail": {
+        "samples": 5,
+        "totalMb": 376.9
+      }
+    },
+    {
+      "name": "the renderer JavaScript heap was read after a forced collection",
+      "ok": true,
+      "detail": {
+        "heapUsedMb": 3.4,
+        "heapTotalMb": 4,
+        "documents": 1,
+        "nodes": 2497,
+        "jsEventListeners": 299,
+        "error": null
+      }
+    },
+    {
+      "name": "every Mona process is attributed to a named process type",
+      "ok": true,
+      "detail": [
+        "Browser:117.4MB",
+        "GPU:105.1MB",
+        "Utility:51.4MB",
+        "Tab:103MB"
+      ]
+    },
+    {
+      "name": "a large diff is available through the real change service",
+      "ok": true,
+      "detail": {
+        "path": "big.txt",
+        "available": true
+      }
+    },
+    {
+      "name": "the diff rendered and was measured with the panel open",
+      "ok": true,
+      "detail": {
+        "totalMb": 385.9,
+        "rendererHeapMb": 3,
+        "domNodes": 431,
+        "jsEventListeners": 169
+      }
+    },
+    {
+      "name": "leaving the diff removes its rows from the DOM",
+      "ok": true,
+      "detail": {
+        "diffRowsLeft": 0
+      }
+    },
+    {
+      "name": "the render-window experiment produced a measurable delta",
+      "ok": true,
+      "detail": {
+        "windowedRows": 120,
+        "fullRows": 500,
+        "expansionClicks": 4,
+        "windowed": {
+          "totalWorkingSetMb": 385.9,
+          "renderer": {
+            "heapUsedMb": 3.5,
+            "heapTotalMb": 4,
+            "documents": 1,
+            "nodes": 2497,
+            "jsEventListeners": 299,
+            "error": null
+          },
+          "processes": [
+            {
+              "pid": 33884,
+              "type": "Browser",
+              "serviceName": null,
+              "name": "",
+              "workingSetMb": 119.9,
+              "privateMb": 84.3,
+              "cpuPercent": 0.03
+            },
+            {
+              "pid": 35604,
+              "type": "GPU",
+              "serviceName": "GPU",
+              "name": "",
+              "workingSetMb": 106.9,
+              "privateMb": 291.1,
+              "cpuPercent": 0.01
+            },
+            {
+              "pid": 36272,
+              "type": "Utility",
+              "serviceName": "network.mojom.NetworkService",
+              "name": "Network Service",
+              "workingSetMb": 51.5,
+              "privateMb": 12.1,
+              "cpuPercent": 0
+            },
+            {
+              "pid": 40608,
+              "type": "Tab",
+              "serviceName": null,
+              "name": "",
+              "workingSetMb": 107.6,
+              "privateMb": 50.1,
+              "cpuPercent": 0.15
+            }
+          ]
+        },
+        "full": {
+          "totalWorkingSetMb": 418,
+          "renderer": {
+            "heapUsedMb": 5.9,
+            "heapTotalMb": 6.3,
+            "documents": 1,
+            "nodes": 9382,
+            "jsEventListeners": 678,
+            "error": null
+          },
+          "processes": [
+            {
+              "pid": 33884,
+              "type": "Browser",
+              "serviceName": null,
+              "name": "",
+              "workingSetMb": 119.9,
+              "privateMb": 84.3,
+              "cpuPercent": 0.01
+            },
+            {
+              "pid": 35604,
+              "type": "GPU",
+              "serviceName": "GPU",
+              "name": "",
+              "workingSetMb": 110.5,
+              "privateMb": 283,
+              "cpuPercent": 0.04
+            },
+            {
+              "pid": 36272,
+              "type": "Utility",
+              "serviceName": "network.mojom.NetworkService",
+              "name": "Network Service",
+              "workingSetMb": 51.5,
+              "privateMb": 12.1,
+              "cpuPercent": 0
+            },
+            {
+              "pid": 40608,
+              "type": "Tab",
+              "serviceName": null,
+              "name": "",
+              "workingSetMb": 136.1,
+              "privateMb": 78.7,
+              "cpuPercent": 0.65
+            }
+          ]
+        },
+        "costOfFullRenderMb": 32.1
+      }
+    }
+  ],
+  "schema": 1,
+  "capturedAt": "2026-11-12T19:22:56.130Z",
+  "metric": {
+    "budget": "sum of workingSetSize across app.getAppMetrics(), the same metric P22 recorded",
+    "unit": "MiB (1 MiB = 1024 KiB)",
+    "inclusion": "every process Electron reports for this app: browser, renderer, GPU, utility",
+    "caveat": "working-set sums count shared pages once per process, so the aggregate overstates unique physical memory; privateBytes is reported alongside as supplemental, and the budget is judged on the original metric only",
+    "idleIntervalSeconds": 30,
+    "workload": "one project open on Studio, no engine running, no interaction, no provider request",
+    "heap": "renderer JavaScript heap from CDP Runtime.getHeapUsage after HeapProfiler.collectGarbage; DOM counters from Memory.getDOMCounters"
+  },
+  "gpu": {
+    "featureStatus": {
+      "2d_canvas": "disabled_software",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "disabled_software",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "disabled_off",
+      "rasterization": "disabled_software",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "disabled_software",
+      "video_encode": "disabled_software",
+      "webgl": "disabled_off",
+      "webgpu": "disabled_off",
+      "webnn": "disabled_off"
+    },
+    "info": {
+      "auxAttributes": {
+        "amdSwitchable": false,
+        "canSupportThreadedTextureMailbox": false,
+        "directMLFeatureLevel": "Not supported",
+        "dx12FeatureLevel": "Not supported",
+        "glImplementationParts": "(gl=none,angle=none)",
+        "glResetNotificationStrategy": 0,
+        "inProcessGpu": true,
+        "initializationTime": 0,
+        "isAsan": false,
+        "isClangCoverage": false,
+        "jpegDecodeAcceleratorSupported": false,
+        "optimus": false,
+        "overlayInfo": {
+          "bgra8OverlaySupport": "NONE",
+          "directComposition": false,
+          "nv12OverlaySupport": "NONE",
+          "p010OverlaySupport": "NONE",
+          "rgb10a2OverlaySupport": "NONE",
+          "supportsOverlays": false,
+          "yuy2OverlaySupport": "NONE"
+        },
+        "passthroughCmdDecoder": false,
+        "sandboxed": false,
+        "skiaBackendType": "None",
+        "subpixelFontRendering": true,
+        "supportsD3dSharedImages": false,
+        "supportsDirectML": false,
+        "supportsDx12": false,
+        "supportsVulkan": false,
+        "targetCpuBits": 64,
+        "visibilityCallbackCallCount": 0,
+        "vulkanVersion": "Not supported"
+      },
+      "gpuDevice": [
+        {
+          "active": false,
+          "deviceId": 12036,
+          "deviceString": "NVIDIA GeForce RTX 5070",
+          "driverVersion": "32.0.16.1088",
+          "gpuPreference": 0,
+          "revision": 161,
+          "subSysId": 1394807906,
+          "vendorId": 4318
+        },
+        {
+          "active": false,
+          "deviceId": 140,
+          "deviceString": "Microsoft Basic Render Driver",
+          "driverVersion": "10.0.26100.9711",
+          "gpuPreference": 0,
+          "revision": 0,
+          "subSysId": 0,
+          "vendorId": 5140
+        }
+      ]
+    },
+    "hardwareAccelerationDisabled": false
+  },
+  "historyRows": 20000,
+  "renderedItems": 120,
+  "idle": {
+    "seconds": 30,
+    "samples": 5,
+    "totalWorkingSetMb": 376.9,
+    "averageWorkingSetMb": 393.5,
+    "cpuAverage": 0.03,
+    "cpuMax": 0.13,
+    "processes": [
+      {
+        "pid": 33884,
+        "type": "Browser",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 117.4,
+        "privateMb": 82.4,
+        "cpuPercent": 0.06
+      },
+      {
+        "pid": 35604,
+        "type": "GPU",
+        "serviceName": "GPU",
+        "name": "",
+        "workingSetMb": 105.1,
+        "privateMb": 288,
+        "cpuPercent": 0
+      },
+      {
+        "pid": 36272,
+        "type": "Utility",
+        "serviceName": "network.mojom.NetworkService",
+        "name": "Network Service",
+        "workingSetMb": 51.4,
+        "privateMb": 12.1,
+        "cpuPercent": 0
+      },
+      {
+        "pid": 40608,
+        "type": "Tab",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 103,
+        "privateMb": 47.4,
+        "cpuPercent": 0.05
+      }
+    ],
+    "mainProcess": {
+      "rssMb": 117.2,
+      "heapUsedMb": 12,
+      "heapTotalMb": 13.5,
+      "externalMb": 2.7
+    },
+    "renderer": {
+      "heapUsedMb": 3.4,
+      "heapTotalMb": 4,
+      "documents": 1,
+      "nodes": 2497,
+      "jsEventListeners": 299,
+      "error": null
+    }
+  },
+  "afterLeavingChanges": {
+    "totalWorkingSetMb": 387,
+    "processes": [
+      {
+        "pid": 33884,
+        "type": "Browser",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 119.8,
+        "privateMb": 84.2,
+        "cpuPercent": 0.03
+      },
+      {
+        "pid": 35604,
+        "type": "GPU",
+        "serviceName": "GPU",
+        "name": "",
+        "workingSetMb": 106.9,
+        "privateMb": 328.9,
+        "cpuPercent": 0.04
+      },
+      {
+        "pid": 36272,
+        "type": "Utility",
+        "serviceName": "network.mojom.NetworkService",
+        "name": "Network Service",
+        "workingSetMb": 51.5,
+        "privateMb": 12.1,
+        "cpuPercent": 0
+      },
+      {
+        "pid": 40608,
+        "type": "Tab",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 108.8,
+        "privateMb": 51.6,
+        "cpuPercent": 0.22
+      }
+    ],
+    "renderer": {
+      "heapUsedMb": 3,
+      "heapTotalMb": 3.5,
+      "documents": 1,
+      "nodes": 2497,
+      "jsEventListeners": 299,
+      "error": null
+    }
+  },
+  "renderWindowExperiment": {
+    "windowedRows": 120,
+    "fullRows": 500,
+    "expansionClicks": 4,
+    "windowed": {
+      "totalWorkingSetMb": 385.9,
+      "renderer": {
+        "heapUsedMb": 3.5,
+        "heapTotalMb": 4,
+        "documents": 1,
+        "nodes": 2497,
+        "jsEventListeners": 299,
+        "error": null
+      },
+      "processes": [
+        {
+          "pid": 33884,
+          "type": "Browser",
+          "serviceName": null,
+          "name": "",
+          "workingSetMb": 119.9,
+          "privateMb": 84.3,
+          "cpuPercent": 0.03
+        },
+        {
+          "pid": 35604,
+          "type": "GPU",
+          "serviceName": "GPU",
+          "name": "",
+          "workingSetMb": 106.9,
+          "privateMb": 291.1,
+          "cpuPercent": 0.01
+        },
+        {
+          "pid": 36272,
+          "type": "Utility",
+          "serviceName": "network.mojom.NetworkService",
+          "name": "Network Service",
+          "workingSetMb": 51.5,
+          "privateMb": 12.1,
+          "cpuPercent": 0
+        },
+        {
+          "pid": 40608,
+          "type": "Tab",
+          "serviceName": null,
+          "name": "",
+          "workingSetMb": 107.6,
+          "privateMb": 50.1,
+          "cpuPercent": 0.15
+        }
+      ]
+    },
+    "full": {
+      "totalWorkingSetMb": 418,
+      "renderer": {
+        "heapUsedMb": 5.9,
+        "heapTotalMb": 6.3,
+        "documents": 1,
+        "nodes": 9382,
+        "jsEventListeners": 678,
+        "error": null
+      },
+      "processes": [
+        {
+          "pid": 33884,
+          "type": "Browser",
+          "serviceName": null,
+          "name": "",
+          "workingSetMb": 119.9,
+          "privateMb": 84.3,
+          "cpuPercent": 0.01
+        },
+        {
+          "pid": 35604,
+          "type": "GPU",
+          "serviceName": "GPU",
+          "name": "",
+          "workingSetMb": 110.5,
+          "privateMb": 283,
+          "cpuPercent": 0.04
+        },
+        {
+          "pid": 36272,
+          "type": "Utility",
+          "serviceName": "network.mojom.NetworkService",
+          "name": "Network Service",
+          "workingSetMb": 51.5,
+          "privateMb": 12.1,
+          "cpuPercent": 0
+        },
+        {
+          "pid": 40608,
+          "type": "Tab",
+          "serviceName": null,
+          "name": "",
+          "workingSetMb": 136.1,
+          "privateMb": 78.7,
+          "cpuPercent": 0.65
+        }
+      ]
+    },
+    "costOfFullRenderMb": 32.1
+  },
+  "changes": {
+    "totalWorkingSetMb": 385.9,
+    "processes": [
+      {
+        "pid": 33884,
+        "type": "Browser",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 120.6,
+        "privateMb": 85.3,
+        "cpuPercent": 0.18
+      },
+      {
+        "pid": 35604,
+        "type": "GPU",
+        "serviceName": "GPU",
+        "name": "",
+        "workingSetMb": 106.5,
+        "privateMb": 319.9,
+        "cpuPercent": 0.05
+      },
+      {
+        "pid": 36272,
+        "type": "Utility",
+        "serviceName": "network.mojom.NetworkService",
+        "name": "Network Service",
+        "workingSetMb": 51.5,
+        "privateMb": 12.1,
+        "cpuPercent": 0
+      },
+      {
+        "pid": 40608,
+        "type": "Tab",
+        "serviceName": null,
+        "name": "",
+        "workingSetMb": 107.3,
+        "privateMb": 50.4,
+        "cpuPercent": 0.13
+      }
+    ],
+    "renderer": {
+      "heapUsedMb": 3,
+      "heapTotalMb": 3.7,
+      "documents": 1,
+      "nodes": 431,
+      "jsEventListeners": 169,
+      "error": null
+    },
+    "path": "big.txt"
+  },
+  "history": [
+    {
+      "atMs": 5001,
+      "totalMb": 395.7,
+      "cpuPercent": 0
+    },
+    {
+      "atMs": 10001,
+      "totalMb": 392.9,
+      "cpuPercent": 0.13
+    },
+    {
+      "atMs": 15003,
+      "totalMb": 392.9,
+      "cpuPercent": 0
+    },
+    {
+      "atMs": 20003,
+      "totalMb": 393,
+      "cpuPercent": 0
+    },
+    {
+      "atMs": 25004,
+      "totalMb": 393,
+      "cpuPercent": 0
+    }
+  ]
+}

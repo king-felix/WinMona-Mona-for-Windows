@@ -1,0 +1,42 @@
+
+PASS the real shell loaded
+PASS Resume Brief names the recorded running task :: "Ship the daily-use polishtsk_0e62b478858e42f199ba7b09586ddb8d · running · mona_queue · at read recorded rowsRequirements: MONA-017, MONA-029irunning"
+PASS Resume Brief reports the recorded spend confidence :: "$0.0025 + 1 unknown record(s)"
+PASS Resume Brief reports the Git changed-file count :: "4 path(s)"
+PASS Resume Brief gives a deterministic next step :: "Resume tsk_0e62b478858e42f199ba7b09586ddb8d at: read recorded rows (running)."
+PASS Since you left reads a prior last-seen window :: "Since 11/11/2026, 12:43:32 PM · 10 event(s) · 0 timeline item(s) · 4 changed path(s)"
+PASS the bridge returns the same brief projection
+PASS Daybreak Home captured
+PASS Daybreak Since-you-left captured
+PASS Studio opened without a runtime
+PASS the execution controls are visible
+PASS Daybreak Studio captured
+PASS Focus Mode toggled from the topbar
+PASS Focus Mode hides the inspector :: {"focus":true,"inspector":false,"interrupt":true}
+PASS Focus Mode keeps the emergency interrupt control
+PASS Daybreak Focus Mode captured
+PASS Alt+2 reaches the Studio without a mouse
+PASS a notification focuses the recorded project :: "polish-project"
+PASS the matching evidence is marked focused
+PASS the focus path starts no task
+PASS Notification focus captured
+PASS Settings opened
+PASS quiet hours are shown as saved policy :: {"checked":true,"detail":"Quiet from 22:00 to 07:00 in the current timezone (America/Denver). Work continues; only notification delivery is silenced.","tray":"Tray: Mona is idle — No runtime is running. Idle Mona makes no request."}
+PASS quiet hours state that work continues :: "Quiet from 22:00 to 07:00 in the current timezone (America/Denver). Work continues; only notification delivery is silenced."
+PASS the tray text is present :: "Tray: Mona is idle — No runtime is running. Idle Mona makes no request."
+PASS a completion notification is planned once
+PASS a replayed completion is suppressed
+PASS quiet hours suppress delivery
+PASS lock-screen content carries no project, prompt or file detail :: {"first":"delivered","replay":"duplicate","quiet":"quiet_hours","title":"Mona finished a run","body":"Open Mona to review the result. Prompt text, file names, and project names are not shown in this notification.","privateLabelLeaked":false,"privatePathLeaked":false}
+PASS quiet hours follow the configured timezone instead of UTC :: {"utcQuietAt2230":true,"tokyoQuietAt2230Utc":false}
+PASS Afterglow shell loaded
+capture home-afterglow attempt 1 failed: Error: UnknownVizError
+PASS Afterglow Home captured
+PASS Studio opened in Afterglow
+PASS Afterglow Studio captured
+PASS Focus Mode toggled in Afterglow
+PASS Afterglow Focus Mode captured
+PASS Settings captured in Afterglow
+PASS Afterglow settings captured
+PASS no runtime was started by the probe :: "not_started"
+PASS the tray exists while the window is open

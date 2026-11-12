@@ -1,0 +1,115 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true
+    },
+    {
+      "name": "the composer is a labelled textarea",
+      "ok": true,
+      "detail": {
+        "label": "Prompt for a11y-project",
+        "tag": "textarea",
+        "labelled": true
+      }
+    },
+    {
+      "name": "the execution controls are present with names, and Interrupt is honestly disabled while idle",
+      "ok": true,
+      "detail": [
+        {
+          "name": "Pause after task",
+          "disabled": false
+        },
+        {
+          "name": "Interrupt now",
+          "disabled": true
+        }
+      ]
+    },
+    {
+      "name": "the timeline is a polite live log region",
+      "ok": true,
+      "detail": {
+        "role": "log",
+        "live": "polite"
+      }
+    },
+    {
+      "name": "a dialog opens from the keyboard with its name and takes focus",
+      "ok": true,
+      "detail": {
+        "dialogOpen": true,
+        "focusInside": true,
+        "dialogName": "Keyboard shortcuts",
+        "opener": true
+      }
+    },
+    {
+      "name": "Tab from the last control stays inside the dialog",
+      "ok": true,
+      "detail": {
+        "wrap": {
+          "wrapped": true,
+          "count": 1
+        },
+        "afterTab": true
+      }
+    },
+    {
+      "name": "Escape closes the dialog and returns focus to the control that opened it",
+      "ok": true,
+      "detail": {
+        "dialogClosed": true,
+        "focusRestored": true,
+        "openerReady": true,
+        "active": "Commands · Ctrl+K"
+      }
+    },
+    {
+      "name": "history was seeded for the windowed-list check",
+      "ok": true,
+      "detail": {
+        "seeded": 300
+      }
+    },
+    {
+      "name": "the earlier-items control is keyboard reachable and reveals older rows",
+      "ok": true,
+      "detail": {
+        "beforeRows": 120,
+        "afterRows": 240
+      }
+    },
+    {
+      "name": "the diff region is focusable and scrolls to its tail with a bounded row count",
+      "ok": true,
+      "detail": {
+        "focusable": true,
+        "lastRows": 28,
+        "firstRow": "1\ndiff --git a/big.txt b/big.txt",
+        "tail": "7980\n+line 3973 edited for the a11y prob"
+      }
+    },
+    {
+      "name": "at 200% zoom the page has no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "scrollWidth": 626,
+        "innerWidth": 634,
+        "composerVisible": true
+      }
+    },
+    {
+      "name": "at 200% zoom the composer is still laid out",
+      "ok": true,
+      "detail": {
+        "scrollWidth": 626,
+        "innerWidth": 634,
+        "composerVisible": true
+      }
+    }
+  ],
+  "providerRequests": 0
+}

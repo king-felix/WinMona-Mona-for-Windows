@@ -1,0 +1,55 @@
+{
+  "ok": false,
+  "stage": "elevation",
+  "elevationRequired": true,
+  "certificate": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-test-signing-0.1.0.cer",
+  "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+  "store": "Cert:\\LocalMachine\\TrustedPeople",
+  "verified": {
+    "certificate": {
+      "subject": "CN=Mona Development",
+      "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+      "notBefore": "2026-11-12T17:22:49.0000000Z",
+      "notAfter": "2027-11-12T17:32:49.0000000Z",
+      "hasPrivateKey": false,
+      "eku": [
+        "1.3.6.1.5.5.7.3.3"
+      ],
+      "sha256": "3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d"
+    },
+    "signer": {
+      "subject": "CN=Mona Development",
+      "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+      "notAfter": "2027-11-12T17:32:49.0000000Z"
+    },
+    "manifest": {
+      "name": "MonaWorkbench",
+      "publisher": "CN=Mona Development",
+      "version": "0.1.0.0",
+      "architecture": "x64"
+    },
+    "signingRecord": {
+      "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+      "subject": "CN=Mona Development",
+      "notAfter": "2027-11-12T17:32:49.0000000Z"
+    },
+    "verdict": {
+      "ok": true,
+      "problems": [],
+      "certificateSha256": "3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d"
+    }
+  },
+  "presence": {
+    "LocalMachine\\TrustedPeople": false,
+    "LocalMachine\\Root": false,
+    "CurrentUser\\TrustedPeople": false,
+    "CurrentUser\\Root": false
+  },
+  "problems": [
+    {
+      "code": "elevation-required",
+      "detail": "Writing LocalMachine\\TrustedPeople needs an elevated shell. Run the prepared command in an elevated terminal, then re-run this check."
+    }
+  ],
+  "preparedCommand": "# Run in an ELEVATED PowerShell (Run as administrator), then re-run the verifier:\nImport-Certificate -FilePath 'C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-test-signing-0.1.0.cer' -CertStoreLocation 'Cert:\\LocalMachine\\TrustedPeople'\nnode 'X:\\AI_projects\\Mona\\tools\\install\\cli.mjs' trust-test-certificate"
+}
