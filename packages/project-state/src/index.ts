@@ -9,6 +9,7 @@ export * from './artifacts.js';
 export * from './backup.js';
 export * from './export.js';
 export * from './journal.js';
+export * from './tasks.js';
 
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

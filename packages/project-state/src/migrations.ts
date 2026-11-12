@@ -230,6 +230,118 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX timeline_items_project ON timeline_items(project_id, created_at);
     `,
   },
+  {
+    version: 3,
+    name: 'task-execution',
+    sql: `
+      -- A task is a bounded, single-owner unit of work. The owner is part of the
+      -- record: Mona's queue must never independently schedule a task a native
+      -- workflow also owns.
+      ALTER TABLE tasks ADD COLUMN description TEXT NOT NULL DEFAULT '';
+      ALTER TABLE tasks ADD COLUMN execution_owner TEXT NOT NULL DEFAULT 'mona_queue';
+      ALTER TABLE tasks ADD COLUMN prompt_text TEXT NOT NULL DEFAULT '';
+      ALTER TABLE tasks ADD COLUMN ordinal INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE tasks ADD COLUMN current_step TEXT;
+      ALTER TABLE tasks ADD COLUMN claimed_at TEXT;
+      ALTER TABLE tasks ADD COLUMN started_at TEXT;
+      ALTER TABLE tasks ADD COLUMN last_transition_at TEXT;
+      ALTER TABLE tasks ADD COLUMN completed_at TEXT;
+      ALTER TABLE tasks ADD COLUMN blocked_reason TEXT;
+      ALTER TABLE tasks ADD COLUMN skipped_reason TEXT;
+
+      CREATE TRIGGER tasks_owner_insert BEFORE INSERT ON tasks
+      WHEN NEW.execution_owner NOT IN ('mona_queue', 'native_workflow')
+      BEGIN
+        SELECT RAISE(ABORT, 'execution_owner must be mona_queue or native_workflow');
+      END;
+      CREATE TRIGGER tasks_owner_update BEFORE UPDATE OF execution_owner ON tasks
+      WHEN NEW.execution_owner NOT IN ('mona_queue', 'native_workflow')
+      BEGIN
+        SELECT RAISE(ABORT, 'execution_owner must be mona_queue or native_workflow');
+      END;
+      CREATE TRIGGER tasks_status_insert BEFORE INSERT ON tasks
+      WHEN NEW.status NOT IN ('pending', 'running', 'verifying', 'completed', 'blocked', 'interrupted', 'skipped')
+      BEGIN
+        SELECT RAISE(ABORT, 'unknown task status');
+      END;
+      CREATE TRIGGER tasks_status_update BEFORE UPDATE OF status ON tasks
+      WHEN NEW.status NOT IN ('pending', 'running', 'verifying', 'completed', 'blocked', 'interrupted', 'skipped')
+      BEGIN
+        SELECT RAISE(ABORT, 'unknown task status');
+      END;
+
+      -- One active task per workspace, enforced by the database rather than by
+      -- the scheduler's good intentions. Two projects (workspaces) may each run
+      -- one task; the same workspace may not.
+      CREATE UNIQUE INDEX tasks_active_per_project ON tasks(project_id)
+        WHERE status IN ('running', 'verifying');
+
+      CREATE TABLE task_steps (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        position INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending',
+        detail TEXT,
+        updated_at TEXT NOT NULL,
+        UNIQUE(task_id, position),
+        CHECK (status IN ('pending', 'running', 'done', 'failed'))
+      );
+      CREATE INDEX task_steps_task ON task_steps(task_id, position);
+
+      CREATE TABLE task_acceptance (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        position INTEGER NOT NULL,
+        description TEXT NOT NULL,
+        kind TEXT NOT NULL DEFAULT 'check',
+        required INTEGER NOT NULL DEFAULT 1,
+        satisfied_at TEXT,
+        satisfied_note TEXT,
+        evidence_id TEXT,
+        UNIQUE(task_id, position),
+        CHECK (kind IN ('check', 'human')),
+        CHECK (required IN (0, 1))
+      );
+      CREATE INDEX task_acceptance_task ON task_acceptance(task_id, position);
+
+      CREATE TABLE task_evidence (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        criterion_id TEXT,
+        path TEXT NOT NULL,
+        sha256 TEXT NOT NULL,
+        kind TEXT NOT NULL,
+        note TEXT,
+        recorded_at TEXT NOT NULL,
+        stale INTEGER NOT NULL DEFAULT 0,
+        stale_reason TEXT,
+        CHECK (stale IN (0, 1))
+      );
+      CREATE INDEX task_evidence_task ON task_evidence(task_id);
+      CREATE INDEX task_evidence_path ON task_evidence(path);
+
+      CREATE TABLE task_requirements (
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        requirement_id TEXT NOT NULL,
+        criterion_id TEXT NOT NULL DEFAULT '',
+        PRIMARY KEY (task_id, requirement_id, criterion_id)
+      );
+
+      CREATE TABLE task_transitions (
+        id TEXT PRIMARY KEY,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        from_status TEXT,
+        to_status TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        actor TEXT NOT NULL,
+        at TEXT NOT NULL
+      );
+      CREATE INDEX task_transitions_task ON task_transitions(task_id, at);
+
+      CREATE INDEX task_dependencies_reverse ON task_dependencies(depends_on);
+    `,
+  },
 ];
 
 export type MigrationReport = {

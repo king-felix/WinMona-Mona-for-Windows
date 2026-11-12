@@ -693,3 +693,65 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   refusal.
 - **Constrains:** zero provider requests from a launch; the composer is focused
   and blocked with the existing reason when the runtime serves elsewhere.
+
+## D-0055 — A task has one recorded execution owner and one active run per workspace
+
+- **Decision:** every task stores `execution_owner = mona_queue | native_workflow`.
+  The Mona queue selects and claims only its own tasks. SQLite enforces one
+  active task (`running` or `verifying`) per project with a partial unique index.
+- **Why:** spec 10.3 forbids the queue and a native workflow from independently
+  scheduling the same task. A scheduler comment is not a guarantee; the database
+  refusing the second active row is.
+- **Constrains:** a native-owned task is visible on the board but never claimable
+  by Mona; two workspaces may each run one task; a blocked or interrupted task
+  does not occupy the active slot.
+
+## D-0056 — Completion is a state transition over recorded evidence, never a model claim
+
+- **Decision:** only `verifying` tasks can complete. Completion re-hashes every
+  linked artifact, requires all required check and human-only criteria to be
+  satisfied, rejects stale evidence, and requires at least one configured
+  criterion. Checks record the hash of a real project-relative artifact; a
+  supplied hash must match it. Human-only criteria are satisfied only by an
+  explicit actor/note call.
+- **Why:** a model saying "done" is a report, not proof. The project state must
+  be able to refuse a false completion even when the caller is confident.
+- **Constrains:** an executor cannot complete a task through the run control; it
+  can only record checks and steps. A changed artifact reopens a completed task
+  from `completed` to `verifying`, the one transition beyond the sketch in spec
+  8.2, because post-completion verification can become stale.
+
+## D-0057 — Imported plans are inert pending data until an explicit start
+
+- **Decision:** `mona.task-plan` imports validate schema, ids, prerequisites and
+  cycles without writing by default. `apply: true` inserts every task as
+  `pending` with no claim, start time, evidence or dispatch. Project export
+  schema v2 carries task criteria, steps, requirement links and evidence paths;
+  an exported active task imports as `interrupted`.
+- **Why:** importing a plan must not spend money or invent execution, and a
+  machine restart is not evidence that a previous run is still alive.
+- **Constrains:** import is a replace, not a merge; a digest-valid export that
+  marks a task completed with an unsatisfied criterion is refused; user-authored
+  criteria, requirement ids and prompt text survive the round trip.
+
+## D-0058 — Selection is deterministic and every exclusion is explained
+
+- **Decision:** eligible Mona tasks sort by interrupted-first, then ordinal,
+  prompt id, creation time and task id. Each board entry carries its status,
+  prerequisite, owner and workspace checks with a human-readable reason.
+  `runOnce` executes exactly one selection and then stops.
+- **Why:** "what should I do next?" must have a reproducible answer, and a
+  blocked or native-owned task must not look merely unlucky.
+- **Constrains:** prerequisites must be `completed` (not merely skipped); a
+  missing workspace is ineligible; `runOnce` never loops into a second task.
+
+## D-0059 — Product task state stays separate from Mona's own build ledger
+
+- **Decision:** the task engine writes project-scoped SQLite state and a
+  project-local handoff; Mona's build still uses `.mona/build/state.json`,
+  `attempts.jsonl` and the bootstrap CLI. Shared semantics (revision checks,
+  evidence hashes, deterministic handoff) do not become a shared file.
+- **Why:** spec 8.1 requires the two layers to remain distinct, and a user
+  project must not be able to corrupt or impersonate Mona's build state.
+- **Constrains:** the product never depends on the bootstrap utility to boot; the
+  bootstrap validator stays the authority for the Mona ledger only.

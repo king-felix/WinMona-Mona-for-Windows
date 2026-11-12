@@ -18,6 +18,10 @@ export type StateErrorCode =
   | 'alias_conflict'
   | 'relocation_required'
   | 'digest_mismatch'
+  | 'dependency_cycle'
+  | 'not_eligible'
+  | 'criteria_unsatisfied'
+  | 'evidence_mismatch'
   | 'oversize'
   | 'internal';
 

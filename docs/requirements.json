@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 189,
+  "revision": 203,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1141,29 +1141,80 @@
         "P10",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "prompt-catalog",
           "description": "Prompts are listed with dependencies and acceptance criteria",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:12Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "board returns every task with dependencies, acceptance criteria, owner and eligibility reason (P10 tests + sample run)"
+            },
+            {
+              "path": "docs/evidence/P10-tests.txt",
+              "sha256": "c6a9b47fbe99617508ca3be245905a555dd79ed707e394bf7df1ddc197e6b8d2",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:18:55Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "the task-state suite builds and asserts a board from real SQLite tasks"
+            }
+          ]
         },
         {
           "id": "dependencies",
           "description": "Blocked prompts cannot start before prerequisites are verified",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:17Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "cycle, self and cross-workspace links rejected; dependent task ineligible until prerequisite completed"
+            },
+            {
+              "path": "docs/evidence/P10-tests.txt",
+              "sha256": "c6a9b47fbe99617508ca3be245905a555dd79ed707e394bf7df1ddc197e6b8d2",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:18:56Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "24 task-state tests exercise prerequisite gating and cycle rejection"
+            }
+          ]
         },
         {
           "id": "eligibility",
           "description": "Eligible-task selection is deterministic and explainable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:17Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "deterministic interrupted-first ordering with an explanation for every exclusion"
+            },
+            {
+              "path": "docs/evidence/P10-tests.txt",
+              "sha256": "c6a9b47fbe99617508ca3be245905a555dd79ed707e394bf7df1ddc197e6b8d2",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:18:56Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "selection order and one-task runOnce behavior asserted"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "fbce73169b7557b962960947837d21e053c288c9",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1251,6 +1302,14 @@
               "recorded_utc": "2026-11-12T00:23:53Z",
               "commit": null,
               "note": "first handoff described; VOLATILE .mona/build/HANDOFF.md is intentionally not hash-pinned"
+            },
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:17Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "deterministic project handoff with current/next task, recorded step, verified work, blockers and evidence"
             }
           ]
         },
@@ -1266,6 +1325,14 @@
               "recorded_utc": "2026-11-12T00:23:53Z",
               "commit": null,
               "note": "ledger structure and counts described"
+            },
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:18Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "task_requirements links and project export v2 carry requirement ids and criteria"
             }
           ]
         },
@@ -1285,7 +1352,7 @@
           ]
         }
       ],
-      "verified_commit": "ad74116",
+      "verified_commit": "fbce73169b7557b962960947837d21e053c288c9",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1926,7 +1993,7 @@
         "P19",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "search",
@@ -1937,8 +2004,25 @@
         {
           "id": "context-preview",
           "description": "Exactly what will be sent as context is previewable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P10-continuity.md",
+              "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:16:18Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "exact dispatch prompt and hash are previewable; zero documents injected"
+            },
+            {
+              "path": "docs/evidence/P10-tests.txt",
+              "sha256": "c6a9b47fbe99617508ca3be245905a555dd79ed707e394bf7df1ddc197e6b8d2",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:18:56Z",
+              "commit": "fbce73169b7557b962960947837d21e053c288c9",
+              "note": "preview text/hash equals the claim prompt; oversized prompt refused"
+            }
+          ]
         },
         {
           "id": "resume-packet",

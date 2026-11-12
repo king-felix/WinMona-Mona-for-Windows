@@ -1,0 +1,5 @@
+P10 sample run: 4 tasks, 14 recorded steps
+  Create greeting: completed
+  Review greeting: completed
+  Independent polish: pending
+  Record a two-step resume: completed

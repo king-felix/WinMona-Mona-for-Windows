@@ -1,95 +1,81 @@
 # Mona build handoff
 
-**Current prompt:** P10 — Implement prompt execution and durable continuation
-**Current status:** P00–P09 completed. State revision 32 (two later P09 checkpoints
-refreshed evidence hashes after wording and line-ending normalization; no work
-changed). Next eligible: P10, P12, P13.
+**Current prompt:** P11 — Enforce the three-attempt rule and clear stop controls
+**Current status:** P00–P10 completed. State revision 34 (a second checkpoint
+refreshed evidence hashes after the final gate runs; no work changed). Next
+eligible: P11, P12, P13. P11 is the earliest eligible prompt.
 
-**Last verified commit / dirty work:** P08 ended at `380d7bb`; the P09 commit is
+**Last verified commit / dirty work:** P09 ended at `fbce731`; the P10 commit is
 created after this file and the evidence are written. `last_verified_commit`
 stays null because a state file cannot contain the hash of the commit that
-contains it. Verify with `node tools/build/cli.mjs validate` (expect OK, r32, 0
+contains it. Verify with `node tools/build/cli.mjs validate` (expect OK, r34, 0
 warnings) before trusting this file.
 
-## P09 result — the first right-click launch works
+## P10 result — bounded tasks with evidence-gated completion
 
-A real Explorer selection now reaches the ready studio. The classic per-user
-folder and folder-background menu are registered on this machine under the exact
-label **Start new DS project with Mona** (Windows 11 may show it under **Show more
-options**; the modern menu is P21).
+Project state now holds real prompt work: each task has one explicit execution
+owner (`mona_queue` or `native_workflow`), dependencies, steps, acceptance
+criteria, requirement links and recorded evidence. The Mona queue runs one
+eligible task and stops; a native-owned task is visible but never scheduled by
+Mona. SQLite enforces one active task per workspace with a partial unique index.
 
-- **Launcher contract** (`packages/adapter/src/cli.ts`):
-  `project open --path <folder> --profile ds-full-access`; `--path=value`, a
-  bare-path fallback, and strict refusal of unknown actions/options, missing
-  values/paths and foreign profiles. `stripLauncherArgs` removes the executable
-  and Electron's app path in development; `coerceLaunchCommand` validates a
-  command that crossed a process boundary.
-- **Live finding — Windows argv is not forwarded intact.** A real second
-  instance exits, but `second-instance` gives the owner a Chromium
-  re-serialization where `--path` is separated from its value
-  (`[exe, "--path", "--profile", ..., appPath, "project", "open", folder]`).
-  Fix: each instance parses its own argv before taking the lock and sends
-  `{ monaLaunch }` through `requestSingleInstanceLock(additionalData)`; the owner
-  validates it and falls back to argv. Decision D-0051. The failed attempt is in
-  `P09-launch-log.txt` history; the successful run logs `bridged=true` five times.
-- **Dispatch** (`launch-dispatch.ts`, `launch-target.ts`): one FIFO queue;
-  identical pending launches coalesce; each path yields one receipt. Opens or
-  reuses the project once, selects the saved DS Full Access profile, records the
-  Studio view, starts the owned runtime unless it already serves that workspace,
-  and never submits a task. Missing/file/inaccessible/unreachable paths are
-  distinct rejections; drive, share and WSL roots open the folder picker; UNC/WSL
-  subfolders open with an unqualified-runtime caveat. A runtime serving another
-  workspace is reported, never stopped.
-- **Renderer**: reads the latest receipt on load and subscribes to new ones;
-  refreshes the catalog, selects the project, forces Studio and focuses `#draft`.
-  Stale sequence numbers are ignored. 27 named preload methods
-  (`getLaunchState`, `onLaunchEvent` added).
-- **Registration** (`tools/launch/context-menu.mjs`): keys
-  `HKCU\Software\Classes\Directory\shell\Mona.StartNewProject` and
-  `...\Directory\Background\shell\Mona.StartNewProject`, exact label, Icon,
-  `MonaOwned=1`, `NeverDefault`, `MultiSelectModel=Single`, and
-  `"<exe>" "<app>" project open --path "%V" --profile ds-full-access`. Every write
-  is an argument array through `reg.exe`; nothing is interpolated into a shell
-  command. Register twice → `changed=false`; uninstall removes only the two Mona
-  keys (a foreign sibling survived the live check). The final registration is
-  left in place and currently names the development Electron binary and this
-  checkout; `npm run launch:menu -- unregister` removes it.
-- **No model work from the shell**: zero threads, zero timeline items and zero
-  spend after every launch in the live run.
+- **Schema v3** (`packages/project-state/src/migrations.ts`): task description,
+  owner, prompt text, ordinal, recorded step and transition timestamps, plus
+  `task_steps`, `task_acceptance`, `task_evidence`, `task_requirements` and
+  `task_transitions`. Triggers constrain owner and status values.
+- **TaskService** (`packages/project-state/src/tasks.ts`): create/edit/remove,
+  dependency validation with cycle rejection, deterministic board and selection,
+  claim, step control, check recording, human acceptance, verification,
+  completion, interrupt/block/skip, reconcile/resume, revalidation, context
+  preview, handoff and inert plan import.
+- **Completion cannot be claimed**: only `verifying` tasks complete; every
+  required check and human item must be satisfied; completion re-hashes linked
+  artifacts and refuses missing or stale evidence; a task with no criteria cannot
+  complete. A model has no completion path through the run control.
+- **Stale verification**: changed artifacts mark evidence stale and reopen a
+  completed task to `verifying`. This is the one transition beyond spec 8.2,
+  recorded as D-0056.
+- **Resume**: `reconcile` turns an active task with no live run into
+  `interrupted` and preserves its recorded step; `resumeTask` continues at that
+  step or moves to verification when all steps are done.
+- **Selection**: interrupted work first, then ordinal, prompt id, creation time
+  and id. Every board entry explains status, prerequisite, owner and workspace
+  checks. `runOnce` runs exactly one task and returns.
+- **Context preview**: the exact prompt and hash that dispatch submits; only the
+  task, steps, criteria, prerequisites and requirement ids. `documentsInjected`
+  is always 0; over-limit prompts are refused, never silently truncated.
+- **Import/export**: `mona.task-plan` is inert until `apply: true`, which creates
+  pending tasks only. Project export v2 carries criteria, steps, requirement
+  links and evidence; a digest-valid completion claim with an unsatisfied
+  criterion is refused; exported active tasks import as `interrupted`.
+- **Build ledger separation**: product tasks live in project-scoped SQLite and a
+  project-local handoff. Mona's own build still uses `.mona/build` and the
+  bootstrap CLI (D-0059).
 
-Evidence: `docs/evidence/P09-launch.md` (report), `P09-launch.json` +
-`P09-launch-log.txt` (20 live in-app steps, 6 ordered receipts, 3 screenshots),
-`P09-launch-registration.json` (14 registration checks), `shots-p09/` (3 live
-screenshots plus each child instance's recorded argv), `P09-tests.txt`,
-`P09-checks.txt`, `P09-build.txt`, `P09-shell-smoke.json`,
-`P09-catalog-regression.json` + log + `shots-p09-catalog/` (P07 regression,
-21/21). Decisions D-0050 … D-0054.
+Evidence: `docs/evidence/P10-continuity.md` (report and acceptance matrix),
+`P10-continuity.json` + `P10-sample-log.txt` (14-step sample run, 4 tasks,
+provider requests 0), `P10-tests.txt` (282 Vitest + 13 bootstrap + 12 launch +
+8 spike = 315 passing), `P10-checks.txt`, `P10-build.txt`. Decisions D-0055 …
+D-0059.
 
-Live receipt: startup argv opened the folder
-`…\mona p09 alpha & (beta) 'quoted' — ünïcode`, runtime ready, composer focused,
-notice "Opened from Explorer"; a real second instance opened
-`mona p09 second` and the window switched with an honest "runtime is serving
-another workspace" caveat; a trailing-separator/case-changed relaunch reused the
-same project id with no new entry; two fast launches produced receipts seq 4–5
-with the newest on screen; a missing folder was rejected and left the screen
-unchanged.
+## Next exact action (P11)
 
-## Next exact action (P10)
-
-Read P10 in `Mona_PROMPTS.md` and spec section 8. Implement task/prompt creation,
-dependencies, single-owner scheduling, the task state machine, evidence-backed
-completion, resume reconciliation and short handoff generation. Keep the Mona
-build ledger separate from user project state. No launch work remains open; the
-modern menu and packaged registration are P21.
+Read P11 in `Mona_PROMPTS.md`, spec 8.4/8.5 and 10.3. Implement stable problem
+IDs, the append-only attempt ledger with total and consecutive-no-progress
+counters, the third-attempt block and Victor handoff card, dependency-block
+propagation, and the execution boundaries for pause/interrupt/cancel. Use
+P10's `blocked`/`interrupted` task states and recorded step; do not invent a
+second scheduler. Keep the build attempt ledger in `.mona/build/attempts.jsonl`
+separate from project attempts in SQLite.
 
 ## Relevant files and spec sections
 
-- `packages/adapter/src/{cli,lifecycle}.ts`,
-  `apps/desktop/src/{shared/launch.ts,preload/preload.ts}`,
-  `apps/desktop/src/main/{launch-target,launch-dispatch,launch-ipc,launch-probe,
-  main}.ts`, `apps/desktop/src/renderer/{App,StudioPanel}.tsx`,
-  `tools/launch/context-menu.mjs`, `apps/desktop/scripts/launch.mjs`
-- Spec 5.1 (J1), 6.4 (process lifecycle), 14 (Explorer integration), 9.1, 13.
+- `packages/project-state/src/{tasks.ts,tasks.test.ts,export.ts,migrations.ts}`,
+  `packages/project-state/scripts/task-run.mjs`
+- P11 will also touch `packages/adapter/src/{work-control,supervisor}.ts`,
+  `apps/desktop/src/main/studio-service.ts` and the task IPC/UI boundary.
+- Spec 8.1 (two layers), 8.2 (task state machine), 8.4 (three-attempt rule),
+  8.5 (resume), 10.3 (scheduler ownership), 17 (definition of done).
 
 ## Open problem IDs and no-progress counts
 
@@ -98,7 +84,7 @@ No open blocker; `attempts.jsonl` holds only the closed P02 rows.
 - **P01-ISSUE-001** — exec vs runtime endpoint fingerprint drift; P16.
 - **P01-ISSUE-002** — one owned runtime per machine session; a launch for a
   different workspace opens the project with a caveat instead of stopping the
-  runtime (live-verified again by P09).
+  runtime (live-verified by P09).
 - **P01-ISSUE-003** — terminal capability flags false; P18.
 - **P01-ISSUE-004** — cost sample provisional; re-run after routing changes.
 - **P04-ISSUE-001** — no Job Object; `taskkill /T` plus reconcile.
@@ -106,8 +92,7 @@ No open blocker; `attempts.jsonl` holds only the closed P02 rows.
 - **P05-ISSUE-001** — maintenance barrier is in-process (D-0032).
 - **P06-ISSUE-002** — no human screen-reader pass yet; P22 owns it.
 - **P07-ISSUE-001** — probe scripts still default to fixed historical paths when
-  prompt-scoped `MONA_*` output variables are absent (P09 used scoped variables).
-- **P07-ISSUE-002** — closed by P08.
+  prompt-scoped `MONA_*` output variables are absent.
 - **P08-ISSUE-001** — `packages/contracts` models four engine event names; the
   studio projects the rest by name in the desktop service; revisit at P16/P18.
 - **P08-ISSUE-002** — approval waits are surfaced and interruptible; Mona still
@@ -117,8 +102,15 @@ No open blocker; `attempts.jsonl` holds only the closed P02 rows.
 - **P09-ISSUE-001** — the classic registration names the development Electron
   binary and repository path until P21/P23 install a packaged executable.
 - **P09-ISSUE-002** — Explorer's own placement ("Show more options") and a human
-  click are not programmatically verifiable; the probe runs the exact registered
-  argv through real Electron instances. Manual acceptance remains for P21/P22.
+  click are not programmatically verifiable.
+- **P10-ISSUE-001** — the task engine has no renderer work-board surface yet. The
+  board, reasons and selection API are tested; the UI is left to the later UI
+  prompts rather than adding an unrequested screen in P10.
+- **P10-ISSUE-002** — `runOnce` has a tested executor boundary but is not yet
+  wired to `StudioService`. P11 owns pause/interrupt/cancel process behavior and
+  is the natural point to connect the queue to live engine turns.
+- **P10-ISSUE-003** — native-workflow execution is recorded as an owner but a
+  real native workflow dispatcher is P15.
 
 ## Blocked dependencies
 
@@ -126,32 +118,28 @@ None.
 
 ## Last relevant validation
 
-- `npx vitest run` → 258 passed (28 files; +43 in P09).
-- `npm run bootstrap:test` → 13; `npm run launch:test` → 12; `npm run spike:test` → 8.
-- `npm run lint`, `npm run format:check`, `npm run typecheck` → pass.
+- `npm test` → 282 Vitest (29 files; +24 in P10); bootstrap 13, launch 12,
+  spike 8 → 315 passing.
 - `npm run build` → contracts, adapter, project-state, ui, desktop; renderer
   290.35 kB (gzip 87.39 kB).
-- `npm run check:build -w @mona/desktop` → pass, 27 named preload channels.
-- `npm run launch` → 14/14 registration checks + 20/20 live launch steps, 3 live
-  screenshots; exact read-back of both keys; uninstall isolation verified.
-- `npm run catalog -w @mona/desktop` (`P09-catalog-regression.json`) → 21/21.
-- `npm run smoke -w @mona/desktop` (`P09-shell-smoke.json`) → pass, 27 named
-  bridge methods, 332 MB.
-- `node tools/build/cli.mjs validate` → OK, r29, 0 warnings before the final
-  checkpoint (r32); re-run after reading this file.
-- Spend: zero. Every P09 check ran without a provider request; launches start the
-  local runtime only.
+- `npm run typecheck`, `npm run lint`, `npm run format:check` → pass.
+- `node tools/build/cli.mjs validate` → OK, r34, 0 warnings after the final P10
+  checkpoint refreshed the evidence hashes.
+- `node packages/project-state/scripts/task-run.mjs` → 4 tasks, 14 steps,
+  create/reconcile/resume/human-completion/stale-revalidation all recorded;
+  provider requests 0.
+- Spend: zero. Every P10 check ran locally without a provider request.
 
 ## Human input needed
 
-None to continue. One standing human acceptance item for P21/P22: right-click a
-folder and a folder background in Explorer and choose **Start new DS project with
-Mona** (possibly under **Show more options**). The registration currently points
-at the development build; remove it with `npm run launch:menu -- unregister` or
-replace it at install time.
+None to continue P11. One standing human acceptance item for P21/P22: right-click
+a folder and a folder background in Explorer and choose **Start new DS project
+with Mona** (possibly under **Show more options**). The registration currently
+points at the development build; remove it with
+`npm run launch:menu -- unregister` or replace it at install time.
 
 Standing caution unchanged: edit source with byte-safe tools. A PowerShell
 `Get-Content`/`Set-Content` round-trip double-encoded `App.tsx` and
-`catalog-probe.ts` in P07; `check-build.mjs` fails on mojibake. The two remaining
+`catalog-probe.ts` in P07; `check-build.mjs` fails on mojibake. The remaining
 `Â·`/`â€™` sequences in `DECISIONS.md` and older handoff text are quoted examples
 of that incident, not corrupted text.

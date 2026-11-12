@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 32,
+  "revision": 34,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P10",
+  "current_prompt": "P11",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -686,15 +686,65 @@
       "blocker_ids": []
     },
     "P10": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-009",
         "MONA-010",
         "MONA-024"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "schema v3 plus TaskService: explicit owner, dependencies, steps, acceptance criteria, evidence, requirement links",
+        "deterministic board and interrupted-first selection; one active task per workspace enforced by a partial unique index",
+        "evidence-gated completion re-hashes artifacts; stale evidence reopens completed work to verifying",
+        "reconcile/resume at the recorded step, block/skip transitions and deterministic handoff",
+        "inert mona.task-plan import and project export v2 preserve user criteria, steps and requirement traceability",
+        "24 task-state tests and a 14-step sample project run with zero provider requests"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P10-continuity.md",
+          "sha256": "9c56336595ef9b3d6ec2977bfff008deab22b614c5d77bb89c4f949121c53bd8",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        },
+        {
+          "path": "docs/evidence/P10-continuity.json",
+          "sha256": "07754fce81183493172779038b968b97016d2bf04c6ea944cb65a43451da5de5",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        },
+        {
+          "path": "docs/evidence/P10-tests.txt",
+          "sha256": "c6a9b47fbe99617508ca3be245905a555dd79ed707e394bf7df1ddc197e6b8d2",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        },
+        {
+          "path": "docs/evidence/P10-checks.txt",
+          "sha256": "a694068cbe809d5ba0586fd3057d068809cc60b33b02e842de4301d33b334148",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        },
+        {
+          "path": "docs/evidence/P10-build.txt",
+          "sha256": "fcd1e413fea4a6c61ea68f4030e494836640e5427d01be743201e51fd20c1f61",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        },
+        {
+          "path": "docs/evidence/P10-sample-log.txt",
+          "sha256": "950d365179b56daa2f50327487edcd16f55cc2c3b6c05245ff296d628b81cf41",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:19:05Z",
+          "commit": "fbce73169b7557b962960947837d21e053c288c9"
+        }
+      ],
       "blocker_ids": []
     },
     "P11": {
@@ -873,9 +923,9 @@
     }
   },
   "next_eligible_prompts": [
-    "P10",
+    "P11",
     "P12",
     "P13"
   ],
-  "last_checkpoint_utc": "2026-11-12T06:46:48Z"
+  "last_checkpoint_utc": "2026-11-12T07:19:06Z"
 }

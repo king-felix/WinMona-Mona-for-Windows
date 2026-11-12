@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "kind": "mona.p10-sample-run",
+  "generated_utc": "2026-11-12T07:18:48.441Z",
+  "workspace": "<temporary sample workspace>",
+  "provider_requests": 0,
+  "tasks": [
+    {
+      "id": "tsk_47c401a7bff543e09beb3f872f5c18ef",
+      "title": "Create greeting",
+      "status": "completed",
+      "owner": "mona_queue",
+      "dependencies": [],
+      "criteria": [
+        {
+          "description": "greeting.txt says hello",
+          "kind": "check",
+          "satisfied": true
+        }
+      ],
+      "evidence": [
+        {
+          "path": "greeting.txt",
+          "sha256": "5891b5b522d5df086d0ff0b110fbd9d21bb4fc7163af34d08286a2e846f6be03",
+          "stale": true
+        },
+        {
+          "path": "greeting.txt",
+          "sha256": "d9a4c6676a62cb3b8ca0b8459ab341837cdba8543316c8574b454ccc24d4c690",
+          "stale": false
+        }
+      ],
+      "requirements": [
+        {
+          "requirementId": "SAMPLE-001",
+          "criterionId": "greeting"
+        }
+      ]
+    },
+    {
+      "id": "tsk_624a758b5fb14941912fccc4b0937b51",
+      "title": "Review greeting",
+      "status": "completed",
+      "owner": "mona_queue",
+      "dependencies": [
+        "tsk_47c401a7bff543e09beb3f872f5c18ef"
+      ],
+      "criteria": [
+        {
+          "description": "review.txt exists",
+          "kind": "check",
+          "satisfied": true
+        },
+        {
+          "description": "Victor accepted the wording",
+          "kind": "human",
+          "satisfied": true
+        }
+      ],
+      "evidence": [
+        {
+          "path": "review.txt",
+          "sha256": "a9f2d25d1f71f8065e2119e538bde8846570fcdad320388236e99d9e225c290d",
+          "stale": false
+        }
+      ],
+      "requirements": []
+    },
+    {
+      "id": "tsk_c8f7b417099348358407afaba15d333f",
+      "title": "Independent polish",
+      "status": "pending",
+      "owner": "mona_queue",
+      "dependencies": [],
+      "criteria": [
+        {
+          "description": "polish applied",
+          "kind": "check",
+          "satisfied": false
+        }
+      ],
+      "evidence": [],
+      "requirements": []
+    },
+    {
+      "id": "tsk_a9b6563fa32c4bd59e3f35ebbb1695ec",
+      "title": "Record a two-step resume",
+      "status": "completed",
+      "owner": "mona_queue",
+      "dependencies": [],
+      "criteria": [
+        {
+          "description": "both step files exist",
+          "kind": "check",
+          "satisfied": true
+        }
+      ],
+      "evidence": [
+        {
+          "path": "step-two.txt",
+          "sha256": "27dd8ed44a83ff94d557f9fd0412ed5a8cbca69ea04922d88c01184a07300a5a",
+          "stale": false
+        }
+      ],
+      "requirements": []
+    }
+  ],
+  "board": {
+    "next": "tsk_c8f7b417099348358407afaba15d333f",
+    "eligible": [
+      "tsk_c8f7b417099348358407afaba15d333f"
+    ],
+    "entries": [
+      {
+        "id": "tsk_47c401a7bff543e09beb3f872f5c18ef",
+        "status": "completed",
+        "eligible": false,
+        "reason": "completed work does not start"
+      },
+      {
+        "id": "tsk_624a758b5fb14941912fccc4b0937b51",
+        "status": "completed",
+        "eligible": false,
+        "reason": "completed work does not start"
+      },
+      {
+        "id": "tsk_c8f7b417099348358407afaba15d333f",
+        "status": "pending",
+        "eligible": true,
+        "reason": "ready to start"
+      },
+      {
+        "id": "tsk_a9b6563fa32c4bd59e3f35ebbb1695ec",
+        "status": "completed",
+        "eligible": false,
+        "reason": "completed work does not start"
+      }
+    ]
+  },
+  "handoff": "# P10 sample — handoff\n\nGenerated: 2026-11-12T07:18:48.431Z\nTasks: 4 total, 3 completed, 0 blocked.\n\n## Next task\n\n- Task: tsk_c8f7b417099348358407afaba15d333f — Independent polish\n- Status: pending\n- Owner: mona_queue\n\n## Verified work\n\n- tsk_47c401a7bff543e09beb3f872f5c18ef: Create greeting (greeting.txt)\n- tsk_624a758b5fb14941912fccc4b0937b51: Review greeting (review.txt)\n- tsk_a9b6563fa32c4bd59e3f35ebbb1695ec: Record a two-step resume (step-two.txt)\n\n## Files\n\n- Workspace: x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p10-sample-kdyez3\\sample-project\n- State: local project SQLite (not the Mona build ledger)\n",
+  "handoff_file_written": true,
+  "steps": [
+    {
+      "name": "register project",
+      "detail": {
+        "projectId": "prj_74c06d025a9c452d890b0ca2002f0b0c",
+        "status": "created"
+      }
+    },
+    {
+      "name": "create tasks",
+      "detail": {
+        "ids": {
+          "first": "tsk_47c401a7bff543e09beb3f872f5c18ef",
+          "resume": "tsk_a9b6563fa32c4bd59e3f35ebbb1695ec",
+          "second": "tsk_624a758b5fb14941912fccc4b0937b51",
+          "independent": "tsk_c8f7b417099348358407afaba15d333f"
+        }
+      }
+    },
+    {
+      "name": "run once (first task)",
+      "detail": {
+        "taskId": "tsk_47c401a7bff543e09beb3f872f5c18ef",
+        "status": "completed",
+        "completed": true,
+        "reason": "one task ran; the queue stops here"
+      }
+    },
+    {
+      "name": "reconcile with no live run",
+      "detail": [
+        {
+          "taskId": "tsk_a9b6563fa32c4bd59e3f35ebbb1695ec",
+          "fromStatus": "running",
+          "step": "tst_cec057f3be774bd4aac7827aa7fae282",
+          "reason": "no live run at reconciliation"
+        }
+      ]
+    },
+    {
+      "name": "resume",
+      "detail": {
+        "status": "running",
+        "currentStep": "tst_cec057f3be774bd4aac7827aa7fae282",
+        "stepTitle": "write step-two.txt"
+      }
+    },
+    {
+      "name": "resume completed",
+      "detail": {
+        "status": "completed"
+      }
+    },
+    {
+      "name": "selection before human acceptance",
+      "detail": {
+        "taskId": "tsk_624a758b5fb14941912fccc4b0937b51",
+        "reason": "ready to start"
+      }
+    },
+    {
+      "name": "run once (dependent task)",
+      "detail": {
+        "taskId": "tsk_624a758b5fb14941912fccc4b0937b51",
+        "status": "verifying",
+        "completion": {
+          "taskId": "tsk_624a758b5fb14941912fccc4b0937b51",
+          "completed": false,
+          "status": "verifying",
+          "gaps": [
+            "Victor accepted the wording is not satisfied",
+            "a human-only acceptance item is still open"
+          ]
+        }
+      }
+    },
+    {
+      "name": "human acceptance and completion",
+      "detail": {
+        "status": "completed"
+      }
+    },
+    {
+      "name": "revalidate",
+      "detail": {
+        "checked": 1,
+        "invalidated": [
+          {
+            "taskId": "tsk_47c401a7bff543e09beb3f872f5c18ef",
+            "evidenceId": "tev_dd0576766f1e4555be39a4c3a99343bc",
+            "path": "greeting.txt",
+            "reason": "artifact greeting.txt changed; its recorded evidence is stale"
+          }
+        ],
+        "reopened": [
+          "tsk_47c401a7bff543e09beb3f872f5c18ef"
+        ]
+      }
+    },
+    {
+      "name": "stale task reopened",
+      "detail": {
+        "status": "verifying",
+        "gaps": "artifact greeting.txt changed; its recorded evidence is stale"
+      }
+    },
+    {
+      "name": "stale task re-verified",
+      "detail": {
+        "status": "completed"
+      }
+    },
+    {
+      "name": "final board",
+      "detail": {
+        "next": "tsk_c8f7b417099348358407afaba15d333f",
+        "eligible": [
+          "tsk_c8f7b417099348358407afaba15d333f"
+        ],
+        "independentStatus": "pending"
+      }
+    },
+    {
+      "name": "handoff generated",
+      "detail": {
+        "bytes": 620
+      }
+    }
+  ]
+}

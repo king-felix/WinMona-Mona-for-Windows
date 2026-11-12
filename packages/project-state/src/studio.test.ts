@@ -45,10 +45,12 @@ async function project(store: ProjectStore, label: string): Promise<{ id: string
 }
 
 describe('studio persistence', () => {
-  it('ships a second migration without editing the first', () => {
-    expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2]);
+  it('ships new migrations without editing the first', () => {
+    expect(MIGRATIONS.map((migration) => migration.version)).toEqual([1, 2, 3]);
     expect(MIGRATIONS[0]?.sql).not.toContain('timeline_items');
     expect(MIGRATIONS[1]?.sql).toContain('timeline_items');
+    expect(MIGRATIONS[2]?.sql).toContain('task_acceptance');
+    expect(MIGRATIONS[1]?.sql).not.toContain('task_acceptance');
   });
 
   it('binds one engine thread per project session and updates the observed profile', async () => {
