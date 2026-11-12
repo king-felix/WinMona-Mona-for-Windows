@@ -1,0 +1,37 @@
+﻿Expose the full Engine API with --http, or smaller compatibility controls
+
+Usage: codewhale app-server [OPTIONS]
+
+Options:
+      --http                       Serve the full HTTP/SSE runtime API (`/v1/*`: sessions, threads, turns, approvals, events, usage, fleet, tasks). This is the canonical runtime API surface; it delegates to the same server as `codewhale serve --http`
+      --mobile                     Serve the runtime API plus the phone-friendly mobile control page. Equivalent to the legacy `codewhale serve --mobile`
+      --stdio                      Run the smaller compatibility JSON-RPC control transport over stdio. Tool-free turns require allowed_tools: []; use --http for interactive work
+      --socket                     Run as the desktop daemon: the same JSON-RPC control transport as `--stdio`, served on a user-private local endpoint under the Codewhale runtime directory (Unix socket or Windows named pipe). Clients must authenticate and `daemon/attach` first
+      --socket-path <SOCKET_PATH>  Socket path override for --socket. Defaults to `$CODEWHALE_HOME/run/daemon.sock`, else `$XDG_RUNTIME_DIR/codewhale/daemon.sock`, else `~/Library/Application Support/codewhale/daemon.sock` (macOS) or `~/.codewhale/run/daemon.sock`
+      --qr                         Show a QR code for the mobile URL in the terminal (requires --mobile)
+      --host <HOST>                Bind host. Defaults to 127.0.0.1. --mobile is loopback-only: it does not widen the bind, and a non-loopback mobile bind is rejected
+      --port <PORT>                Bind port. Defaults to 7878 for --http/--mobile (the runtime API) and 8787 for the legacy in-process app-server HTTP transport
+      --enable <FEATURE>           Enable a feature for this run (repeatable)
+      --workers <WORKERS>          Background task worker count (1-8). Only used with --http/--mobile
+      --config <CONFIG>            
+      --disable <FEATURE>          Disable a feature for this run (repeatable)
+      --auth-token <AUTH_TOKEN>    Bearer token required on runtime API routes. Visible in the process list; prefer CODEWHALE_RUNTIME_TOKEN
+      --insecure-no-auth           
+      --cors-origin <CORS_ORIGIN>  
+  -h, --help                       Print help
+
+Transports:
+  codewhale app-server --http              Full HTTP/SSE runtime API (/v1/*) on 127.0.0.1:7878
+  codewhale app-server --mobile            Runtime API + phone control page (127.0.0.1 only)
+  codewhale app-server --stdio             Compatibility JSON-RPC controls and tool-free turns
+  codewhale app-server                     Compatibility HTTP routes on the canonical owner at 127.0.0.1:8787
+
+`--http` and `--mobile` serve the same mature runtime API as `codewhale serve
+--http`/`--mobile`, which remain as compatibility aliases. The runtime API token
+is read from --auth-token, CODEWHALE_RUNTIME_TOKEN, or DEEPSEEK_RUNTIME_TOKEN.
+
+Compatibility turns require explicit allowed_tools: []; use --http for tools,
+approvals, clarification and the full event journal.
+
+See docs/RUNTIME_API.md.
+

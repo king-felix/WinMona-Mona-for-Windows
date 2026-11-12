@@ -1,0 +1,30 @@
+﻿Run a local Codewhale server
+
+Usage: codewhale serve [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Forwarded serve options:
+      --mcp                 Start MCP server over stdio
+      --http                Start runtime HTTP/SSE API server
+      --mobile              Start runtime HTTP/SSE API server with the mobile control page
+      --web                 Start the embedded loopback-only browser client
+      --qr                  Show a QR code for the mobile URL (requires --mobile)
+      --acp                 Start ACP server over stdio for editor clients
+      --host <HOST>         Bind host (default 127.0.0.1; --mobile is loopback-only)
+      --port <PORT>         Bind port [default: 7878]
+      --workers <WORKERS>   Background task worker count (1-8)
+      --cors-origin <URL>   Additional CORS origin to allow (repeatable)
+      --auth-token <TOKEN>  Require this bearer token for /v1/* runtime API routes
+      --insecure            Disable runtime API auth when no token is configured
+
+`codewhale serve --http` and `codewhale serve --mobile` remain compatibility
+aliases for `codewhale app-server --http` and `codewhale app-server --mobile`.
+New integrations should prefer `codewhale app-server --http` for the full Engine API.
+

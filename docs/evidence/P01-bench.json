@@ -1,0 +1,1081 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T00:53:14.822Z",
+  "engine_path": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+  "pilot_ceiling_usd": 2,
+  "rates": {
+    "source": "engine bundled model catalog: deepseek-flash cost {input: 0.15, cache_read: 0.003, output: 0.6} USD per million tokens",
+    "input_per_m_usd": 0.15,
+    "cache_read_per_m_usd": 0.003,
+    "output_per_m_usd": 0.6
+  },
+  "reps": 2,
+  "runs": [
+    {
+      "task": "file-test",
+      "rep": 0,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 7645,
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27392,
+        "miss": 12396,
+        "output": 271,
+        "reasoning": 0
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11915,
+          "output": 178,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 13056,
+          "miss": 233,
+          "output": 58,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 3,
+          "hit": 13184,
+          "miss": 248,
+          "output": 35,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "`sum.js` and `sum.test.js` created.\n\n`node --test` result: **1 passing**, 0 failing (1 test, 0 suites).",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\file-test-direct-0-1794444794823-688088",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "sum_bytes": 66,
+          "test_bytes": 185,
+          "pass": 1,
+          "fail": 0
+        }
+      },
+      "costUsd": 0.002104176,
+      "costBasis": "estimated with engine bundled rates"
+    },
+    {
+      "task": "file-test",
+      "rep": 0,
+      "arm": "adapter",
+      "elapsedMs": 9210,
+      "threadId": "thr_a795abcccdb74107911824abfbb1ef73",
+      "turnId": "turn_c4ddbe6b27854f718d9f74e6e834fc65",
+      "status": "completed",
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27264,
+        "miss": 12265,
+        "output": 346,
+        "reasoning": 0
+      },
+      "engineCostUsd": 0.002129142,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12265,
+        "cached_tokens": 27264,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11823,
+          "output": 186,
+          "duration_ms": 913
+        },
+        {
+          "hit": 12928,
+          "miss": 277,
+          "output": 58,
+          "duration_ms": 720
+        },
+        {
+          "hit": 13184,
+          "miss": 165,
+          "output": 102,
+          "duration_ms": 1180
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "I'll create the two files and run the tests.\nDone.\n\n- **sum.js**: exports `sum(a, b)` via `module.exports` (CommonJS, so `node --test` picks up `.js` in a non-`type: module` dir).\n- **sum.test.js**: uses `node:test` with `assert.strictEqual(sum(2, 2), 4)`.\n- **`node --test` result**: 1 test, 1 pass, 0 fail.\n\nNo other files were created.",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\file-test-adapter-0-1794444802567-50768",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "sum_bytes": 66,
+          "test_bytes": 180,
+          "pass": 1,
+          "fail": 0
+        }
+      },
+      "costUsd": 0.002129142,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "file-test",
+      "rep": 1,
+      "arm": "adapter",
+      "elapsedMs": 12689,
+      "threadId": "thr_83e8dc97a6874e35aeff2638530702bb",
+      "turnId": "turn_30fabad7de274405a6d97b0d236d8709",
+      "status": "completed",
+      "requests": 4,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 40576,
+        "miss": 12510,
+        "output": 514,
+        "reasoning": 80
+      },
+      "engineCostUsd": 0.002306628,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12510,
+        "cached_tokens": 40576,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11823,
+          "output": 187,
+          "duration_ms": 1171
+        },
+        {
+          "hit": 12928,
+          "miss": 278,
+          "output": 84,
+          "duration_ms": 1130
+        },
+        {
+          "hit": 13184,
+          "miss": 187,
+          "output": 121,
+          "duration_ms": 896
+        },
+        {
+          "hit": 13312,
+          "miss": 222,
+          "output": 122,
+          "duration_ms": 1233
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "I'll create both files, then run the test.\nDone.\n\n- **sum.js**: exports `sum(a, b)` as a named export (`module.exports = { sum }`).\n- **sum.test.js**: uses `node:test` + `node:assert`, asserts `sum(2, 2) === 4`.\n- **`node --test` result: 1 passing, 0 failing** (`tests 1`, `pass 1`, `fail 0`, ~56ms).\n\nWorking tree contains only `sum.js` and `sum.test.js` (plus the pre-existing `.codewhale` directory).",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\file-test-adapter-1-1794444811891-938985",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "sum_bytes": 66,
+          "test_bytes": 184,
+          "pass": 1,
+          "fail": 0
+        }
+      },
+      "costUsd": 0.002306628,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "file-test",
+      "rep": 1,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 8413,
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27392,
+        "miss": 12395,
+        "output": 267,
+        "reasoning": 0
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11915,
+          "output": 177,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 13056,
+          "miss": 232,
+          "output": 58,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 3,
+          "hit": 13184,
+          "miss": 248,
+          "output": 32,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "Created `sum.js` and `sum.test.js`; `node --test` → **pass 1, fail 0** (1 test).",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\file-test-direct-1-1794444824695-138285",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "sum_bytes": 66,
+          "test_bytes": 184,
+          "pass": 1,
+          "fail": 0
+        }
+      },
+      "costUsd": 0.0021016259999999997,
+      "costBasis": "estimated with engine bundled rates"
+    },
+    {
+      "task": "diagnostic",
+      "rep": 0,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 5067,
+      "requests": 2,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 14080,
+        "miss": 12155,
+        "output": 108,
+        "reasoning": 12
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11931,
+          "output": 38,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 12928,
+          "miss": 224,
+          "output": 70,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "`sum.js` exports a single function `sum(a, b)` that returns the arithmetic sum of its two arguments. It has no side effects beyond exporting that function and no input validation, so it relies on the caller passing numbers (or values where `+` coercion is intended).",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\diagnostic-direct-0-1794444833211-442002",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "unchanged": true,
+          "response_chars": 266
+        }
+      },
+      "costUsd": 0.0019302899999999999,
+      "costBasis": "estimated with engine bundled rates"
+    },
+    {
+      "task": "diagnostic",
+      "rep": 0,
+      "arm": "adapter",
+      "elapsedMs": 5175,
+      "threadId": "thr_172d92c5736944a9ae2abaf8d2b829e2",
+      "turnId": "turn_b35a6df6047049798f7a72f9bd0de14d",
+      "status": "completed",
+      "requests": 2,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 13952,
+        "miss": 12099,
+        "output": 133,
+        "reasoning": 29
+      },
+      "engineCostUsd": 0.001936506,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12099,
+        "cached_tokens": 13952,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11839,
+          "output": 38,
+          "duration_ms": 1059
+        },
+        {
+          "hit": 12800,
+          "miss": 260,
+          "output": 95,
+          "duration_ms": 943
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "`sum.js` defines and exports an ES module function `sum(a, b)` that returns the addition of its two arguments. There is no validation or coercion logic, so the result follows JavaScript's native `+` semantics (numeric addition, or string concatenation if either argument is a string).\n\nNo files were modified.",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\diagnostic-adapter-0-1794444838288-836763",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "unchanged": true,
+          "response_chars": 309
+        }
+      },
+      "costUsd": 0.001936506,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "diagnostic",
+      "rep": 1,
+      "arm": "adapter",
+      "elapsedMs": 4464,
+      "threadId": "thr_b2d86c8dc8e34f359b5016c220ef8731",
+      "turnId": "turn_097690a6bfa946b29985b2876fa0b316",
+      "status": "completed",
+      "requests": 2,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 13952,
+        "miss": 12099,
+        "output": 80,
+        "reasoning": 0
+      },
+      "engineCostUsd": 0.001904706,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12099,
+        "cached_tokens": 13952,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11839,
+          "output": 38,
+          "duration_ms": 429
+        },
+        {
+          "hit": 12800,
+          "miss": 260,
+          "output": 42,
+          "duration_ms": 766
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "`sum.js` exports a single function `sum(a, b)` that returns the result of adding its two arguments together. It is a minimal ES module with no validation, defaults, or other logic.",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\diagnostic-adapter-1-1794444843484-718358",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "unchanged": true,
+          "response_chars": 180
+        }
+      },
+      "costUsd": 0.001904706,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "diagnostic",
+      "rep": 1,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 4738,
+      "requests": 2,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 14080,
+        "miss": 12155,
+        "output": 76,
+        "reasoning": 0
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11931,
+          "output": 38,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 12928,
+          "miss": 224,
+          "output": 38,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "`sum.js` exports a function `sum(a, b)` that returns the addition of its two arguments. It's a single named ES module export with no side effects or validation.",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\diagnostic-direct-1-1794444847969-4878",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "unchanged": true,
+          "response_chars": 160
+        }
+      },
+      "costUsd": 0.0019110899999999998,
+      "costBasis": "estimated with engine bundled rates"
+    },
+    {
+      "task": "multi-step",
+      "rep": 0,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 7764,
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27264,
+        "miss": 12319,
+        "output": 345,
+        "reasoning": 87
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11889,
+          "output": 98,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 12928,
+          "miss": 254,
+          "output": 159,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 3,
+          "hit": 13184,
+          "miss": 176,
+          "output": 88,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "Created `a.txt` (1 byte, `1`) and `b.txt` (1 byte, `2`) — no trailing newlines.\n\nCommand:\n\n```powershell\nGet-Content a.txt, b.txt | ForEach-Object { \"[$_]\" }\n```\n\nOutput:\n\n```\n[1]\n[2]\n```\n\nThe bracket delimiters make it visible that each file holds exactly one character, in order a then b.",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\multi-step-direct-0-1794444852716-588376",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "a": "1",
+          "b": "2",
+          "response_chars": 290
+        }
+      },
+      "costUsd": 0.002136642,
+      "costBasis": "estimated with engine bundled rates"
+    },
+    {
+      "task": "multi-step",
+      "rep": 0,
+      "arm": "adapter",
+      "elapsedMs": 10891,
+      "threadId": "thr_a4be87a18e3f4500b3e82eb84f6968e9",
+      "turnId": "turn_58d0713ba5c4463e8328bd9699286149",
+      "status": "completed",
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27520,
+        "miss": 12173,
+        "output": 802,
+        "reasoning": 389
+      },
+      "engineCostUsd": 0.00238971,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12173,
+        "cached_tokens": 27520,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11797,
+          "output": 111,
+          "duration_ms": 588
+        },
+        {
+          "hit": 12928,
+          "miss": 175,
+          "output": 505,
+          "duration_ms": 2635
+        },
+        {
+          "hit": 13440,
+          "miss": 201,
+          "output": 186,
+          "duration_ms": 1123
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "I'll create both files, then read them back in one command.\nDone — both files created in the workspace and read back in a single shell command.\n\nCommand run:\n```powershell\nWrite-Host \"a.txt: [$(Get-Content -Raw a.txt)]  bytes=$((Get-Item a.txt).Length)\"; Write-Host \"b.txt: [$(Get-Content -Raw b.txt)]  bytes=$((Get-Item b.txt).Length)\"\n```\n\nOutput:\n```\na.txt: [1]  bytes=1\nb.txt: [2]  bytes=1\n```\n\n- **a.txt**: contents `1`, 1 byte, no trailing newline.\n- **b.txt**: contents `2`, 1 byte, no trailing newline.\n\nThe bracketed values are the raw contents with nothing stripped, so the \"exactly 1\" / \"exactly 2\" requirement is visible: one character each, no line break.",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\multi-step-adapter-0-1794444860483-443673",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "a": "1",
+          "b": "2",
+          "response_chars": 668
+        }
+      },
+      "costUsd": 0.00238971,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "multi-step",
+      "rep": 1,
+      "arm": "adapter",
+      "elapsedMs": 13364,
+      "threadId": "thr_e6c66c964ed24ecab3eed1a623aff6ac",
+      "turnId": "turn_373b9f455d0c4ccb91e984732301453d",
+      "status": "completed",
+      "requests": 3,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 27904,
+        "miss": 12224,
+        "output": 979,
+        "reasoning": 592
+      },
+      "engineCostUsd": 0.002504712,
+      "costComplete": true,
+      "pricingProvenances": [
+        "provider_docs"
+      ],
+      "totalsSemantics": {
+        "input_tokens": 12224,
+        "cached_tokens": 27904,
+        "note": "thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input"
+      },
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "requestUsage": [
+        {
+          "hit": 1152,
+          "miss": 11797,
+          "output": 376,
+          "duration_ms": 2564
+        },
+        {
+          "hit": 13184,
+          "miss": 179,
+          "output": 417,
+          "duration_ms": 2488
+        },
+        {
+          "hit": 13568,
+          "miss": 248,
+          "output": 186,
+          "duration_ms": 1581
+        }
+      ],
+      "toolCatalogHash": "0f99047f2627d914733a13f5a9bfa6b55f21de2e80032f86dcb357d09de17148",
+      "response": "Done — both files created and printed with a single shell command.\n\nCommand run:\n\n```powershell\n\"---- a.txt ($((Get-Item a.txt).Length) bytes) ----\"; Get-Content -Raw a.txt; \"---- b.txt ($((Get-Item b.txt).Length) bytes) ----\"; Get-Content -Raw b.txt\n```\n\nOutput:\n\n```\n---- a.txt (1 bytes) ----\n1\n---- b.txt (1 bytes) ----\n2\n```\n\nVerified by the write receipts (1 byte each) and by the byte counts in the command output: `a.txt` is exactly `1`, `b.txt` is exactly `2`, with no trailing newline. Note the shell's own return needs a newline to separate the two, so the terminal shows the closing `----` line right after the digits — the files themselves hold only the single byte.",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\multi-step-adapter-1-1794444871392-797139",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "a": "1",
+          "b": "2",
+          "response_chars": 678
+        }
+      },
+      "costUsd": 0.002504712,
+      "costBasis": "engine-reported priced usage"
+    },
+    {
+      "task": "multi-step",
+      "rep": 1,
+      "arm": "direct",
+      "exitCode": 0,
+      "elapsedMs": 12303,
+      "requests": 6,
+      "transportRetries": 0,
+      "usage": {
+        "hit": 68096,
+        "miss": 12886,
+        "output": 542,
+        "reasoning": 66
+      },
+      "requestUsage": [
+        {
+          "turn": 1,
+          "hit": 1152,
+          "miss": 11889,
+          "output": 100,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 2,
+          "hit": 12928,
+          "miss": 256,
+          "output": 164,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 3,
+          "hit": 13312,
+          "miss": 216,
+          "output": 66,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 4,
+          "hit": 13440,
+          "miss": 181,
+          "output": 98,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 5,
+          "hit": 13568,
+          "miss": 194,
+          "output": 63,
+          "finish_reason": "tool_use"
+        },
+        {
+          "turn": 6,
+          "hit": 13696,
+          "miss": 150,
+          "output": 51,
+          "finish_reason": "end_turn"
+        }
+      ],
+      "tool": {
+        "count": 15,
+        "schema_bytes": 35883,
+        "schema_sha256": "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+      },
+      "endpointFingerprint": "6a440b422e727dd307ca07f0f1df977bd3ac1d0d62917187225a12b9f5f306de",
+      "wireModel": "deepseek-flash",
+      "metadata": {
+        "status": "completed",
+        "retry_count": 0,
+        "approval_posture": "auto_tools",
+        "sandbox_posture": "full access (sandbox disabled)",
+        "model": "deepseek-flash",
+        "provider": "deepseek",
+        "binary_sha256": "sha256:578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+        "tool_catalog_sha256": "sha256:f26540bc4e27fa3de3f80ea5bbe87b72e0c2cf32b04ac5d5cf4e2a70f1d730f4"
+      },
+      "response": "Done.\n\n- `a.txt`: 1 byte, content `1`\n- `b.txt`: 1 byte, content `2`\n- Command: `Get-Content a.txt, b.txt` → output:\n```\n1\n2\n```",
+      "stderr": "",
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p01-bench\\multi-step-direct-1-1794444884773-213597",
+      "accepted": true,
+      "acceptance": {
+        "accepted": true,
+        "evidence": {
+          "a": "1",
+          "b": "2",
+          "response_chars": 128
+        }
+      },
+      "costUsd": 0.002462388,
+      "costBasis": "estimated with engine bundled rates"
+    }
+  ],
+  "pairs": [
+    {
+      "task": "file-test",
+      "rep": 0,
+      "order": [
+        "direct",
+        "adapter"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.002104176,
+        "requests": 3,
+        "usage": {
+          "hit": 27392,
+          "miss": 12396,
+          "output": 271,
+          "reasoning": 0
+        },
+        "elapsedMs": 7645,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.002129142,
+        "requests": 3,
+        "usage": {
+          "hit": 27264,
+          "miss": 12265,
+          "output": 346,
+          "reasoning": 0
+        },
+        "elapsedMs": 9210,
+        "status": "completed"
+      },
+      "costRatio": 1.011864977074161,
+      "deltaPct": 1.1864977074161078
+    },
+    {
+      "task": "file-test",
+      "rep": 1,
+      "order": [
+        "adapter",
+        "direct"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.0021016259999999997,
+        "requests": 3,
+        "usage": {
+          "hit": 27392,
+          "miss": 12395,
+          "output": 267,
+          "reasoning": 0
+        },
+        "elapsedMs": 8413,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.002306628,
+        "requests": 4,
+        "usage": {
+          "hit": 40576,
+          "miss": 12510,
+          "output": 514,
+          "reasoning": 80
+        },
+        "elapsedMs": 12689,
+        "status": "completed"
+      },
+      "costRatio": 1.0975444727082746,
+      "deltaPct": 9.754447270827454
+    },
+    {
+      "task": "diagnostic",
+      "rep": 0,
+      "order": [
+        "direct",
+        "adapter"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.0019302899999999999,
+        "requests": 2,
+        "usage": {
+          "hit": 14080,
+          "miss": 12155,
+          "output": 108,
+          "reasoning": 12
+        },
+        "elapsedMs": 5067,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.001936506,
+        "requests": 2,
+        "usage": {
+          "hit": 13952,
+          "miss": 12099,
+          "output": 133,
+          "reasoning": 29
+        },
+        "elapsedMs": 5175,
+        "status": "completed"
+      },
+      "costRatio": 1.003220241518114,
+      "deltaPct": 0.3220241518113899
+    },
+    {
+      "task": "diagnostic",
+      "rep": 1,
+      "order": [
+        "adapter",
+        "direct"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.0019110899999999998,
+        "requests": 2,
+        "usage": {
+          "hit": 14080,
+          "miss": 12155,
+          "output": 76,
+          "reasoning": 0
+        },
+        "elapsedMs": 4738,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.001904706,
+        "requests": 2,
+        "usage": {
+          "hit": 13952,
+          "miss": 12099,
+          "output": 80,
+          "reasoning": 0
+        },
+        "elapsedMs": 4464,
+        "status": "completed"
+      },
+      "costRatio": 0.9966594979828266,
+      "deltaPct": -0.33405020171733957
+    },
+    {
+      "task": "multi-step",
+      "rep": 0,
+      "order": [
+        "direct",
+        "adapter"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.002136642,
+        "requests": 3,
+        "usage": {
+          "hit": 27264,
+          "miss": 12319,
+          "output": 345,
+          "reasoning": 87
+        },
+        "elapsedMs": 7764,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.00238971,
+        "requests": 3,
+        "usage": {
+          "hit": 27520,
+          "miss": 12173,
+          "output": 802,
+          "reasoning": 389
+        },
+        "elapsedMs": 10891,
+        "status": "completed"
+      },
+      "costRatio": 1.118441928970787,
+      "deltaPct": 11.844192897078706
+    },
+    {
+      "task": "multi-step",
+      "rep": 1,
+      "order": [
+        "adapter",
+        "direct"
+      ],
+      "direct": {
+        "accepted": true,
+        "costUsd": 0.002462388,
+        "requests": 6,
+        "usage": {
+          "hit": 68096,
+          "miss": 12886,
+          "output": 542,
+          "reasoning": 66
+        },
+        "elapsedMs": 12303,
+        "status": "completed"
+      },
+      "adapter": {
+        "accepted": true,
+        "costUsd": 0.002504712,
+        "requests": 3,
+        "usage": {
+          "hit": 27904,
+          "miss": 12224,
+          "output": 979,
+          "reasoning": 592
+        },
+        "elapsedMs": 13364,
+        "status": "completed"
+      },
+      "costRatio": 1.017188192924917,
+      "deltaPct": 1.7188192924916899
+    }
+  ],
+  "notes": [
+    "Adapter cost is engine-reported (priced usage provenance provider_docs); direct cost is computed from the same engine bundled rates because exec does not emit a cost field.",
+    "Reasoning tokens are already included in output_tokens for this route; they are not added again.",
+    "Every run is a fresh workspace; order alternates per repetition to reduce warm-cache bias."
+  ],
+  "totals": {
+    "reportedCostUsd": 0.025817615999999998,
+    "directCostUsd": 0.012646211999999999,
+    "adapterCostUsd": 0.013171404000000001,
+    "acceptedDirect": 6,
+    "acceptedAdapter": 6,
+    "runs": 12,
+    "medianPairedDeltaPct": 1.4526584999538987
+  },
+  "verdict": {
+    "tool_schema_parity": true,
+    "tool_schema_hashes": [
+      "bf3cf7cbad2ac3ab1548ce4865a633c1fcfb5bbae265ea3bd3e966a9ce1f1465"
+    ],
+    "acceptance_parity": true,
+    "median_paired_delta_pct": 1.4526584999538987,
+    "within_5_percent_tolerance": true,
+    "status": "pass_provisional",
+    "caveat": "small sample, one machine, prompt caching active; provisional per spec 9.4"
+  }
+}

@@ -1,0 +1,19 @@
+﻿Update this release binary from GitHub (package-managed installs get migration instructions)
+
+Usage: codewhale update [OPTIONS]
+
+Options:
+      --beta               Update to the latest beta release instead of the latest stable release
+      --check              Only check the latest release; do not download or replace binaries
+      --proxy <URL>        Proxy URL to use for update HTTP requests
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+GitHub Releases is the default source. Supported mirrors are explicit overrides or manifest-failure fallbacks. Checksums are required; older releases never replace a newer build.
+
+The command prints the executable it will update. If you have multiple installs, run the intended binary by its full path.
+
+New macOS/Linux install: curl -fsSL https://codewhale.net/install.sh | sh
+Installation and PATH help: https://github.com/codewhale-hq/CodeWhale/blob/main/docs/INSTALL.md
+

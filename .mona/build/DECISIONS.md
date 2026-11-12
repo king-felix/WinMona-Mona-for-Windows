@@ -110,3 +110,78 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   the moment P00 itself completed. Tests must not depend on build progress.
 - **Constrains:** test evidence is fixture-based by nature; runtime/engine
   compatibility claims still require tests against the real binary (P01+).
+
+## D-0011 — HTTP/SSE runtime is the primary integration; exec is one-shot only
+
+- **Decision:** Mona integrates through `codewhale app-server --http` (`/v1/*`,
+  bearer token, loopback) behind a versioned adapter. `codewhale exec` is used
+  only for verified one-shot jobs and diagnostics, never as a silent substitute
+  for the persistent control channel.
+- **Why:** P01 contract tests proved auth, thread/turn lifecycle, durable events,
+  replay, resume, usage, interrupt, and idempotent submission on `/v1/*`. The
+  stdio/socket compatibility transports advertise a narrower surface.
+- **Evidence:** `docs/evidence/P01-contract.json`, `P01-g0.json`.
+- **Constrains:** P03 must keep the adapter contract-tested against the pinned
+  binary; no route may be added from documentation alone.
+
+## D-0012 — Serialize mutating work per workspace by default
+
+- **Decision:** one mutating turn per workspace is the default. Parallel project
+  execution stays disabled until Mona owns and verifies a workspace lease.
+- **Why:** on Windows the second runtime in the same workspace was not refused;
+  two simultaneous tiny turns completed without observed corruption, but one
+  observation is not a safety proof, and the upstream changelog says the
+  per-workspace lease is Unix-only today.
+- **Evidence:** `docs/evidence/P01-g0.json` (concurrent A/C step).
+- **Constrains:** P04/P07 must implement the lease before enabling parallelism.
+
+## D-0013 — Persist submission intent and operation key before sending
+
+- **Decision:** every thread create and turn submit carries a client-generated
+  operation key persisted locally first. A replay of the same key with the same
+  data is accepted idempotently; a replay with different data is a hard error.
+- **Why:** the runtime advertises `turn_operation_idempotency`,
+  `turn_operation_lookup`, and `thread_create_idempotency`. P01 observed turn
+  replay as `200` + `idempotent_replay: true` with the same turn id, and thread
+  replay as `201` with the same thread id; a changed request under the same key
+  returns `409` and was never substituted.
+- **Evidence:** `docs/evidence/P01-contract.json`, `P01-g0.json`.
+- **Constrains:** a lost response must never trigger a blind retry. P03 must
+  reconcile with the operation key and surface outcome-unknown when the runtime
+  cannot answer.
+
+## D-0014 — Cost buckets use cache-hit, cache-miss, and output separately
+
+- **Decision:** cost is computed as
+  `hit × 0.003 + miss × 0.15 + output × 0.6` USD per million for the pinned
+  `deepseek-flash` route, using rates from the engine's bundled model catalog.
+  Reasoning tokens are not added again because the engine includes them in
+  `output_tokens`. Unknown buckets remain unknown.
+- **Why:** the formula reproduces the engine-reported adapter cost exactly, and
+  the stream/period endpoints expose the three buckets.
+- **Evidence:** `docs/evidence/P01-bench.json`, `P01-g0.json`.
+- **Constrains:** provider billing stays authoritative; P12 must store rate
+  provenance and the historical rate revision.
+
+## D-0015 — Runtime token travels through the environment, never argv
+
+- **Decision:** the owned runtime receives `CODEWHALE_RUNTIME_TOKEN` through its
+  environment; the client binds only to `http://127.0.0.1:<port>`; credentials
+  are never printed, committed, or passed on a command line.
+- **Why:** the engine help states `--auth-token` is visible in the process list.
+  The client rejects non-loopback base URLs and short tokens at construction.
+- **Evidence:** `tests/spike/client.test.mjs`, `tools/spike/runtime/client.mjs`.
+- **Constrains:** P02's preload/IPC boundary must never expose the token or
+  arbitrary HTTP to the renderer.
+
+## D-0016 — Preserve the route and report fingerprint drift, do not "fix" it
+
+- **Decision:** the configured provider/model/endpoint stay untouched. The
+  observed difference between CLI `exec` and runtime endpoint fingerprints
+  (`6a440b42…` vs `812b1f7c…`) is recorded as an open issue, not corrected by
+  editing config.
+- **Why:** wire model, dialect, and tool-schema hash are identical, so this is
+  not justification for changing Victor's working route.
+- **Evidence:** `docs/evidence/P01-feasibility.md`, `P01-bench.json`.
+- **Constrains:** P03 displays the runtime fingerprint actually used; P16 must
+  explain or resolve the difference with Victor's consent.

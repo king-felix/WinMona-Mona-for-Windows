@@ -1,0 +1,11 @@
+﻿Print a usage rollup from the audit log and session store
+
+Usage: codewhale metrics [OPTIONS]
+
+Options:
+      --json               Emit machine-readable JSON
+      --since <DURATION>   Restrict to events newer than this duration (e.g. 7d, 24h, 30m, now-2h)
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

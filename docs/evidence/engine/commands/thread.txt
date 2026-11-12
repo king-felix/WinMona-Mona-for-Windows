@@ -1,0 +1,20 @@
+﻿Manage thread/session metadata and resume/fork flows
+
+Usage: codewhale thread [OPTIONS] <COMMAND>
+
+Commands:
+  list        
+  read        
+  resume      Resume through the acknowledged owner and print its durable receipt
+  fork        Fork complete history through the owner and print the new receipt
+  archive     
+  unarchive   
+  set-name    
+  clear-name  Remove the custom name from a thread, restoring the default `(unnamed)` rendering in `thread list`
+  help        Print this message or the help of the given subcommand(s)
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

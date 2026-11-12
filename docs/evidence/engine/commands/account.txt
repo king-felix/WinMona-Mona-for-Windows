@@ -1,0 +1,26 @@
+﻿Manage an existing Codewhale account; new accounts are not open
+
+Usage: codewhale account [OPTIONS] <COMMAND>
+
+Commands:
+  login      Sign this CLI profile in through the browser device flow
+  status     Show the signed-in account for this CLI profile
+  logout     Remove this profile's local account session and revoke it when reachable
+  keys       Manage provider API keys stored in the signed-in Codewhale account
+  computers  Manage Computers in this signed-in Codewhale account
+  projects   List Projects available to this signed-in Codewhale account
+  github     Inspect GitHub repositories authorized for this account
+  agents     Manage named Agents and their account conversations
+  api-keys   Manage Codewhale account API keys: machine tokens for CI
+  whoami     Show the account this CLI authenticates as, preferring a machine key
+  agent      Check the account's agent-model precondition for machine work
+  pull       Inspect the account document; local settings import is not available yet
+  push       Push local settings to the account document (never automatic, --dry-run required)
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+      --api-base <URL>     Codewhale account API origin. HTTPS is required except for loopback HTTP
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

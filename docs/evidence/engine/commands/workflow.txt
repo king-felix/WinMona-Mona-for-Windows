@@ -1,0 +1,21 @@
+﻿Run checked-in Workflows through a Lane Runtime backend
+
+Usage: codewhale workflow [OPTIONS] <COMMAND>
+
+Commands:
+  run   Run a checked-in Workflow through a Runtime-backed Lane
+  help  Print this message or the help of the given subcommand(s)
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Examples:
+  codewhale workflow run stopship --fleet stopship --runtime tmux --goal verify-release-candidate
+  codewhale workflow run stopship --fleet stopship --runtime inline --verify
+
+`workflow run` validates the checked-in Workflow source and named Fleet roster,
+creates a Lane record, then dispatches the Workflow tool directly through the
+selected Runtime backend without an operator model turn.
+

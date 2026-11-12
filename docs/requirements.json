@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 14,
+  "revision": 27,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -374,7 +374,7 @@
         "P03",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "identity",
@@ -394,15 +394,23 @@
         {
           "id": "capabilities",
           "description": "Version-pinned CLI, API, configuration and extension inventory exists with evidence",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
-              "path": "docs/codewhale-capabilities.json",
-              "sha256": "4faaa310a1051b6f9e38cd0087f111249f9ca61a314dd819624bb8acc750b004",
+              "path": "docs/evidence/P01-feasibility.md",
+              "sha256": "de6663a6a54f541c36281d3f666c2bb42647976c3ea08a6e92886f23274b1763",
               "kind": "document",
-              "recorded_utc": "2026-11-12T00:23:41Z",
-              "commit": null,
-              "note": "seed inventory only: 43 top-level commands + 4 transports, all unqualified"
+              "recorded_utc": "2026-11-12T01:02:18Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "P01 qualified 43 top-level commands with captured help and the full /v1 route table; deep subcommand/MCP/plugin detail remains P17/P18"
+            },
+            {
+              "path": "docs/codewhale-capabilities.json",
+              "sha256": "d0b424249095fd8c07453adbaf17a0fee232dbb6fd0fc0d36e10651f0eae57a1",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:35Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "P01 qualified ledger: 2 qualified transports, 43 command help captures, tested runtime routes, honest unsupported flags"
             }
           ]
         },
@@ -430,8 +438,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -444,35 +452,71 @@
         "P04",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "tool-turn",
           "description": "One real tool-enabled task starts, streams, finishes through the installed runtime",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-g0.json",
+              "sha256": "af5d6a1e379559f7bdf6cf6511d55799557888397b6634911e50d7ed984a4ee6",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:19Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "real tool turn wrote files and passed an independent node --test"
+            }
+          ]
         },
         {
           "id": "stream",
           "description": "Live events are observed, validated and survive unknown event types",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-g0.json",
+              "sha256": "af5d6a1e379559f7bdf6cf6511d55799557888397b6634911e50d7ed984a4ee6",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:19Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "durable event journal observed end to end, including usage and workspace snapshots"
+            }
+          ]
         },
         {
           "id": "interrupt-resume",
           "description": "Interrupt and resume produce truthful receipts and no silent replay",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-g0.json",
+              "sha256": "af5d6a1e379559f7bdf6cf6511d55799557888397b6634911e50d7ed984a4ee6",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:19Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "interrupt converged to interrupted with no owned child left; restart resumed the same thread"
+            }
+          ]
         },
         {
           "id": "route",
           "description": "Effective provider and resolved model match the configured route",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-g0.json",
+              "sha256": "af5d6a1e379559f7bdf6cf6511d55799557888397b6634911e50d7ed984a4ee6",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:19Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "effective provider deepseek, model deepseek-flash, permission_posture full_access on the turn record"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -485,29 +529,56 @@
         "P22",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "no-idle-inference",
           "description": "Idle UI, navigation, exports and reconnects cause zero provider requests",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-contract.json",
+              "sha256": "dc83a659b87195b0e306320962c6c626c8cc3db31ec156500c409943b7bc0198",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:19Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "5s idle, discovery, thread create, history, event reconnect all moved zero tokens"
+            }
+          ]
         },
         {
           "id": "parity",
           "description": "Paired direct/Mona cost per accepted task recorded with method and confidence",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-bench.json",
+              "sha256": "b40b12f5ad7b2cc0bd2c60dc46a89d8b4be9dad6d3b36f7fdeef39fca20e6e46",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "median paired delta +1.45% across 6 pairs, identical tool-schema hash and request counts; provisional small sample"
+            }
+          ]
         },
         {
           "id": "transparency",
           "description": "Unknown usage or price is labeled unknown, never zero or invented",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-bench.json",
+              "sha256": "b40b12f5ad7b2cc0bd2c60dc46a89d8b4be9dad6d3b36f7fdeef39fca20e6e46",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "adapter cost engine-reported; direct cost estimated from the same bundled rates; provenance recorded"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1586,31 +1657,67 @@
         "P22",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "unsupported-states",
           "description": "Unsupported features explain the exact reason and never appear enabled",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/codewhale-capabilities.json",
+              "sha256": "d0b424249095fd8c07453adbaf17a0fee232dbb6fd0fc0d36e10651f0eae57a1",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "terminal capability flags false and unavailable-by-choice rows recorded instead of enabled controls"
+            }
+          ]
         },
         {
           "id": "version-drift",
           "description": "Runtime version changes are detected and unsafe operations disabled",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-feasibility.md",
+              "sha256": "de6663a6a54f541c36281d3f666c2bb42647976c3ea08a6e92886f23274b1763",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "pinned 0.10.2/ff466b2ed0bf; runtime reports version/commit; drift UI is P18/P22"
+            }
+          ]
         },
         {
           "id": "upgrade-qualification",
           "description": "Upgrades are explicit tested compatibility decisions",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P01-feasibility.md",
+              "sha256": "de6663a6a54f541c36281d3f666c2bb42647976c3ea08a6e92886f23274b1763",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "no upgrade exercised; compatibility policy begins in P03"
+            }
+          ]
         },
         {
           "id": "coverage-report",
           "description": "A coverage report states what is qualified, partial or blocked",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/codewhale-capabilities.json",
+              "sha256": "d0b424249095fd8c07453adbaf17a0fee232dbb6fd0fc0d36e10651f0eae57a1",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:02:20Z",
+              "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+              "note": "discovered surface and route table recorded; full capability explorer is P18"
+            }
+          ]
         }
       ],
       "verified_commit": null,

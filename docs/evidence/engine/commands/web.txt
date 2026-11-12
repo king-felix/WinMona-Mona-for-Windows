@@ -1,0 +1,13 @@
+﻿Open the first-class local browser client over the canonical Runtime API
+
+Usage: codewhale web [OPTIONS]
+
+Options:
+      --port <PORT>        Loopback port for the local Runtime API and embedded client [default: 7878]
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+The browser receives a one-time loopback bootstrap capability, never the Runtime token.
+The capability is exchanged for a bounded, process-local HttpOnly, SameSite=Strict web session and then invalidated.
+

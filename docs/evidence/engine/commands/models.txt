@@ -1,0 +1,19 @@
+﻿List cached models; use --update to refresh configured provider catalogs
+
+Usage: codewhale models [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Examples:
+  codewhale models --update
+  codewhale models --update --provider openai
+  codewhale models --provider openai-codex --json
+
+--update (alias: --refresh) refreshes configured provider catalogs. --provider ID limits the scope.
+

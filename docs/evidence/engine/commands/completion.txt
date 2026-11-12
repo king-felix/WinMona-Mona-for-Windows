@@ -1,0 +1,46 @@
+﻿Generate shell completions
+
+Usage: codewhale completion [OPTIONS] <SHELL>
+
+Arguments:
+  <SHELL>  [possible values: bash, elvish, fish, powershell, zsh]
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Every script completes both `codewhale` and the `codew` shorthand.
+
+Examples:
+  Bash (current shell only):
+    source <(codewhale completion bash)
+
+  Bash (persistent, Linux/bash-completion):
+    mkdir -p ~/.local/share/bash-completion/completions
+    codewhale completion bash > ~/.local/share/bash-completion/completions/codewhale
+    # Requires bash-completion to be installed and loaded by your shell.
+
+  Zsh:
+    mkdir -p ~/.zfunc
+    codewhale completion zsh > ~/.zfunc/_codewhale
+    # Add to ~/.zshrc if needed:
+    #   fpath=(~/.zfunc $fpath)
+    #   autoload -Uz compinit && compinit
+
+  Fish:
+    mkdir -p ~/.config/fish/completions
+    codewhale completion fish > ~/.config/fish/completions/codewhale.fish
+
+  PowerShell (current shell only):
+    codewhale completion powershell | Out-String | Invoke-Expression
+
+  PowerShell (persistent):
+    New-Item -ItemType Directory -Force -Path (Split-Path -Parent $PROFILE)
+    codewhale completion powershell >> $PROFILE
+
+  Elvish:
+    codewhale completion elvish >> ~/.config/elvish/rc.elv
+
+The command prints the completion script to stdout; redirect it to a path your shell loads automatically.
+

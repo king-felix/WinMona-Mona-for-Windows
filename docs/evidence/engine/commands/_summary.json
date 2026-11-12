@@ -1,0 +1,303 @@
+﻿[
+    {
+        "command":  "run",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  357,
+        "subcommands":  0
+    },
+    {
+        "command":  "doctor",
+        "exit":  0,
+        "lines":  25,
+        "bytes":  1417,
+        "subcommands":  0
+    },
+    {
+        "command":  "session-diagnostics",
+        "exit":  0,
+        "lines":  14,
+        "bytes":  454,
+        "subcommands":  0
+    },
+    {
+        "command":  "scorecard",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  377,
+        "subcommands":  0
+    },
+    {
+        "command":  "models",
+        "exit":  0,
+        "lines":  19,
+        "bytes":  633,
+        "subcommands":  0
+    },
+    {
+        "command":  "speech",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  367,
+        "subcommands":  0
+    },
+    {
+        "command":  "sessions",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  339,
+        "subcommands":  0
+    },
+    {
+        "command":  "receipts",
+        "exit":  0,
+        "lines":  18,
+        "bytes":  677,
+        "subcommands":  0
+    },
+    {
+        "command":  "resume",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  340,
+        "subcommands":  0
+    },
+    {
+        "command":  "rc",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  380,
+        "subcommands":  0
+    },
+    {
+        "command":  "fork",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  336,
+        "subcommands":  0
+    },
+    {
+        "command":  "init",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  367,
+        "subcommands":  0
+    },
+    {
+        "command":  "install",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  374,
+        "subcommands":  0
+    },
+    {
+        "command":  "setup",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  363,
+        "subcommands":  0
+    },
+    {
+        "command":  "remote-setup",
+        "exit":  0,
+        "lines":  16,
+        "bytes":  952,
+        "subcommands":  0
+    },
+    {
+        "command":  "exec",
+        "exit":  0,
+        "lines":  43,
+        "bytes":  2668,
+        "subcommands":  0
+    },
+    {
+        "command":  "fleet",
+        "exit":  0,
+        "lines":  21,
+        "bytes":  657,
+        "subcommands":  0
+    },
+    {
+        "command":  "workflow",
+        "exit":  0,
+        "lines":  21,
+        "bytes":  855,
+        "subcommands":  2
+    },
+    {
+        "command":  "lane",
+        "exit":  0,
+        "lines":  40,
+        "bytes":  1861,
+        "subcommands":  10
+    },
+    {
+        "command":  "review",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  369,
+        "subcommands":  0
+    },
+    {
+        "command":  "apply",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  364,
+        "subcommands":  0
+    },
+    {
+        "command":  "eval",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  350,
+        "subcommands":  0
+    },
+    {
+        "command":  "mcp",
+        "exit":  0,
+        "lines":  28,
+        "bytes":  1070,
+        "subcommands":  12
+    },
+    {
+        "command":  "features",
+        "exit":  0,
+        "lines":  15,
+        "bytes":  390,
+        "subcommands":  1
+    },
+    {
+        "command":  "integrations",
+        "exit":  0,
+        "lines":  12,
+        "bytes":  404,
+        "subcommands":  0
+    },
+    {
+        "command":  "serve",
+        "exit":  0,
+        "lines":  30,
+        "bytes":  1513,
+        "subcommands":  0
+    },
+    {
+        "command":  "web",
+        "exit":  0,
+        "lines":  13,
+        "bytes":  615,
+        "subcommands":  0
+    },
+    {
+        "command":  "login",
+        "exit":  0,
+        "lines":  20,
+        "bytes":  742,
+        "subcommands":  0
+    },
+    {
+        "command":  "logout",
+        "exit":  0,
+        "lines":  10,
+        "bytes":  460,
+        "subcommands":  0
+    },
+    {
+        "command":  "auth",
+        "exit":  0,
+        "lines":  28,
+        "bytes":  2082,
+        "subcommands":  16
+    },
+    {
+        "command":  "account",
+        "exit":  0,
+        "lines":  26,
+        "bytes":  1484,
+        "subcommands":  14
+    },
+    {
+        "command":  "dispatch",
+        "exit":  0,
+        "lines":  22,
+        "bytes":  1488,
+        "subcommands":  0
+    },
+    {
+        "command":  "mcp-server",
+        "exit":  0,
+        "lines":  9,
+        "bytes":  267,
+        "subcommands":  0
+    },
+    {
+        "command":  "config",
+        "exit":  0,
+        "lines":  24,
+        "bytes":  1226,
+        "subcommands":  10
+    },
+    {
+        "command":  "model",
+        "exit":  0,
+        "lines":  15,
+        "bytes":  504,
+        "subcommands":  3
+    },
+    {
+        "command":  "thread",
+        "exit":  0,
+        "lines":  20,
+        "bytes":  739,
+        "subcommands":  6
+    },
+    {
+        "command":  "sandbox",
+        "exit":  0,
+        "lines":  13,
+        "bytes":  378,
+        "subcommands":  1
+    },
+    {
+        "command":  "app-server",
+        "exit":  0,
+        "lines":  37,
+        "bytes":  3077,
+        "subcommands":  0
+    },
+    {
+        "command":  "completion",
+        "exit":  0,
+        "lines":  46,
+        "bytes":  1538,
+        "subcommands":  0
+    },
+    {
+        "command":  "metrics",
+        "exit":  0,
+        "lines":  11,
+        "bytes":  446,
+        "subcommands":  0
+    },
+    {
+        "command":  "update",
+        "exit":  0,
+        "lines":  19,
+        "bytes":  1071,
+        "subcommands":  0
+    },
+    {
+        "command":  "providers",
+        "exit":  0,
+        "lines":  13,
+        "bytes":  444,
+        "subcommands":  2
+    },
+    {
+        "command":  "help",
+        "exit":  2,
+        "lines":  13,
+        "bytes":  609,
+        "subcommands":  0
+    }
+]

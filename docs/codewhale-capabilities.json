@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "captured_utc": "2026-11-12T00:22:06Z",
+  "captured_utc": "2026-11-12T01:00:32.823Z",
   "engine": {
     "product": "Codewhale",
     "version": "0.10.2",
-    "commit": "ff466b2ed0bf",
+    "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
     "install_method": "winget package HunterBown.CodeWhale",
     "executable": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
     "resolved_binary": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HunterBown.CodeWhale_Microsoft.Winget.Source_8wekyb3d8bbwe\\codewhale.exe",
@@ -14,38 +14,48 @@
   "transports": [
     {
       "name": "app-server --http",
-      "description": "Full HTTP/SSE Runtime API under /v1/*; documented canonical surface",
+      "description": "Full HTTP/SSE Runtime API under /v1/*; canonical runtime surface",
       "default_bind": "127.0.0.1:7878",
-      "auth": "--auth-token, CODEWHALE_RUNTIME_TOKEN, or DEEPSEEK_RUNTIME_TOKEN",
-      "qualified": false
+      "auth": "bearer token from --auth-token, CODEWHALE_RUNTIME_TOKEN, or DEEPSEEK_RUNTIME_TOKEN; /v1/runtime/info and /health are unauthenticated",
+      "qualified": true,
+      "evidence": "docs/evidence/P01-contract.json",
+      "notes": "Contract-tested: auth boundary, thread create idempotency (201 + same id on replay, 409 on changed data), event replay, interrupt, history, usage, unknown-route 404."
     },
     {
       "name": "app-server --stdio",
-      "description": "Smaller JSON-RPC compatibility control transport; tool-free turns need allowed_tools: []",
+      "description": "Smaller JSON-RPC compatibility transport; tool-free turns require allowed_tools: []",
       "default_bind": "stdio",
       "auth": "process boundary",
-      "qualified": false
+      "qualified": false,
+      "notes": "Not selected: help states it lacks tools/approvals/full journal."
     },
     {
       "name": "app-server --socket",
       "description": "Desktop daemon JSON-RPC on a user-private local endpoint; requires daemon/attach",
       "default_bind": "named pipe under ~/.codewhale/run",
       "auth": "client authentication + daemon/attach",
-      "qualified": false
+      "qualified": false,
+      "notes": "Not selected: narrower compatibility controls and extra attach handshake."
     },
     {
       "name": "exec",
       "description": "Headless one-shot CLI; --auto offers tools with Full Access by default",
       "default_bind": "n/a",
       "auth": "existing provider credentials",
-      "qualified": false
+      "qualified": true,
+      "evidence": "docs/evidence/P01-bench.json",
+      "notes": "Qualified as a one-shot benchmark/diagnostic path only. It emits per-request usage and wire tool-schema evidence."
     }
   ],
-  "inventory_scope": "Top-level CLI commands of the pinned build. Subcommand arguments, config schema, HTTP routes, tools, skills, plugins and hooks remain to be enumerated at P01/P18.",
+  "inventory_scope": "Top-level CLI commands with captured help (docs/evidence/engine/commands), the runtime API route table extracted from the installed binary and contract-tested where marked, effective configuration, transports, and permission posture. Subcommand deep-dive, MCP/skill/plugin detail and full capability explorer remain P17/P18.",
   "coverage_notes": {
     "upstream_overlap": "This build already ships a browser client (`codewhale web`, `codewhale rc`) and a runtime server (`serve`, `app-server`). Per spec section 2.3, reassess upstream desktop progress at G0 and before release instead of duplicating it blindly.",
     "rows": 43,
-    "qualified": 0
+    "qualified": 2,
+    "read_qualified": 8,
+    "discovered": 30,
+    "unavailable_by_choice": 3,
+    "note": "qualified = exercised against the live 0.10.2 binary; read-qualified = read path exercised without mutation; discovered = help captured only; unavailable-by-choice = intentionally not surfaced in 1.0."
   },
   "rows": [
     {
@@ -58,14 +68,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Integrated terminal",
+      "ui_location": "bottom drawer / terminal",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: interactive or non-interactive task runner (TUI). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Interactive TUI; Mona uses the runtime API for normal work.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/run.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0002",
@@ -77,14 +92,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none-by-default",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → diagnostics",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: diagnostics; --probe-api/--probe-search make live calls only when asked. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "`--probe-api` executed at P01 with no token spend; structural JSON remains unqualified.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/doctor.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0003",
@@ -96,14 +116,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "right inspector → diagnostics",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: summarizes failure signals without raw content. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/session-diagnostics.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0004",
@@ -115,14 +140,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "right inspector → changes/tests",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: scores recorded turn metrics. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/scorecard.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0005",
@@ -134,14 +164,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "top context bar / settings → models",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: cached model list; --update refreshes catalogs over the network. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Catalog read via runtime `/v1/providers/{id}/models`; CLI output not exercised.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/models.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0006",
@@ -153,14 +188,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "bottom drawer",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: TTS audio generation (paid model call). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Model-backed; never automatic.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/speech.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0007",
@@ -172,14 +212,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "left rail → recent sessions",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: lists saved sessions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Listed through `/v1/sessions` and `/v1/threads/summary`.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/sessions.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0008",
@@ -191,14 +236,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "right inspector → receipts",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: files, commands, web/MCP calls, agents and failures for a session. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Read for the direct exec arm; JSON shape recorded.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/receipts.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0009",
@@ -210,14 +260,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "left rail → resume",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: resumes a saved session; may send model requests. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Engine session resume verified through `exec --resume` equivalents at G0.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/resume.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0010",
@@ -229,14 +284,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Unavailable",
+      "ui_location": "none",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: interactive session handed to the Codewhale web app. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "unavailable-by-choice",
+      "gap": "Upstream remote-control UI overlaps Mona; not exposed in 1.0.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/rc.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0011",
@@ -248,14 +308,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "right inspector → thread",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: forks a saved session. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Runtime route `/v1/threads/{id}/fork` discovered, not yet contract-tested.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/fork.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0012",
@@ -267,14 +332,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → project instructions",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: creates a default AGENTS.md. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/init.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0013",
@@ -286,14 +356,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → integrations",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: installs a plugin bundle without trusting/enabling it. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/install.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0014",
@@ -305,14 +380,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: scaffolds MCP config and skills directories. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/setup.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0015",
@@ -324,14 +404,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → remote",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: generates a remote deploy bundle. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Later-scope transport; not part of Windows 1.0 support claims.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/remote-setup.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0016",
@@ -343,14 +428,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "bottom drawer / one-shot jobs",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: headless one-shot; --auto adds tools and defaults to Full Access. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "qualified",
+      "gap": "Used as the direct benchmark arm with `--auto --output-format stream-json`; not the persistent control channel.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/exec.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0017",
@@ -362,14 +452,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "right inspector → agents",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: durable fleet runs; schedules native child agents. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Fleet routes discovered (`/v1/fleet/*`); native execution deferred to P15.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/fleet.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0018",
@@ -381,14 +476,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "right inspector → workflows",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: runs checked-in workflows. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/workflow.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0019",
@@ -400,14 +500,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "bottom drawer",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: manages running workflow instances and runtime backends. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/lane.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0020",
@@ -419,14 +524,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "right inspector → review",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: code review over a git diff. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/review.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0021",
@@ -438,14 +548,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "right inspector → changes",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: applies a patch file or stdin to the working tree. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Destructive surface; preview required.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/apply.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0022",
@@ -457,14 +572,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "bottom drawer",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: offline evaluation harness. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Model-backed; explicit only.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/eval.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0023",
@@ -476,14 +596,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings → tools",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: MCP server configuration. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Runtime MCP management routes discovered (`/v1/apps/mcp/*`).",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/mcp.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0024",
@@ -495,14 +620,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings → advanced",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: inspects feature flags. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/features.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0025",
@@ -514,14 +644,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings → integrations",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: connects third-party harnesses (e.g. dsh). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/integrations.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0026",
@@ -533,14 +668,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → advanced",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: local server; compatibility alias of app-server --http/--mobile. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Compatibility alias of `app-server --http`; Mona uses app-server explicitly.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/serve.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0027",
@@ -552,14 +692,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Unavailable",
+      "ui_location": "none",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: opens the bundled browser client over the Runtime API. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "unavailable-by-choice",
+      "gap": "Upstream browser client; Mona does not embed a duplicate chat surface.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/web.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0028",
@@ -571,14 +716,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → account",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: account/provider sign-in; writes credentials. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Credential mutation; never silent.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/login.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0029",
@@ -590,14 +740,19 @@
       },
       "platform": "windows-x64",
       "class": "destructive",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "destructive; requires explicit confirmation",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → account",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: removes saved authentication state for every provider. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Destructive to saved auth; explicit confirmation required.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/logout.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0030",
@@ -609,14 +764,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → account",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: credential and provider-mode management. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Credential store; Mona must not read or rewrite keys.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/auth.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0031",
@@ -628,14 +788,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings → account",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: Codewhale account management (cloud). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/account.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0032",
@@ -647,14 +812,19 @@
       },
       "platform": "windows-x64",
       "class": "unknown",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "unknown; do not expose without qualification",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "bottom drawer",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: cloud computer task; help states cloud computers are paused. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": null,
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/dispatch.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0033",
@@ -666,14 +836,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Unavailable",
+      "ui_location": "none",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: runs Codewhale as an MCP server over stdio. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "unavailable-by-choice",
+      "gap": "Mona is not an MCP server in 1.0.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/mcp-server.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0034",
@@ -685,14 +860,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: read/write/list configuration values. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Effective config read via `/v1/config`; mutation not exposed.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/config.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0035",
@@ -704,14 +884,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "top context bar",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: resolves or lists available models. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Resolved model/deepseek-flash verified through `/v1/config`.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/model.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0036",
@@ -723,14 +908,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "right inspector → thread",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: thread/session metadata, resume and fork flows. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Runtime thread routes are the primary Mona surface.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/thread.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0037",
@@ -742,14 +932,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "top context bar → permissions",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: evaluates sandbox/approval policy decisions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Host reports no sandbox; posture display must say so.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/sandbox.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0038",
@@ -761,14 +956,19 @@
       },
       "platform": "windows-x64",
       "class": "mixed",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "depends on subcommand; not yet classified per subcommand",
       "cost_implications": "model",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "internal runtime transport",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: HTTP/SSE runtime API (--http), stdio/socket compatibility transports. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "qualified",
+      "gap": "Primary integration: `--http` with bearer token, contract-tested at P01 and used for G0/G1.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/app-server.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0039",
@@ -780,14 +980,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → advanced",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: generates shell completions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Shell completion generation; no inference.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/completion.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0040",
@@ -799,14 +1004,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "right inspector → usage",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: usage rollup from the audit log and session store. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Read for tool-call evidence; no cost field observed.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/metrics.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0041",
@@ -818,14 +1028,19 @@
       },
       "platform": "windows-x64",
       "class": "write",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "settings → about",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: updates the release binary (package-managed installs get migration instructions). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "Never automatic during active work.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/update.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     },
     {
       "id": "CAP-0042",
@@ -837,14 +1052,19 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Native view",
+      "ui_location": "settings → providers",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: exports the provider route catalog. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "read-qualified",
+      "gap": "Read via `/v1/providers`; route preserved unchanged.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/providers.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": "docs/evidence/P01-contract.json"
+      }
     },
     {
       "id": "CAP-0043",
@@ -856,14 +1076,67 @@
       },
       "platform": "windows-x64",
       "class": "read",
-      "permission_implications": "not yet qualified (see P01/P18)",
+      "permission_implications": "read-only",
       "cost_implications": "none",
-      "required_arguments": "not yet qualified (see P01/P18)",
-      "chosen_integration": null,
-      "ui_location": null,
+      "required_arguments": "see help capture",
+      "chosen_integration": "Advanced action",
+      "ui_location": "command palette",
       "tests": [],
-      "status": "unqualified",
-      "gap": "P00 seed only: help for commands. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+      "status": "discovered",
+      "gap": "`help --help` exits 2 (no help for help); captured for completeness.",
+      "evidence": {
+        "help_capture": "docs/evidence/engine/commands/help.txt",
+        "captured_utc": "2026-11-12T01:00:32.823Z",
+        "contract_report": null
+      }
     }
-  ]
+  ],
+  "runtime_api": {
+    "runtime_api_version": "1.0",
+    "service": "codewhale-runtime-api",
+    "routes_discovered": 250,
+    "discovery_method": "ASCII route strings extracted from the installed binary, then contract-tested on the live server; no route invented from prose.",
+    "tested_routes": [
+      "GET /health",
+      "GET /v1/runtime/info",
+      "GET /v1/config",
+      "GET /v1/providers",
+      "GET /v1/providers/{id}/models",
+      "GET /v1/sessions",
+      "GET /v1/usage",
+      "GET /v1/tasks",
+      "GET /v1/approvals",
+      "GET /v1/skills",
+      "GET /v1/goals",
+      "GET /v1/settings/schema",
+      "POST /v1/threads",
+      "GET /v1/threads",
+      "GET /v1/threads/summary",
+      "GET /v1/threads/{id}",
+      "GET /v1/threads/{id}/history",
+      "GET /v1/threads/{id}/usage",
+      "GET /v1/threads/{id}/events",
+      "POST /v1/threads/{id}/turns",
+      "POST /v1/threads/{id}/turns/{turn_id}/interrupt",
+      "GET /v1/threads/{id}/turns/{turn_id}/receipt",
+      "POST /v1/approvals/{approval_id}",
+      "POST /v1/tasks/{id}/cancel"
+    ],
+    "tested_capabilities": [
+      "thread_create_idempotency",
+      "turn_operation_idempotency",
+      "turn_operation_lookup",
+      "event_replay",
+      "event_stream_resume",
+      "turn_interrupt",
+      "turn_steer",
+      "fleet_event_stream"
+    ],
+    "observed_limitations": [
+      "terminal_stream/terminal_input/terminal_resize/terminal_kill report false in this build; terminal routes exist but are not capability-advertised.",
+      "/v1/runtime/info is unauthenticated discovery metadata (loopback-only); stateful routes require the bearer token.",
+      "A second Windows runtime can create and run turns in a workspace another runtime drives; safe simultaneous mutation is not proven, so Mona serializes execution by default until P04/P07 own a lease.",
+      "CLI exec and runtime turns report different endpoint fingerprints (6a440b42... vs 812b1f7c...) for the same deepseek route; parity is proven by wire model/dialect/tool-schema, not by fingerprint. Investigate at P03/P16."
+    ]
+  }
 }

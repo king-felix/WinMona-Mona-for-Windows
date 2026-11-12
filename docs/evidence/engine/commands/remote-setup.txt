@@ -1,0 +1,16 @@
+﻿Generate a remote Codewhale agent deploy bundle (cloud + chat bridge)
+
+Usage: codewhale remote-setup [OPTIONS]
+
+Options:
+      --cloud <CLOUD>        Cloud target slug (lighthouse, azure, digitalocean). Skips the prompt
+      --bridge <BRIDGE>      Chat bridge slug (feishu, telegram). Skips the prompt
+      --provider <PROVIDER>  Provider slug; validated against the provider registry. Skips the prompt
+      --out <DIR>            Bundle output directory (default `./codewhale-deploy/<cloud>-<bridge>`)
+      --generate-only        Emit the bundle, do not provision (default)
+      --yes                  Skip the final confirmation gate (CI / non-interactive)
+      --non-interactive      Fail instead of prompting if any required value is missing
+      --enable <FEATURE>     Enable a feature for this run (repeatable)
+      --disable <FEATURE>    Disable a feature for this run (repeatable)
+  -h, --help                 Print help
+

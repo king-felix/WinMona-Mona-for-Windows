@@ -1,0 +1,28 @@
+﻿Manage MCP servers
+
+Usage: codewhale mcp [OPTIONS] <COMMAND>
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Commands:
+  list      List configured MCP servers
+  init      Create a template MCP config at the configured path
+  connect   Connect to MCP servers and report status (does not attach to a running session)
+  tools     List tools discovered from MCP servers
+  add       Add an MCP server entry
+  login     Authenticate to a URL-based MCP server using OAuth
+  logout    Delete stored OAuth credentials for a URL-based MCP server
+  remove    Remove an MCP server entry
+  enable    Enable an MCP server
+  disable   Disable an MCP server
+  validate  Validate MCP config and required servers
+  add-self  Register this Codewhale binary as a local MCP stdio server
+
+Run `codewhale mcp <COMMAND> --help` for a command's options.
+

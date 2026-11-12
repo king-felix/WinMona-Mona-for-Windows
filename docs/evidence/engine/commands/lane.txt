@@ -1,0 +1,40 @@
+﻿Manage running workflow instances (Lanes) and Runtime backends (#4176)
+
+Usage: codewhale lane [OPTIONS] <COMMAND>
+
+Commands:
+  list       List known lanes (newest first)
+  status     Show one lane's status and attach metadata
+  attach     Attach to a tmux-backed lane (prints attach command; execs when possible)
+  logs       Tail the lane stream-json / NDJSON journal
+  stop       Stop a running lane and run worktree TTL cleanup
+  interrupt  Interrupt a running lane (durable `lane.interrupt`)
+  restart    Restart a lane in place (declared, no backend — reports why)
+  resume     Resume a stopped lane (declared, no backend — reports why)
+  start      Start a lane under a Runtime backend (tmux|inline)
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Examples:
+  codewhale lane list
+  codewhale lane status <lane-id>
+  codewhale lane attach <lane-id>
+  codewhale lane logs <lane-id>
+  codewhale lane interrupt <lane-id>
+  codewhale lane interrupt <lane-id>@<lifecycle-seq>
+  codewhale lane start --workflow stopship --fleet stopship --runtime tmux --goal verify-release-candidate -- echo hello
+
+Lane records persist under $CODEWHALE_HOME/lanes/. tmux durability belongs to
+Runtime, not Fleet.
+
+list/status/interrupt/restart/resume share one control-plane contract with the
+`/lane` slash command and its hotbar action: same verb ids, same availability,
+same read-vs-write authority, same exact-identity target selection, and the
+same receipt (`--json`). `lane stop` is a compatibility spelling of
+`lane interrupt`. Appending `@<lifecycle-seq>` fences a write to the exact
+lifecycle generation you observed.
+

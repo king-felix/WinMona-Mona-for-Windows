@@ -1,0 +1,24 @@
+﻿Read/write/list config values
+
+Usage: codewhale config [OPTIONS] <COMMAND>
+
+Commands:
+  get        
+  set        
+  unset      
+  telemetry  Review aggregate usage counting by Codewhale and PostHog (default on)
+  list       
+  path       
+  edit       Open the config file in `$VISUAL`/`$EDITOR` (else `vi`)
+  doctor     Check the loaded config: unknown keys, empty secrets, malformed URLs. Read-only; prints warnings, fails on errors, never prints a credential
+  dump       Print the effective config (including `--set` overlays) as TOML with secrets redacted by key name
+  import     Import a portable config bundle from a file, HTTPS URL, or stdin (-)
+  export     Export a portable, secret-free config bundle
+  migrate    Move legacy top-level `base_url` / `api_key` into their `[providers.<name>]` tables, keeping comments. Writes a one-time, credential-free backup first. Codewhale already reads the old shape; this only tidies the file
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

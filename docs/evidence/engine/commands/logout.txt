@@ -1,0 +1,10 @@
+﻿Remove saved authentication state (every provider key, OAuth login, the Codewhale account session). Asks before deleting
+
+Usage: codewhale logout [OPTIONS]
+
+Options:
+  -y, --yes                Delete without the confirmation prompt (required when stdin is not a terminal)
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

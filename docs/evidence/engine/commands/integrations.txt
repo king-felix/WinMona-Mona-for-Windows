@@ -1,0 +1,12 @@
+﻿Connect third-party harnesses through Codewhale (e.g. `integrations dsh status`)
+
+Usage: codewhale integrations [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

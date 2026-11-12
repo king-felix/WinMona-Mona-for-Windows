@@ -1,0 +1,28 @@
+﻿Manage authentication credentials and provider mode
+
+Usage: codewhale auth [OPTIONS] <COMMAND>
+
+Commands:
+  plugin-login      Sign in to a reviewed plugin-defined OAuth provider (PKCE loopback)
+  plugin-logout     Remove host-owned credentials for a plugin-defined provider
+  xai-device        Sign in to xAI/Grok with an SSH-friendly device code; run again to switch accounts
+  chatgpt           Sign in with ChatGPT; use CODEWHALE_CHATGPT_NEW_ACCOUNT=1 to register another account
+  chatgpt-revoke    Revoke Codewhale-owned ChatGPT tokens. Codex CLI consent is unchanged
+  claude            
+  claude-revoke     
+  orcarouter        Sign in to OrcaRouter with OAuth 2.0 + PKCE and store the issued key
+  external-consent  Explicitly allow read-only access to one credential file owned by another CLI. Managed mutation is currently unsupported and fails closed
+  external-revoke   Revoke access to another CLI's credential file for one provider
+  status            Show current provider and runtime-effective credential route state. Without `--provider`, shows all known providers. With `--provider`, shows detailed status for that provider
+  set               Save an API key to the credential store (config keeps metadata only). Reads from `--api-key`, `--api-key-stdin`, or prompts on stdin when neither is given. Does not echo the key
+  get               Report the effective credential route for a provider. Never prints a credential; reports the source layer or structural OAuth/repair state
+  print-api-key     Pipe the runtime-effective API key to a local client; refuses terminals
+  clear             Delete a provider's key from config and secret-store storage
+  list              List all known providers with their runtime-effective auth state, without revealing credentials
+  help              Print this message or the help of the given subcommand(s)
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+

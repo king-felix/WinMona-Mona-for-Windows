@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 4,
+  "revision": 5,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P01",
+  "current_prompt": "P02",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -66,16 +66,65 @@
       "blocker_ids": []
     },
     "P01": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-001",
         "MONA-002",
         "MONA-003",
         "MONA-030"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "engine surface inventoried: 43 command help captures, 250 /v1 routes extracted and contract-tested where marked",
+        "HTTP runtime client qualified: auth, thread/turn lifecycle, SSE replay, usage, interrupt, 404",
+        "G0 live tool turn, restart resume, interrupt cleanup, dual-runtime observation recorded",
+        "G1 paired cost pilot: median delta +1.45%, identical tool-schema hash, provisional",
+        "zero-idle and zero-discovery inference verified; capability ledger qualified"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P01-feasibility.md",
+          "sha256": "de6663a6a54f541c36281d3f666c2bb42647976c3ea08a6e92886f23274b1763",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:30Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/evidence/P01-contract.json",
+          "sha256": "dc83a659b87195b0e306320962c6c626c8cc3db31ec156500c409943b7bc0198",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:30Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/evidence/P01-g0.json",
+          "sha256": "af5d6a1e379559f7bdf6cf6511d55799557888397b6634911e50d7ed984a4ee6",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:30Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/evidence/P01-bench.json",
+          "sha256": "b40b12f5ad7b2cc0bd2c60dc46a89d8b4be9dad6d3b36f7fdeef39fca20e6e46",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:31Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/codewhale-capabilities.json",
+          "sha256": "d0b424249095fd8c07453adbaf17a0fee232dbb6fd0fc0d36e10651f0eae57a1",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:31Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        },
+        {
+          "path": "docs/evidence/P01-tests.txt",
+          "sha256": "004a75057de52502cd2a728fbec8c13c3c27670458e236f388169a17452c4d45",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:02:31Z",
+          "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c"
+        }
+      ],
       "blocker_ids": []
     },
     "P02": {
@@ -362,7 +411,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P01"
+    "P02"
   ],
-  "last_checkpoint_utc": "2026-11-12T00:26:05Z"
+  "last_checkpoint_utc": "2026-11-12T01:02:31Z"
 }

@@ -1,0 +1,18 @@
+﻿Show what a session did: files, commands, web and MCP calls, agents, approvals, and failures. `codewhale receipts [ID|--last] [--format md|json]`
+
+Usage: codewhale receipts [ID|--last] [--format <md|json>]
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Receipt options:
+      --last             Show the most recent session
+      --format <FORMAT>  Output format: md or json
+
+ID is a saved session id or prefix; `codewhale sessions` lists them.
+

@@ -1,0 +1,13 @@
+﻿codewhale.exe : error: unrecognized subcommand '--help'
+At X:\AI_Projects\Qwen3.8-27B\cache\temp\codewhale-shell-12560-171a7e9e52f04c2a87ba5020eff41dbb.ps1:1 char:690
++ ... ary=@(); foreach ($c in $cmds) { $out = & $bin $c --help 2>&1 | Out-S ...
++                                             ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (error: unrecognized subcommand '--help':String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+Usage: codewhale [OPTIONS] [PROMPT]
+       codewhale [OPTIONS] <COMMAND> [ARGS]
+
+For more information, try '--help'.
+

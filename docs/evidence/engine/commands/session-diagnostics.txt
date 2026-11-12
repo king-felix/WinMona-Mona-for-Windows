@@ -1,0 +1,14 @@
+﻿Summarize local session failure signals without raw content
+
+Usage: codewhale session-diagnostics <JSONL>
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+JSONL is a saved session log; `codewhale sessions` lists saved sessions.
+

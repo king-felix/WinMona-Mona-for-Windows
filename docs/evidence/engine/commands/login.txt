@@ -1,0 +1,20 @@
+﻿Sign in to an existing Codewhale account; new accounts are not open
+
+Usage: codewhale login [OPTIONS]
+
+Options:
+      --no-open
+          Print the verification URL without trying to open a browser
+      --timeout-seconds <TIMEOUT_SECONDS>
+          Maximum time to wait for browser authorization [default: 600]
+      --enable <FEATURE>
+          Enable a feature for this run (repeatable)
+      --disable <FEATURE>
+          Disable a feature for this run (repeatable)
+  -h, --help
+          Print help
+
+New Codewhale accounts are not open, and local use does not require one.
+Keep provider keys on this machine with /provider or `codewhale auth set --provider <provider>`.
+Signing in does not upload existing local keys.
+

@@ -1,0 +1,43 @@
+﻿Run a non-interactive prompt
+
+Usage: codewhale exec [OPTIONS] [ARGS]...
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Examples:
+  codewhale exec "explain this function"
+  codewhale exec --auto "list crates/ with ls"
+  codewhale exec --auto --output-format stream-json "fix the failing test"
+
+Run options such as --model, --provider, --config and --profile work before or after exec:
+  codewhale --model MODEL exec "explain this function"
+  codewhale exec --model MODEL "explain this function"
+
+Common forwarded flags:
+  --auto                           Enable tools with automatic approvals and Full Access by default
+  --sandbox <POLICY>               Override the sandbox policy for this run
+  --json                           Emit summary JSON
+  --resume <SESSION_ID>            Resume a previous session by ID or prefix
+  --session-id <SESSION_ID>        Resume a previous session by ID or prefix
+  --continue                       Continue the most recent session for this workspace
+  --output-format <FORMAT>         Output format: text or stream-json
+  --hooks                          Opt in to configured hooks (tool_call_before, shell_env)
+
+Plain `codewhale exec` is a one-shot model response: one Engine turn with the
+same system prompt as every other run, and no tools. Use `--auto` for
+non-interactive agent-with-tools execution. Tools are offered only with
+`--auto`, `--yolo`, `--allowed-tools`, or when resuming a session; limits such
+as `--max-turns`, `--disallowed-tools` or `--sandbox`, and the output format,
+never add tools. A reply cut off at the provider's output limit is continued
+in the same turn, at most 8 model steps unless `--max-turns` says otherwise.
+--auto defaults to Full Access: no shell sandbox and trust mode on. Use --sandbox workspace-write to keep the shell sandbox and file-tool workspace restrictions; stricter configured policies also apply. A denied sandbox retry requires --allow-sandbox-elevation or --sandbox danger-full-access.
+Any --sandbox other than danger-full-access (or an equivalent sandbox_mode in config) disables trust mode.
+Runs that offer tools, stream-json runs, and resumed sessions are saved for codewhale sessions, exec --continue, and codewhale receipts <id>. Plain answer-only text/--json runs are not saved unless compaction needs recovery.
+Put flags before the prompt. Put -- before a prompt starting with - or containing literal exec flags.
+

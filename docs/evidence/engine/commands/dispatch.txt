@@ -1,0 +1,22 @@
+﻿Run a task on a Codewhale cloud computer (not available: cloud computers and accounts are paused for new users)
+
+Usage: codewhale dispatch [OPTIONS] [PROMPT]...
+
+Arguments:
+  [PROMPT]...  Task for the remote agent. Required unless inspecting or cancelling a job
+
+Options:
+      --show <ID>                      Inspect one account job
+      --cancel <ID>                    Cancel one account job
+      --agent <AGENT>                  Account dispatch: Agent name or ID (default: the repository-free default Agent)
+      --seconds <SECONDS>              Account dispatch: task time in seconds (default: what your offer allows)
+      --context-file <PATH>            Account dispatch: UTF-8 source context file
+      --file <FILE_ID@VERSION>         Account dispatch: saved account file FILE_ID@VERSION; repeatable
+      --yes                            Account dispatch: skip the question (needs --confirm-eu-compute)
+      --confirm-eu-compute             Account dispatch: agree that repository code and Work files run on EU compute
+      --enable <FEATURE>               Enable a feature for this run (repeatable)
+      --operation-key <OPERATION_KEY>  Account dispatch: replay key for a retry after an uncertain response
+      --disable <FEATURE>              Disable a feature for this run (repeatable)
+      --message-id <MESSAGE_ID>        Account dispatch: message ID for a retry after an uncertain response
+  -h, --help                           Print help
+

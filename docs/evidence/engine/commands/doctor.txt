@@ -1,0 +1,25 @@
+﻿Run Codewhale diagnostics
+
+Usage: codewhale doctor [OPTIONS]
+
+Arguments:
+  [ARGS]...  Arguments and options forwarded to the command
+
+Options:
+      --enable <FEATURE>   Enable a feature for this run (repeatable)
+      --disable <FEATURE>  Disable a feature for this run (repeatable)
+  -h, --help               Print help
+
+Doctor options:
+      --json             Emit machine-readable structural JSON output (always offline)
+      --context-json     Emit only the diagnostic context source map as JSON
+      --probe-local      Opt in to probing a local provider endpoint (may start a local service)
+      --probe-api        Opt in to probing the configured hosted provider API
+      --check-updates    Opt in to contacting the release service for an update check
+      --probe-mcp        Opt in to starting enabled MCP servers and checking process/protocol reachability
+      --probe-search     Opt in to a credential-free transport probe of the selected search provider
+      --fix              Plan and apply automatic repairs with consent (#5552)
+      --yes              Apply the planned repairs without prompting (requires --fix)
+      --repair-sessions  Repair the saved-session store now: re-index recoverable sessions, unbind dead thread links, set aside (never delete) what nothing uses
+      --dry-run          With --repair-sessions: report what would be repaired, change nothing
+

@@ -11,7 +11,7 @@
     "mona": "node tools/build/cli.mjs",
     "index": "node tools/build/cli.mjs index",
     "validate": "node tools/build/cli.mjs validate",
-    "test": "node --test tests/bootstrap"
+    "test": "node --test tests"
   },
   "devDependencies": {
     "ajv": "8.20.0"
