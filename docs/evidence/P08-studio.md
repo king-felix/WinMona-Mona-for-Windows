@@ -90,8 +90,8 @@ window end to end:
 - 22/22 steps passed in a real Electron window against the pinned runtime.
 - The fixture project received: *"Create a file named hello.txt … Then run
   `node check.mjs` … Do not change any other file."*
-- Outcome card: `Status: completed`, 13.2 s, usage `in 1,059 (65,792 cached) ·
-  out 599 · reasoning 95`, `Cost: $0.0015 (engine-priced thread delta;
+- Outcome card: `Status: completed`, 14.8 s, usage `in 1,174 (65,792 cached) ·
+  out 631 · reasoning 135`, `Cost: $0.0015 (engine-priced thread delta;
   provider_docs)`, `Changed paths: hello.txt`.
 - Independent checks: `hello.txt` contains `MONA_STUDIO_OK`; `node check.mjs`
   exits 0 with `MONA_STUDIO_CHECK_PASS`; four tool cards carry the runtime's own
