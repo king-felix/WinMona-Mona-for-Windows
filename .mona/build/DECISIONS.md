@@ -988,3 +988,31 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   keep the route they were created with; the workbench shows requested and
   effective values separately. No provider probe and no automatic fallback run
   from this path.
+
+## D-0079 - Extension inventory is read from the runtime, never by spawning
+
+- **Decision:** the Extensions view projects `/v1/apps/mcp/servers` (and one
+  detail per server), `/v1/skills`, `/v1/apps/plugins`, `/v1/hooks` and
+  `/v1/workspace/instructions`. It does not call `/v1/apps/mcp/tools`, does not
+  reconnect a server, and does not read extension files itself.
+- **Why:** opening a settings page must not spawn processes, execute project
+  content, or pull every server and tool description into memory. The runtime
+  already owns config parsing, trust and redaction. A local reimplementation
+  would drift and could show a different effective state.
+- **Constrains:** health is an explicit action against one named server. Tool
+  names are returned only then. A route that fails is reported as an unavailable
+  section, not as an empty list.
+
+## D-0080 - MCP writes carry the displayed revision and stay engine-gated
+
+- **Decision:** enable and disable send the runtime's MCP revision in `If-Match`.
+  A mismatch is a conflict; Mona never retries with a fresher revision on the
+  user's behalf. Required servers cannot be disabled from the UI.
+- **Why:** the runtime refused a stale revision with HTTP 412 in the P17 probe,
+  and the engine preserves unknown top-level and server-level keys. Delegating
+  the write keeps that guarantee; recomputing or rewriting the file in Mona
+  would not.
+- **Constrains:** project-scope MCP servers and hooks appear only after the
+  engine records workspace trust and approval. Mona reports that state and does
+  not approve it. Install/trust/update for plugins and skills remain advanced
+  engine actions; the UI shows the exact invocation instead of simulating it.

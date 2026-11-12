@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 261,
+  "revision": 267,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -414,11 +414,11 @@
             },
             {
               "path": "docs/codewhale-capabilities.json",
-              "sha256": "53a44f09eb3eaf737d6c81eb8050bd62afd5b5c1b397b0208d20691346c5e5c7",
+              "sha256": "ebbdac52ce6331f8d400e97b8105d69ff8c342a038a0ed43798dc8c7699352df",
               "kind": "document",
-              "recorded_utc": "2026-11-12T09:00:12Z",
-              "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34",
-              "note": "P15/P16 refreshed the capability ledger with qualified native orchestration, provider/model and configuration rows."
+              "recorded_utc": "2026-11-12T15:21:50Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "P17 refreshed extension coverage rows (CAP-0023, CAP-0048..0052) and hashes."
             }
           ]
         },
@@ -454,7 +454,7 @@
           ]
         }
       ],
-      "verified_commit": "089b653b79774bbfb039801718d9fb75cdcf1e34",
+      "verified_commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2256,29 +2256,56 @@
         "P17",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "mcp",
           "description": "MCP servers can be inspected and managed through engine mechanisms",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P17-extensions.md",
+              "sha256": "5485bb50ac9835fbb7f4580d6823e8ff93aab7eb65e212fe5b94ac991a21f6f5",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T15:20:18Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "MCP list/detail/health/enable/disable exercised with If-Match revision guard; probe P17-extensions.json."
+            }
+          ]
         },
         {
           "id": "skills-plugins",
           "description": "Skills, plugins and hooks show scope, provenance and health",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P17-extensions.md",
+              "sha256": "5485bb50ac9835fbb7f4580d6823e8ff93aab7eb65e212fe5b94ac991a21f6f5",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T15:20:18Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "Skills, plugins, hooks and instructions projected with scope, provenance and health."
+            }
+          ]
         },
         {
           "id": "config-safety",
           "description": "Edits never replace unknown configuration keys",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P17-extensions.md",
+              "sha256": "5485bb50ac9835fbb7f4580d6823e8ff93aab7eb65e212fe5b94ac991a21f6f5",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T15:20:18Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "Unknown top-level and server-level keys survived an engine delete; stale edits refused; env values never returned."
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -2738,11 +2765,11 @@
           "evidence": [
             {
               "path": "docs/codewhale-capabilities.json",
-              "sha256": "53a44f09eb3eaf737d6c81eb8050bd62afd5b5c1b397b0208d20691346c5e5c7",
+              "sha256": "ebbdac52ce6331f8d400e97b8105d69ff8c342a038a0ed43798dc8c7699352df",
               "kind": "document",
-              "recorded_utc": "2026-11-12T09:00:12Z",
-              "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34",
-              "note": "P15/P16 rows label scheduled-but-unleased fleet runs, missing credentials, invalid endpoints and unavailable parallel builders explicitly."
+              "recorded_utc": "2026-11-12T15:21:50Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "P17 records extension gaps honestly (project trust, CLI-only install/remove)."
             }
           ]
         },
@@ -2783,11 +2810,11 @@
           "evidence": [
             {
               "path": "docs/codewhale-capabilities.json",
-              "sha256": "53a44f09eb3eaf737d6c81eb8050bd62afd5b5c1b397b0208d20691346c5e5c7",
+              "sha256": "ebbdac52ce6331f8d400e97b8105d69ff8c342a038a0ed43798dc8c7699352df",
               "kind": "document",
-              "recorded_utc": "2026-11-12T09:00:12Z",
-              "commit": "089b653b79774bbfb039801718d9fb75cdcf1e34",
-              "note": "Coverage rows 47; P15/P16 qualification and gaps recorded."
+              "recorded_utc": "2026-11-12T15:21:50Z",
+              "commit": "62eedfec919fd8ec55a36fc21b7a84b9362edaeb",
+              "note": "P17 refreshed coverage counts and extension rows."
             }
           ]
         }

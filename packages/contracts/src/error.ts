@@ -12,6 +12,7 @@ export const ErrorCode = z.enum([
   'port_occupied',
   'permission_denied',
   'stale_ownership',
+  'conflict',
   'identity_mismatch',
   'outcome_unknown',
   'schema_drift',

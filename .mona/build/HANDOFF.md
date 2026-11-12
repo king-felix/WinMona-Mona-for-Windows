@@ -1,34 +1,37 @@
 # Mona build handoff
 
-**Current prompt:** P17 — Make tools and extensions manageable
-**Current status:** P00–P16 completed. State revision 51 after the P16 checkpoint.
-Next eligible: P17.
+**Current prompt:** P18 — Complete advanced access and the capability explorer
+**Current status:** P00–P17 completed. State revision 54 after the P17 checkpoint.
+Next eligible: P18.
 
 `last_verified_commit` stays null because a state file cannot contain the hash of
 the commit that contains it. Verify with `node tools/build/cli.mjs validate`
-(expect OK, r51, 0 warnings) before trusting this file.
+(expect OK, r54, 0 warnings) before trusting this file.
 
-## P15 result — native agents, goals, fleets and workflows
+## P17 result — tools and extensions are manageable
 
-- **Adapter.** `packages/adapter/src/native.ts` projects `/v1/goals`,
-  `/v1/threads/{id}/goal`, `/v1/tasks`, `/v1/agent-runs`, `/v1/fleet/runs`,
-  fleet receipts/workers and turn artifacts. Tolerant wire schemas, strict
-  internal contracts; missing usage stays `unknown`.
-- **Observatory.** `apps/desktop/src/main/agent-observatory.ts` builds the
-  thread/goal/agent/fleet/task/worker graph, one explicit ownership record and
-  aggregate spend that uses the parent thread total once. `AgentsPanel.tsx` is a
-  new Agents section (Alt+4) with nine validated IPC channels.
-- **Control without a second scheduler.** `StudioService.submit` refuses while a
-  native owner is active; native starts are refused while Mona's queue owns the
-  turn. Fleet runs are created with one task, one worker and `max_workers: 1`.
-- **Real delegated run.** One parent turn delegated a one-word read-only task
-  through the native `agent` tool. `agent.spawned` seq 2088 and
-  `agent.completed` seq 2095 were observed; child cost 678 µUSD is included in
-  the parent thread total 5,731.872 µUSD, so it is marked `inParent` and not
-  added twice.
-- **Fleet limitation.** `POST /v1/fleet/runs/{id}/start` returned
-  `execution: scheduled`, `leased: 0`, `queued: 1`; no worker lease appeared in
-  180 s and usage did not move. Mona reports exactly that (P15-ISSUE-001).
+- **Adapter.** `packages/adapter/src/extensions.ts` projects
+  `/v1/apps/mcp/servers` (+ detail), `/v1/skills`, `/v1/apps/plugins`,
+  `/v1/hooks` and `/v1/workspace/instructions`. Sections carry `ok` or
+  `unavailable`, so an empty list is never mistaken for a failed read.
+- **Workbench.** `extensions-service.ts` + `ExtensionsPanel.tsx` add an
+  Extensions section (Alt+5, palette entry) with MCP provenance, key-name-only
+  env reporting, skills/plugins/hooks/instructions and explicit scope notes.
+- **Actions.** MCP enable/disable and health check are the only writes. They
+  send the displayed `mcp-v1-…` revision in `If-Match`; HTTP 412/428 map to a
+  `conflict` and the UI asks for a reload. Required servers cannot be disabled.
+- **No implicit side effects.** Snapshot performs seven reads (MCP list, two
+  details, skills, plugins, hooks, instructions) and never calls
+  `/v1/apps/mcp/tools` or `/reconnect`. Health is explicit and per server.
+- **Scope.** Global MCP servers are visible and writable. Project MCP servers
+  and project hooks remain hidden/inert until the engine records workspace trust
+  and approval; Mona reports that state and does not approve it.
+- **Unknown keys.** The live probe disabled a server and confirmed the unknown
+  top-level key, the unknown server-level key, the unrelated server and its
+  secret value all survived. A stale revision was refused and left the state
+  unchanged.
+- **Spend.** Zero. The probe submitted no turn; `/v1/usage` totals were
+  identical before and after (0 turns, 0 tokens, 0 cost).
 
 ## P16 result — providers, models and effective settings
 
@@ -41,59 +44,69 @@ the commit that contains it. Verify with `node tools/build/cli.mjs validate`
 - **Scoped writes.** `codewhale config set` with a config.toml + settings.toml
   snapshot, hashed backup, expected-revision check and read-back verification.
   Route changes affect new threads; the active thread keeps its route.
-- **Live scope proof.** `P16-scope.json`: thread created on `deepseek-flash`;
-  config set model `deepseek-chat`; `getThread` still reports `deepseek-flash`;
-  the runtime still reports its launch route. Isolated `CODEWHALE_HOME`, zero
-  inference.
-- **Diagnostics.** Offline `doctor --json`; missing credential and invalid
-  endpoint are distinct. No `--probe-api` call. Redaction test covers keys,
-  bearer tokens and `token:` values.
 - **Reasoning.** `deepseek-flash` reports `reasoning_effort: "unknown"` with no
   levels, so no reasoning control is offered and none is sent.
 
-## Next exact action (P17)
+## Next exact action (P18)
 
-Read P17 in `Mona_PROMPTS.md` and spec sections 7 (021), 9.2, 11 extensions and
-13. P17 owns MONA-021 (MCP, skills, plugins, hooks, rules, instructions). Reuse
-the runtime routes already observed: `/v1/skills` exists and P01 tested it;
-MCP/plugin management capabilities are advertised. Do not load every server
-description into model context just to render a settings page.
+Read P18 in `Mona_PROMPTS.md` and spec sections 7.1, 11 (terminal/palette) and
+13. P18 owns MONA-022, MONA-023 and MONA-030.
+
+Known starting facts:
+
+- P01 recorded `terminal_stream`, `terminal_input`, `terminal_resize` and
+  `terminal_kill` as **false** in this build (P01-ISSUE-003). Do not fake a
+  terminal. Qualify the advertised terminal routes and, if the build still
+  reports them false, record the exact advanced/terminal route and the blocked
+  native claim.
+- The capability ledger now has 52 rows with P17 extension coverage. P18 must
+  compare its rows with the P01 inventory, investigate additions/removals and
+  version drift, and give every supported row a name, scope, invocation, status,
+  help source, cost class and test.
+- The palette already ranks projects, prompts and local actions. P18 finishes
+  the engine-capability part and must not convert local commands into model
+  prompts.
+- Windows PTY: the discovery report found no Visual Studio Build Tools; check
+  whether a prebuilt PTY package is installable before promising a native
+  terminal. If not, record the blocker rather than switching the stack.
 
 ## Relevant files and spec sections
 
-- `packages/adapter/src/{native,configuration,http,adapter}.ts` (+ tests)
-- `packages/contracts/src/{orchestration,configuration}.ts`
-- `apps/desktop/src/main/{agent-observatory,agents-ipc,provider-workbench,provider-ipc,engine-config,main}.ts`
-- `apps/desktop/src/shared/{agents,provider}.ts`
-- `apps/desktop/src/renderer/{AgentsPanel,ProviderWorkbench,App}.tsx`
-- `docs/adr/0001-orchestration-ownership.md`
-- `docs/evidence/P15-*`, `docs/evidence/P16-*`
-- Spec 7 (018/019/020), 9.1, 10.3, 11, 12, 13; O3/O5.
+- `packages/adapter/src/{extensions,configuration,native,http,adapter}.ts`
+- `packages/contracts/src/{extensions,configuration,orchestration}.ts`
+- `apps/desktop/src/main/{extensions-service,extensions-ipc,provider-workbench,agent-observatory,main}.ts`
+- `apps/desktop/src/shared/{extensions,provider,agents,catalog}.ts`
+- `apps/desktop/src/renderer/{ExtensionsPanel,ProviderWorkbench,AgentsPanel,App}.tsx`
+- `docs/codewhale-capabilities.json`, `docs/evidence/P17-extensions.{md,json}`
+- `tools/spike/p17-extensions.mjs`, `tools/spike/qualify-p17.mjs`
+- Spec 7.1, 11 terminal/palette, 13, 15; O3/O5.
 
 ## Open problem IDs and no-progress counts
 
 No open blocker. `attempts.jsonl` still holds only the closed P02 rows.
 
-Carried forward, relevant to P17+:
-- **P15-ISSUE-001** — local fleet start schedules but no worker lease was
-  observed in the app-server runtime; a foreground supervisor or later build may
-  be required. Re-qualify at P18/P20.
-- **P15-ISSUE-002** — parallel builder runs are not offered; worktrees, branch
-  ownership, budgets and a merge boundary remain unqualified.
-- **P15-ISSUE-003** — agent-run history is engine-owned; Mona keeps a last
-  observed projection, not full child transcripts.
-- **P16-ISSUE-001** — Flash reports reasoning support as unknown; no reasoning
-  control is offered.
-- **P16-ISSUE-002** — diagnostics are offline; live route probes stay explicit.
-- **P16-ISSUE-003** — credential entry remains with the engine.
-- **P16-ISSUE-004** — providers without a model catalog cannot be validated
-  locally; the workbench refuses to pretend.
-- Carried earlier: P01-ISSUE-001 (endpoint fingerprint drift), P01-ISSUE-002
-  (one runtime per machine session), P01-ISSUE-003 (terminal flags false; P18),
-  P01-ISSUE-004 (provisional cost sample), P05-ISSUE-001 (in-process barrier),
-  P06-ISSUE-002 (no human screen-reader pass), P07-ISSUE-001 (probe default
-  paths), P08-ISSUE-001..003, P09-ISSUE-001..002, P10-ISSUE-001..003,
-  P11-ISSUE-001, P12-ISSUE-001..003, P13-ISSUE-001..003, P14-ISSUE-001..004.
+New, carried for P18+:
+- **P17-ISSUE-001** — project-scope MCP servers and hooks stay hidden/inert
+  until the engine records workspace trust and approval. Engine authority; Mona
+  does not bypass it.
+- **P17-ISSUE-002** — MCP add/remove/connect/login are CLI advanced actions in
+  this build; there is no runtime add/remove route. The UI shows the exact
+  invocation.
+- **P17-ISSUE-003** — plugin install/trust/update and skill install/trust/update
+  were not exercised because they stage or execute third-party content. They
+  remain engine actions with their own consent step.
+- **P17-ISSUE-004** — an isolated `CODEWHALE_HOME` still scans the real
+  `~/.codewhale/skills`, producing shadowing warnings that are a probe artifact,
+  not a product defect.
+- **P17-ISSUE-005** — an MCP health check can start a configured server. That is
+  why it is explicit, per server, and never part of page load.
+
+Carried earlier: P15-ISSUE-001..003 (fleet lease, parallel builders, agent-run
+history), P16-ISSUE-001..004 (Flash reasoning unknown, offline diagnostics,
+engine-owned credentials, providers without catalogs), P01-ISSUE-001..004,
+P05-ISSUE-001, P06-ISSUE-002, P07-ISSUE-001, P08-ISSUE-001..003,
+P09-ISSUE-001..002, P10-ISSUE-001..003, P11-ISSUE-001, P12-ISSUE-001..003,
+P13-ISSUE-001..003, P14-ISSUE-001..004.
 
 ## Blocked dependencies
 
@@ -101,23 +114,19 @@ None.
 
 ## Last relevant validation
 
-- `npm test` → 381 Vitest (40 files) + 13 bootstrap + 12 launch + 8 spike
-  (`docs/evidence/P15-tests.txt`).
+- `npm test` → 403 Vitest (43 files) + 13 bootstrap + 12 launch + 8 spike.
 - `npm run build` → contracts, adapter, project-state, ui, desktop; renderer
-  332.57 kB (gzip 97.06 kB) (`docs/evidence/P15-build.txt`).
+  347.57 kB (gzip 100.21 kB).
 - `npm run typecheck`, `npm run lint`, `npm run format:check`,
-  `npm run check:build -w @mona/desktop` (48 named preload channels), and
-  `node tools/build/cli.mjs validate` → pass (`docs/evidence/P15-checks.txt`).
-- `node tools/spike/p15-agent-run.mjs` → one real delegated run; 119 events;
-  `docs/evidence/P15-agent-run.json`.
-- `node tools/spike/p16-scope.mjs` → isolated live scope probe, zero inference;
-  `docs/evidence/P16-scope.json`.
-- Spend: P15 delegated run 5,731.872 µUSD; every other P15/P16 check local and
-  offline. P16 spend zero.
+  `npm run check:build -w @mona/desktop` (51 named preload channels), and
+  `node tools/build/cli.mjs validate` → pass (r54, 0 warnings).
+- `node tools/spike/p17-extensions.mjs --out docs/evidence/P17-extensions.json`
+  → 16/16 checks; zero inference; `docs/evidence/P17-extensions.json`.
+- Spend: P17 zero. P15 delegated run remains the last paid run (5,731.872 µUSD).
 
 ## Human input needed
 
-None to continue P17. Standing acceptance item for P21/P22: right-click a folder
+None to continue P18. Standing acceptance item for P21/P22: right-click a folder
 and a folder background in Explorer and choose **Start new DS project with Mona**
 (possibly under **Show more options**). The registration currently points at the
 development build; remove it with `npm run launch:menu -- unregister` or replace

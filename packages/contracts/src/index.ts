@@ -7,4 +7,5 @@ export * from './error.js';
 export * from './upstream.js';
 export * from './orchestration.js';
 export * from './configuration.js';
+export * from './extensions.js';
 export * from './fixtures.js';

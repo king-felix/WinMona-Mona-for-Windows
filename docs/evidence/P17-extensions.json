@@ -1,0 +1,1474 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T15:19:07.512Z",
+  "engine": {
+    "command": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+    "root": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203",
+    "home": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home",
+    "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace"
+  },
+  "checks": [
+    {
+      "name": "snapshot reports MCP servers with a revision",
+      "ok": true,
+      "detail": {
+        "revision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca",
+        "servers": [
+          "fixture-echo",
+          "missing-exec"
+        ]
+      }
+    },
+    {
+      "name": "snapshot did not request the tool catalog or connect a server",
+      "ok": true,
+      "detail": {
+        "calls": 7
+      }
+    },
+    {
+      "name": "global and project scope are reported honestly",
+      "ok": true,
+      "detail": {
+        "origins": [
+          "fixture-echo:global",
+          "missing-exec:global"
+        ]
+      }
+    },
+    {
+      "name": "MCP environment values are reported as key names only",
+      "ok": true,
+      "detail": {
+        "missing_server_env_keys": [
+          "FIXTURE_TOKEN"
+        ]
+      }
+    },
+    {
+      "name": "custom skill is listed with provenance",
+      "ok": true,
+      "detail": {
+        "skills": 48,
+        "local_note": {
+          "name": "local-note",
+          "description": "A harmless local fixture skill for P17.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\local-note\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": false,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": null
+        }
+      }
+    },
+    {
+      "name": "project instructions are reported as loaded",
+      "ok": true,
+      "detail": {
+        "loaded": [
+          "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\AGENTS.md"
+        ]
+      }
+    },
+    {
+      "name": "project hooks are not approved implicitly",
+      "ok": true,
+      "detail": {
+        "enabled": false,
+        "hooks": [],
+        "problems": [
+          "rejected: `[hooks]` setting — Project hooks require workspace trust and separate hook approval"
+        ]
+      }
+    },
+    {
+      "name": "fixture MCP server connects and reports its tool",
+      "ok": true,
+      "detail": {
+        "connected": true,
+        "tools": [
+          {
+            "server": "fixture-echo",
+            "name": "echo_text",
+            "prefixedName": "mcp_fixture-echo_echo_text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing executable fails with an actionable redacted error",
+      "ok": true,
+      "detail": {
+        "connected": false,
+        "error": "MCP stdio spawn failed (transport=stdio server=missing-exec cmd=\"C:\\\\nonexistent\\\\mona-p17-fixture.exe\" args=[] env_keys=[\"FIXTURE_TOKEN\"]): [redacted]"
+      }
+    },
+    {
+      "name": "disable is verified by reading the server back",
+      "ok": true,
+      "detail": {
+        "receipt": {
+          "action": "mcp.disable",
+          "target": "fixture-echo",
+          "origin": "global",
+          "enabled": false,
+          "connected": false,
+          "verified": true,
+          "previousRevision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca",
+          "revision": "mcp-v1-dd3630b53277d21d73aa0a022d7f88c9d7689d7fb4fb5159fcd34dfda0819c24",
+          "detail": "The engine confirms fixture-echo is disabled.",
+          "appliedAt": "2026-11-12T15:19:08.412Z"
+        }
+      }
+    },
+    {
+      "name": "only the intended server changed",
+      "ok": true,
+      "detail": {
+        "servers": [
+          "fixture-echo:false",
+          "missing-exec:true"
+        ]
+      }
+    },
+    {
+      "name": "unrelated server and secret survive the edit",
+      "ok": true,
+      "detail": {
+        "missing_exec_present": true
+      }
+    },
+    {
+      "name": "unknown top-level configuration keys are preserved",
+      "ok": true,
+      "detail": {
+        "value": {
+          "keep": true,
+          "note": "preserve unknown keys"
+        }
+      }
+    },
+    {
+      "name": "unknown server-level keys are preserved",
+      "ok": true,
+      "detail": {
+        "value": "keep-this-unknown-server-key"
+      }
+    },
+    {
+      "name": "a stale revision is refused",
+      "ok": true,
+      "detail": {
+        "code": "conflict",
+        "message": "The MCP configuration changed since this view was read. Reload before saving."
+      }
+    },
+    {
+      "name": "a refused stale edit leaves the server disabled",
+      "ok": true,
+      "detail": {
+        "servers": [
+          "fixture-echo:false",
+          "missing-exec:true"
+        ]
+      }
+    },
+    {
+      "name": "re-enable is verified",
+      "ok": true,
+      "detail": {
+        "receipt": {
+          "action": "mcp.enable",
+          "target": "fixture-echo",
+          "origin": "global",
+          "enabled": true,
+          "connected": false,
+          "verified": true,
+          "previousRevision": "mcp-v1-dd3630b53277d21d73aa0a022d7f88c9d7689d7fb4fb5159fcd34dfda0819c24",
+          "revision": "mcp-v1-8b0aeff7fcd5d71da31d0c0902b632a9f89048a5f5a35a195f6439e0afa417e5",
+          "detail": "The engine confirms fixture-echo is enabled.",
+          "appliedAt": "2026-11-12T15:19:09.146Z"
+        }
+      }
+    },
+    {
+      "name": "the probe caused zero inference",
+      "ok": true,
+      "detail": {
+        "before": {
+          "turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        },
+        "after": {
+          "turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    }
+  ],
+  "usage_before": {
+    "turns": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0
+  },
+  "snapshot": {
+    "connected": true,
+    "capturedAt": "2026-11-12T15:19:07.688Z",
+    "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+    "engineState": "connected",
+    "mcp": {
+      "status": "ok",
+      "note": null,
+      "revision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca",
+      "servers": [
+        {
+          "name": "fixture-echo",
+          "origin": "global",
+          "writable": true,
+          "authRequired": false,
+          "enabled": true,
+          "required": false,
+          "command": "C:\\Program Files\\nodejs\\node.exe",
+          "argumentCount": 1,
+          "url": null,
+          "transport": "unknown",
+          "connected": false,
+          "credentialConfigured": false,
+          "enabledTools": [],
+          "disabledTools": [],
+          "envKeys": [],
+          "scopes": [],
+          "detailAvailable": true,
+          "detailNote": null
+        },
+        {
+          "name": "missing-exec",
+          "origin": "global",
+          "writable": true,
+          "authRequired": false,
+          "enabled": true,
+          "required": false,
+          "command": "C:\\nonexistent\\mona-p17-fixture.exe",
+          "argumentCount": 0,
+          "url": null,
+          "transport": "unknown",
+          "connected": false,
+          "credentialConfigured": true,
+          "enabledTools": [],
+          "disabledTools": [],
+          "envKeys": [
+            "FIXTURE_TOKEN"
+          ],
+          "scopes": [],
+          "detailAvailable": true,
+          "detailNote": null
+        }
+      ]
+    },
+    "skills": {
+      "status": "ok",
+      "note": null,
+      "directories": [
+        "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills",
+        "C:\\Users\\victo\\.codewhale/skills"
+      ],
+      "warnings": [
+        "Skill `batch` at C:\\Users\\victo\\.codewhale/skills\\batch\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\batch\\SKILL.md.",
+        "Skill `best-of-n` at C:\\Users\\victo\\.codewhale/skills\\best-of-n\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\best-of-n\\SKILL.md.",
+        "Skill `dataviz` at C:\\Users\\victo\\.codewhale/skills\\dataviz\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\dataviz\\SKILL.md.",
+        "Skill `debug` at C:\\Users\\victo\\.codewhale/skills\\debug\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\debug\\SKILL.md.",
+        "Skill `delegate` at C:\\Users\\victo\\.codewhale/skills\\delegate\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\delegate\\SKILL.md.",
+        "Skill `dependency-update` at C:\\Users\\victo\\.codewhale/skills\\dependency-update\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\dependency-update\\SKILL.md.",
+        "Skill `document` at C:\\Users\\victo\\.codewhale/skills\\document\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\document\\SKILL.md.",
+        "Skill `documents` at C:\\Users\\victo\\.codewhale/skills\\documents\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\documents\\SKILL.md.",
+        "Skill `docx` at C:\\Users\\victo\\.codewhale/skills\\docx\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\docx\\SKILL.md.",
+        "Skill `fleet-manager` at C:\\Users\\victo\\.codewhale/skills\\fleet-manager\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\fleet-manager\\SKILL.md.",
+        "Skill `flights` at C:\\Users\\victo\\.codewhale/skills\\flights\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\flights\\SKILL.md.",
+        "Skill `forget` at C:\\Users\\victo\\.codewhale/skills\\forget\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\forget\\SKILL.md.",
+        "Skill `frontend-design` at C:\\Users\\victo\\.codewhale/skills\\frontend-design\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\frontend-design\\SKILL.md.",
+        "Skill `github` at C:\\Users\\victo\\.codewhale/skills\\github\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\github\\SKILL.md.",
+        "Skill `gmail` at C:\\Users\\victo\\.codewhale/skills\\gmail\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\gmail\\SKILL.md.",
+        "Skill `goals` at C:\\Users\\victo\\.codewhale/skills\\goals\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\goals\\SKILL.md.",
+        "Skill `google-calendar` at C:\\Users\\victo\\.codewhale/skills\\google-calendar\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\google-calendar\\SKILL.md.",
+        "Skill `handoff` at C:\\Users\\victo\\.codewhale/skills\\handoff\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\handoff\\SKILL.md.",
+        "Skill `help` at C:\\Users\\victo\\.codewhale/skills\\help\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\help\\SKILL.md.",
+        "Skill `image-search` at C:\\Users\\victo\\.codewhale/skills\\image-search\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\image-search\\SKILL.md.",
+        "Skill `implement` at C:\\Users\\victo\\.codewhale/skills\\implement\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\implement\\SKILL.md.",
+        "Skill `interview` at C:\\Users\\victo\\.codewhale/skills\\interview\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\interview\\SKILL.md.",
+        "Skill `mcp-builder` at C:\\Users\\victo\\.codewhale/skills\\mcp-builder\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\mcp-builder\\SKILL.md.",
+        "Skill `mcp-discovery` at C:\\Users\\victo\\.codewhale/skills\\mcp-discovery\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\mcp-discovery\\SKILL.md.",
+        "Skill `money` at C:\\Users\\victo\\.codewhale/skills\\money\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\money\\SKILL.md.",
+        "Skill `pdf` at C:\\Users\\victo\\.codewhale/skills\\pdf\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\pdf\\SKILL.md.",
+        "Skill `photos` at C:\\Users\\victo\\.codewhale/skills\\photos\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\photos\\SKILL.md.",
+        "Skill `plan` at C:\\Users\\victo\\.codewhale/skills\\plan\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\plan\\SKILL.md.",
+        "Skill `plugin-creator` at C:\\Users\\victo\\.codewhale/skills\\plugin-creator\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\plugin-creator\\SKILL.md.",
+        "Skill `podcast` at C:\\Users\\victo\\.codewhale/skills\\podcast\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\podcast\\SKILL.md.",
+        "Skill `pptx` at C:\\Users\\victo\\.codewhale/skills\\pptx\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\pptx\\SKILL.md.",
+        "Skill `presentations` at C:\\Users\\victo\\.codewhale/skills\\presentations\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\presentations\\SKILL.md.",
+        "Skill `release` at C:\\Users\\victo\\.codewhale/skills\\release\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\release\\SKILL.md.",
+        "Skill `research` at C:\\Users\\victo\\.codewhale/skills\\research\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\research\\SKILL.md.",
+        "Skill `review` at C:\\Users\\victo\\.codewhale/skills\\review\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\review\\SKILL.md.",
+        "Skill `security-review` at C:\\Users\\victo\\.codewhale/skills\\security-review\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\security-review\\SKILL.md.",
+        "Skill `shopping` at C:\\Users\\victo\\.codewhale/skills\\shopping\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\shopping\\SKILL.md.",
+        "Skill `simplify` at C:\\Users\\victo\\.codewhale/skills\\simplify\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\simplify\\SKILL.md.",
+        "Skill `skill-creator` at C:\\Users\\victo\\.codewhale/skills\\skill-creator\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\skill-creator\\SKILL.md.",
+        "Skill `skill-installer` at C:\\Users\\victo\\.codewhale/skills\\skill-installer\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\skill-installer\\SKILL.md.",
+        "Skill `spotify` at C:\\Users\\victo\\.codewhale/skills\\spotify\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\spotify\\SKILL.md.",
+        "Skill `spreadsheets` at C:\\Users\\victo\\.codewhale/skills\\spreadsheets\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\spreadsheets\\SKILL.md.",
+        "Skill `test` at C:\\Users\\victo\\.codewhale/skills\\test\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\test\\SKILL.md.",
+        "Skill `tts` at C:\\Users\\victo\\.codewhale/skills\\tts\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\tts\\SKILL.md.",
+        "Skill `verify` at C:\\Users\\victo\\.codewhale/skills\\verify\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\verify\\SKILL.md.",
+        "Skill `webapp-testing` at C:\\Users\\victo\\.codewhale/skills\\webapp-testing\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\webapp-testing\\SKILL.md.",
+        "Skill `xlsx` at C:\\Users\\victo\\.codewhale/skills\\xlsx\\SKILL.md is shadowed by C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\xlsx\\SKILL.md."
+      ],
+      "skills": [
+        {
+          "name": "batch",
+          "description": "Break a large, parallelizable goal into bounded work units, coordinate existing agent/worktree machinery, integrate, and verify. Explicit-only.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\batch\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "explicit-only",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "best-of-n",
+          "description": "Generate a small set of independent candidate solutions in worktrees, judge them against one explicit rubric, and apply the winner only after PASS verification.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\best-of-n\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "dataviz",
+          "description": "Choose and produce an appropriate chart/dashboard/visual explanation from data, with legible encodings and source/assumption notes.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\dataviz\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "debug",
+          "description": "Reproduce, minimize, localize, identify root cause, and distinguish diagnosis from an authorized fix. Prefer root-cause over symptom patches.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\debug\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "delegate",
+          "description": "Strategic delegation for multi-step coding, research, or verification work. Use when a task can be split into parent reasoning plus focused sub-agent execution through the agent tool.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\delegate\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "dependency-update",
+          "description": "Read release notes/changelogs, update a defined dependency scope, handle breaking changes, and verify. Explicit-only; no broad update-everything by inference.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\dependency-update\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "explicit-only",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "document",
+          "description": "Write or update repository/product documentation: README, user guides, API docs, architecture, migration notes, and changelog material. This is not the Word-document artifact skill.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\document\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "documents",
+          "description": "Compatibility alias for the docx skill. Prefer loading docx.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\documents\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "docx"
+          ],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "docx",
+          "description": "Create/edit/inspect Word documents using available managed or host capabilities.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\docx\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "fleet-manager",
+          "description": "Use when managing, triaging, restarting, escalating, or summarizing Codewhale fleet runs and workers.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\fleet-manager\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "flights",
+          "description": "Track flights and look up status and schedules. Use when: flight status, track a flight, flightaware, arrivals, departures, delays, or a flight number.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\flights\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "forget",
+          "description": "Help the user remove a stored fact using Codewhale's Context Lens when they ask to forget or delete a memory.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\forget\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "frontend-design",
+          "description": "Produce intentional, responsive, accessible UI work and perform visual QA instead of generic component assembly.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\frontend-design\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "github",
+          "description": "GitHub via gh — issues, PRs, reviews, search, and CI runs. Use when: user mentions a repo, issue, PR, review, release, workflow run, or anything on github.com.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\github\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "gmail",
+          "description": "Search, read, draft, and send Gmail when the user asks to work with their inbox or email.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\gmail\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "goals",
+          "description": "Set, review, and update the user's goals. Use when: goals, resolutions, track progress, what am I working toward, or holding me accountable.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\goals\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "google-calendar",
+          "description": "Read schedules, check availability, and create or update Google Calendar events when the user asks to work with their calendar.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\google-calendar\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "handoff",
+          "description": "Write a compact, decision-ready handoff so the next session (or the user) can continue without reconstructing the current one. Use when the session is ending, context is running low, the user asks for a handoff / 'pass the baton' / 'hand off', or a long-running operation needs a durable state checkpoint.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\handoff\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "help",
+          "description": "Route a \"how do I use Codewhale\" question to the installed help, config, and doctor surfaces instead of reciting a manual from memory. Explicit-only.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\help\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "explicit-only",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "image-search",
+          "description": "Find images on the web and save them locally. Use when: find an image, image search, stock photo, picture of, download an image, or need a visual.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\image-search\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "implement",
+          "description": "Carry an authorized, defined request or approved plan through scoped edits and proportionate verification. Skill loading is not write authorization by itself.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\implement\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "interview",
+          "description": "Ask one useful structured question at a time only when material product/implementation choices are genuinely missing; remember answers and produce a brief/spec. Discoverable facts should be investigated instead of asked.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\interview\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "local-note",
+          "description": "A harmless local fixture skill for P17.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\local-note\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": false,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": null
+        },
+        {
+          "name": "mcp-builder",
+          "description": "Design, build, configure, or debug Model Context Protocol servers for codewhale, including stdio and HTTP/SSE transports.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\mcp-builder\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "mcp-discovery",
+          "description": "Find and start a zero-environment local MCP server when the session lacks a capability that no available tool, project script, or ordinary local code can cover.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\mcp-discovery\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "money",
+          "description": "Bank accounts, balances, and transactions via Plaid. Use when: bank, balance, transactions, spending, accounts, or plaid.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\money\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "pdf",
+          "description": "Read, extract, split, merge, rotate, watermark, fill, OCR, or create PDF files with verification of page counts and text extraction.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\pdf\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "photos",
+          "description": "Search a local macOS Photos library and export selected copies when the user asks to find or use their own photos.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\photos\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "plan",
+          "description": "Turn a sufficiently understood task into an ordered implementation plan with dependencies and verification. Orchestrate Codewhale’s native plan state; do not build a parallel planner.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\plan\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "plugin-creator",
+          "description": "Scaffold a local Codewhale plugin bundle with a versioned manifest, namespaced Skills, and an explicit trust review.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\plugin-creator\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "podcast",
+          "description": "Turn research into a spoken podcast — script, synthesize, stitch. Use when: podcast, generate a podcast, audio briefing, narrate, or turn this into audio.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\podcast\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "pptx",
+          "description": "Create/edit/inspect/verify slide decks and PPTX presentations.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\pptx\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "presentations",
+          "description": "Compatibility alias for the pptx skill. Prefer loading pptx.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\presentations\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "pptx"
+          ],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "release",
+          "description": "Prepare a named version: preflight, version consistency, build/package, smoke test, checksums/notes, and release readiness. Publishing/tagging/deploy need separate authorization. Explicit-only.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\release\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "explicit-only",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "research",
+          "description": "Current external research using available web tools, primary sources where possible, links/citations, date awareness, synthesis, and unresolved uncertainty.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\research\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "review",
+          "description": "Diff-scoped correctness review that reads the codebase around the change — callers, contracts, and invariants — and returns line-anchored findings ranked by severity with confidence, then a merge-risk verdict. Use for reviewing a PR, diff, or named change set. Not for style review, approvals-as-rubber-stamp, or editing the code.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\review\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "code-review"
+          ],
+          "bundledTier": "core"
+        },
+        {
+          "name": "security-review",
+          "description": "Review a change, module, or surface for exploitable defects — trust boundaries, authn/authz, injection, secret exposure, filesystem and network reach, dependency risk. Use when the user asks for a security review, audit, or vulnerability check of concrete code. Not for general code review, lint, or compliance paperwork.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\security-review\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "shopping",
+          "description": "Product research — compare options, prices, and reviews. Use when: buy, shopping, product recommendation, compare prices, best X to buy, or is this a good deal.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\shopping\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "simplify",
+          "description": "Improve clarity and reduce needless complexity after behavior is understood; preserve behavior and keep cleanup separate from correctness fixes.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\simplify\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "skill-creator",
+          "description": "Create or improve codewhale skills. Use when the user wants a new skill, wants to update an existing skill, or needs guidance on when a skill should be a skill versus MCP, hooks, tools, or a plugin scaffold.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\skill-creator\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "create-skill"
+          ],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "skill-installer",
+          "description": "Install, update, trust, or inspect Codewhale skills from GitHub or local skill folders. Use when the user asks for available skills or wants a community skill installed.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\skill-installer\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "spotify",
+          "description": "Control Spotify playback and search the library and playlists. Use when: spotify, music, playlist, play, pause, or what's playing.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\spotify\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "spreadsheets",
+          "description": "Compatibility alias for the xlsx skill. Prefer loading xlsx.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\spreadsheets\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "xlsx"
+          ],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "test",
+          "description": "Detect the project’s test stack, run the narrowest useful tests, create tests when authorized, and report coverage/gaps honestly.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\test\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "tts",
+          "description": "Speak or render text to speech locally. Use when: read aloud, speak, voice output, tts, text to speech, or an audio version of text.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\tts\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "core"
+        },
+        {
+          "name": "verify",
+          "description": "Exercise the real app/API/CLI and collect observable evidence; tests alone do not count as end-to-end verification.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\verify\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [
+            "check-work"
+          ],
+          "bundledTier": "core"
+        },
+        {
+          "name": "webapp-testing",
+          "description": "Start/reuse a local app, wait for readiness, inspect rendered state/console/network, act from observed selectors, and verify with evidence.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\webapp-testing\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        },
+        {
+          "name": "xlsx",
+          "description": "Create/edit/analyze/verify spreadsheet workbooks including XLSX/CSV/TSV.",
+          "path": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\skills\\xlsx\\SKILL.md",
+          "source": "native",
+          "pluginId": null,
+          "pluginGeneration": null,
+          "pluginContentHash": null,
+          "enabled": true,
+          "bundled": true,
+          "invocation": "model+user",
+          "aliases": [],
+          "bundledTier": "tools"
+        }
+      ]
+    },
+    "plugins": {
+      "status": "ok",
+      "note": null,
+      "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+      "plugins": [
+        {
+          "id": "builtin/794188af6f6c/computer-use",
+          "name": "computer-use",
+          "displayName": "Computer Use",
+          "author": "Codewhale",
+          "homepage": "https://codewhale.net/computer-use",
+          "version": "0.12.1",
+          "description": "Control apps with Codewhale. macOS beta; unsigned Windows preview and experimental Linux/Docker support.",
+          "scope": "builtin",
+          "origin": "codewhale-builtin",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\home\\builtin-plugins\\snapshots\\computer-use-15c07e49ec3687d668c3d074873d3ec1e59ea3b8b2084292e7694d9e88114977\\computer-use",
+          "state": "disabled",
+          "enabled": false,
+          "trustStatus": "not-reviewed",
+          "active": false,
+          "compatibility": "full",
+          "platforms": [
+            "macos"
+          ],
+          "inventory": {
+            "skills": 1,
+            "mcpServers": 1,
+            "stdioMcpServers": 1,
+            "remoteMcpServers": 0,
+            "commands": 1,
+            "agents": 0,
+            "hooks": 0,
+            "lsp": 0,
+            "native": 0,
+            "filesystemRoots": [],
+            "networkHosts": [],
+            "lifecycleMutation": false
+          },
+          "contentHash": "094946ffe050c2ede1a714f1deff8199496ff609b82ebfe631246bddf9fe211d",
+          "capabilityHash": "6d0f62add294575eb4dce138c212540a2d124c91b25ffab8e86d9cbfde5fa516",
+          "stateGeneration": 0,
+          "diagnostics": []
+        }
+      ],
+      "registryDiagnostics": [],
+      "validationClean": true
+    },
+    "hooks": {
+      "status": "ok",
+      "note": null,
+      "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+      "enabled": false,
+      "hooks": [],
+      "problems": [
+        "rejected: `[hooks]` setting — Project hooks require workspace trust and separate hook approval"
+      ]
+    },
+    "instructions": {
+      "status": "ok",
+      "note": null,
+      "workspace": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+      "sources": [
+        {
+          "kind": "project",
+          "status": "loaded",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\AGENTS.md",
+          "relativePath": "AGENTS.md",
+          "exists": true,
+          "bytes": 45,
+          "warning": null
+        },
+        {
+          "kind": "project",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\.codewhale\\instructions.md",
+          "relativePath": ".codewhale/instructions.md",
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "project",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\.deepseek\\instructions.md",
+          "relativePath": ".deepseek/instructions.md",
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.codewhale\\AGENTS.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.agents\\AGENTS.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.deepseek\\AGENTS.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.codewhale\\instructions.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.agents\\instructions.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "global",
+          "status": "missing",
+          "scopeDir": "C:\\Users\\victo",
+          "path": "C:\\Users\\victo\\.deepseek\\instructions.md",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "fragment",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\.agents\\AGENTS.md",
+          "relativePath": ".agents/AGENTS.md",
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace\\.codewhale\\constitution.json",
+          "relativePath": ".codewhale/constitution.json",
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\AppData\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\victo\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\Users\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        },
+        {
+          "kind": "constitution",
+          "status": "missing",
+          "scopeDir": "\\\\?\\C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p17-extensions\\1794496747203\\workspace",
+          "path": "\\\\?\\C:\\.codewhale\\constitution.json",
+          "relativePath": null,
+          "exists": false,
+          "bytes": null,
+          "warning": null
+        }
+      ],
+      "foreignImports": [],
+      "generatedFallback": false,
+      "aggregateBudgetBytes": 49152,
+      "warnings": []
+    },
+    "counts": {
+      "mcpServers": 2,
+      "mcpEnabled": 2,
+      "skills": 48,
+      "plugins": 1,
+      "hooks": 0,
+      "instructionsLoaded": 1
+    },
+    "scopes": [
+      {
+        "id": "global",
+        "label": "Global",
+        "detail": "Applies to every project and new session on this machine. Global MCP servers live in the engine’s own mcp.json."
+      },
+      {
+        "id": "project",
+        "label": "Project",
+        "detail": "Applies to this workspace only. The engine loads project instructions, hooks and servers only after its own review or trust step; Mona does not approve them for you."
+      },
+      {
+        "id": "builtin",
+        "label": "Bundled",
+        "detail": "Ships with the pinned engine or a reviewed plugin snapshot. Mona reports the engine’s state and never edits the reviewed bytes."
+      }
+    ],
+    "caveats": []
+  },
+  "snapshot_calls": [
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/skills",
+    "GET /v1/apps/plugins",
+    "GET /v1/hooks",
+    "GET /v1/workspace/instructions",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "POST /v1/apps/mcp/servers/fixture-echo/reconnect [If-Match]",
+    "GET /v1/apps/mcp/tools",
+    "GET /v1/apps/mcp/servers",
+    "POST /v1/apps/mcp/servers/missing-exec/reconnect [If-Match]",
+    "GET /v1/apps/mcp/tools",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/skills",
+    "GET /v1/apps/plugins",
+    "GET /v1/hooks",
+    "GET /v1/workspace/instructions",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "POST /v1/apps/mcp/servers/fixture-echo/disable [If-Match]",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/skills",
+    "GET /v1/apps/plugins",
+    "GET /v1/hooks",
+    "GET /v1/workspace/instructions",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/skills",
+    "GET /v1/apps/plugins",
+    "GET /v1/hooks",
+    "GET /v1/workspace/instructions",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec",
+    "POST /v1/apps/mcp/servers/fixture-echo/enable [If-Match]",
+    "GET /v1/apps/mcp/servers",
+    "GET /v1/apps/mcp/servers/fixture-echo",
+    "GET /v1/apps/mcp/servers/missing-exec"
+  ],
+  "health_fixture": {
+    "server": "fixture-echo",
+    "connected": true,
+    "authRequired": false,
+    "error": null,
+    "tools": [
+      {
+        "server": "fixture-echo",
+        "name": "echo_text",
+        "prefixedName": "mcp_fixture-echo_echo_text"
+      }
+    ],
+    "checkedAt": "2026-11-12T15:19:07.865Z",
+    "revision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca"
+  },
+  "health_missing": {
+    "server": "missing-exec",
+    "connected": false,
+    "authRequired": false,
+    "error": "MCP stdio spawn failed (transport=stdio server=missing-exec cmd=\"C:\\\\nonexistent\\\\mona-p17-fixture.exe\" args=[] env_keys=[\"FIXTURE_TOKEN\"]): [redacted]",
+    "tools": [],
+    "checkedAt": "2026-11-12T15:19:07.952Z",
+    "revision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca"
+  },
+  "disable_receipt": {
+    "action": "mcp.disable",
+    "target": "fixture-echo",
+    "origin": "global",
+    "enabled": false,
+    "connected": false,
+    "verified": true,
+    "previousRevision": "mcp-v1-764eb960b62c0cf3bed9d59180bfa92bd8e740fdebc6b873aeebca07c0524cca",
+    "revision": "mcp-v1-dd3630b53277d21d73aa0a022d7f88c9d7689d7fb4fb5159fcd34dfda0819c24",
+    "detail": "The engine confirms fixture-echo is disabled.",
+    "appliedAt": "2026-11-12T15:19:08.412Z"
+  },
+  "after_disable": {
+    "status": "ok",
+    "note": null,
+    "revision": "mcp-v1-dd3630b53277d21d73aa0a022d7f88c9d7689d7fb4fb5159fcd34dfda0819c24",
+    "servers": [
+      {
+        "name": "fixture-echo",
+        "origin": "global",
+        "writable": true,
+        "authRequired": false,
+        "enabled": false,
+        "required": false,
+        "command": "C:\\Program Files\\nodejs\\node.exe",
+        "argumentCount": 1,
+        "url": null,
+        "transport": "unknown",
+        "connected": false,
+        "credentialConfigured": false,
+        "enabledTools": [],
+        "disabledTools": [],
+        "envKeys": [],
+        "scopes": [],
+        "detailAvailable": true,
+        "detailNote": null
+      },
+      {
+        "name": "missing-exec",
+        "origin": "global",
+        "writable": true,
+        "authRequired": false,
+        "enabled": true,
+        "required": false,
+        "command": "C:\\nonexistent\\mona-p17-fixture.exe",
+        "argumentCount": 0,
+        "url": null,
+        "transport": "unknown",
+        "connected": false,
+        "credentialConfigured": true,
+        "enabledTools": [],
+        "disabledTools": [],
+        "envKeys": [
+          "FIXTURE_TOKEN"
+        ],
+        "scopes": [],
+        "detailAvailable": true,
+        "detailNote": null
+      }
+    ]
+  },
+  "mcp_file_before_hash": "23cf56e6f41dc0b39d5468d68425710efaf5ea180ea3bab3b93b2a51dda23587",
+  "mcp_file_after_hash": "b1c5830f6ad6b841041c4a577e87867caf4bd760a974ef2aed0d86450cfad909",
+  "stale_attempt": {
+    "ok": false,
+    "error": {
+      "code": "conflict",
+      "message": "The MCP configuration changed since this view was read. Reload before saving.",
+      "retryable": false
+    }
+  },
+  "reenable_receipt": {
+    "action": "mcp.enable",
+    "target": "fixture-echo",
+    "origin": "global",
+    "enabled": true,
+    "connected": false,
+    "verified": true,
+    "previousRevision": "mcp-v1-dd3630b53277d21d73aa0a022d7f88c9d7689d7fb4fb5159fcd34dfda0819c24",
+    "revision": "mcp-v1-8b0aeff7fcd5d71da31d0c0902b632a9f89048a5f5a35a195f6439e0afa417e5",
+    "detail": "The engine confirms fixture-echo is enabled.",
+    "appliedAt": "2026-11-12T15:19:09.146Z"
+  },
+  "usage_after": {
+    "turns": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0
+  },
+  "finished_utc": "2026-11-12T15:19:09.164Z",
+  "ok": true
+}

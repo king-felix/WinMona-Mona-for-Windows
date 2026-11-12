@@ -13,6 +13,7 @@ import type {
 import type { AppInfo } from '../shared/ipc.js';
 import type { AttentionFocus, AttentionView } from '../shared/attention.js';
 import type { BriefingView } from '../shared/briefing.js';
+import type { ExtensionsView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
 import { App } from './App.js';
@@ -268,6 +269,8 @@ type Store = {
   briefing?: BriefingView;
   focusHandlers?: Array<(focus: AttentionFocus) => void>;
   layouts?: Array<{ projectId: string; layout: string }>;
+  extensions?: ExtensionsView;
+  extensionActions?: string[];
 };
 
 function emptyStudio(): StudioView {
@@ -314,6 +317,39 @@ function launchFor(target: CatalogProject, seq: number): LaunchReceipt {
     }),
     profile: { label: 'Full Access', profile: 'DS', posture: 'full_access' },
     focusComposer: true,
+  };
+}
+
+function emptyExtensionsView(): ExtensionsView {
+  return {
+    connected: true,
+    capturedAt: '2026-11-12T00:00:00.000Z',
+    workspace: 'x:\\work\\alpha',
+    engineState: 'connected',
+    mcp: { status: 'ok', note: null, revision: 'mcp-v1-aaaa', servers: [] },
+    skills: { status: 'ok', note: null, directories: [], warnings: [], skills: [] },
+    plugins: {
+      status: 'ok',
+      note: null,
+      workspace: 'x:\\work\\alpha',
+      plugins: [],
+      registryDiagnostics: [],
+      validationClean: true,
+    },
+    hooks: { status: 'ok', note: null, workspace: 'x:\\work\\alpha', enabled: false, hooks: [], problems: [] },
+    instructions: {
+      status: 'ok',
+      note: null,
+      workspace: 'x:\\work\\alpha',
+      sources: [],
+      foreignImports: [],
+      generatedFallback: true,
+      aggregateBudgetBytes: 49_152,
+      warnings: [],
+    },
+    counts: { mcpServers: 0, mcpEnabled: 0, skills: 0, plugins: 0, hooks: 0, instructionsLoaded: 0 },
+    scopes: [],
+    caveats: [],
   };
 }
 
@@ -581,6 +617,34 @@ function bridgeFor(store: Store): Window['mona'] {
     providerApplyRoute: async () => ok({ verified: true }),
     providerApplyPermission: async () => ok({ verified: true }),
     providerApplyMode: async () => ok({ verified: true }),
+    extensionsGet: async () => ok(store.extensions ?? emptyExtensionsView()),
+    extensionsSetMcp: async (input: { name: string; enabled: boolean; expectedRevision: string }) => {
+      (store.extensionActions ??= []).push(`set:${input.name}:${input.enabled}:${input.expectedRevision}`);
+      return ok({
+        action: input.enabled ? ('mcp.enable' as const) : ('mcp.disable' as const),
+        target: input.name,
+        origin: 'global' as const,
+        enabled: input.enabled,
+        connected: false,
+        verified: true,
+        previousRevision: input.expectedRevision,
+        revision: 'mcp-v1-bbbb',
+        detail: 'The engine confirms the change.',
+        appliedAt: '2026-11-12T00:00:00.000Z',
+      });
+    },
+    extensionsCheckMcp: async (input: { name: string; expectedRevision: string }) => {
+      (store.extensionActions ??= []).push(`check:${input.name}:${input.expectedRevision}`);
+      return ok({
+        server: input.name,
+        connected: true,
+        authRequired: false,
+        error: null,
+        tools: [{ server: input.name, name: 'echo_text', prefixedName: 'mcp_fixture_echo_text' }],
+        checkedAt: '2026-11-12T00:00:00.000Z',
+        revision: 'mcp-v1-aaaa',
+      });
+    },
     getLaunchState: async () => ok({ latest: store.launch ?? null, count: store.launch?.seq ?? 0 }),
     onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {
       const list = (store.launchHandlers ??= []);
@@ -769,6 +833,73 @@ describe('Mona shell', () => {
     expect(document.querySelector('[data-testid="provider-select"]')).toBeTruthy();
     expect(document.querySelector('[data-testid="requested-route"]')?.textContent).toContain('deepseek');
     expect(document.querySelector('[data-testid="reasoning-note"]')?.textContent).toContain('reasoning control');
+    await act(async () => root.unmount());
+  });
+
+  it('shows extension provenance and sends MCP actions with the observed revision', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const extensions = emptyExtensionsView();
+    extensions.mcp.servers = [
+      {
+        name: 'fixture',
+        origin: 'global',
+        writable: true,
+        authRequired: false,
+        enabled: true,
+        required: false,
+        command: 'node',
+        argumentCount: 1,
+        url: null,
+        transport: 'stdio',
+        connected: false,
+        credentialConfigured: false,
+        enabledTools: [],
+        disabledTools: [],
+        envKeys: ['FIXTURE_TOKEN'],
+        scopes: [],
+        detailAvailable: true,
+        detailNote: null,
+      },
+    ];
+    extensions.counts = { ...extensions.counts, mcpServers: 1, mcpEnabled: 1 };
+    extensions.instructions.sources = [
+      {
+        kind: 'project',
+        status: 'loaded',
+        scopeDir: 'x:\\work\\alpha',
+        path: 'x:\\work\\alpha\\AGENTS.md',
+        relativePath: 'AGENTS.md',
+        exists: true,
+        bytes: 42,
+        warning: null,
+      },
+    ];
+    extensions.counts = { ...extensions.counts, instructionsLoaded: 1 };
+    const store: Store = { projects: [alpha], ui: emptyUi(), engine: engine(), spends: {}, extensions };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    await act(async () => {
+      (document.querySelector('[data-testid="nav-extensions"]') as HTMLButtonElement).dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="mcp-server-fixture"]')?.textContent).toContain('Global');
+    expect(document.querySelector('[data-testid="instruction-project-loaded"]')?.textContent).toContain('AGENTS.md');
+    await act(async () => {
+      exactButton('Check health').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="mcp-health-fixture"]')?.textContent).toContain('echo_text');
+    await act(async () => {
+      exactButton('Disable').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(store.extensionActions).toEqual(['check:fixture:mcp-v1-aaaa', 'set:fixture:false:mcp-v1-aaaa']);
     await act(async () => root.unmount());
   });
 

@@ -16,6 +16,7 @@ import {
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import { StudioPanel } from './StudioPanel.js';
 import { AgentsPanel } from './AgentsPanel.js';
+import { ExtensionsPanel } from './ExtensionsPanel.js';
 import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
@@ -42,6 +43,7 @@ const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'studio', label: 'Studio', hint: 'Project conversation, drafts, and engine connection' },
   { id: 'work', label: 'Work', hint: 'Prompt board and queue' },
   { id: 'agents', label: 'Agents', hint: 'Native goals, fleets, runs and child agents' },
+  { id: 'extensions', label: 'Extensions', hint: 'MCP servers, skills, plugins, hooks and project rules' },
   { id: 'cost', label: 'Cost', hint: 'Recorded usage and spend' },
   { id: 'settings', label: 'Settings', hint: 'Route, permission, appearance, diagnostics' },
 ];
@@ -620,7 +622,7 @@ export function App(): React.JSX.Element {
     }
   }, []);
 
-  // Keyboard flow: Alt+1…6 for sections, Ctrl+Shift+F for Focus Mode,
+  // Keyboard flow: Alt+1…7 for sections, Ctrl+Shift+F for Focus Mode,
   // Ctrl+Shift+N for a new session, Ctrl+/ for the shortcut list. Interrupting
   // work stays a deliberate click on the execution controls.
   useEffect(() => {
@@ -632,8 +634,9 @@ export function App(): React.JSX.Element {
           '2': 'studio',
           '3': 'work',
           '4': 'agents',
-          '5': 'cost',
-          '6': 'settings',
+          '5': 'extensions',
+          '6': 'cost',
+          '7': 'settings',
         };
         const target = targets[event.key];
         if (target) {
@@ -676,6 +679,7 @@ export function App(): React.JSX.Element {
       { id: 'action:studio', label: 'Go to Studio', group: 'Navigate', disabled: !selected },
       { id: 'action:work', label: 'Go to Work board', group: 'Navigate' },
       { id: 'action:agents', label: 'Go to Agents observatory', group: 'Navigate' },
+      { id: 'action:extensions', label: 'Go to Extensions', group: 'Navigate' },
       { id: 'action:cost', label: 'Go to Cost lens', group: 'Navigate' },
       { id: 'action:settings', label: 'Go to Settings', group: 'Navigate' },
       {
@@ -1160,6 +1164,8 @@ export function App(): React.JSX.Element {
                 <WorkView project={selected} />
               ) : screen === 'agents' ? (
                 <AgentsPanel project={selected} sessionId={sessionId} />
+              ) : screen === 'extensions' ? (
+                <ExtensionsPanel project={selected} />
               ) : screen === 'cost' ? (
                 <CostView info={info} project={selected} spend={spend} />
               ) : (
@@ -1450,7 +1456,7 @@ export function App(): React.JSX.Element {
             <kbd>Ctrl</kbd>+<kbd>K</kbd> command palette
           </li>
           <li>
-            <kbd>Alt</kbd>+<kbd>1…5</kbd> Home, Studio, Work, Cost, Settings
+            <kbd>Alt</kbd>+<kbd>1…7</kbd> Home, Studio, Work, Agents, Extensions, Cost, Settings
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> toggle Focus Mode

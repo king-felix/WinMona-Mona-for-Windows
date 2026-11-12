@@ -11,6 +11,8 @@ export type TransportResponse = {
 export type TransportOptions = {
   signal?: AbortSignal | undefined;
   timeoutMs?: number | undefined;
+  /** Extra request headers. Used for the runtime's If-Match revision guard. */
+  headers?: Record<string, string> | undefined;
 };
 
 export interface RuntimeTransport {
@@ -62,6 +64,7 @@ export class HttpTransport implements RuntimeTransport {
       headers: {
         Authorization: `Bearer ${this.token}`,
         'Content-Type': 'application/json',
+        ...(options.headers ?? {}),
       },
     };
     if (body !== undefined) init.body = JSON.stringify(body);
@@ -158,6 +161,16 @@ export class HttpTransport implements RuntimeTransport {
       return fail('invalid_request', 'runtime refused a conflicting operation key', {
         detail: redact(typeof body === 'string' ? body.slice(0, 300) : '', [this.token]),
       });
+    }
+    if (response.status === 412 || response.status === 428) {
+      const body = await readBounded(response, 16 * 1024).catch(() => '');
+      return fail(
+        'conflict',
+        response.status === 412
+          ? 'runtime refused a stale revision; reload before saving'
+          : 'runtime requires a current revision before saving',
+        { detail: redact(typeof body === 'string' ? body.slice(0, 300) : '', [this.token]) },
+      );
     }
     if (response.status >= 500) {
       await readBounded(response, 16 * 1024).catch(() => undefined);

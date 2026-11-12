@@ -19,6 +19,7 @@ import {
 } from '@mona/contracts';
 import { assessCompatibility, type DiscoveryContext, type EngineDiscovery } from './compatibility.js';
 import { EngineConfiguration } from './configuration.js';
+import { EngineExtensions } from './extensions.js';
 import { fail, isAbortError, ok, type AdapterFailure, type Result } from './errors.js';
 import type { RuntimeTransport } from './http.js';
 import { NativeOrchestration } from './native.js';
@@ -177,6 +178,10 @@ export class EngineAdapter {
   /** Read-only provider/model/settings projections over the same transport. */
   configuration(): EngineConfiguration {
     return new EngineConfiguration(this.transport, () => new Date(this.now()));
+  }
+
+  extensions(): EngineExtensions {
+    return new EngineExtensions(this.transport, () => new Date(this.now()));
   }
 
   async discover(): Promise<Result<EngineDiscovery>> {

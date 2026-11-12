@@ -17,6 +17,8 @@ import { registerAgentIpc } from './agents-ipc.js';
 import { EngineConfigCli } from './engine-config.js';
 import { ProviderWorkbenchService } from './provider-workbench.js';
 import { registerProviderIpc } from './provider-ipc.js';
+import { ExtensionsService } from './extensions-service.js';
+import { registerExtensionIpc } from './extensions-ipc.js';
 import { STUDIO_CHANNELS, type StudioEvent, type StudioRun } from '../shared/studio.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
 import {
@@ -118,6 +120,7 @@ let localState: LocalState | null = null;
 let studioService: StudioService | null = null;
 let observatoryService: AgentObservatoryService | null = null;
 let providerService: ProviderWorkbenchService | null = null;
+let extensionsService: ExtensionsService | null = null;
 let uiStateStore: UiStateStore | null = null;
 let briefingService: BriefingService | null = null;
 let tray: Tray | null = null;
@@ -565,6 +568,10 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         config: new EngineConfigCli({ executable: resolveEngineExecutable() }),
         backupRoot: path.join(app.getPath('userData'), 'config-backups'),
       });
+      extensionsService = new ExtensionsService({
+        store: localState.store,
+        engine: enginePort,
+      });
     }
 
     // Launches share one serialized queue: the path is resolved and validated,
@@ -640,6 +647,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: () => providerService,
+    });
+    registerExtensionIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => extensionsService,
     });
     registerLaunchIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
@@ -883,6 +895,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
     studioService = null;
     observatoryService = null;
     providerService = null;
+    extensionsService = null;
     localState?.close();
     localState = null;
   });

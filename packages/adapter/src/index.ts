@@ -3,6 +3,7 @@ export * from './cli.js';
 export * from './compatibility.js';
 export * from './configuration.js';
 export * from './errors.js';
+export * from './extensions.js';
 export * from './http.js';
 export * from './journal.js';
 export * from './lifecycle.js';

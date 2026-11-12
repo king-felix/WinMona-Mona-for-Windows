@@ -4,6 +4,7 @@ import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js'
 import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
@@ -110,6 +111,11 @@ const bridge = Object.freeze({
     mode: 'agent' | 'plan';
     expectedRevision: string;
   }) => ipcRenderer.invoke(PROVIDER_CHANNELS.applyMode, input),
+  extensionsGet: (input: { projectId: string }) => ipcRenderer.invoke(EXTENSION_CHANNELS.get, input),
+  extensionsSetMcp: (input: { projectId: string; name: string; enabled: boolean; expectedRevision: string }) =>
+    ipcRenderer.invoke(EXTENSION_CHANNELS.setMcp, input),
+  extensionsCheckMcp: (input: { projectId: string; name: string; expectedRevision: string }) =>
+    ipcRenderer.invoke(EXTENSION_CHANNELS.checkMcp, input),
   /** The latest Explorer launch, and pushes for new ones. Returns no path to execute. */
   getLaunchState: () => ipcRenderer.invoke(LAUNCH_CHANNELS.state, {}),
   onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {

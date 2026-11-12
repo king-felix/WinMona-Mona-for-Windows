@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_utc": "2026-11-12T01:00:32.823Z",
+  "captured_utc": "2026-11-12T15:18:59.941Z",
   "engine": {
     "product": "Codewhale",
     "version": "0.10.2",
@@ -47,13 +47,13 @@
       "notes": "Qualified as a one-shot benchmark/diagnostic path only. It emits per-request usage and wire tool-schema evidence."
     }
   ],
-  "inventory_scope": "Top-level CLI commands with captured help (docs/evidence/engine/commands), the runtime API route table extracted from the installed binary and contract-tested where marked, effective configuration, transports, and permission posture. Subcommand deep-dive, MCP/skill/plugin detail and full capability explorer remain P17/P18.",
+  "inventory_scope": "Top-level CLI commands with captured help, the runtime route table extracted from the installed binary, effective configuration, transports, and the extension surfaces read or exercised at P17 (MCP, skills, plugins, hooks, workspace instructions). Remaining subcommand and terminal deep-dive stays P18.",
   "coverage_notes": {
     "upstream_overlap": "This build already ships a browser client (`codewhale web`, `codewhale rc`) and a runtime server (`serve`, `app-server`). Per spec section 2.3, reassess upstream desktop progress at G0 and before release instead of duplicating it blindly.",
-    "rows": 43,
-    "qualified": 2,
-    "read_qualified": 8,
-    "discovered": 30,
+    "rows": 52,
+    "qualified": 5,
+    "read_qualified": 17,
+    "discovered": 27,
     "unavailable_by_choice": 3,
     "note": "qualified = exercised against the live 0.10.2 binary; read-qualified = read path exercised without mutation; discovered = help captured only; unavailable-by-choice = intentionally not surfaced in 1.0."
   },
@@ -366,10 +366,10 @@
       "cost_implications": "none",
       "required_arguments": "see help capture",
       "chosen_integration": "Advanced action",
-      "ui_location": "settings → integrations",
+      "ui_location": "Extensions → Plugins advanced actions",
       "tests": [],
       "status": "discovered",
-      "gap": null,
+      "gap": "Installs a plugin bundle without trusting or enabling it. Mona shows the exact command; installation is not performed from the renderer.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/install.txt",
         "captured_utc": "2026-11-12T01:00:32.823Z",
@@ -611,15 +611,15 @@
       "permission_implications": "mutates local files/config; requires explicit user action",
       "cost_implications": "none",
       "required_arguments": "see help capture",
-      "chosen_integration": "Native view",
-      "ui_location": "settings → tools",
+      "chosen_integration": "Advanced action",
+      "ui_location": "Extensions → MCP advanced actions",
       "tests": [],
       "status": "discovered",
-      "gap": "Runtime MCP management routes discovered (`/v1/apps/mcp/*`).",
+      "gap": "Add, remove, connect, login, logout and validate remain engine CLI actions; Mona shows the exact invocation and does not assemble it from remote content. The runtime read/action routes are CAP-0052.",
       "evidence": {
         "help_capture": "docs/evidence/engine/commands/mcp.txt",
-        "captured_utc": "2026-11-12T01:00:32.823Z",
-        "contract_report": null
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
       }
     },
     {
@@ -1223,6 +1223,156 @@
         "contract_report": "docs/evidence/P16-scope.json"
       },
       "gap": "Permission options are read from the engine schema; the workbench offers only values the engine reports."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+      "tests": [
+        "packages/adapter/src/extensions.test.ts",
+        "apps/desktop/src/main/extensions-service.test.ts",
+        "apps/desktop/src/main/extensions-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p17-extensions.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
+      },
+      "id": "CAP-0048",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "skills (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/skills"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Extensions → Skills",
+      "status": "read-qualified",
+      "gap": "List and provenance read (name, source, plugin, invocation, aliases, bundled tier). Skill bodies stay on disk. Install/trust/update remain engine-reviewed routes and were not exercised."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+      "tests": [
+        "packages/adapter/src/extensions.test.ts",
+        "apps/desktop/src/main/extensions-service.test.ts",
+        "apps/desktop/src/main/extensions-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p17-extensions.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
+      },
+      "id": "CAP-0049",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "plugins (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/apps/plugins"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Extensions → Plugins",
+      "status": "read-qualified",
+      "gap": "List and provenance read (scope, origin, trust, compatibility, inventory, content hash). Trust/install/enable are engine actions with their own consent step and were not exercised."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+      "tests": [
+        "packages/adapter/src/extensions.test.ts",
+        "apps/desktop/src/main/extensions-service.test.ts",
+        "apps/desktop/src/main/extensions-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p17-extensions.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
+      },
+      "id": "CAP-0050",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "hooks (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/hooks"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Extensions → Hooks",
+      "status": "read-qualified",
+      "gap": "Read-only inventory with redacted commands. Project hooks were observed rejected until the engine records workspace trust and hook approval; Mona never approves them."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+      "tests": [
+        "packages/adapter/src/extensions.test.ts",
+        "apps/desktop/src/main/extensions-service.test.ts",
+        "apps/desktop/src/main/extensions-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p17-extensions.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
+      },
+      "id": "CAP-0051",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "workspace instructions (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/workspace/instructions"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Extensions → Rules and instructions",
+      "status": "read-qualified",
+      "gap": "Reports each source, kind, status, byte count and warnings. Imported instructions remain inert until the engine selects them."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+      "tests": [
+        "packages/adapter/src/extensions.test.ts",
+        "apps/desktop/src/main/extensions-service.test.ts",
+        "apps/desktop/src/main/extensions-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p17-extensions.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:18:59.941Z",
+        "contract_report": "docs/evidence/P17-extensions.json"
+      },
+      "id": "CAP-0052",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "mcp servers (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/apps/mcp/servers; GET /v1/apps/mcp/servers/{name}; POST .../enable|disable|reconnect; GET /v1/apps/mcp/tools"
+      },
+      "class": "read/write",
+      "chosen_integration": "Native view",
+      "ui_location": "Extensions → MCP servers",
+      "status": "qualified",
+      "gap": "List, detail, explicit health check, enable and disable were exercised with If-Match revisions. Stale edits return conflict; unknown top-level and server-level keys survived an edit; env values are never returned, only key names. Project-scope servers stay hidden until engine trust. Add/remove/login remain CLI advanced actions."
     }
   ],
   "runtime_api": {

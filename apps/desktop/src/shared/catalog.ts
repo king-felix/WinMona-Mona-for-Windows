@@ -32,7 +32,7 @@ export const CATALOG_CHANNELS = {
 
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: ErrorResult };
 
-export type ProjectView = 'home' | 'studio' | 'work' | 'agents' | 'cost' | 'settings';
+export type ProjectView = 'home' | 'studio' | 'work' | 'agents' | 'extensions' | 'cost' | 'settings';
 
 export type RepoKind = 'none' | 'git' | 'worktree';
 
