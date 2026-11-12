@@ -1,6 +1,6 @@
 import { errorResult } from '@mona/contracts';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
-import { AppInfoRequest, type AppInfo, type IpcResult } from '../shared/ipc.js';
+import { AppInfoRequest, type AppInfo, type EngineStatus, type IpcResult } from '../shared/ipc.js';
 
 export type IpcHandle = (
   channel: string,
@@ -14,7 +14,12 @@ export function createAppInfo(input: {
   node: string;
   platform: string;
   arch: string;
+  engine?: { status: EngineStatus; detail: string; descriptors?: string[] };
 }): AppInfo {
+  const engine = input.engine ?? {
+    status: 'not_started' as const,
+    detail: 'No Codewhale runtime is running. Mona starts one only for a project you open.',
+  };
   return {
     schemaVersion: 1,
     name: 'Mona',
@@ -25,8 +30,9 @@ export function createAppInfo(input: {
     platform: input.platform,
     arch: input.arch,
     engine: {
-      status: 'not_connected',
-      detail: 'No Codewhale runtime is owned yet. Connecting arrives with the adapter build.',
+      status: engine.status,
+      detail: engine.detail,
+      descriptors: engine.descriptors ?? [],
     },
   };
 }

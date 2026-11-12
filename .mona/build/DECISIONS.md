@@ -335,3 +335,64 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** any future validator that parses the specification must be
   ASCII-only or operate on parsed structures, so an encoding accident cannot
   masquerade as a content failure.
+
+## D-0028 — Ownership is (workspace lease, pid, creation time), never a pid alone
+
+- **Decision:** every owned runtime has a machine-local record keyed by the
+  normalized workspace, holding executable realpath + size + mtime, engine
+  version and commit, pid, **process creation time**, parent pid, desktop
+  instance id, loopback endpoint, and a token digest. Any lifecycle decision
+  that could terminate a process compares the recorded creation time with the
+  live one; a mismatch means the pid was reused and the record is marked
+  `stale` without touching the process.
+- **Why:** pids are reused on Windows, and P01-ISSUE-002 showed a second runtime
+  can start in one workspace. Without creation identity, "kill the pid in our
+  record" can kill an unrelated process — the exact harm P04 forbids.
+- **Constrains:** the record never contains the token (digest only), never lives
+  in a project repository, and is written atomically. Reclaiming a previous
+  instance's runtime is allowed only with a matching creation time; an
+  unverifiable live pid is reported and left running.
+
+## D-0029 — Windows cleanup is `taskkill /T` on one verified pid; Job Objects are deferred
+
+- **Decision:** descendant cleanup walks the OS parent/child relation for the
+  single owned pid (`taskkill /PID <pid> /T`, then bounded `/F`), polls every
+  observed descendant by pid, and never selects processes by image name. A
+  Windows Job Object with `KILL_ON_JOB_CLOSE` is the stronger mechanism and is
+  deferred until a native addon or helper binary can be built and qualified.
+- **Why:** there is no MSVC toolchain on this host (BLOCKERS prerequisite
+  table), and `taskkill /T` plus creation-identity reconciliation is testable
+  today: `supervisor.test.ts` stops a real parent/child tree while an unrelated
+  node process survives, and the live run stops the real engine with its child.
+- **Constrains:** forced desktop termination leaves the runtime alive until the
+  next start reconciles; this is documented as bounded recovery, not as a
+  daemon guarantee. Revisiting Job Objects requires a recorded build
+  prerequisite, not a silent dependency swap.
+
+## D-0030 — Losing a window never abandons owned work; the tray arrives at P07
+
+- **Decision:** closing the window while Mona owns a runtime prevents the close
+  and hides the window; `window-all-closed` quits only when nothing is owned;
+  a renderer crash destroys the dead window and recreates exactly one window
+  while the runtime continues. Relaunching the app restores the existing window.
+- **Why:** the probe exposed a real defect — destroying the crashed last window
+  fired `window-all-closed` → `app.quit()` → stop during a renderer crash, which
+  would have thrown away work precisely when the spec requires it to survive.
+- **Constrains:** until the tray icon exists (desktop shell, P07), a hidden
+  window is restored by launching Mona again. Quit remains the only path that
+  stops owned children, and it does so deliberately.
+
+## D-0031 — Pause, interrupt, cancel and quit are four transitions with four receipts
+
+- **Decision:** `pause_after_task` is a Mona queue boundary and never calls the
+  engine; `interrupt_now` requires an engine receipt and reports
+  `outcome_unknown` when the channel is missing or fails, leaving active work in
+  place; `cancel_queued` removes future starts and refuses the running task;
+  `quit_and_stop` interrupts (best effort), then stops the owned runtime, and
+  reports `partial` if either half is uncertain. Every receipt carries
+  `rollback_claimed: false`.
+- **Why:** the specification forbids collapsing these, and a forced termination
+  cannot promise rollback of already-sent requests or external side effects.
+- **Constrains:** the desktop interrupt path stays honestly unknown until a
+  project binds a submission journal (P05/P08). No receipt may claim success
+  that the engine did not acknowledge.

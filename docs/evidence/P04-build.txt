@@ -1,0 +1,165 @@
+﻿P04 build and runtime smoke - 2026-11-11T19:11:03.6723560-07:00
+node v26.13.1 / win32-x64 / electron 45.3.0
+
+=== npm run build ===
+
+> mona@0.0.0 build
+> npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/desktop@0.1.0 build
+> npm run clean && npm run build:main && npm run build:preload && npm run build:renderer
+
+
+> @mona/desktop@0.1.0 clean
+> node -e "require('node:fs').rmSync('dist',{recursive:true,force:true})"
+
+
+> @mona/desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+
+> @mona/desktop@0.1.0 build:preload
+> esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  dist\preload\preload.cjs  327b 
+
+Done in 9ms
+
+> @mona/desktop@0.1.0 build:renderer
+> vite build
+
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 17 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/renderer/index.html                   0.73 kB │ gzip:  0.40 kB
+dist/renderer/assets/index-BzIYdsah.css    4.74 kB │ gzip:  1.59 kB
+dist/renderer/assets/index-DVglNv1c.js   224.52 kB │ gzip: 70.27 kB │ map: 1,057.49 kB
+
+[32m✓ built in 107ms[39m
+
+=== npm run check:build -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 check:build
+> node scripts/check-build.mjs
+
+build checks passed: 4 renderer files, CSP replaced, no fixtures, no credentials, one preload channel
+
+=== npm run smoke -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 smoke
+> node scripts/smoke.mjs
+
+{
+  "ok": true,
+  "appVersion": "0.1.0",
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "arch": "x64",
+  "dom": {
+    "title": "Mona",
+    "version": "v0.1.0",
+    "nav": [
+      "Projects",
+      "Work",
+      "Cost",
+      "Settings"
+    ],
+    "engine": "Engine not connected",
+    "theme": "daybreak",
+    "hasFixtureMarker": false
+  },
+  "bridge": {
+    "keys": [
+      "getAppInfo"
+    ],
+    "frozen": true,
+    "hasNodeRequire": false,
+    "hasProcess": false,
+    "hasIpcRenderer": false
+  },
+  "security": {
+    "remoteNavigationAttempted": "https://example.com/",
+    "urlAfterNavigation": "file:///X:/AI_projects/Mona/apps/desktop/dist/renderer/index.html",
+    "navigationRefused": true,
+    "popupAttempted": "https://example.com/",
+    "popupRefused": true,
+    "windowCount": 1,
+    "devToolsAllowed": false
+  },
+  "metrics": [
+    {
+      "type": "Browser",
+      "pid": 11952,
+      "workingSetSizeKb": 110440,
+      "peakWorkingSetSizeKb": 110912
+    },
+    {
+      "type": "GPU",
+      "pid": 31952,
+      "workingSetSizeKb": 94812,
+      "peakWorkingSetSizeKb": 95724
+    },
+    {
+      "type": "Utility",
+      "pid": 38000,
+      "workingSetSizeKb": 51960,
+      "peakWorkingSetSizeKb": 51960
+    },
+    {
+      "type": "Tab",
+      "pid": 5724,
+      "workingSetSizeKb": 83156,
+      "peakWorkingSetSizeKb": 83552
+    }
+  ],
+  "rendererProcessCount": 1,
+  "totalWorkingSetMb": 332,
+  "capturedAt": "2026-11-12T02:11:13.390Z"
+}
+smoke security checks passed: navigation refused, popup refused, one frozen bridge key, footprint 332 MB
+
+=== npm run lifecycle -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 lifecycle
+> node scripts/lifecycle.mjs
+
+
+PASS owned runtime started for the lifecycle probe :: {"endpoint":"http://127.0.0.1:51611"}
+PASS runtime is owned with a real process id :: {"pid":13424,"state":"connected"}
+PASS closing the window hides it instead of ending owned work :: {"windowDestroyed":false,"runtimePid":13424,"runtimeAlive":true,"hostState":"connected"}
+PASS a renderer crash recreates the window :: {"crashedWebContentsId":1,"newWebContentsId":2,"windowCount":1}
+PASS the recreated window renders the real application :: {"title":"Mona","version":"v0.1.0"}
+PASS the runtime survived the renderer crash :: {"runtimePid":13424,"hostState":"connected"}
+PASS the renderer crash did not start a quit :: {"hostState":"connected"}
+PASS a second launch restores the existing window and keeps the same runtime :: {"windowCount":1,"runtimePid":13424,"sameRuntime":true}
+PASS quit and stop ends the owned runtime with a receipt :: {"outcome":"stopped_forced","rootExited":true,"rollbackClaimed":false,"quit":{"receipt":{"runtime_id":"rt_b6170838b8fdcdf1833e9c9f","requested_at":"2026-11-12T02:11:16.244Z","completed_at":"2026-11-12T02:11:19.463Z","reason":"app_quit","outcome":"stopped_forced","root_exited":true,"observed_descendants":[3744],"remaining_pids":[],"endpoint_closed":true,"rollback_claimed":false}}}
+PASS the runtime process is gone after quit :: {"runtimePid":13424}
+node.exe : mona: renderer gone (crashed); recreating window
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mona: renderer ...creating window:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+lifecycle probe passed 10 checks in real Electron
+

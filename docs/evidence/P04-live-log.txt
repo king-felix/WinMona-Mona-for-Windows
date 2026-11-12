@@ -1,0 +1,15 @@
+PASS owned runtime reaches authenticated readiness :: {"runtimeId":"rt_af568364e87cc569faa3d05e","pid":33380,"endpoint":"http://127.0.0.1:51556"}
+PASS runtime identity matches the pinned engine :: {"version":"0.10.2","commit":"ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e","compatibility":"qualified","gaps":["terminalStream","terminalInput","terminalResize","terminalKill"]}
+PASS ownership record is machine-local and token-free :: {"file":"X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p04-live-Md5yNl\\ownership\\runtime-ownership\\b31840580ae1c0704a52a388.json","pid":33380,"creation_time_recorded":true,"state":"running","token_digest_only":true}
+PASS ownership file contains no bearer token :: {}
+PASS recorded creation identity matches the live process :: {"pid":33380,"name":"codewhale","recorded":"2026-11-12T02:10:05.3737089Z","observed":"2026-11-12T02:10:05.3737089Z"}
+PASS external attach is read-only and refuses to stop the runtime :: {"owned":false,"refusal":"external runtimes are not owned by Mona; this runtime was left running"}
+PASS loopback endpoint answers before the stop :: {"endpoint":"http://127.0.0.1:51556"}
+PASS owned runtime stops with a receipt :: {"runtime_id":"rt_af568364e87cc569faa3d05e","requested_at":"2026-11-12T02:10:06.626Z","completed_at":"2026-11-12T02:10:09.822Z","reason":"p04_live_qualification","outcome":"stopped_forced","root_exited":true,"observed_descendants":[17196],"remaining_pids":[],"endpoint_closed":true,"rollback_claimed":false}
+PASS stop receipt reports root exit, descendants and endpoint closure :: {"outcome":"stopped_forced","forced":true,"observed_descendants":1,"remaining_pids":[],"rollback_claimed":false}
+PASS the runtime process is gone :: {"pid":33380}
+PASS the loopback port is closed :: {"port":51556}
+PASS ownership record is marked stopped :: {"state":"stopped","reason":"stop_stopped_forced"}
+PASS an unrelated node process survived the whole run :: {"pid":35644}
+PASS a port already held by another Codewhale runtime is refused without killing it :: {"error":{"code":"port_occupied","message":"loopback port 51556 is already in use by another Codewhale runtime","retryable":false,"detail":"Mona did not start or stop that runtime. Choose another port or close the external runtime."},"holder_pid":37508}
+PASS a missing executable is an actionable failure :: {"code":"engine_unavailable","message":"Codewhale executable was not found","retryable":false,"detail":"X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p04-live-Md5yNl\\no-such-codewhale.exe"}

@@ -1,0 +1,104 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "owned runtime started for the lifecycle probe",
+      "ok": true,
+      "detail": {
+        "endpoint": "http://127.0.0.1:51611"
+      }
+    },
+    {
+      "name": "runtime is owned with a real process id",
+      "ok": true,
+      "detail": {
+        "pid": 13424,
+        "state": "connected"
+      }
+    },
+    {
+      "name": "closing the window hides it instead of ending owned work",
+      "ok": true,
+      "detail": {
+        "windowDestroyed": false,
+        "runtimePid": 13424,
+        "runtimeAlive": true,
+        "hostState": "connected"
+      }
+    },
+    {
+      "name": "a renderer crash recreates the window",
+      "ok": true,
+      "detail": {
+        "crashedWebContentsId": 1,
+        "newWebContentsId": 2,
+        "windowCount": 1
+      }
+    },
+    {
+      "name": "the recreated window renders the real application",
+      "ok": true,
+      "detail": {
+        "title": "Mona",
+        "version": "v0.1.0"
+      }
+    },
+    {
+      "name": "the runtime survived the renderer crash",
+      "ok": true,
+      "detail": {
+        "runtimePid": 13424,
+        "hostState": "connected"
+      }
+    },
+    {
+      "name": "the renderer crash did not start a quit",
+      "ok": true,
+      "detail": {
+        "hostState": "connected"
+      }
+    },
+    {
+      "name": "a second launch restores the existing window and keeps the same runtime",
+      "ok": true,
+      "detail": {
+        "windowCount": 1,
+        "runtimePid": 13424,
+        "sameRuntime": true
+      }
+    },
+    {
+      "name": "quit and stop ends the owned runtime with a receipt",
+      "ok": true,
+      "detail": {
+        "outcome": "stopped_forced",
+        "rootExited": true,
+        "rollbackClaimed": false,
+        "quit": {
+          "receipt": {
+            "runtime_id": "rt_b6170838b8fdcdf1833e9c9f",
+            "requested_at": "2026-11-12T02:11:16.244Z",
+            "completed_at": "2026-11-12T02:11:19.463Z",
+            "reason": "app_quit",
+            "outcome": "stopped_forced",
+            "root_exited": true,
+            "observed_descendants": [
+              3744
+            ],
+            "remaining_pids": [],
+            "endpoint_closed": true,
+            "rollback_claimed": false
+          }
+        }
+      }
+    },
+    {
+      "name": "the runtime process is gone after quit",
+      "ok": true,
+      "detail": {
+        "runtimePid": 13424
+      }
+    }
+  ],
+  "capturedAt": "2026-11-12T02:11:19.466Z"
+}

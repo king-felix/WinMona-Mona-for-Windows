@@ -13,7 +13,7 @@ const info = {
   node: '24.0.0',
   platform: 'win32',
   arch: 'x64',
-  engine: { status: 'not_connected' as const, detail: 'No runtime yet.' },
+  engine: { status: 'not_started' as const, detail: 'No runtime yet.', descriptors: [] as string[] },
 };
 
 beforeEach(() => {

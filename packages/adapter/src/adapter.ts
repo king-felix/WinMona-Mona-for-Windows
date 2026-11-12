@@ -1,5 +1,3 @@
-﻿import { existsSync } from 'node:fs';
-import { spawn } from 'node:child_process';
 import { z } from 'zod';
 import {
   OperationKey,
@@ -14,20 +12,14 @@ import {
   toEventEnvelope,
   type EffectiveProfile,
   type EngineEventEnvelope,
-  type EngineIdentity,
   type ParsedEngineEvent,
   type SubmissionRecord,
   type SubmissionState,
   type UsageEvidence,
 } from '@mona/contracts';
-import {
-  assessCompatibility,
-  type CompatibilityReport,
-  type DiscoveryContext,
-  type EngineDiscovery,
-} from './compatibility.js';
-import { fail, isAbortError, ok, redact, type AdapterFailure, type Result } from './errors.js';
-import { HttpTransport, type RuntimeTransport } from './http.js';
+import { assessCompatibility, type DiscoveryContext, type EngineDiscovery } from './compatibility.js';
+import { fail, isAbortError, ok, type AdapterFailure, type Result } from './errors.js';
+import type { RuntimeTransport } from './http.js';
 import type { SubmissionJournal } from './journal.js';
 import {
   HistoryWire,
@@ -783,128 +775,3 @@ function stateFromTurnStatus(status: string): SubmissionState | null {
 
 /** The project store arrives at P05; P02/P03 use a deterministic placeholder. */
 const PLACEHOLDER_PROJECT_ID = ProjectId.parse(`prj_${'0'.repeat(32)}`);
-
-export type RuntimeStartInput = {
-  executable: string;
-  workspace: string;
-  port: number;
-  token: string;
-  startupTimeoutMs?: number;
-};
-
-export type OwnedRuntime = {
-  runtimeId: string;
-  pid: number;
-  baseUrl: string;
-  workspace: string;
-  identity: EngineIdentity;
-  report: CompatibilityReport;
-  createAdapter: (journal: SubmissionJournal) => EngineAdapter;
-  stop: () => Promise<Result<{ runtimeId: string; exitCode: number | null; stoppedAt: string }>>;
-};
-
-/**
- * Minimal owned-runtime bootstrap for P03. P04 replaces this with the real
- * process supervisor (Job Objects, lease, crash handling); this version never
- * kills by process name and never logs the token.
- */
-export async function startOwnedRuntime(input: RuntimeStartInput): Promise<Result<OwnedRuntime>> {
-  if (!existsSync(input.executable)) return fail('engine_unavailable', 'Codewhale executable was not found');
-  if (!existsSync(input.workspace)) return fail('invalid_request', 'workspace directory does not exist');
-  if (!Number.isInteger(input.port) || input.port < 1024 || input.port > 65535) {
-    return fail('invalid_request', 'port must be an integer between 1024 and 65535');
-  }
-  if (typeof input.token !== 'string' || input.token.length < 8) {
-    return fail('invalid_request', 'runtime token is required');
-  }
-  const child = spawn(input.executable, ['app-server', '--http', '--port', String(input.port)], {
-    cwd: input.workspace,
-    env: { ...process.env, CODEWHALE_RUNTIME_TOKEN: input.token },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  });
-  let stderr = '';
-  child.stdout?.resume();
-  child.stderr?.on('data', (chunk: Buffer) => {
-    stderr = (stderr + chunk.toString('utf8')).slice(-4000);
-  });
-  const baseUrl = `http://127.0.0.1:${input.port}`;
-  const deadline = Date.now() + (input.startupTimeoutMs ?? 20_000);
-  let healthy = false;
-  while (Date.now() < deadline) {
-    if (child.exitCode !== null) break;
-    try {
-      const response = await fetch(`${baseUrl}/health`, { signal: AbortSignal.timeout(1500) });
-      const body = (await response.json()) as { service?: string };
-      if (response.ok && body.service === 'codewhale-runtime-api') {
-        healthy = true;
-        break;
-      }
-    } catch {
-      /* not ready yet */
-    }
-    await delay(150);
-  }
-  if (!healthy) {
-    child.kill();
-    return fail('engine_unavailable', 'runtime did not become ready', {
-      detail: redact(stderr, [input.token]).slice(-500),
-    });
-  }
-  const transport = new HttpTransport({ baseUrl, token: input.token });
-  const info = await transport.json('GET', '/v1/runtime/info');
-  if (!info.ok) {
-    child.kill();
-    return info;
-  }
-  const startedAt = new Date().toISOString();
-  const discovery = assessCompatibility(info.value.json, {
-    baseUrl,
-    pid: child.pid ?? null,
-    workspace: input.workspace,
-    startedAt,
-  });
-  if (!discovery.ok) {
-    child.kill();
-    return discovery;
-  }
-  if (discovery.value.report.status === 'unsupported') {
-    child.kill();
-    return fail('capability_unsupported', 'runtime version is not supported by this adapter', {
-      detail: discovery.value.report.reasons.join('; '),
-    });
-  }
-  const runtimeId = `rt_${child.pid ?? 0}_${Date.now()}`;
-  let stopped = false;
-  const stop = async (): Promise<Result<{ runtimeId: string; exitCode: number | null; stoppedAt: string }>> => {
-    if (!stopped && child.exitCode === null) {
-      const exited = new Promise<number | null>((resolve) => child.once('exit', (code) => resolve(code)));
-      child.kill();
-      const code = await Promise.race([exited, delay(5000).then(() => null)]);
-      if (code === null && child.exitCode === null) child.kill('SIGKILL');
-      stopped = true;
-      return ok({ runtimeId, exitCode: child.exitCode ?? code, stoppedAt: new Date().toISOString() });
-    }
-    stopped = true;
-    return ok({ runtimeId, exitCode: child.exitCode, stoppedAt: new Date().toISOString() });
-  };
-  return ok({
-    runtimeId,
-    pid: child.pid ?? 0,
-    baseUrl,
-    workspace: input.workspace,
-    identity: discovery.value.identity,
-    report: discovery.value.report,
-    createAdapter: (journal: SubmissionJournal) =>
-      new EngineAdapter({
-        transport,
-        journal,
-        context: { baseUrl, pid: child.pid ?? null, workspace: input.workspace, startedAt },
-      }),
-    stop,
-  });
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}

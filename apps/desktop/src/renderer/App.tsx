@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import type { AppInfo } from '../shared/ipc.js';
 
 type Theme = 'daybreak' | 'afterglow';
@@ -86,7 +87,7 @@ export function App(): React.JSX.Element {
         </div>
         <div className="context" role="status" aria-live="polite">
           <span className="context-item" data-testid="engine-state">
-            {info ? `Engine ${info.engine.status.replace('_', ' ')}` : 'Engine state pending'}
+            {info ? ENGINE_STATUS_LABEL[info.engine.status] : 'Engine state pending'}
           </span>
           <span className="context-item muted">Model —</span>
           <span className="context-item muted">Full Access —</span>
@@ -145,7 +146,7 @@ export function App(): React.JSX.Element {
                 </div>
                 <div>
                   <span className="fact-label">Runtime</span>
-                  <span className="fact-value">{info ? info.engine.status.replace('_', ' ') : 'unknown'}</span>
+                  <span className="fact-value">{info ? ENGINE_STATUS_LABEL[info.engine.status] : 'unknown'}</span>
                 </div>
                 <div>
                   <span className="fact-label">Platform</span>
@@ -158,6 +159,13 @@ export function App(): React.JSX.Element {
           <aside className="inspector" aria-label="Inspector">
             <h2>Inspector</h2>
             <p>{info ? info.engine.detail : 'Waiting for the application bridge.'}</p>
+            {info && info.engine.descriptors.length > 0 ? (
+              <ul className="facts">
+                {info.engine.descriptors.map((descriptor) => (
+                  <li key={descriptor}>{descriptor}</li>
+                ))}
+              </ul>
+            ) : null}
           </aside>
         </main>
       </div>

@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "@mona/desktop",
   "version": "0.1.0",
   "private": true,
@@ -12,11 +12,13 @@
     "typecheck": "tsc -p tsconfig.main.json --noEmit \u0026\u0026 tsc -p tsconfig.preload.json \u0026\u0026 tsc -p tsconfig.renderer.json --noEmit \u0026\u0026 tsc -p tsconfig.test.json --noEmit",
     "start": "electron .",
     "smoke": "node scripts/smoke.mjs",
+    "lifecycle": "node scripts/lifecycle.mjs",
     "check:build": "node scripts/check-build.mjs",
     "verify": "npm run build \u0026\u0026 npm run check:build",
     "clean": "node -e \"require(\u0027node:fs\u0027).rmSync(\u0027dist\u0027,{recursive:true,force:true})\""
   },
   "dependencies": {
+    "@mona/adapter": "0.1.0",
     "@mona/contracts": "0.1.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"

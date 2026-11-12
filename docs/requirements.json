@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 77,
+  "revision": 93,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -721,11 +721,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
+              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:41:17Z",
-              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
-              "note": "Daybreak tokens rendered in the live Electron window; full design system, density and contrast audit are P06"
+              "recorded_utc": "2026-11-12T02:12:28Z",
+              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
+              "note": "Daybreak tokens rendered in the live Electron window; re-verified during P04 with the same security assertions"
             }
           ]
         },
@@ -1070,37 +1070,82 @@
         "P11",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "pause-after-task",
           "description": "Pause-after-task stops at the next queue boundary",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P04-supervisor.md",
+              "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
+            }
+          ]
         },
         {
           "id": "interrupt-now",
           "description": "Interrupt-now returns an engine receipt without claiming rollback",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P04-supervisor.md",
+              "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
+            }
+          ]
         },
         {
           "id": "queue-cancel",
           "description": "Cancelling queued work prevents future starts only",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P04-tests.txt",
+              "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
+            }
+          ]
         },
         {
           "id": "stop-descendants",
           "description": "Owned descendants are stopped without killing unrelated processes",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P04-live.json",
+              "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
+            }
+          ]
         },
         {
           "id": "truthful-partial",
           "description": "Partial or uncertain outcomes are labeled as such",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P04-supervisor.md",
+              "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -1242,12 +1287,12 @@
         "P20",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "crash-reconnect",
           "description": "Renderer/main restart reconnects and reconciles without replaying tool work",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P03-adapter.md",
@@ -1256,6 +1301,14 @@
               "recorded_utc": "2026-11-12T01:30:55Z",
               "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
               "note": "bounded reconnect and dedup tested; process-crash ownership is P04/P20"
+            },
+            {
+              "path": "docs/evidence/P04-lifecycle.json",
+              "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:12:48Z",
+              "commit": "00eb166",
+              "note": "P04 evidence recorded at commit 00eb166"
             }
           ]
         },
@@ -1290,8 +1343,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "00eb166",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1630,11 +1683,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
+              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:41:18Z",
-              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
-              "note": "live Electron 45.3.0 window: sandboxed renderer, no Node globals, one frozen preload key, devtools closed"
+              "recorded_utc": "2026-11-12T02:12:29Z",
+              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
+              "note": "re-verified at P04: sandboxed renderer, one frozen preload key, no Node or ipcRenderer globals, devtools closed"
             }
           ]
         },
@@ -1645,11 +1698,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
+              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:41:18Z",
-              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
-              "note": "live bridge exposes exactly getAppInfo and is frozen; sender and payload validation covered by unit tests"
+              "recorded_utc": "2026-11-12T02:12:29Z",
+              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
+              "note": "single app-info channel; P04 added no renderer-facing IPC"
             }
           ]
         },
@@ -1690,11 +1743,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
+              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:41:18Z",
-              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
-              "note": "live remote navigation and window.open refused, window count 1, CSP header and meta present, permissions denied"
+              "recorded_utc": "2026-11-12T02:12:29Z",
+              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
+              "note": "remote navigation and popups still refused in the live window after the P04 lifecycle wiring"
             }
           ]
         }

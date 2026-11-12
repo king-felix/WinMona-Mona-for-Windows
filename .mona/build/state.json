@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 10,
+  "revision": 13,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P04",
+  "current_prompt": "P05",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -168,13 +168,6 @@
           "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
         },
         {
-          "path": "docs/evidence/P02-smoke.json",
-          "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T01:41:22Z",
-          "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb"
-        },
-        {
           "path": "docs/evidence/P02-smoke-log.txt",
           "sha256": "08fdbd3bc298c094e3da5a7e0622a43697d7e1642e19f05f3544d8118b55b556",
           "kind": "document",
@@ -201,6 +194,13 @@
           "kind": "document",
           "recorded_utc": "2026-11-12T01:41:49Z",
           "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb"
+        },
+        {
+          "path": "docs/evidence/P02-smoke.json",
+          "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:28Z",
+          "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a"
         }
       ],
       "blocker_ids": []
@@ -262,15 +262,80 @@
       "blocker_ids": []
     },
     "P04": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-002",
         "MONA-012",
         "MONA-016"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "RuntimeSupervisor: per-workspace ownership record with executable/version/pid plus creation identity, loopback endpoint and token digest; atomic machine-local writes",
+        "Startup verifies executable, port occupancy, authenticated readiness, runtime identity, loopback bind and port match; startup exits are treated as failures",
+        "Windows descendant cleanup via taskkill /T on the verified pid with bounded force; pid reuse and stale records handled; no name-based killing",
+        "WorkQueue separates pause-after-task, interrupt-now, cancel-queued and quit-and-stop with receipts that never claim rollback",
+        "Electron lifecycle: single owner, second-instance path forwarding, close-to-tray preservation, renderer-crash window recreation, bounded runtime restart",
+        "External runtime attach is read-only; occupied port, missing executable and permission denial are actionable typed failures",
+        "Evidence: 25 new tests (109 vitest), 15-step live engine qualification, 10-check real Electron lifecycle probe"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P04-supervisor.md",
+          "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-live.json",
+          "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-live-log.txt",
+          "sha256": "48eafebf4d8052afc0ad7ea71293ca87ef3db93b68ef6c9acce6d407f801d84c",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-lifecycle.json",
+          "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-lifecycle-log.txt",
+          "sha256": "de925d14175296f7ef7bc568492658aa55f6d995a904f87c2adfb244469881f2",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-tests.txt",
+          "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-checks.txt",
+          "sha256": "a0678bf2afa20c9a0bd591572fba7086db8b3670fde7be461541e886adb430b3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        },
+        {
+          "path": "docs/evidence/P04-build.txt",
+          "sha256": "fc410464552be8868c69e82f35d12e5742f01805437114ae812d7d28854519e0",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:12:47Z",
+          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+        }
+      ],
       "blocker_ids": []
     },
     "P05": {
@@ -520,9 +585,8 @@
     }
   },
   "next_eligible_prompts": [
-    "P04",
     "P05",
     "P06"
   ],
-  "last_checkpoint_utc": "2026-11-12T01:41:49Z"
+  "last_checkpoint_utc": "2026-11-12T02:12:48Z"
 }
