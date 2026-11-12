@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/main/main.js",
   "scripts": {
-    "build": "npm run clean \u0026\u0026 npm run build:main \u0026\u0026 npm run build:preload \u0026\u0026 npm run build:renderer",
+    "build": "npm run clean \u0026\u0026 npm run build:main \u0026\u0026 node scripts/copy-capabilities.mjs \u0026\u0026 npm run build:preload \u0026\u0026 npm run build:renderer",
     "build:main": "tsc -p tsconfig.main.json",
     "build:preload": "esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs",
     "build:renderer": "vite build",

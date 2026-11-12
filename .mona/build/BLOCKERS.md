@@ -14,6 +14,7 @@ _None._
 |---|---|---|---|
 | Verifiable DeepSeek route | P01 (G0/G1) | **verified** at P01: `doctor --probe-api` passed; model resolved to `deepseek-flash`; live turns priced | nothing; re-probe only if the key is rotated |
 | Native build toolchain | P05+ if a native binary is needed | no MSVC Build Tools; Electron and esbuild prebuilts supply everything used so far | a verified prebuilt for the specific native module, or installing VS Build Tools |
+| Windows PTY support | MONA-023 / P18 | **unavailable in the pinned engine**: `terminal_stream/input/resize/kill` are false and the route returns HTTP 501 (Unix-only) | Victor accepts terminal as platform-unavailable for 1.0, or authorizes a native Windows PTY path (likely P21) |
 | Code-signing certificate | P21/P23 release packaging | not present, not requested | Victor's explicit decision at release time; unsigned test packages are labeled until then |
 | Windows 11 modern context-menu qualification | P21 | untested | a clean per-user install and Explorer test on this machine |
 | Human click on the classic menu | P21/P22 acceptance | registered live at P09 and exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |

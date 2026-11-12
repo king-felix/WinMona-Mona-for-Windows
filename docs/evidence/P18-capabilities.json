@@ -1,0 +1,2295 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T15:32:10.290Z",
+  "engine": {
+    "command": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+    "root": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p18-capabilities\\1794497529982",
+    "home": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p18-capabilities\\1794497529982\\home",
+    "workspace": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p18-capabilities\\1794497529982\\workspace"
+  },
+  "checks": [
+    {
+      "name": "the explorer reports the pinned engine and zero drift",
+      "ok": true,
+      "detail": {
+        "version": "0.10.2",
+        "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+        "drift": "none"
+      }
+    },
+    {
+      "name": "every ledger row is present in the explorer",
+      "ok": true,
+      "detail": {
+        "rows": 56,
+        "coverageTotal": 56
+      }
+    },
+    {
+      "name": "coverage accounts for every row without hiding awkward ones",
+      "ok": true,
+      "detail": {
+        "coverage": {
+          "total": 56,
+          "qualified": 5,
+          "readQualified": 20,
+          "discovered": 27,
+          "unavailable": 4,
+          "blocked": 0,
+          "unknown": 0,
+          "nativeView": 29,
+          "advancedAction": 22,
+          "integratedTerminal": 1,
+          "unavailableSurface": 4,
+          "blockedGap": 0,
+          "verifiedEntryPoints": 25,
+          "discoveredOnly": 27,
+          "completenessPercent": 45,
+          "note": "Verified entry points are qualified plus read-qualified rows. Discovered rows have recorded help or routes but no tested entry point. Unavailable rows stay visible with their reason. This is catalog coverage, not a parity claim."
+        }
+      }
+    },
+    {
+      "name": "the terminal row is unavailable-on-platform, not a hidden or fake feature",
+      "ok": true,
+      "detail": {
+        "status": "unavailable-on-platform",
+        "integration": "Unavailable",
+        "gap": "The runtime reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. A direct route check returned HTTP 501: \"terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet\". Mona shows the exact limitation and does not fake a PTY. A native Windows PTY path is a release blocker for MONA-023/terminal."
+      }
+    },
+    {
+      "name": "the live terminal flags are false",
+      "ok": true,
+      "detail": {
+        "flags": [
+          {
+            "name": "terminal_input",
+            "value": false
+          },
+          {
+            "name": "terminal_kill",
+            "value": false
+          },
+          {
+            "name": "terminal_resize",
+            "value": false
+          },
+          {
+            "name": "terminal_stream",
+            "value": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "the terminal availability reason names the engine limitation",
+      "ok": true,
+      "detail": {
+        "status": "unavailable",
+        "reason": "The engine reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. Its terminal route is not advertised on this build; Mona does not fake a PTY."
+      }
+    },
+    {
+      "name": "the palette exposes every capability row",
+      "ok": true,
+      "detail": {
+        "palette": 56
+      }
+    },
+    {
+      "name": "the explicit terminal route check returns the engine 501 answer",
+      "ok": true,
+      "detail": {
+        "supported": false,
+        "status": "unavailable",
+        "statusCode": 501,
+        "message": "terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet",
+        "checkedAt": "2026-11-12T15:32:10.319Z"
+      }
+    },
+    {
+      "name": "engine logs are listed read-only",
+      "ok": true,
+      "detail": {
+        "names": [
+          "big.log",
+          "runtime.log"
+        ]
+      }
+    },
+    {
+      "name": "log content is bounded and credential-shaped values are redacted",
+      "ok": true,
+      "detail": {
+        "bytes": 38,
+        "redacted": true,
+        "content": "line one\nsecret=[redacted]\nline three\n"
+      }
+    },
+    {
+      "name": "a large log is bounded to 64 KiB and marked truncated",
+      "ok": true,
+      "detail": {
+        "bytes": 65536,
+        "truncated": true,
+        "size": 200000
+      }
+    },
+    {
+      "name": "path-like log names are refused",
+      "ok": true,
+      "detail": {
+        "ok": false,
+        "error": {
+          "code": "invalid_request",
+          "message": "Log name must be a single file name without a path.",
+          "retryable": false
+        }
+      }
+    },
+    {
+      "name": "the probe caused zero inference",
+      "ok": true,
+      "detail": {
+        "before": {
+          "turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        },
+        "after": {
+          "turns": 0,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    }
+  ],
+  "usage_before": {
+    "turns": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0
+  },
+  "view": {
+    "connected": true,
+    "capturedAt": "2026-11-12T15:32:10.293Z",
+    "ledgerPath": "X:\\AI_projects\\Mona\\docs\\codewhale-capabilities.json",
+    "identity": {
+      "connected": true,
+      "version": "0.10.2",
+      "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+      "apiVersion": "1.0",
+      "bindHost": "127.0.0.1",
+      "port": 7924,
+      "authRequired": true,
+      "pid": 14792,
+      "startedAt": "2026-11-12T15:32:10.282430900+00:00",
+      "uptimeSeconds": 0,
+      "executable": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+      "ledgerVersion": "0.10.2",
+      "ledgerCommit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+      "compatibility": "qualified",
+      "drift": "none",
+      "driftDetail": "The running engine matches the ledger version and commit.",
+      "capturedAt": "2026-11-12T15:32:10.293Z"
+    },
+    "coverage": {
+      "total": 56,
+      "qualified": 5,
+      "readQualified": 20,
+      "discovered": 27,
+      "unavailable": 4,
+      "blocked": 0,
+      "unknown": 0,
+      "nativeView": 29,
+      "advancedAction": 22,
+      "integratedTerminal": 1,
+      "unavailableSurface": 4,
+      "blockedGap": 0,
+      "verifiedEntryPoints": 25,
+      "discoveredOnly": 27,
+      "completenessPercent": 45,
+      "note": "Verified entry points are qualified plus read-qualified rows. Discovered rows have recorded help or routes but no tested entry point. Unavailable rows stay visible with their reason. This is catalog coverage, not a parity claim."
+    },
+    "rows": [
+      {
+        "id": "CAP-0001",
+        "upstream": {
+          "name": "run",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Integrated terminal",
+        "uiLocation": "bottom drawer / terminal",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Interactive TUI; Mona uses the runtime API for normal work.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/run.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0002",
+        "upstream": {
+          "name": "doctor",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none-by-default",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "Settings ? connection diagnostics",
+        "tests": [
+          "apps/desktop/src/main/provider-workbench.test.ts",
+          "docs/evidence/P16-scope.json"
+        ],
+        "status": "read-qualified",
+        "gap": "Offline `doctor --json` is read. `--probe-api` stays an explicit engine action and is never run by this view.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/doctor.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0003",
+        "upstream": {
+          "name": "session-diagnostics",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "right inspector → diagnostics",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/session-diagnostics.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0004",
+        "upstream": {
+          "name": "scorecard",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "right inspector → changes/tests",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/scorecard.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0005",
+        "upstream": {
+          "name": "models",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "packages/adapter/src/configuration.test.ts",
+          "apps/desktop/src/main/provider-workbench.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Full provider catalog is read per provider; reasoning levels are shown only when the route reports them.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/models.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0006",
+        "upstream": {
+          "name": "speech",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "bottom drawer",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Model-backed; never automatic.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/speech.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0007",
+        "upstream": {
+          "name": "sessions",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "left rail → recent sessions",
+        "tests": [],
+        "status": "read-qualified",
+        "gap": "Listed through `/v1/sessions` and `/v1/threads/summary`.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/sessions.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P01-contract.json"
+        }
+      },
+      {
+        "id": "CAP-0008",
+        "upstream": {
+          "name": "receipts",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "right inspector → receipts",
+        "tests": [],
+        "status": "read-qualified",
+        "gap": "Read for the direct exec arm; JSON shape recorded.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/receipts.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P01-contract.json"
+        }
+      },
+      {
+        "id": "CAP-0009",
+        "upstream": {
+          "name": "resume",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "left rail → resume",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Engine session resume verified through `exec --resume` equivalents at G0.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/resume.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0010",
+        "upstream": {
+          "name": "rc",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Unavailable",
+        "uiLocation": "none",
+        "tests": [],
+        "status": "unavailable-by-choice",
+        "gap": "Upstream remote-control UI overlaps Mona; not exposed in 1.0.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/rc.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0011",
+        "upstream": {
+          "name": "fork",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "right inspector → thread",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Runtime route `/v1/threads/{id}/fork` discovered, not yet contract-tested.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/fork.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0012",
+        "upstream": {
+          "name": "init",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → project instructions",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/init.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0013",
+        "upstream": {
+          "name": "install",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "Extensions → Plugins advanced actions",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Installs a plugin bundle without trusting or enabling it. Mona shows the exact command; installation is not performed from the renderer.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/install.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0014",
+        "upstream": {
+          "name": "setup",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/setup.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0015",
+        "upstream": {
+          "name": "remote-setup",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → remote",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Later-scope transport; not part of Windows 1.0 support claims.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/remote-setup.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0016",
+        "upstream": {
+          "name": "exec",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "bottom drawer / one-shot jobs",
+        "tests": [],
+        "status": "qualified",
+        "gap": "Used as the direct benchmark arm with `--auto --output-format stream-json`; not the persistent control channel.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/exec.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P01-contract.json"
+        }
+      },
+      {
+        "id": "CAP-0017",
+        "upstream": {
+          "name": "fleet",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read/write",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Agents ? native fleet runs",
+        "tests": [
+          "packages/adapter/src/native.test.ts",
+          "apps/desktop/src/main/agent-observatory.test.ts",
+          "docs/evidence/P15-agent-run.json"
+        ],
+        "status": "read-qualified",
+        "gap": "P15 reads fleet runs, creates one serial run, and returns start/stop receipts. Local start returned execution=scheduled with no worker lease (P15-ISSUE-001). Parallel builders are not offered.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/fleet.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0018",
+        "upstream": {
+          "name": "workflow",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Agents ? native fleet runs",
+        "tests": [
+          "apps/desktop/src/main/agent-observatory.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Workflow runs appear through fleet runs. Checked-in workflow lanes remain a validated CLI advanced action until P18.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/workflow.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0019",
+        "upstream": {
+          "name": "lane",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "bottom drawer",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/lane.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0020",
+        "upstream": {
+          "name": "review",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "right inspector → review",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/review.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0021",
+        "upstream": {
+          "name": "apply",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "right inspector → changes",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Destructive surface; preview required.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/apply.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0022",
+        "upstream": {
+          "name": "eval",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "bottom drawer",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Model-backed; explicit only.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/eval.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0023",
+        "upstream": {
+          "name": "mcp",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "Extensions → MCP advanced actions",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Add, remove, connect, login, logout and validate remain engine CLI actions; Mona shows the exact invocation and does not assemble it from remote content. The runtime read/action routes are CAP-0052.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/mcp.txt",
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0024",
+        "upstream": {
+          "name": "features",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "settings → advanced",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/features.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0025",
+        "upstream": {
+          "name": "integrations",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "settings → integrations",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/integrations.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0026",
+        "upstream": {
+          "name": "serve",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → advanced",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Compatibility alias of `app-server --http`; Mona uses app-server explicitly.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/serve.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0027",
+        "upstream": {
+          "name": "web",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Unavailable",
+        "uiLocation": "none",
+        "tests": [],
+        "status": "unavailable-by-choice",
+        "gap": "Upstream browser client; Mona does not embed a duplicate chat surface.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/web.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0028",
+        "upstream": {
+          "name": "login",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → account",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Credential mutation; never silent.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/login.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0029",
+        "upstream": {
+          "name": "logout",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "destructive",
+        "permissionImplications": "destructive; requires explicit confirmation",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → account",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Destructive to saved auth; explicit confirmation required.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/logout.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0030",
+        "upstream": {
+          "name": "auth",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "apps/desktop/src/main/provider-workbench.test.ts"
+        ],
+        "status": "discovered",
+        "gap": "Credential presence and state are displayed. Mona never reads, writes, copies or logs a key; entry stays with the engine CLI/credential store.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/auth.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0031",
+        "upstream": {
+          "name": "account",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "settings → account",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/account.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0032",
+        "upstream": {
+          "name": "dispatch",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "unknown",
+        "permissionImplications": "unknown; do not expose without qualification",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "bottom drawer",
+        "tests": [],
+        "status": "discovered",
+        "gap": null,
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/dispatch.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0033",
+        "upstream": {
+          "name": "mcp-server",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Unavailable",
+        "uiLocation": "none",
+        "tests": [],
+        "status": "unavailable-by-choice",
+        "gap": "Mona is not an MCP server in 1.0.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/mcp-server.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0034",
+        "upstream": {
+          "name": "config",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "packages/adapter/src/configuration.test.ts",
+          "apps/desktop/src/main/provider-workbench.test.ts",
+          "docs/evidence/P16-scope.json"
+        ],
+        "status": "qualified",
+        "gap": "Read via `/v1/config`; writes go through `codewhale config set` with a hashed backup, revision check and verification. Active threads are untouched.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/config.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0035",
+        "upstream": {
+          "name": "model",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "apps/desktop/src/main/provider-workbench.test.ts",
+          "docs/evidence/P16-scope.json"
+        ],
+        "status": "qualified",
+        "gap": "Requested and effective models are displayed separately. A changed default applies to new threads; the active thread kept deepseek-flash in the isolated live probe.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/model.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0036",
+        "upstream": {
+          "name": "thread",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Studio thread + Agents observatory",
+        "tests": [
+          "packages/adapter/src/native.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Thread lifecycle is the primary Mona surface; thread goal read/create/complete is exposed through the observatory.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/thread.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0037",
+        "upstream": {
+          "name": "sandbox",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "top context bar → permissions",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Host reports no sandbox; posture display must say so.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/sandbox.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0038",
+        "upstream": {
+          "name": "app-server",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "mixed",
+        "permissionImplications": "depends on subcommand; not yet classified per subcommand",
+        "costImplications": "model",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "internal runtime transport",
+        "tests": [],
+        "status": "qualified",
+        "gap": "Primary integration: `--http` with bearer token, contract-tested at P01 and used for G0/G1.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/app-server.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P01-contract.json"
+        }
+      },
+      {
+        "id": "CAP-0039",
+        "upstream": {
+          "name": "completion",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → advanced",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Shell completion generation; no inference.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/completion.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0040",
+        "upstream": {
+          "name": "metrics",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "right inspector → usage",
+        "tests": [],
+        "status": "read-qualified",
+        "gap": "Read for tool-call evidence; no cost field observed.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/metrics.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P01-contract.json"
+        }
+      },
+      {
+        "id": "CAP-0041",
+        "upstream": {
+          "name": "update",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "write",
+        "permissionImplications": "mutates local files/config; requires explicit user action",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "settings → about",
+        "tests": [],
+        "status": "discovered",
+        "gap": "Never automatic during active work.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/update.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0042",
+        "upstream": {
+          "name": "providers",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Native view",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "packages/adapter/src/configuration.test.ts",
+          "apps/desktop/src/main/provider-workbench.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Credential state, source and writability are shown. Provider switching is an explicit engine config action, not an automatic fallback.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/providers.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0043",
+        "upstream": {
+          "name": "help",
+          "surface": "cli",
+          "source": "codewhale --help",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "read-only",
+        "costImplications": "none",
+        "requiredArguments": "see help capture",
+        "integration": "Advanced action",
+        "uiLocation": "command palette",
+        "tests": [],
+        "status": "discovered",
+        "gap": "`help --help` exits 2 (no help for help); captured for completeness.",
+        "evidence": {
+          "helpCapture": "docs/evidence/engine/commands/help.txt",
+          "capturedAt": "2026-11-12T01:00:32.823Z",
+          "contractReport": null
+        }
+      },
+      {
+        "id": "CAP-0044",
+        "upstream": {
+          "name": "goals (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/goals; PUT /v1/threads/{id}/goal",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read/write",
+        "permissionImplications": "Uses the authenticated local runtime token; no renderer access.",
+        "costImplications": "native",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Agents observatory",
+        "tests": [
+          "packages/adapter/src/native.test.ts",
+          "apps/desktop/src/main/agent-observatory.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Read, create, complete and block. Creating a goal starts a native goal kickoff turn and becomes the execution owner.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T09:10:00Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0045",
+        "upstream": {
+          "name": "agent-runs (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/agent-runs; POST /v1/agent-runs/{id}/cancel",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read/write",
+        "permissionImplications": "Uses the authenticated local runtime token; no renderer access.",
+        "costImplications": "native",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Agents observatory",
+        "tests": [
+          "packages/adapter/src/native.test.ts",
+          "apps/desktop/src/main/agent-observatory.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Child lifecycle, route, usage and artifacts are read from the engine. Cancel is offered for running children.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T09:10:00Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0046",
+        "upstream": {
+          "name": "turn artifacts (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/threads/{id}/turns/{turnId}/artifacts",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated local runtime token; no renderer access.",
+        "costImplications": "native",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Agents observatory",
+        "tests": [
+          "packages/adapter/src/native.test.ts",
+          "apps/desktop/src/main/agent-observatory.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Turn artifacts are read into the observatory projection; a missing route is a typed failure, not an empty list.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T09:10:00Z",
+          "contractReport": "docs/evidence/P15-agent-run.json"
+        }
+      },
+      {
+        "id": "CAP-0047",
+        "upstream": {
+          "name": "settings schema (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/settings/schema",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Authenticated local read; no renderer access.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Settings ? provider and model",
+        "tests": [
+          "packages/adapter/src/configuration.test.ts",
+          "apps/desktop/src/main/provider-workbench.test.ts"
+        ],
+        "status": "read-qualified",
+        "gap": "Permission options are read from the engine schema; the workbench offers only values the engine reports.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T09:30:00Z",
+          "contractReport": "docs/evidence/P16-scope.json"
+        }
+      },
+      {
+        "id": "CAP-0048",
+        "upstream": {
+          "name": "skills (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/skills",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Extensions → Skills",
+        "tests": [
+          "packages/adapter/src/extensions.test.ts",
+          "apps/desktop/src/main/extensions-service.test.ts",
+          "apps/desktop/src/main/extensions-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p17-extensions.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "List and provenance read (name, source, plugin, invocation, aliases, bundled tier). Skill bodies stay on disk. Install/trust/update remain engine-reviewed routes and were not exercised.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0049",
+        "upstream": {
+          "name": "plugins (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/apps/plugins",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Extensions → Plugins",
+        "tests": [
+          "packages/adapter/src/extensions.test.ts",
+          "apps/desktop/src/main/extensions-service.test.ts",
+          "apps/desktop/src/main/extensions-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p17-extensions.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "List and provenance read (scope, origin, trust, compatibility, inventory, content hash). Trust/install/enable are engine actions with their own consent step and were not exercised.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0050",
+        "upstream": {
+          "name": "hooks (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/hooks",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Extensions → Hooks",
+        "tests": [
+          "packages/adapter/src/extensions.test.ts",
+          "apps/desktop/src/main/extensions-service.test.ts",
+          "apps/desktop/src/main/extensions-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p17-extensions.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "Read-only inventory with redacted commands. Project hooks were observed rejected until the engine records workspace trust and hook approval; Mona never approves them.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0051",
+        "upstream": {
+          "name": "workspace instructions (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/workspace/instructions",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Extensions → Rules and instructions",
+        "tests": [
+          "packages/adapter/src/extensions.test.ts",
+          "apps/desktop/src/main/extensions-service.test.ts",
+          "apps/desktop/src/main/extensions-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p17-extensions.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "Reports each source, kind, status, byte count and warnings. Imported instructions remain inert until the engine selects them.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0052",
+        "upstream": {
+          "name": "mcp servers (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/apps/mcp/servers; GET /v1/apps/mcp/servers/{name}; POST .../enable|disable|reconnect; GET /v1/apps/mcp/tools",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read/write",
+        "permissionImplications": "Uses the authenticated loopback runtime token; no renderer access and no file parsing by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Extensions → MCP servers",
+        "tests": [
+          "packages/adapter/src/extensions.test.ts",
+          "apps/desktop/src/main/extensions-service.test.ts",
+          "apps/desktop/src/main/extensions-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p17-extensions.mjs"
+        ],
+        "status": "qualified",
+        "gap": "List, detail, explicit health check, enable and disable were exercised with If-Match revisions. Stale edits return conflict; unknown top-level and server-level keys survived an edit; env values are never returned, only key names. Project-scope servers stay hidden until engine trust. Add/remove/login remain CLI advanced actions.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:18:59.941Z",
+          "contractReport": "docs/evidence/P17-extensions.json"
+        }
+      },
+      {
+        "id": "CAP-0053",
+        "upstream": {
+          "name": "terminal (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/terminal/{name}/output; POST /v1/terminal/{name}/input|resize|kill",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read/write",
+        "permissionImplications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Unavailable",
+        "uiLocation": "Capabilities → Integrated terminal",
+        "tests": [
+          "packages/adapter/src/diagnostics.test.ts",
+          "apps/desktop/src/main/capability-service.test.ts",
+          "apps/desktop/src/main/capability-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p18-capabilities.mjs"
+        ],
+        "status": "unavailable-on-platform",
+        "gap": "The runtime reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. A direct route check returned HTTP 501: \"terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet\". Mona shows the exact limitation and does not fake a PTY. A native Windows PTY path is a release blocker for MONA-023/terminal.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:31:38.050Z",
+          "contractReport": "docs/evidence/P18-capabilities.json"
+        }
+      },
+      {
+        "id": "CAP-0054",
+        "upstream": {
+          "name": "logs (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/logs; GET /v1/logs/{name}?offset&limit",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Capabilities → Engine logs",
+        "tests": [
+          "packages/adapter/src/diagnostics.test.ts",
+          "apps/desktop/src/main/capability-service.test.ts",
+          "apps/desktop/src/main/capability-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p18-capabilities.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "Read-only. Mona lists log sources, reads at most 64 KiB per request, paginates with offset, rejects path-like names and redacts credential-shaped values. No log is writable from the renderer.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:31:38.050Z",
+          "contractReport": "docs/evidence/P18-capabilities.json"
+        }
+      },
+      {
+        "id": "CAP-0055",
+        "upstream": {
+          "name": "process (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/process",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Capabilities → identity",
+        "tests": [
+          "packages/adapter/src/diagnostics.test.ts",
+          "apps/desktop/src/main/capability-service.test.ts",
+          "apps/desktop/src/main/capability-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p18-capabilities.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "Reports pid, version, commit, start time, uptime and executable for the owned runtime. Read-only.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:31:38.050Z",
+          "contractReport": "docs/evidence/P18-capabilities.json"
+        }
+      },
+      {
+        "id": "CAP-0056",
+        "upstream": {
+          "name": "runtime info (runtime)",
+          "surface": "runtime-api",
+          "source": "GET /v1/runtime/info",
+          "version": "0.10.2+ff466b2ed0bf"
+        },
+        "platform": "windows-x64",
+        "kind": "read",
+        "permissionImplications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+        "costImplications": "none",
+        "requiredArguments": "see route contract",
+        "integration": "Native view",
+        "uiLocation": "Capabilities → identity and live flags",
+        "tests": [
+          "packages/adapter/src/diagnostics.test.ts",
+          "apps/desktop/src/main/capability-service.test.ts",
+          "apps/desktop/src/main/capability-ipc.test.ts",
+          "apps/desktop/src/renderer/App.test.tsx",
+          "tools/spike/p18-capabilities.mjs"
+        ],
+        "status": "read-qualified",
+        "gap": "Reports runtime API version, engine version/commit, bind host/port, auth requirement and the capability-flag map. Mona compares the live version/commit with the ledger and reports drift; it does not inherit ledger claims across a version change.",
+        "evidence": {
+          "helpCapture": null,
+          "capturedAt": "2026-11-12T15:31:38.050Z",
+          "contractReport": "docs/evidence/P18-capabilities.json"
+        }
+      }
+    ],
+    "liveFlags": [
+      {
+        "name": "account_model_owner",
+        "value": true
+      },
+      {
+        "name": "account_session",
+        "value": true
+      },
+      {
+        "name": "agent_mail",
+        "value": true
+      },
+      {
+        "name": "automation_mutation_preconditions",
+        "value": true
+      },
+      {
+        "name": "client_token_intents",
+        "value": true
+      },
+      {
+        "name": "environments",
+        "value": false
+      },
+      {
+        "name": "event_replay",
+        "value": true
+      },
+      {
+        "name": "event_stream_resume",
+        "value": true
+      },
+      {
+        "name": "external_tools",
+        "value": true
+      },
+      {
+        "name": "fleet_event_replay",
+        "value": true
+      },
+      {
+        "name": "fleet_event_stream",
+        "value": true
+      },
+      {
+        "name": "fleet_local_target",
+        "value": true
+      },
+      {
+        "name": "fleet_run_create",
+        "value": true
+      },
+      {
+        "name": "fleet_run_start",
+        "value": true
+      },
+      {
+        "name": "mcp_server_management",
+        "value": true
+      },
+      {
+        "name": "memory",
+        "value": true
+      },
+      {
+        "name": "plugin_management",
+        "value": true
+      },
+      {
+        "name": "profile_constitution",
+        "value": true
+      },
+      {
+        "name": "session_provider_keys",
+        "value": false
+      },
+      {
+        "name": "skill_detail",
+        "value": true
+      },
+      {
+        "name": "skill_lifecycle",
+        "value": true
+      },
+      {
+        "name": "terminal_input",
+        "value": false
+      },
+      {
+        "name": "terminal_kill",
+        "value": false
+      },
+      {
+        "name": "terminal_resize",
+        "value": false
+      },
+      {
+        "name": "terminal_stream",
+        "value": false
+      },
+      {
+        "name": "thread_create_idempotency",
+        "value": true
+      },
+      {
+        "name": "thread_goals",
+        "value": true
+      },
+      {
+        "name": "thread_shell_consent",
+        "value": true
+      },
+      {
+        "name": "threads",
+        "value": true
+      },
+      {
+        "name": "turn_image_inputs",
+        "value": true
+      },
+      {
+        "name": "turn_interrupt",
+        "value": true
+      },
+      {
+        "name": "turn_operation_idempotency",
+        "value": true
+      },
+      {
+        "name": "turn_operation_lookup",
+        "value": true
+      },
+      {
+        "name": "turn_output_token_limit",
+        "value": true
+      },
+      {
+        "name": "turn_steer",
+        "value": true
+      },
+      {
+        "name": "turns",
+        "value": true
+      },
+      {
+        "name": "worker_runtime",
+        "value": true
+      }
+    ],
+    "terminal": {
+      "supported": false,
+      "status": "unavailable",
+      "flags": {
+        "stream": false,
+        "input": false,
+        "resize": false,
+        "kill": false
+      },
+      "route": "/v1/terminal/{name}",
+      "reason": "The engine reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. Its terminal route is not advertised on this build; Mona does not fake a PTY.",
+      "checkedAt": "2026-11-12T15:32:10.293Z"
+    },
+    "logs": {
+      "status": "ok",
+      "note": null,
+      "sources": [
+        {
+          "dir": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p18-capabilities\\1794497529982\\home\\logs",
+          "files": [
+            {
+              "name": "big.log",
+              "size": 200000,
+              "modifiedAt": "2026-11-12T15:32:09.987971800+00:00"
+            },
+            {
+              "name": "runtime.log",
+              "size": 52,
+              "modifiedAt": "2026-11-12T15:32:09.987471700+00:00"
+            }
+          ]
+        }
+      ]
+    },
+    "palette": [
+      {
+        "id": "capability:CAP-0001",
+        "label": "run — discovered",
+        "hint": "cli · bottom drawer / terminal",
+        "status": "discovered",
+        "integration": "Integrated terminal"
+      },
+      {
+        "id": "capability:CAP-0002",
+        "label": "doctor — read-qualified",
+        "hint": "cli · Settings ? connection diagnostics",
+        "status": "read-qualified",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0003",
+        "label": "session-diagnostics — discovered",
+        "hint": "cli · right inspector → diagnostics",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0004",
+        "label": "scorecard — discovered",
+        "hint": "cli · right inspector → changes/tests",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0005",
+        "label": "models — read-qualified",
+        "hint": "cli · Settings ? provider and model",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0006",
+        "label": "speech — discovered",
+        "hint": "cli · bottom drawer",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0007",
+        "label": "sessions — read-qualified",
+        "hint": "cli · left rail → recent sessions",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0008",
+        "label": "receipts — read-qualified",
+        "hint": "cli · right inspector → receipts",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0009",
+        "label": "resume — discovered",
+        "hint": "cli · left rail → resume",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0010",
+        "label": "rc — unavailable-by-choice",
+        "hint": "cli · none",
+        "status": "unavailable-by-choice",
+        "integration": "Unavailable"
+      },
+      {
+        "id": "capability:CAP-0011",
+        "label": "fork — discovered",
+        "hint": "cli · right inspector → thread",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0012",
+        "label": "init — discovered",
+        "hint": "cli · settings → project instructions",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0013",
+        "label": "install — discovered",
+        "hint": "cli · Extensions → Plugins advanced actions",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0014",
+        "label": "setup — discovered",
+        "hint": "cli · settings",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0015",
+        "label": "remote-setup — discovered",
+        "hint": "cli · settings → remote",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0016",
+        "label": "exec — qualified",
+        "hint": "cli · bottom drawer / one-shot jobs",
+        "status": "qualified",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0017",
+        "label": "fleet — read-qualified",
+        "hint": "cli · Agents ? native fleet runs",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0018",
+        "label": "workflow — read-qualified",
+        "hint": "cli · Agents ? native fleet runs",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0019",
+        "label": "lane — discovered",
+        "hint": "cli · bottom drawer",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0020",
+        "label": "review — discovered",
+        "hint": "cli · right inspector → review",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0021",
+        "label": "apply — discovered",
+        "hint": "cli · right inspector → changes",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0022",
+        "label": "eval — discovered",
+        "hint": "cli · bottom drawer",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0023",
+        "label": "mcp — discovered",
+        "hint": "cli · Extensions → MCP advanced actions",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0024",
+        "label": "features — discovered",
+        "hint": "cli · settings → advanced",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0025",
+        "label": "integrations — discovered",
+        "hint": "cli · settings → integrations",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0026",
+        "label": "serve — discovered",
+        "hint": "cli · settings → advanced",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0027",
+        "label": "web — unavailable-by-choice",
+        "hint": "cli · none",
+        "status": "unavailable-by-choice",
+        "integration": "Unavailable"
+      },
+      {
+        "id": "capability:CAP-0028",
+        "label": "login — discovered",
+        "hint": "cli · settings → account",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0029",
+        "label": "logout — discovered",
+        "hint": "cli · settings → account",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0030",
+        "label": "auth — discovered",
+        "hint": "cli · Settings ? provider and model",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0031",
+        "label": "account — discovered",
+        "hint": "cli · settings → account",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0032",
+        "label": "dispatch — discovered",
+        "hint": "cli · bottom drawer",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0033",
+        "label": "mcp-server — unavailable-by-choice",
+        "hint": "cli · none",
+        "status": "unavailable-by-choice",
+        "integration": "Unavailable"
+      },
+      {
+        "id": "capability:CAP-0034",
+        "label": "config — qualified",
+        "hint": "cli · Settings ? provider and model",
+        "status": "qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0035",
+        "label": "model — qualified",
+        "hint": "cli · Settings ? provider and model",
+        "status": "qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0036",
+        "label": "thread — read-qualified",
+        "hint": "cli · Studio thread + Agents observatory",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0037",
+        "label": "sandbox — discovered",
+        "hint": "cli · top context bar → permissions",
+        "status": "discovered",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0038",
+        "label": "app-server — qualified",
+        "hint": "cli · internal runtime transport",
+        "status": "qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0039",
+        "label": "completion — discovered",
+        "hint": "cli · settings → advanced",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0040",
+        "label": "metrics — read-qualified",
+        "hint": "cli · right inspector → usage",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0041",
+        "label": "update — discovered",
+        "hint": "cli · settings → about",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0042",
+        "label": "providers — read-qualified",
+        "hint": "cli · Settings ? provider and model",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0043",
+        "label": "help — discovered",
+        "hint": "cli · command palette",
+        "status": "discovered",
+        "integration": "Advanced action"
+      },
+      {
+        "id": "capability:CAP-0044",
+        "label": "goals (runtime) — read-qualified",
+        "hint": "runtime-api · Agents observatory",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0045",
+        "label": "agent-runs (runtime) — read-qualified",
+        "hint": "runtime-api · Agents observatory",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0046",
+        "label": "turn artifacts (runtime) — read-qualified",
+        "hint": "runtime-api · Agents observatory",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0047",
+        "label": "settings schema (runtime) — read-qualified",
+        "hint": "runtime-api · Settings ? provider and model",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0048",
+        "label": "skills (runtime) — read-qualified",
+        "hint": "runtime-api · Extensions → Skills",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0049",
+        "label": "plugins (runtime) — read-qualified",
+        "hint": "runtime-api · Extensions → Plugins",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0050",
+        "label": "hooks (runtime) — read-qualified",
+        "hint": "runtime-api · Extensions → Hooks",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0051",
+        "label": "workspace instructions (runtime) — read-qualified",
+        "hint": "runtime-api · Extensions → Rules and instructions",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0052",
+        "label": "mcp servers (runtime) — qualified",
+        "hint": "runtime-api · Extensions → MCP servers",
+        "status": "qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0053",
+        "label": "terminal (runtime) — unavailable-on-platform",
+        "hint": "runtime-api · Capabilities → Integrated terminal",
+        "status": "unavailable-on-platform",
+        "integration": "Unavailable"
+      },
+      {
+        "id": "capability:CAP-0054",
+        "label": "logs (runtime) — read-qualified",
+        "hint": "runtime-api · Capabilities → Engine logs",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0055",
+        "label": "process (runtime) — read-qualified",
+        "hint": "runtime-api · Capabilities → identity",
+        "status": "read-qualified",
+        "integration": "Native view"
+      },
+      {
+        "id": "capability:CAP-0056",
+        "label": "runtime info (runtime) — read-qualified",
+        "hint": "runtime-api · Capabilities → identity and live flags",
+        "status": "read-qualified",
+        "integration": "Native view"
+      }
+    ],
+    "caveats": [
+      "The engine reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. Its terminal route is not advertised on this build; Mona does not fake a PTY.",
+      "27 row(s) are discovered-only: their help or route is recorded, but no tested entry point is claimed."
+    ]
+  },
+  "terminal_check": {
+    "supported": false,
+    "status": "unavailable",
+    "statusCode": 501,
+    "message": "terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet",
+    "checkedAt": "2026-11-12T15:32:10.319Z"
+  },
+  "log_sources": [
+    {
+      "dir": "C:\\Users\\victo\\AppData\\Local\\Temp\\mona-p18-capabilities\\1794497529982\\home\\logs",
+      "files": [
+        {
+          "name": "big.log",
+          "size": 200000,
+          "modifiedAt": "2026-11-12T15:32:09.987971800+00:00"
+        },
+        {
+          "name": "runtime.log",
+          "size": 52,
+          "modifiedAt": "2026-11-12T15:32:09.987471700+00:00"
+        }
+      ]
+    }
+  ],
+  "log_small": {
+    "name": "runtime.log",
+    "size": 52,
+    "modifiedAt": "2026-11-12T15:32:09.987471700+00:00",
+    "offset": 0,
+    "requestedLimit": 65536,
+    "bytes": 38,
+    "content": "line one\nsecret=[redacted]\nline three\n",
+    "truncated": true,
+    "redacted": true,
+    "readAt": "2026-11-12T15:32:10.328Z"
+  },
+  "log_large": {
+    "bytes": 65536,
+    "truncated": true,
+    "size": 200000
+  },
+  "path_traversal": {
+    "ok": false,
+    "error": {
+      "code": "invalid_request",
+      "message": "Log name must be a single file name without a path.",
+      "retryable": false
+    }
+  },
+  "usage_after": {
+    "turns": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cost_usd": 0
+  },
+  "finished_utc": "2026-11-12T15:32:10.350Z",
+  "ok": true
+}

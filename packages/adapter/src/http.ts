@@ -13,6 +13,8 @@ export type TransportOptions = {
   timeoutMs?: number | undefined;
   /** Extra request headers. Used for the runtime's If-Match revision guard. */
   headers?: Record<string, string> | undefined;
+  /** Statuses the caller will inspect instead of treating as transport failures. */
+  acceptStatuses?: number[] | undefined;
 };
 
 export interface RuntimeTransport {
@@ -146,6 +148,7 @@ export class HttpTransport implements RuntimeTransport {
         detail: redact(error instanceof Error ? error.message : String(error), [this.token]),
       });
     }
+    if (options.acceptStatuses?.includes(response.status)) return ok(response);
     if (response.status === 401 || response.status === 403) {
       await readBounded(response, 16 * 1024).catch(() => undefined);
       return fail('authentication_failed', 'runtime rejected the bearer token');

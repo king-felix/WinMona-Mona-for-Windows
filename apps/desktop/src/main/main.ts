@@ -19,6 +19,8 @@ import { ProviderWorkbenchService } from './provider-workbench.js';
 import { registerProviderIpc } from './provider-ipc.js';
 import { ExtensionsService } from './extensions-service.js';
 import { registerExtensionIpc } from './extensions-ipc.js';
+import { CapabilityService } from './capability-service.js';
+import { registerCapabilityIpc } from './capability-ipc.js';
 import { STUDIO_CHANNELS, type StudioEvent, type StudioRun } from '../shared/studio.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
 import {
@@ -121,6 +123,7 @@ let studioService: StudioService | null = null;
 let observatoryService: AgentObservatoryService | null = null;
 let providerService: ProviderWorkbenchService | null = null;
 let extensionsService: ExtensionsService | null = null;
+let capabilityService: CapabilityService | null = null;
 let uiStateStore: UiStateStore | null = null;
 let briefingService: BriefingService | null = null;
 let tray: Tray | null = null;
@@ -572,6 +575,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         store: localState.store,
         engine: enginePort,
       });
+      capabilityService = new CapabilityService({ engine: enginePort });
     }
 
     // Launches share one serialized queue: the path is resolved and validated,
@@ -652,6 +656,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: () => extensionsService,
+    });
+    registerCapabilityIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => capabilityService,
     });
     registerLaunchIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
@@ -896,6 +905,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
     observatoryService = null;
     providerService = null;
     extensionsService = null;
+    capabilityService = null;
     localState?.close();
     localState = null;
   });

@@ -1016,3 +1016,44 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   engine records workspace trust and approval. Mona reports that state and does
   not approve it. Install/trust/update for plugins and skills remain advanced
   engine actions; the UI shows the exact invocation instead of simulating it.
+
+## D-0081 - The capability explorer separates the ledger from live truth
+
+- **Decision:** the explorer reads the versioned `docs/codewhale-capabilities.json`
+  as a static inventory and joins it with live `/v1/runtime/info` and
+  `/v1/process` identity plus the capability-flag map. A version or commit
+  mismatch is shown as drift; ledger claims are never inherited silently.
+- **Why:** the ledger records what was tested at P00–P18. An upgraded engine
+  could add, remove or change a route without Mona noticing. Keeping the two
+  sources separate makes every row auditable and lets the coverage report count
+  discovered-only and unavailable rows instead of hiding them.
+- **Constrains:** the explorer refuses to invent a row or upgrade a status. The
+  completeness figure is labelled catalog coverage, not parity. A missing or
+  malformed ledger is an error, not an empty explorer.
+
+## D-0082 - No fake terminal on a platform the engine does not support
+
+- **Decision:** Mona shows the terminal route, the four capability flags and the
+  engine’s exact response, and ships no terminal widget on Windows. Logs are a
+  separate read-only surface.
+- **Why:** the pinned runtime reports `terminal_stream/input/resize/kill` false
+  and returns HTTP 501: “terminal sessions are Unix-only in this build; native
+  Windows PTY support is not implemented yet.” A `child_process` shell or a
+  pseudo-PTY would be a fake terminal with wrong resize, signal and job-control
+  semantics. MONA-023/terminal stays blocked as ISSUE-0018 until Victor accepts
+  platform-unavailable or authorizes a real Windows PTY path.
+- **Constrains:** logs are capped at 64 KiB per request with offset pagination,
+  path-like names are refused, and credential-shaped values are redacted. No
+  terminal, shell or generic invoke channel may be added to the preload to work
+  around the engine limitation.
+
+## D-0083 - Capability palette entries navigate; they never invoke
+
+- **Decision:** every ledger row becomes a palette item. Selecting it opens the
+  Capabilities section and focuses that row.
+- **Why:** the palette is a finder, not an execution surface. A row may be
+  discovered-only, unavailable or blocked; invoking it from a keystroke would
+  bypass the effect preview and consent rules in spec 7.1.
+- **Constrains:** palette actions for local UI commands keep their existing
+  behavior; capability items only navigate and can be selected even when the row
+  is unavailable, because the explanation is the useful destination.

@@ -4,6 +4,7 @@ import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js'
 import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { CAPABILITY_CHANNELS } from '../shared/capabilities.js';
 import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { PROVIDER_CHANNELS } from '../shared/provider.js';
@@ -116,6 +117,10 @@ const bridge = Object.freeze({
     ipcRenderer.invoke(EXTENSION_CHANNELS.setMcp, input),
   extensionsCheckMcp: (input: { projectId: string; name: string; expectedRevision: string }) =>
     ipcRenderer.invoke(EXTENSION_CHANNELS.checkMcp, input),
+  capabilitiesGet: () => ipcRenderer.invoke(CAPABILITY_CHANNELS.get, {}),
+  capabilitiesReadLog: (input: { name: string; offset?: number; limit?: number }) =>
+    ipcRenderer.invoke(CAPABILITY_CHANNELS.readLog, input),
+  capabilitiesCheckTerminal: () => ipcRenderer.invoke(CAPABILITY_CHANNELS.checkTerminal, {}),
   /** The latest Explorer launch, and pushes for new ones. Returns no path to execute. */
   getLaunchState: () => ipcRenderer.invoke(LAUNCH_CHANNELS.state, {}),
   onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {

@@ -13,7 +13,7 @@ import type {
 import type { AppInfo } from '../shared/ipc.js';
 import type { AttentionFocus, AttentionView } from '../shared/attention.js';
 import type { BriefingView } from '../shared/briefing.js';
-import type { ExtensionsView } from '@mona/contracts';
+import type { ExtensionsView, CapabilityExplorerView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
 import { App } from './App.js';
@@ -271,6 +271,8 @@ type Store = {
   layouts?: Array<{ projectId: string; layout: string }>;
   extensions?: ExtensionsView;
   extensionActions?: string[];
+  capabilities?: CapabilityExplorerView;
+  capabilityActions?: string[];
 };
 
 function emptyStudio(): StudioView {
@@ -349,6 +351,64 @@ function emptyExtensionsView(): ExtensionsView {
     },
     counts: { mcpServers: 0, mcpEnabled: 0, skills: 0, plugins: 0, hooks: 0, instructionsLoaded: 0 },
     scopes: [],
+    caveats: [],
+  };
+}
+
+function emptyCapabilityView(): CapabilityExplorerView {
+  return {
+    connected: true,
+    capturedAt: '2026-11-12T00:00:00.000Z',
+    ledgerPath: 'docs/codewhale-capabilities.json',
+    identity: {
+      connected: true,
+      version: '0.10.2',
+      commit: 'ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e',
+      apiVersion: '1.0',
+      bindHost: '127.0.0.1',
+      port: 7878,
+      authRequired: true,
+      pid: 1234,
+      startedAt: '2026-11-12T00:00:00.000Z',
+      uptimeSeconds: 10,
+      executable: 'codewhale.exe',
+      ledgerVersion: '0.10.2',
+      ledgerCommit: 'ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e',
+      compatibility: 'qualified',
+      drift: 'none',
+      driftDetail: 'matches',
+      capturedAt: '2026-11-12T00:00:00.000Z',
+    },
+    coverage: {
+      total: 0,
+      qualified: 0,
+      readQualified: 0,
+      discovered: 0,
+      unavailable: 0,
+      blocked: 0,
+      unknown: 0,
+      nativeView: 0,
+      advancedAction: 0,
+      integratedTerminal: 0,
+      unavailableSurface: 0,
+      blockedGap: 0,
+      verifiedEntryPoints: 0,
+      discoveredOnly: 0,
+      completenessPercent: 0,
+      note: 'catalog coverage, not parity',
+    },
+    rows: [],
+    liveFlags: [],
+    terminal: {
+      supported: false,
+      status: 'unavailable',
+      flags: { stream: false, input: false, resize: false, kill: false },
+      route: '/v1/terminal/{name}',
+      reason: 'terminal sessions are Unix-only in this build',
+      checkedAt: '2026-11-12T00:00:00.000Z',
+    },
+    logs: { status: 'ok', note: null, sources: [] },
+    palette: [],
     caveats: [],
   };
 }
@@ -645,6 +705,32 @@ function bridgeFor(store: Store): Window['mona'] {
         revision: 'mcp-v1-aaaa',
       });
     },
+    capabilitiesGet: async () => ok(store.capabilities ?? emptyCapabilityView()),
+    capabilitiesReadLog: async (input: { name: string; offset?: number; limit?: number }) => {
+      (store.capabilityActions ??= []).push(`log:${input.name}:${input.offset ?? 0}`);
+      return ok({
+        name: input.name,
+        size: 24,
+        modifiedAt: '2026-11-12T00:00:00.000Z',
+        offset: input.offset ?? 0,
+        requestedLimit: input.limit ?? 64 * 1024,
+        bytes: 20,
+        content: 'line one\ntoken=[redacted]\n',
+        truncated: false,
+        redacted: true,
+        readAt: '2026-11-12T00:00:00.000Z',
+      });
+    },
+    capabilitiesCheckTerminal: async () => {
+      (store.capabilityActions ??= []).push('terminal-check');
+      return ok({
+        supported: false,
+        status: 'unavailable' as const,
+        statusCode: 501,
+        message: 'terminal sessions are Unix-only in this build',
+        checkedAt: '2026-11-12T00:00:00.000Z',
+      });
+    },
     getLaunchState: async () => ok({ latest: store.launch ?? null, count: store.launch?.seq ?? 0 }),
     onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {
       const list = (store.launchHandlers ??= []);
@@ -900,6 +986,94 @@ describe('Mona shell', () => {
       await new Promise((resolve) => setTimeout(resolve, 20));
     });
     expect(store.extensionActions).toEqual(['check:fixture:mcp-v1-aaaa', 'set:fixture:false:mcp-v1-aaaa']);
+    await act(async () => root.unmount());
+  });
+
+  it('shows capability coverage, terminal limits, bounded logs and palette entries', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const view = emptyCapabilityView();
+    view.rows = [
+      {
+        id: 'CAP-0001',
+        upstream: { name: 'run', surface: 'cli', source: 'codewhale --help', version: '0.10.2+ff466b2ed0bf' },
+        platform: 'windows-x64',
+        kind: 'read/write',
+        permissionImplications: 'shell access',
+        costImplications: 'model',
+        requiredArguments: 'see help',
+        integration: 'Advanced action',
+        uiLocation: 'Studio composer',
+        tests: ['packages/adapter/src/cli.test.ts'],
+        status: 'qualified',
+        gap: null,
+        evidence: { helpCapture: 'docs/evidence/engine/commands/run.txt', capturedAt: null, contractReport: null },
+      },
+    ];
+    view.coverage = {
+      ...view.coverage,
+      total: 1,
+      qualified: 1,
+      advancedAction: 1,
+      verifiedEntryPoints: 1,
+      completenessPercent: 100,
+    };
+    view.logs = {
+      status: 'ok',
+      note: null,
+      sources: [
+        {
+          dir: 'x:\\home\\logs',
+          files: [{ name: 'runtime.log', size: 24, modifiedAt: '2026-11-12T00:00:00.000Z' }],
+        },
+      ],
+    };
+    view.palette = [
+      {
+        id: 'capability:CAP-0001',
+        label: 'run — qualified',
+        hint: 'cli · Studio composer',
+        status: 'qualified',
+        integration: 'Advanced action',
+      },
+    ];
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      capabilities: view,
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    await act(async () => {
+      (document.querySelector('[data-testid="nav-capabilities"]') as HTMLButtonElement).dispatchEvent(
+        new MouseEvent('click', { bubbles: true }),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="capability-coverage"]')?.textContent).toContain('1/1');
+    expect(document.querySelector('[data-testid="capability-CAP-0001"]')?.textContent).toContain('run');
+    expect(document.querySelector('[data-testid="terminal-reason"]')?.textContent).toContain('Unix-only');
+    await act(async () => {
+      exactButton('Check terminal route').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="terminal-check"]')?.textContent).toContain('501');
+    await act(async () => {
+      exactButton('Read').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="log-content"]')?.textContent).toContain('[redacted]');
+    await act(async () => {
+      window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.body.textContent).toContain('run — qualified');
+    expect(store.capabilityActions).toEqual(['terminal-check', 'log:runtime.log:0']);
     await act(async () => root.unmount());
   });
 

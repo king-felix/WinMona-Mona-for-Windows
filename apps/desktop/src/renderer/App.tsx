@@ -17,6 +17,7 @@ import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import { StudioPanel } from './StudioPanel.js';
 import { AgentsPanel } from './AgentsPanel.js';
 import { ExtensionsPanel } from './ExtensionsPanel.js';
+import { CapabilitiesPanel } from './CapabilitiesPanel.js';
 import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
@@ -31,6 +32,7 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { CapabilityExplorerView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
 
 type Theme = 'daybreak' | 'afterglow';
@@ -45,6 +47,7 @@ const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'agents', label: 'Agents', hint: 'Native goals, fleets, runs and child agents' },
   { id: 'extensions', label: 'Extensions', hint: 'MCP servers, skills, plugins, hooks and project rules' },
   { id: 'cost', label: 'Cost', hint: 'Recorded usage and spend' },
+  { id: 'capabilities', label: 'Capabilities', hint: 'Pinned-engine capability map, live flags, terminal and logs' },
   { id: 'settings', label: 'Settings', hint: 'Route, permission, appearance, diagnostics' },
 ];
 
@@ -127,6 +130,10 @@ export function App(): React.JSX.Element {
   const [focusToken, setFocusToken] = useState(0);
   const [briefing, setBriefing] = useState<BriefingView | null>(null);
   const [briefingError, setBriefingError] = useState<string | null>(null);
+  const [capabilities, setCapabilities] = useState<CapabilityExplorerView | null>(null);
+  const [capabilitiesError, setCapabilitiesError] = useState<string | null>(null);
+  const [capabilitiesLoading, setCapabilitiesLoading] = useState(false);
+  const [focusCapabilityId, setFocusCapabilityId] = useState<string | null>(null);
   const [attention, setAttention] = useState<AttentionView | null>(null);
   const [focusedEvidence, setFocusedEvidence] = useState<string | null>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -185,6 +192,25 @@ export function App(): React.JSX.Element {
       setBriefingError(result.error.message);
     }
   }, []);
+
+  const loadCapabilities = useCallback(async () => {
+    setCapabilitiesLoading(true);
+    try {
+      const result = await window.mona.capabilitiesGet();
+      if (result.ok) {
+        setCapabilities(result.data);
+        setCapabilitiesError(null);
+      } else {
+        setCapabilitiesError(result.error.message);
+      }
+    } finally {
+      setCapabilitiesLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadCapabilities();
+  }, [loadCapabilities, engine?.state]);
 
   const activateProject = useCallback(
     async (project: CatalogProject, persistDraftFor: { projectId: string; sessionId: string; text: string } | null) => {
@@ -622,7 +648,7 @@ export function App(): React.JSX.Element {
     }
   }, []);
 
-  // Keyboard flow: Alt+1…7 for sections, Ctrl+Shift+F for Focus Mode,
+  // Keyboard flow: Alt+1…8 for sections, Ctrl+Shift+F for Focus Mode,
   // Ctrl+Shift+N for a new session, Ctrl+/ for the shortcut list. Interrupting
   // work stays a deliberate click on the execution controls.
   useEffect(() => {
@@ -636,7 +662,8 @@ export function App(): React.JSX.Element {
           '4': 'agents',
           '5': 'extensions',
           '6': 'cost',
-          '7': 'settings',
+          '7': 'capabilities',
+          '8': 'settings',
         };
         const target = targets[event.key];
         if (target) {
@@ -681,6 +708,7 @@ export function App(): React.JSX.Element {
       { id: 'action:agents', label: 'Go to Agents observatory', group: 'Navigate' },
       { id: 'action:extensions', label: 'Go to Extensions', group: 'Navigate' },
       { id: 'action:cost', label: 'Go to Cost lens', group: 'Navigate' },
+      { id: 'action:capabilities', label: 'Go to Capabilities', group: 'Navigate' },
       { id: 'action:settings', label: 'Go to Settings', group: 'Navigate' },
       {
         id: 'action:toggle-theme',
@@ -725,8 +753,16 @@ export function App(): React.JSX.Element {
         group: 'Projects',
       });
     }
+    for (const capability of capabilities?.palette ?? []) {
+      items.push({
+        id: capability.id,
+        label: capability.label,
+        hint: capability.hint,
+        group: 'Engine capabilities',
+      });
+    }
     return items;
-  }, [engine?.state, focusMode, projects, selected, theme]);
+  }, [capabilities, engine?.state, focusMode, projects, selected, theme]);
 
   const runPaletteAction = useCallback(
     (id: string) => {
@@ -740,6 +776,11 @@ export function App(): React.JSX.Element {
           );
         return;
       }
+      if (id.startsWith('capability:')) {
+        setFocusCapabilityId(id.slice('capability:'.length));
+        void changeScreen('capabilities');
+        return;
+      }
       switch (id) {
         case 'action:open-folder':
           void openFolder();
@@ -751,7 +792,9 @@ export function App(): React.JSX.Element {
         case 'action:studio':
         case 'action:work':
         case 'action:agents':
+        case 'action:extensions':
         case 'action:cost':
+        case 'action:capabilities':
         case 'action:settings': {
           const target = id.slice('action:'.length) as ProjectView;
           void changeScreen(target);
@@ -1168,6 +1211,14 @@ export function App(): React.JSX.Element {
                 <ExtensionsPanel project={selected} />
               ) : screen === 'cost' ? (
                 <CostView info={info} project={selected} spend={spend} />
+              ) : screen === 'capabilities' ? (
+                <CapabilitiesPanel
+                  view={capabilities}
+                  error={capabilitiesError}
+                  loading={capabilitiesLoading}
+                  focusId={focusCapabilityId}
+                  onRefresh={loadCapabilities}
+                />
               ) : (
                 <SettingsView
                   info={info}
@@ -1456,7 +1507,7 @@ export function App(): React.JSX.Element {
             <kbd>Ctrl</kbd>+<kbd>K</kbd> command palette
           </li>
           <li>
-            <kbd>Alt</kbd>+<kbd>1…7</kbd> Home, Studio, Work, Agents, Extensions, Cost, Settings
+            <kbd>Alt</kbd>+<kbd>1…8</kbd> Home, Studio, Work, Agents, Extensions, Cost, Capabilities, Settings
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> toggle Focus Mode

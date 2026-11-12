@@ -19,6 +19,7 @@ import {
 } from '@mona/contracts';
 import { assessCompatibility, type DiscoveryContext, type EngineDiscovery } from './compatibility.js';
 import { EngineConfiguration } from './configuration.js';
+import { EngineDiagnostics } from './diagnostics.js';
 import { EngineExtensions } from './extensions.js';
 import { fail, isAbortError, ok, type AdapterFailure, type Result } from './errors.js';
 import type { RuntimeTransport } from './http.js';
@@ -182,6 +183,10 @@ export class EngineAdapter {
 
   extensions(): EngineExtensions {
     return new EngineExtensions(this.transport, () => new Date(this.now()));
+  }
+
+  diagnostics(): EngineDiagnostics {
+    return new EngineDiagnostics(this.transport, () => new Date(this.now()));
   }
 
   async discover(): Promise<Result<EngineDiscovery>> {

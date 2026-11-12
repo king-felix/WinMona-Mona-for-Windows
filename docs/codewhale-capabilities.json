@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_utc": "2026-11-12T15:18:59.941Z",
+  "captured_utc": "2026-11-12T15:31:38.050Z",
   "engine": {
     "product": "Codewhale",
     "version": "0.10.2",
@@ -47,15 +47,17 @@
       "notes": "Qualified as a one-shot benchmark/diagnostic path only. It emits per-request usage and wire tool-schema evidence."
     }
   ],
-  "inventory_scope": "Top-level CLI commands with captured help, the runtime route table extracted from the installed binary, effective configuration, transports, and the extension surfaces read or exercised at P17 (MCP, skills, plugins, hooks, workspace instructions). Remaining subcommand and terminal deep-dive stays P18.",
+  "inventory_scope": "Top-level CLI commands with captured help, the runtime route table extracted from the installed binary, effective configuration, transports, extension surfaces (P17), and the capability-explorer inputs (P18: runtime info, process, logs, terminal). The explorer reports every row with its own status; unsupported rows stay visible.",
   "coverage_notes": {
     "upstream_overlap": "This build already ships a browser client (`codewhale web`, `codewhale rc`) and a runtime server (`serve`, `app-server`). Per spec section 2.3, reassess upstream desktop progress at G0 and before release instead of duplicating it blindly.",
-    "rows": 52,
+    "rows": 56,
     "qualified": 5,
-    "read_qualified": 17,
+    "read_qualified": 20,
     "discovered": 27,
     "unavailable_by_choice": 3,
-    "note": "qualified = exercised against the live 0.10.2 binary; read-qualified = read path exercised without mutation; discovered = help captured only; unavailable-by-choice = intentionally not surfaced in 1.0."
+    "note": "qualified = exercised against the live 0.10.2 binary; read-qualified = read path exercised without mutation; discovered = help captured only; unavailable-by-choice = intentionally not surfaced in 1.0; unavailable-on-platform = the pinned build does not implement it on Windows.",
+    "unavailable_on_platform": 1,
+    "unknown": 0
   },
   "rows": [
     {
@@ -1373,6 +1375,126 @@
       "ui_location": "Extensions → MCP servers",
       "status": "qualified",
       "gap": "List, detail, explicit health check, enable and disable were exercised with If-Match revisions. Stale edits return conflict; unknown top-level and server-level keys survived an edit; env values are never returned, only key names. Project-scope servers stay hidden until engine trust. Add/remove/login remain CLI advanced actions."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+      "tests": [
+        "packages/adapter/src/diagnostics.test.ts",
+        "apps/desktop/src/main/capability-service.test.ts",
+        "apps/desktop/src/main/capability-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p18-capabilities.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:31:38.050Z",
+        "contract_report": "docs/evidence/P18-capabilities.json"
+      },
+      "id": "CAP-0053",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "terminal (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/terminal/{name}/output; POST /v1/terminal/{name}/input|resize|kill"
+      },
+      "class": "read/write",
+      "chosen_integration": "Unavailable",
+      "ui_location": "Capabilities → Integrated terminal",
+      "status": "unavailable-on-platform",
+      "gap": "The runtime reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. A direct route check returned HTTP 501: \"terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet\". Mona shows the exact limitation and does not fake a PTY. A native Windows PTY path is a release blocker for MONA-023/terminal."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+      "tests": [
+        "packages/adapter/src/diagnostics.test.ts",
+        "apps/desktop/src/main/capability-service.test.ts",
+        "apps/desktop/src/main/capability-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p18-capabilities.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:31:38.050Z",
+        "contract_report": "docs/evidence/P18-capabilities.json"
+      },
+      "id": "CAP-0054",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "logs (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/logs; GET /v1/logs/{name}?offset&limit"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Capabilities → Engine logs",
+      "status": "read-qualified",
+      "gap": "Read-only. Mona lists log sources, reads at most 64 KiB per request, paginates with offset, rejects path-like names and redacts credential-shaped values. No log is writable from the renderer."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+      "tests": [
+        "packages/adapter/src/diagnostics.test.ts",
+        "apps/desktop/src/main/capability-service.test.ts",
+        "apps/desktop/src/main/capability-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p18-capabilities.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:31:38.050Z",
+        "contract_report": "docs/evidence/P18-capabilities.json"
+      },
+      "id": "CAP-0055",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "process (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/process"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Capabilities → identity",
+      "status": "read-qualified",
+      "gap": "Reports pid, version, commit, start time, uptime and executable for the owned runtime. Read-only."
+    },
+    {
+      "platform": "windows-x64",
+      "cost_implications": "none",
+      "required_arguments": "see route contract",
+      "permission_implications": "Uses the authenticated loopback runtime token; logs are redacted and bounded by Mona.",
+      "tests": [
+        "packages/adapter/src/diagnostics.test.ts",
+        "apps/desktop/src/main/capability-service.test.ts",
+        "apps/desktop/src/main/capability-ipc.test.ts",
+        "apps/desktop/src/renderer/App.test.tsx",
+        "tools/spike/p18-capabilities.mjs"
+      ],
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T15:31:38.050Z",
+        "contract_report": "docs/evidence/P18-capabilities.json"
+      },
+      "id": "CAP-0056",
+      "upstream": {
+        "version": "0.10.2+ff466b2ed0bf",
+        "name": "runtime info (runtime)",
+        "surface": "runtime-api",
+        "source": "GET /v1/runtime/info"
+      },
+      "class": "read",
+      "chosen_integration": "Native view",
+      "ui_location": "Capabilities → identity and live flags",
+      "status": "read-qualified",
+      "gap": "Reports runtime API version, engine version/commit, bind host/port, auth requirement and the capability-flag map. Mona compares the live version/commit with the ledger and reports drift; it does not inherit ledger claims across a version change."
     }
   ],
   "runtime_api": {
