@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 47,
+  "revision": 77,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -720,12 +720,12 @@
           "status": "partial",
           "evidence": [
             {
-              "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "path": "docs/evidence/P02-smoke.json",
+              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:03Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "Daybreak tokens implemented in the renderer; full design system and contrast validation are P06"
+              "recorded_utc": "2026-11-12T01:41:17Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "Daybreak tokens rendered in the live Electron window; full design system, density and contrast audit are P06"
             }
           ]
         },
@@ -736,11 +736,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "sha256": "ec6d54ab609eccf0867a94a0beb451862fc346ded57ef454f2f384e812d0638f",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "Afterglow tokens implemented; equal accessibility testing is P06"
+              "recorded_utc": "2026-11-12T01:41:48Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "Afterglow tokens implemented and unit-tested; live equal-accessibility testing is P06"
             }
           ]
         },
@@ -751,11 +751,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "sha256": "ec6d54ab609eccf0867a94a0beb451862fc346ded57ef454f2f384e812d0638f",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "semantic nav, aria-current, aria-live, focus-visible, system typography; screen-reader and 200% QA are P06/P22"
+              "recorded_utc": "2026-11-12T01:41:48Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "semantic nav, aria-current, aria-live, focus-visible, system typography verified live and in DOM tests; screen-reader and 200% QA are P06/P22"
             }
           ]
         },
@@ -766,10 +766,10 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "sha256": "ec6d54ab609eccf0867a94a0beb451862fc346ded57ef454f2f384e812d0638f",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "recorded_utc": "2026-11-12T01:41:49Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "reduced-motion media query and compact density foundation; full density modes are P06"
             }
           ]
@@ -1629,12 +1629,12 @@
           "status": "passed",
           "evidence": [
             {
-              "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "path": "docs/evidence/P02-smoke.json",
+              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "sandbox, context isolation, Node disabled, webview disabled, devtools prod off; unit-tested, Electron launch blocked by P02-ELECTRON-BINARY"
+              "recorded_utc": "2026-11-12T01:41:18Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "live Electron 45.3.0 window: sandboxed renderer, no Node globals, one frozen preload key, devtools closed"
             }
           ]
         },
@@ -1644,12 +1644,12 @@
           "status": "passed",
           "evidence": [
             {
-              "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "path": "docs/evidence/P02-smoke.json",
+              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "one frozen preload method, one channel, sender and payload validation, typed errors"
+              "recorded_utc": "2026-11-12T01:41:18Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "live bridge exposes exactly getAppInfo and is frozen; sender and payload validation covered by unit tests"
             }
           ]
         },
@@ -1660,11 +1660,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "sha256": "ec6d54ab609eccf0867a94a0beb451862fc346ded57ef454f2f384e812d0638f",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:04Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "runtime bearer token handling qualified at P01; desktop adapter integration is P03"
+              "recorded_utc": "2026-11-12T01:41:49Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "runtime bearer token handling qualified at P01 and wrapped by the P03 adapter; desktop wiring lands with P04/P07"
             }
           ]
         },
@@ -1675,11 +1675,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-build.txt",
-              "sha256": "22f7cdacb535c69718913b4436803de8c445c80367efc81b49101b4d12190835",
+              "sha256": "194e7839ef801372eeda9bc55491a1d8dc665cb3877bed98ddfaae24fa0a8aee",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:05Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "built renderer scanned for credentials, fixtures and remote origins; diagnostics redaction is P19"
+              "recorded_utc": "2026-11-12T01:41:22Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "built renderer scanned for credential material, fixtures and remote origins; diagnostics redaction is P19"
             }
           ]
         },
@@ -1689,12 +1689,12 @@
           "status": "passed",
           "evidence": [
             {
-              "path": "docs/evidence/P02-foundation.md",
-              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "path": "docs/evidence/P02-smoke.json",
+              "sha256": "d0a0e8854c3b5cfc5b4388e263d441e19db3eafed700d9be8735d93a12421755",
               "kind": "document",
-              "recorded_utc": "2026-11-12T01:16:05Z",
-              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
-              "note": "CSP injected and checked, navigation/window-open/webview denied, permissions denied at code level"
+              "recorded_utc": "2026-11-12T01:41:18Z",
+              "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
+              "note": "live remote navigation and window.open refused, window count 1, CSP header and meta present, permissions denied"
             }
           ]
         }

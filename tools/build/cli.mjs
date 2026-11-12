@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 // Mona bootstrap build utility (P00).
 //
 // Commands:
@@ -368,7 +368,9 @@ function validateAll(root, { verbose = false } = {}) {
   if (notInLedger.length) add(`proposal requirements missing from ledger: ${notInLedger.join(', ')}`);
   const notInSpec = reqIds.filter((id) => !inSpec.includes(id));
   if (notInSpec.length) add(`ledger requirements absent from Mona_Project.md: ${notInSpec.join(', ')}`);
-  const promptSections = [...promptText.matchAll(/^### (P\d{2}) —/gm)].map((m) => m[1]);
+  // ASCII-only on purpose: the heading separator is an em dash, and depending on
+  // that byte sequence makes the check fragile across encodings.
+  const promptSections = [...promptText.matchAll(/^### (P\d{2})(?=\s)/gm)].map((m) => m[1]);
   const missingSections = expectedPrompts.filter((id) => !promptSections.includes(id));
   if (missingSections.length) add(`prompt sections missing from Mona_PROMPTS.md: ${missingSections.join(', ')}`);
 
@@ -621,6 +623,9 @@ function cmdCheckpoint(root, flags) {
     const task = next.tasks[prompt];
     task.status = status;
     for (const step of flags['completed-step'] ?? []) task.completed_steps.push(step);
+    // A step recorded as remaining can later be finished. Clearing is explicit so
+    // the ledger never silently loses an open item.
+    if (flags['clear-remaining-steps'] === true) task.remaining_steps = [];
     for (const step of flags['remaining-step'] ?? []) task.remaining_steps.push(step);
     for (const id of flags.blocker ?? []) if (!task.blocker_ids.includes(id)) task.blocker_ids.push(id);
     for (const p of flags.evidence ?? []) {
@@ -788,6 +793,17 @@ function cmdEvidence(root, flags) {
       commit: flags.commit ?? git(root, ['rev-parse', 'HEAD']),
     };
     if (flags.note) ref.note = String(flags.note);
+    // An artifact that was edited after being recorded leaves a stale reference
+    // behind on every criterion that cited it. Pruning is explicit and only
+    // drops references whose file is missing or whose digest no longer matches.
+    if (flags['prune-stale'] === true) {
+      for (const criterion of req.criteria) {
+        criterion.evidence = criterion.evidence.filter((entry) => {
+          const candidate = abs(root, entry.path);
+          return fs.existsSync(candidate) && entry.sha256 === sha256File(candidate);
+        });
+      }
+    }
     crit.evidence = crit.evidence.filter((e) => e.path !== ref.path);
     crit.evidence.push(ref);
     if (flags.status) crit.status = String(flags.status);
@@ -845,11 +861,11 @@ usage: node tools/build/cli.mjs <command> [--root DIR]
   init         create .mona/build/state.json from docs/requirements.json [--force]
   validate     schema/semantic validation [--verbose] [--json]
   checkpoint   --prompt P00 --status completed --expected-revision N
-               [--completed-step s]... [--remaining-step s]... [--evidence path]...
+               [--completed-step s]... [--remaining-step s]... [--clear-remaining-steps] [--evidence path]...
                [--blocker ISSUE-0001]... [--current-prompt P01] [--verified-commit SHA]
   recover      promote a complete interrupted write or restore a verified backup
   evidence     --requirement MONA-001 --criterion identity --path docs/evidence/x.md
-               [--status passed] [--note text] [--expected-revision N]
+               [--status passed] [--note text] [--expected-revision N] [--prune-stale]
   status       compact state summary`);
   return EXIT.usage;
 }
@@ -894,3 +910,4 @@ try {
   code = EXIT.io;
 }
 process.exitCode = code;
+

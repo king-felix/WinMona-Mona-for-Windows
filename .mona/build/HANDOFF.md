@@ -1,11 +1,39 @@
 # Mona build handoff
 
 **Current prompt:** P04 — Own runtime processes and stopping behavior correctly
-**Current status:** P01, P02 (with one unverified runtime check), and P03
-completed. State revision 7. Next eligible: P04, P05, P06.
+**Current status:** P01, P02 (now verified end to end, including the real Electron
+window), and P03 completed. State revision 9. Next eligible: P04, P05, P06.
 
-**Last verified commit / dirty work:** P03 work is in this session's local
-commit (see `git log`); working tree is clean after it.
+**Last verified commit / dirty work:** this session's commit covers the P02
+runtime verification, the blocker resolution, and two bootstrap-CLI additions;
+working tree is clean after it.
+
+## P02 runtime verification — the blocker is gone
+
+P02-ELECTRON-BINARY was a **transient resolver failure**, not a network policy.
+On retry, `github.com`, `api.github.com`, and `objects.githubusercontent.com`
+resolved and served HTTP 200, `node node_modules/electron/install.js` installed
+Electron 45.3.0, and the smoke test passed. No firewall, proxy, hosts-file, DNS,
+or registry setting was changed.
+
+The smoke test now proves behaviour, not rendering only:
+
+- real window renders `Mona`, version `v0.1.0`, Projects/Work/Cost/Settings,
+  `Engine not connected`, Daybreak theme, no fixture marker;
+- bridge has exactly one frozen key (`getAppInfo`), no `require`/`process`/
+  `ipcRenderer` globals;
+- live `location.assign('https://example.com/')` refused (URL unchanged);
+- live `window.open('https://example.com/')` returned null, window count 1;
+- DevTools closed; footprint **~323–330 MB** working set, one renderer.
+
+Evidence: `docs/evidence/P02-smoke.json`, `P02-smoke-log.txt`,
+`P02-foundation.md`. `BLOCKERS.md` now has no open entry; the three no-progress
+attempts remain in `attempts.jsonl` with a closing row (D-0025).
+
+Two bootstrap-CLI additions this session: `--clear-remaining-steps` (finish a
+previously recorded remaining step) and `evidence --prune-stale` (drop evidence
+references whose digest no longer matches). Both are covered by
+`tests/bootstrap` (13/13).
 
 ## P03 result — the adapter is real now
 
@@ -51,10 +79,10 @@ workspaces until the lease is proven.
 
 ## Open problem IDs and no-progress counts
 
-- **P02-ELECTRON-BINARY** — 3 no-progress attempts; exact help in `BLOCKERS.md`.
-  Desktop runtime launch and process footprint remain unverified.
-- **P01-ISSUE-001** — exec vs runtime endpoint fingerprint drift. P03 reports
-  the runtime fingerprint; P16 resolves.
+No open blocker. `attempts.jsonl` holds only the closed P02-ELECTRON-BINARY rows.
+
+- **P01-ISSUE-001** — exec vs runtime endpoint fingerprint drift. P03 reports the
+  runtime fingerprint; P16 resolves.
 - **P01-ISSUE-002** — Windows allows a second runtime in one workspace.
   Serialized execution remains the default until P04 owns a lease.
 - **P01-ISSUE-003** — terminal capability flags false; P18.
@@ -62,21 +90,20 @@ workspaces until the lease is proven.
 
 ## Blocked dependencies
 
-- Electron runtime: P02-ELECTRON-BINARY. Does not block P04/P05/P06.
-- No adapter blocker. `attempts.jsonl` has only the three Electron entries.
+None. The only prerequisite that was blocking (Electron runtime) is resolved and
+evidenced.
 
 ## Last relevant validation
 
-- `npm test` → 73 Vitest + 11 bootstrap + 8 spike = 92 pass.
+- `npm test` → 73 Vitest + 13 bootstrap + 8 spike = 94 pass.
 - `npm run typecheck`, `npm run lint`, `npm run format:check` → pass.
 - `npm run build` → contracts, adapter, desktop; renderer checks pass.
-- `node tools/build/cli.mjs validate --verbose` → OK, state r7.
-- Live smoke spend **$0.003543**; cumulative P01/P03 recorded spend still well
-  under the $2 pilot ceiling.
+- `npm run smoke -w @mona/desktop` → pass with the live security assertions.
+- `node tools/build/cli.mjs validate --verbose` → OK, state r9.
+- Spend so far ≈ $0.05 of the $2 pilot ceiling.
 
 ## Human input needed
 
-Electron binary for the desktop smoke: allow GitHub/objects.githubusercontent.com
-egress, provide a reachable `ELECTRON_MIRROR`, or seed
-`%LOCALAPPDATA%\electron\Cache` with `electron-v45.3.0-win32-x64.zip`, then
-`node node_modules/electron/install.js` and `npm run smoke -w @mona/desktop`.
+None. One caution for the next session: edit source with byte-safe tools, not
+PowerShell `Get-Content`/`Set-Content` round-trips — one such round-trip
+double-encoded four files and broke the prompt-heading validator (D-0027).

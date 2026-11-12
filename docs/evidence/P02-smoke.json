@@ -1,0 +1,69 @@
+{
+  "ok": true,
+  "appVersion": "0.1.0",
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "arch": "x64",
+  "dom": {
+    "title": "Mona",
+    "version": "v0.1.0",
+    "nav": [
+      "Projects",
+      "Work",
+      "Cost",
+      "Settings"
+    ],
+    "engine": "Engine not connected",
+    "theme": "daybreak",
+    "hasFixtureMarker": false
+  },
+  "bridge": {
+    "keys": [
+      "getAppInfo"
+    ],
+    "frozen": true,
+    "hasNodeRequire": false,
+    "hasProcess": false,
+    "hasIpcRenderer": false
+  },
+  "security": {
+    "remoteNavigationAttempted": "https://example.com/",
+    "urlAfterNavigation": "file:///X:/AI_projects/Mona/apps/desktop/dist/renderer/index.html",
+    "navigationRefused": true,
+    "popupAttempted": "https://example.com/",
+    "popupRefused": true,
+    "windowCount": 1,
+    "devToolsAllowed": false
+  },
+  "metrics": [
+    {
+      "type": "Browser",
+      "pid": 31428,
+      "workingSetSizeKb": 106636,
+      "peakWorkingSetSizeKb": 107144
+    },
+    {
+      "type": "GPU",
+      "pid": 34392,
+      "workingSetSizeKb": 93404,
+      "peakWorkingSetSizeKb": 93964
+    },
+    {
+      "type": "Utility",
+      "pid": 35756,
+      "workingSetSizeKb": 51772,
+      "peakWorkingSetSizeKb": 51772
+    },
+    {
+      "type": "Tab",
+      "pid": 23300,
+      "workingSetSizeKb": 79008,
+      "peakWorkingSetSizeKb": 79356
+    }
+  ],
+  "rendererProcessCount": 1,
+  "totalWorkingSetMb": 323,
+  "capturedAt": "2026-11-12T01:41:03.692Z"
+}

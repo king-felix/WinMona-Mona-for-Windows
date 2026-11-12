@@ -251,3 +251,73 @@ test('checkpoint refuses evidence paths that do not exist', () => {
   assert.match(r.err, /does not exist/);
   assert.equal(readState(root).revision, 1);
 });
+
+test('a recorded remaining step can be explicitly cleared when it is finished', () => {
+  const root = sandbox();
+  const first = cli(root, [
+    'checkpoint',
+    '--prompt',
+    'P00',
+    '--status',
+    'completed',
+    '--expected-revision',
+    '1',
+    '--remaining-step',
+    'run the runtime smoke test',
+  ]);
+  assert.equal(first.code, 0, first.err);
+  assert.deepEqual(readState(root).tasks.P00.remaining_steps, ['run the runtime smoke test']);
+
+  const second = cli(root, [
+    'checkpoint',
+    '--prompt',
+    'P00',
+    '--status',
+    'completed',
+    '--expected-revision',
+    '2',
+    '--clear-remaining-steps',
+    '--completed-step',
+    'runtime smoke test passed',
+    '--current-prompt',
+    'P01',
+  ]);
+  assert.equal(second.code, 0, second.err);
+  const state = readState(root);
+  assert.deepEqual(state.tasks.P00.remaining_steps, []);
+  assert.equal(state.tasks.P00.completed_steps.at(-1), 'runtime smoke test passed');
+  assert.equal(state.current_prompt, 'P01');
+});
+
+test('evidence can prune stale references left on sibling criteria', () => {
+  const root = sandbox();
+  const ledgerPath = path.join(root, 'docs', 'requirements.json');
+  const ledger = readLedger(root);
+  const req = ledger.requirements.find((x) => x.id === 'MONA-001');
+  req.criteria[1].evidence = [
+    {
+      path: 'docs/requirements.json',
+      sha256: 'f'.repeat(64),
+      kind: 'document',
+      recorded_utc: '2026-01-01T00:00:00Z',
+      commit: null,
+    },
+  ];
+  writeJson(ledgerPath, ledger);
+
+  const r = cli(root, [
+    'evidence',
+    '--requirement',
+    'MONA-001',
+    '--criterion',
+    'identity',
+    '--path',
+    'docs/requirements.json',
+    '--status',
+    'passed',
+    '--prune-stale',
+  ]);
+  assert.equal(r.code, 0, r.err);
+  const after = readLedger(root).requirements.find((x) => x.id === 'MONA-001');
+  assert.deepEqual(after.criteria[1].evidence, []);
+});

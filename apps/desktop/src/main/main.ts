@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
+﻿import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +13,10 @@ const isDev = Boolean(devServerUrl);
 const smokeTest = process.argv.includes('--smoke-test');
 const smokeOut = process.env.MONA_SMOKE_OUT ?? path.join(process.cwd(), 'mona-smoke.json');
 const trustOptions = { indexPath: rendererIndex, ...(devServerUrl ? { devServerUrl } : {}) };
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -103,8 +107,19 @@ type SmokeResult = {
   platform: string;
   arch: string;
   dom: unknown;
+  bridge: unknown;
+  security: {
+    remoteNavigationAttempted: string;
+    urlAfterNavigation: string;
+    navigationRefused: boolean;
+    popupAttempted: string;
+    popupRefused: boolean;
+    windowCount: number;
+    devToolsAllowed: boolean;
+  };
   metrics: Array<{ type: string; pid: number; workingSetSizeKb: number; peakWorkingSetSizeKb: number }>;
   rendererProcessCount: number;
+  totalWorkingSetMb: number;
   capturedAt: string;
 };
 
@@ -125,6 +140,38 @@ async function runSmoke(window: BrowserWindow, outputPath: string): Promise<void
     })`,
     true,
   );
+
+  // The renderer-facing bridge must be a frozen single method.
+  const bridge = await window.webContents.executeJavaScript(
+    `({
+      keys: Object.keys(window.mona ?? {}),
+      frozen: Object.isFrozen(window.mona),
+      hasNodeRequire: typeof window.require !== 'undefined',
+      hasProcess: typeof window.process !== 'undefined',
+      hasIpcRenderer: typeof window.ipcRenderer !== 'undefined'
+    })`,
+    true,
+  );
+
+  // Live security behaviour: these must be refused by the main process, not by
+  // the renderer's own good manners.
+  const urlBefore = window.webContents.getURL();
+  await window.webContents
+    .executeJavaScript(
+      `(() => { try { window.location.assign('https://example.com/'); return 'assigned'; } catch (error) { return 'threw:' + error.name; } })()`,
+      true,
+    )
+    .catch((error: unknown) => `execute-failed:${String(error)}`);
+  await delay(1200);
+  const urlAfter = window.webContents.getURL();
+  const popupResult = await window.webContents
+    .executeJavaScript(
+      `(() => { try { const handle = window.open('https://example.com/', '_blank'); return handle === null ? 'null-returned' : 'window-created'; } catch (error) { return 'threw:' + error.name; } })()`,
+      true,
+    )
+    .catch((error: unknown) => `execute-failed:${String(error)}`);
+  await delay(600);
+
   const metrics = app.getAppMetrics().map((metric) => ({
     type: metric.type,
     pid: metric.pid,
@@ -140,8 +187,19 @@ async function runSmoke(window: BrowserWindow, outputPath: string): Promise<void
     platform: process.platform,
     arch: process.arch,
     dom,
+    bridge,
+    security: {
+      remoteNavigationAttempted: 'https://example.com/',
+      urlAfterNavigation: urlAfter,
+      navigationRefused: urlAfter === urlBefore,
+      popupAttempted: 'https://example.com/',
+      popupRefused: popupResult === 'null-returned',
+      windowCount: BrowserWindow.getAllWindows().length,
+      devToolsAllowed: window.webContents.isDevToolsOpened(),
+    },
     metrics,
     rendererProcessCount: metrics.filter((metric) => metric.type === 'Tab').length,
+    totalWorkingSetMb: Math.round(metrics.reduce((sum, metric) => sum + metric.workingSetSizeKb, 0) / 1024),
     capturedAt: new Date().toISOString(),
   };
   fs.mkdirSync(path.dirname(path.resolve(outputPath)), { recursive: true });

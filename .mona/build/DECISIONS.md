@@ -283,3 +283,55 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Evidence:** `packages/adapter/src/mapping.ts`, P01 cost formula checks.
 - **Constrains:** P12's ledger stores buckets plus source/provenance, not a bare
   total.
+
+## D-0025 — External blockers record resolution; counters are closed by evidence
+
+- **Decision:** when a recorded blocker's prerequisite appears, retry the
+  blocked action, append a closing attempt row with `material_progress: true`
+  and `resolution: prerequisite_obtained`, and move the blocker to `Resolved`.
+  The original no-progress rows stay in `attempts.jsonl`.
+- **Why:** P02-ELECTRON-BINARY turned out to be a transient failure of the local
+  resolver, not a network policy. The honest record is "three attempts made no
+  progress, a fourth obtained the prerequisite", not "the blocker never existed".
+- **Evidence:** `.mona/build/attempts.jsonl` (4 rows),
+  `docs/evidence/P02-smoke.json`, `BLOCKERS.md` Resolved section.
+- **Constrains:** a resolved prerequisite does not retroactively justify prose
+  claims made while it was blocked; the earlier reports keep their original
+  blocker note in `P02-electron-blocker.txt`.
+
+## D-0026 — The window smoke proves security behaviour, not just rendering
+
+- **Decision:** `npm run smoke -w @mona/desktop` launches the production build
+  and additionally drives `location.assign('https://example.com/')` and
+  `window.open('https://example.com/')` inside the real renderer, asserting the
+  URL is unchanged, the popup returns null, the window count stays 1, DevTools
+  are closed, the preload exposes exactly one frozen key, and no Node or
+  `ipcRenderer` globals exist. Any failure exits non-zero.
+- **Why:** P02 acceptance requires remote navigation and privileged popups to be
+  refused. Reading `security.ts` is not evidence that the running app refuses
+  them.
+- **Evidence:** `apps/desktop/src/main/main.ts` (`runSmoke`),
+  `apps/desktop/scripts/smoke.mjs`, `docs/evidence/P02-smoke.json`.
+- **Constrains:** later prompts that add windows or IPC must extend this smoke
+  rather than replace it with a screenshot.
+
+## D-0027 — Source files are edited with byte-safe tools only
+
+- **Decision:** edit repository source with the file tools (or Node with explicit
+  `utf8`), never by round-tripping through PowerShell 5.1 `Get-Content` /
+  `Set-Content`, and never add a dependency on a non-ASCII byte sequence in a
+  validator. `tools/build/cli.mjs` now matches prompt headings with the
+  ASCII-only pattern `^### (P\d{2})(?=\s)`.
+- **Why:** a `Get-Content -Raw` / `Set-Content -Encoding utf8` round-trip
+  double-encoded four files during P02 verification (an em-dash regex literal,
+  the `héllo` test fixture, and the `package.json` description). The corrupted
+  regex silently stopped matching every prompt heading, so `validate` reported
+  all 24 prompt sections missing even though the document was untouched.
+- **Detection:** a repo-wide mojibake scan (`â€`, `Ã¢`, `ï¿½`) plus the fact that
+  `.gitattributes` stores bytes exactly, so an encoding change shows up as a
+  real diff.
+- **Evidence:** this session's diff; `node tools/build/cli.mjs validate` returns
+  OK at revision 9; `tests/bootstrap` 13/13.
+- **Constrains:** any future validator that parses the specification must be
+  ASCII-only or operate on parsed structures, so an encoding accident cannot
+  masquerade as a content failure.

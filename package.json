@@ -1,11 +1,11 @@
-﻿{
+{
   "name": "mona",
   "version": "0.0.0",
   "private": true,
-  "description": "Mona â€” a local desktop workbench for Codewhale. Bootstrap build tooling lives here until P02 creates apps/desktop.",
+  "description": "Mona — a local desktop workbench for Codewhale. Desktop app and shared contracts live in apps/desktop and packages/*; the bootstrap utility stays in tools/build.",
   "type": "module",
   "engines": {
-    "node": "\u003e=22"
+    "node": ">=22"
   },
   "workspaces": [
     "apps/*",
@@ -17,24 +17,24 @@
     "validate": "node tools/build/cli.mjs validate",
     "bootstrap:test": "node --test tests/bootstrap",
     "spike:test": "node --test tests/spike",
-    "test": "vitest run \u0026\u0026 npm run bootstrap:test \u0026\u0026 npm run spike:test",
-    "build": "npm run build -w @mona/contracts \u0026\u0026 npm run build -w @mona/adapter \u0026\u0026 npm run build -w @mona/desktop",
-    "typecheck": "npm run build -w @mona/contracts \u0026\u0026 npm run typecheck -w @mona/adapter \u0026\u0026 npm run typecheck -w @mona/desktop",
+    "test": "vitest run && npm run bootstrap:test && npm run spike:test",
+    "build": "npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/desktop",
+    "typecheck": "npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/desktop",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "ci": "npm run format:check \u0026\u0026 npm run lint \u0026\u0026 npm run typecheck \u0026\u0026 npm test \u0026\u0026 npm run build",
+    "ci": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
     "smoke": "npm run smoke -w @mona/desktop"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "26.6.6",
+    "ajv": "8.20.0",
     "eslint": "10.14.0",
+    "happy-dom": "21.0.4",
     "prettier": "3.10.0",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.2",
-    "vitest": "5.1.0",
-    "happy-dom": "21.0.4",
-    "ajv": "8.20.0"
+    "vitest": "5.1.0"
   }
 }

@@ -576,12 +576,12 @@ describe('history, usage, interrupt, capabilities', () => {
 describe('SSE decoder', () => {
   it('handles UTF-8 split across chunks and CRLF frames', () => {
     const decoder = new SseDecoder(4096);
-    const bytes = new TextEncoder().encode('event: item.delta\r\ndata: {"delta":"hÃ©llo"}\r\n\r\n');
+    const bytes = new TextEncoder().encode('event: item.delta\r\ndata: {"delta":"héllo"}\r\n\r\n');
     const first = decoder.push(bytes.slice(0, 32)).frames;
     const second = decoder.push(bytes.slice(32)).frames;
     const frames = [...first, ...second];
     expect(frames).toHaveLength(1);
-    expect(JSON.parse(frames[0]!.data)).toEqual({ delta: 'hÃ©llo' });
+    expect(JSON.parse(frames[0]!.data)).toEqual({ delta: 'héllo' });
   });
 
   it('ignores comments and joins multi-line data', () => {

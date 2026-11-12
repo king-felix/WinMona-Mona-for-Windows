@@ -5,13 +5,38 @@ Captured 2026-11-12. Node 26.13.1, npm 11.20.0, Windows 11 x64.
 ## Status
 
 The desktop repository, security boundary, shared schemas, fixtures, renderer
-shell, tests, and production build are implemented and pass. **One acceptance
-item is blocked by the environment:** the Electron runtime binary cannot be
-downloaded (only `registry.npmjs.org` resolves; GitHub and every tested mirror
-return `ENOTFOUND`), so the real window launch and process-footprint measurement
-could not run. See `P02-electron-blocker.txt` and `BLOCKERS.md`
-(P02-ELECTRON-BINARY). Nothing in this report claims Electron runtime
-compatibility.
+shell, tests, production build, **and the real Electron window** are implemented
+and verified.
+
+The earlier Electron blocker was environmental and transient: at the time, the
+local resolver (`192.168.1.1`) returned `ENOTFOUND` for `github.com`,
+`objects.githubusercontent.com`, and three mirrors while `registry.npmjs.org`
+resolved. On retry the same names resolved normally, `install.js` downloaded
+Electron 45.3.0, and the smoke test passed. No firewall, proxy, hosts-file, or
+DNS setting was changed; the only installed artifact is the Electron runtime
+itself. `P02-electron-blocker.txt` keeps the original failure record, and
+`BLOCKERS.md` marks the prerequisite obtained.
+
+## Live window evidence (`P02-smoke.json`)
+
+Launched the production build (`electron . --smoke-test`, no dev server, no
+engine process, no network request from the window):
+
+- Title `Mona`, displayed version `v0.1.0` = `app.getVersion()`.
+- Placeholder navigation present: Projects, Work, Cost, Settings.
+- Engine state rendered honestly as `Engine not connected`.
+- Daybreak theme applied; no fixture marker in the DOM.
+- Bridge: exactly one key (`getAppInfo`), frozen; no `window.require`,
+  `window.process`, or `window.ipcRenderer`.
+- **Remote navigation refused live:** `location.assign('https://example.com/')`
+  left the URL at `file:///…/dist/renderer/index.html`.
+- **Remote popup refused live:** `window.open('https://example.com/')` returned
+  null; window count stayed 1.
+- DevTools closed in the production window.
+- Process footprint: Browser ~101–102 MB, GPU ~100 MB, Utility ~50 MB,
+  renderer ~78 MB; **total ~323–330 MB working set** across two runs, one
+  renderer process. Electron's memory is a local resource cost, not a token
+  cost.
 
 ## Stack and pinned versions
 
@@ -80,18 +105,19 @@ SQLite belongs to P05), one package manager (npm). The bootstrap/spike suites us
 
 ## Verification
 
-- `npm run typecheck` → pass (contracts build + main/preload/renderer/test programs).
+- `npm run typecheck` → pass (contracts build + adapter + main/preload/renderer/test programs).
 - `npm run lint` → pass.
 - `npm run format:check` → pass.
-- `npm test` → **38 Vitest** (contracts, IPC/security, renderer DOM) + **11
-  bootstrap** + **8 spike**, all pass.
+- `npm test` → **73 Vitest** (contracts, adapter, IPC/security, renderer DOM) +
+  **12 bootstrap** + **8 spike**, all pass.
 - `npm run build` → pass: tsc main, esbuild preload (327 B), Vite renderer.
 - `node apps/desktop/scripts/check-build.mjs` → pass: CSP replaced, no fixtures,
   no credentials, one preload channel, no remote origin, no engine route.
+- `npm run smoke -w @mona/desktop` → pass, including the live navigation,
+  popup, bridge, and devtools assertions; report in `P02-smoke.json`.
 - Bundle baseline: renderer JS **224.22 kB** (70.18 kB gzip), CSS **4.74 kB**,
   HTML 736 B, main 5.46 kB + 2.68 kB + 1.44 kB, preload 327 B.
-- `npm run smoke` → exits 3 with the explicit blocker message. No fake pass.
-- Process footprint: **not measured** (requires the Electron binary).
+- Process footprint: **~323–330 MB** total working set, one renderer process.
 
 ## Bugs found and fixed while verifying
 
@@ -103,6 +129,15 @@ SQLite belongs to P05), one package manager (npm). The bootstrap/spike suites us
   requirement status/evidence to pending before `init`, honouring D-0010.
 - The preload was emitted twice (tsc ESM and esbuild CJS); the authoritative
   `preload.cjs` remains and the stray emit was removed.
+- The smoke test initially asserted only rendering. It now also drives a remote
+  navigation and a `window.open` inside the real window and fails the run if
+  either is allowed, so the security section is proven by behaviour rather than
+  by code reading alone.
+- A PowerShell `Get-Content`/`Set-Content` round-trip double-encoded four files,
+  including the prompt-heading regex in `tools/build/cli.mjs`. `validate` then
+  reported all 24 prompt sections missing even though `Mona_PROMPTS.md` was
+  untouched. The literal is now ASCII-only (`^### (P\d{2})(?=\s)`) and D-0027
+  bans that editing path.
 
 ## Audit
 
