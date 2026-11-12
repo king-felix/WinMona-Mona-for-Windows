@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 112,
+  "revision": 120,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -687,9 +687,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:27Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "create/open/rename label/pin/archive/search fields and removal exist in the store; reveal and the catalog UI are P07"
+              "recorded_utc": "2026-11-12T02:23:00Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -702,9 +702,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:27Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "removing a catalog entry never deletes the folder; the marker and files survive removal in tests"
+              "recorded_utc": "2026-11-12T02:23:00Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -717,9 +717,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:28Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "alias/junction resolves to one project; a moved folder requires explicit rebind and keeps its project id; worktrees stay distinct with a shared repo key"
+              "recorded_utc": "2026-11-12T02:23:01Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         }
@@ -970,9 +970,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:27Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "versioned schema_migrations with checksums; 16 tables plus store_meta; foreign keys on; real app opens schema v1 (P05-state-open.json)"
+              "recorded_utc": "2026-11-12T02:23:00Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -993,9 +993,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:27Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "single BEGIN IMMEDIATE write path with full rollback; crash mid-transaction leaves valid state; verified backups keep a prior copy"
+              "recorded_utc": "2026-11-12T02:23:00Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -1060,7 +1060,7 @@
           ]
         }
       ],
-      "verified_commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+      "verified_commit": "ad74116",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1372,9 +1372,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:28Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "event cursors and submission intent share the single transactional write path; journal lookups are keyed by thread plus operation key"
+              "recorded_utc": "2026-11-12T02:23:01Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -1394,7 +1394,7 @@
           ]
         }
       ],
-      "verified_commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+      "verified_commit": "ad74116",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1696,9 +1696,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:28Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "verified snapshot via the SQLite backup API, digest and integrity checked, restore parks the prior database and never unlinks recovery files; writers quiesced"
+              "recorded_utc": "2026-11-12T02:23:01Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
@@ -1711,9 +1711,9 @@
               "path": "docs/evidence/P05-state.md",
               "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:28Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "immutable checksummed migrations; failed migration rolls back and keeps the prior version; pre-migration backup retained"
+              "recorded_utc": "2026-11-12T02:23:01Z",
+              "commit": "ad74116",
+              "note": "P05 evidence recorded at commit ad74116"
             }
           ]
         },
