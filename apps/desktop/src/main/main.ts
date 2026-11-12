@@ -54,6 +54,7 @@ import { runLaunchProbe } from './launch-probe.js';
 import { runShots } from './shots.js';
 import { runPolishProbe } from './polish-probe.js';
 import { runTerminalProbe, writeTerminalProbe } from './terminal-probe.js';
+import { runQaProbe } from './qa-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
@@ -105,6 +106,12 @@ const launchTest = process.env.MONA_LAUNCH_TEST === '1';
 const launchOut = process.env.MONA_LAUNCH_OUT ?? path.join(process.cwd(), 'mona-launch.json');
 const launchShots = process.env.MONA_LAUNCH_SHOTS ?? path.join(process.cwd(), 'mona-launch-shots');
 const launchFixturesFile = process.env.MONA_LAUNCH_FIXTURES ?? null;
+// P22 measurement run: real shell, real database, no engine work.
+const qaTest = process.env.MONA_QA === '1';
+const qaOut = process.env.MONA_QA_OUT ?? path.join(process.cwd(), 'mona-qa.json');
+const qaWorkspace = process.env.MONA_QA_WORKSPACE ?? null;
+const qaEvents = Number.parseInt(process.env.MONA_QA_EVENTS ?? '10000', 10);
+const qaIdleSeconds = Number.parseInt(process.env.MONA_QA_IDLE_SECONDS ?? '60', 10);
 const terminalTest = process.argv.includes('--terminal-test');
 const terminalOut = process.env.MONA_TERMINAL_OUT ?? path.join(process.cwd(), 'mona-terminal.json');
 const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
@@ -844,6 +851,80 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         profile: null,
         focusComposer: false,
       });
+    }
+
+    if (qaTest && qaWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runQaProbe({
+        window: probeWindow,
+        outputPath: qaOut,
+        workspace: qaWorkspace,
+        eventCount: Number.isFinite(qaEvents) ? qaEvents : 10000,
+        idleSeconds: Number.isFinite(qaIdleSeconds) ? qaIdleSeconds : 60,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        showStudio: (projectId) => {
+          catalogService?.select(projectId);
+          catalogService?.setView(projectId, 'studio');
+        },
+        reload: () => {
+          if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.reload();
+        },
+        sessionId: (projectId) => {
+          if (!uiStateStore) return null;
+          const state = uiStateStore.view();
+          const existing = state.projects[projectId]?.currentSessionId ?? null;
+          if (existing) return existing;
+          return uiStateStore.newSession(projectId).projects[projectId]?.currentSessionId ?? null;
+        },
+        emitItems: (projectId, count) => {
+          const target = mainWindow;
+          if (!target || target.isDestroyed()) return;
+          const at = new Date().toISOString();
+          for (let index = 0; index < count; index += 1) {
+            target.webContents.send(STUDIO_CHANNELS.event, {
+              type: 'item',
+              projectId,
+              item: {
+                id: `qa_load_${index}`,
+                seq: 900000 + index,
+                turnId: null,
+                kind: index % 7 === 0 ? 'tool' : index % 3 === 0 ? 'status' : 'assistant',
+                title: `Synthetic event ${index}`,
+                body: `Load-fixture body ${index}: this item exists to measure rendering and never claims a runtime result.`,
+                status: null,
+                truncated: false,
+                at,
+              },
+            });
+          }
+        },
+        database: () => (localState ? (localState.store.database as never) : null),
+        startRuntime: async (projectId) => {
+          if (!catalogService) return null;
+          const started = await catalogService.startEngine(projectId);
+          if (!started.ok) return null;
+          const summary = engineHost.summary();
+          return { pid: summary.pid ?? null };
+        },
+        stopRuntime: async () => {
+          await engineHost.stopOwned('qa_probe');
+        },
+      })
+        .then((result) => {
+          process.stdout.write(`mona-qa: ${result.ok ? 'ok' : 'failed'}\n`);
+        })
+        .catch((error) => {
+          fs.writeFileSync(qaOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+        })
+        .finally(() => {
+          setTimeout(() => app.exit(0), 500);
+        });
+      return;
     }
 
     if (launchTest && launchFixturesFile && launchDispatcher) {

@@ -16,9 +16,10 @@ const logFile = process.env.MONA_STUDIO_LOG ?? path.join(repoRoot, 'docs', 'evid
 const shotsDir = process.env.MONA_STUDIO_SHOTS ?? path.join(repoRoot, 'docs', 'evidence', 'shots-p08');
 await mkdir(path.dirname(out), { recursive: true });
 
+const packagedExe = process.env.MONA_STUDIO_EXE?.trim() || null;
 let electronPath;
 try {
-  electronPath = (await import('electron')).default;
+  electronPath = packagedExe ?? (await import('electron')).default;
 } catch (error) {
   console.error('Electron runtime is not installed:', String(error));
   process.exit(3);
@@ -34,8 +35,8 @@ const taskText =
 
 const workspace = await mkdtemp(path.join(tmpdir(), 'mona-p08-studio-'));
 const profile = await mkdtemp(path.join(tmpdir(), 'mona-p08-profile-'));
-const child = spawn(electronPath, ['.', '--studio-test'], {
-  cwd: appDir,
+const child = spawn(electronPath, packagedExe ? ['--studio-test'] : ['.', '--studio-test'], {
+  cwd: packagedExe ? repoRoot : appDir,
   env: {
     ...process.env,
     MONA_STUDIO_OUT: out,
