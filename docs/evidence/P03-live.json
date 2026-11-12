@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T01:26:42.793Z",
+  "engine_path": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+  "steps": [
+    {
+      "name": "owned runtime started with pinned identity",
+      "ok": true,
+      "detail": {
+        "version": "0.10.2",
+        "commit": "ff466b2ed0bf"
+      }
+    },
+    {
+      "name": "discover() returned a capability report",
+      "ok": true,
+      "detail": {
+        "status": "qualified",
+        "pinnedVersion": "0.10.2",
+        "pinnedCommit": "ff466b2ed0bf",
+        "observedVersion": "0.10.2",
+        "observedCommit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+        "runtimeApiVersion": "1.0",
+        "reasons": [],
+        "capabilityGaps": [
+          "terminalStream",
+          "terminalInput",
+          "terminalResize",
+          "terminalKill"
+        ]
+      }
+    },
+    {
+      "name": "createOrOpenThread() verified Full Access route",
+      "ok": true,
+      "detail": {
+        "threadId": "thr_1d90581faeb64d18a31a288331cc5f9e",
+        "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p03-live\\1794446802794",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "mode": "agent",
+        "permissionPosture": "full_access",
+        "allowShell": true,
+        "trustMode": true,
+        "autoApprove": true,
+        "observedAt": "2026-11-12T01:26:43.131Z"
+      }
+    },
+    {
+      "name": "submitTurn() accepted with a persisted intent",
+      "ok": true,
+      "detail": {
+        "submissionId": "sub_c5b0e5662add4a30a50ad5e77bbf14d8",
+        "operationKey": "p03-live-21898be2bbad4e9f8e80a3d4af0bf7af",
+        "threadId": "thr_1d90581faeb64d18a31a288331cc5f9e",
+        "turnId": "turn_5e09012bb68f46dd8b4b4574ee6baca1",
+        "state": "accepted",
+        "replayed": false,
+        "reconciliation": {
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "turn completed on the event stream",
+      "ok": true,
+      "detail": {
+        "result": "matched",
+        "frames": 15,
+        "last": "event"
+      }
+    },
+    {
+      "name": "readUsage() returned priced buckets",
+      "ok": true,
+      "detail": {
+        "buckets": {
+          "inputMissTokens": 11760,
+          "cacheHitTokens": 1152,
+          "outputTokens": 7,
+          "reasoningTokens": 0
+        },
+        "cost": {
+          "status": "known",
+          "usd": 0.003543312,
+          "source": "engine_priced",
+          "rateRevision": "provider_docs"
+        },
+        "complete": true,
+        "capturedAt": "2026-11-12T01:26:46.775Z",
+        "turnId": null
+      }
+    },
+    {
+      "name": "readHistory() projected engine-owned history",
+      "ok": true,
+      "detail": {
+        "messageCount": 2
+      }
+    },
+    {
+      "name": "same operation key reconciles instead of creating a second turn",
+      "ok": true,
+      "detail": {
+        "submissionId": "sub_c5b0e5662add4a30a50ad5e77bbf14d8",
+        "operationKey": "p03-live-21898be2bbad4e9f8e80a3d4af0bf7af",
+        "threadId": "thr_1d90581faeb64d18a31a288331cc5f9e",
+        "turnId": "turn_5e09012bb68f46dd8b4b4574ee6baca1",
+        "state": "completed",
+        "replayed": true,
+        "reconciliation": {
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "replayed journal is strictly increasing (no duplicate projection)",
+      "ok": true,
+      "detail": {
+        "seqs": [
+          1139,
+          1140,
+          1141,
+          1142,
+          1143,
+          1144,
+          1145,
+          1146,
+          1147,
+          1148,
+          1149,
+          1150
+        ],
+        "count": 16
+      }
+    },
+    {
+      "name": "interrupt candidate reached the tool stage",
+      "ok": true,
+      "detail": {
+        "submissionId": "sub_7e71cb75238d4e7bb6d844b0e18b7141",
+        "operationKey": "p03-int-7a77495b561b4cccacc44541d1fff075",
+        "threadId": "thr_7ba0b3068ab34b898aeb4cd3f3cb63eb",
+        "turnId": "turn_cf56c445bedd44239124bc4fb3d9bf85",
+        "state": "accepted",
+        "replayed": false,
+        "reconciliation": {
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "interrupt() acknowledged the exact turn",
+      "ok": true,
+      "detail": {
+        "threadId": "thr_7ba0b3068ab34b898aeb4cd3f3cb63eb",
+        "turnId": "turn_cf56c445bedd44239124bc4fb3d9bf85",
+        "acknowledgedStatus": "in_progress"
+      }
+    },
+    {
+      "name": "interrupted turn converged to a terminal state",
+      "ok": true,
+      "detail": {
+        "submissionId": "sub_7e71cb75238d4e7bb6d844b0e18b7141",
+        "operationKey": "p03-int-7a77495b561b4cccacc44541d1fff075",
+        "threadId": "thr_7ba0b3068ab34b898aeb4cd3f3cb63eb",
+        "turnId": "turn_cf56c445bedd44239124bc4fb3d9bf85",
+        "state": "interrupted",
+        "replayed": true,
+        "reconciliation": {
+          "required": false
+        }
+      }
+    },
+    {
+      "name": "live smoke stayed inside the P03 pilot budget",
+      "ok": true,
+      "detail": {
+        "usd": 0.003543312
+      }
+    }
+  ],
+  "spend": [
+    {
+      "buckets": {
+        "inputMissTokens": 11760,
+        "cacheHitTokens": 1152,
+        "outputTokens": 7,
+        "reasoningTokens": 0
+      },
+      "cost": {
+        "status": "known",
+        "usd": 0.003543312,
+        "source": "engine_priced",
+        "rateRevision": "provider_docs"
+      },
+      "complete": true,
+      "capturedAt": "2026-11-12T01:26:46.775Z",
+      "turnId": null
+    }
+  ],
+  "reconnects": [],
+  "events": {
+    "total": 65,
+    "kinds": {
+      "event:thread.started": 3,
+      "event:turn.started": 3,
+      "event:item.started": 7,
+      "event:item.completed": 6,
+      "event:turn.lifecycle": 3,
+      "event:turn.workspace_snapshot": 5,
+      "event:model.tools.snapshot": 5,
+      "event:item.delta": 24,
+      "event:turn.provider_request": 3,
+      "event:turn.usage": 3,
+      "event:turn.completed": 2,
+      "event:turn.artifacts": 1
+    }
+  },
+  "runtime": {
+    "runtimeId": "rt_19728_1794446803118",
+    "pid": 19728,
+    "baseUrl": "http://127.0.0.1:7903",
+    "identity": {
+      "product": "Codewhale",
+      "version": "0.10.2",
+      "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+      "runtimeApiVersion": "1.0",
+      "baseUrl": "http://127.0.0.1:7903",
+      "pid": 19728,
+      "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p03-live\\1794446802794",
+      "startedAt": "2026-11-12T01:26:43.115Z"
+    },
+    "compatibility": {
+      "status": "qualified",
+      "pinnedVersion": "0.10.2",
+      "pinnedCommit": "ff466b2ed0bf",
+      "observedVersion": "0.10.2",
+      "observedCommit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+      "runtimeApiVersion": "1.0",
+      "reasons": [],
+      "capabilityGaps": [
+        "terminalStream",
+        "terminalInput",
+        "terminalResize",
+        "terminalKill"
+      ]
+    }
+  },
+  "interrupt": {
+    "frames": 34,
+    "final": {
+      "submissionId": "sub_7e71cb75238d4e7bb6d844b0e18b7141",
+      "operationKey": "p03-int-7a77495b561b4cccacc44541d1fff075",
+      "threadId": "thr_7ba0b3068ab34b898aeb4cd3f3cb63eb",
+      "turnId": "turn_cf56c445bedd44239124bc4fb3d9bf85",
+      "state": "interrupted",
+      "replayed": true,
+      "reconciliation": {
+        "required": false
+      }
+    }
+  },
+  "total_reported_cost_usd": 0.003543312,
+  "finished_utc": "2026-11-12T01:26:52.631Z"
+}

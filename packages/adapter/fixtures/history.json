@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "data_dir": "C:\\Users\\public\\.codewhale\\tasks\\runtime",
+  "execution_scope": "0e2b6323abfb4b8890aa5b3e5af731e5094bba5f7b8c7c84187400aaab2a6eb7",
+  "runtime_thread_id": "thr_0123456789abcdef0123456789abcdef",
+  "saved_session_id": null,
+  "document_digest": "6c2eec058476c3fea672c47587691ce84323f36004434870fb84411113529158",
+  "session": {
+    "schema_version": 1,
+    "metadata": {
+      "id": "thr_0123456789abcdef0123456789abcdef",
+      "title": "New Session",
+      "message_count": 2,
+      "model": "deepseek-flash",
+      "model_provider": "deepseek",
+      "workspace": "C:\\work\\demo",
+      "mode": "agent"
+    },
+    "messages": [
+      {
+        "role": "user",
+        "content": "Reply with exactly MONA_P03 and nothing else."
+      },
+      {
+        "role": "assistant",
+        "content": "MONA_P03"
+      }
+    ]
+  }
+}

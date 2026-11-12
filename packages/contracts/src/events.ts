@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { ThreadId, TurnId } from './ids.js';
 
 const Timestamp = z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'invalid ISO timestamp');
@@ -56,21 +56,34 @@ export type UsageEvidence = z.infer<typeof UsageEvidence>;
  * Known engine payloads. Unknown event names stay inspectable through
  * EngineEventEnvelope rather than crashing the client.
  */
-export const TurnCompletedPayload = z
-  .object({
-    status: z.enum(['completed', 'interrupted', 'failed', 'canceled']),
-    turnId: TurnId,
-    durationMs: z.number().int().nonnegative().optional(),
-  })
-  .strict();
+export const TurnCompletedPayload = z.union([
+  z
+    .object({
+      turn: z
+        .object({
+          id: z.string().min(1),
+          thread_id: z.string().min(1),
+          status: z.enum(['completed', 'interrupted', 'failed', 'canceled']),
+        })
+        .passthrough(),
+    })
+    .passthrough(),
+  z
+    .object({
+      status: z.enum(['completed', 'interrupted', 'failed', 'canceled']),
+      turnId: TurnId.optional(),
+      durationMs: z.number().int().nonnegative().optional(),
+    })
+    .strict(),
+]);
 export type TurnCompletedPayload = z.infer<typeof TurnCompletedPayload>;
 
 export const ItemDeltaPayload = z
   .object({
-    itemId: z.string().min(1).nullable(),
+    itemId: z.string().min(1).nullable().optional(),
     delta: z.string(),
   })
-  .strict();
+  .passthrough();
 export type ItemDeltaPayload = z.infer<typeof ItemDeltaPayload>;
 
 export const ApprovalRequiredPayload = z
@@ -79,7 +92,7 @@ export const ApprovalRequiredPayload = z
     toolName: z.string().min(1),
     description: z.string().optional(),
   })
-  .strict();
+  .passthrough();
 export type ApprovalRequiredPayload = z.infer<typeof ApprovalRequiredPayload>;
 
 export const StreamEndPayload = z

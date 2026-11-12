@@ -13,6 +13,7 @@ const nodeGlobals = {
   setTimeout: 'readonly',
   clearTimeout: 'readonly',
   __dirname: 'readonly',
+  crypto: 'readonly',
 };
 
 export default tseslint.config(

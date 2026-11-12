@@ -1,0 +1,26 @@
+{
+  "schema_version": 2,
+  "id": "turn_0123456789abcdef0123456789abcdef",
+  "thread_id": "thr_0123456789abcdef0123456789abcdef",
+  "status": "completed",
+  "input_summary": "Reply with exactly MONA_P03 and nothing else.",
+  "created_at": "2026-11-12T01:17:47.436651900Z",
+  "started_at": "2026-11-12T01:17:47.445409800Z",
+  "ended_at": "2026-11-12T01:17:50.144977300Z",
+  "duration_ms": 2699,
+  "usage": {
+    "input_tokens": 12910,
+    "output_tokens": 5,
+    "prompt_cache_hit_tokens": 1152,
+    "prompt_cache_miss_tokens": 11758,
+    "reasoning_tokens": 0
+  },
+  "permission_posture": "full_access",
+  "mode": "agent",
+  "effective_provider": "deepseek",
+  "effective_provider_id": "deepseek",
+  "effective_billing_surface": "first-party-payg",
+  "effective_endpoint_fingerprint": "812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db",
+  "effective_billing_mode": "metered",
+  "effective_model": "deepseek-flash"
+}

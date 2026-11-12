@@ -1,0 +1,30 @@
+{
+  "thread_id": "thr_0123456789abcdef0123456789abcdef",
+  "totals": {
+    "input_tokens": 11758,
+    "output_tokens": 5,
+    "cached_tokens": 1152,
+    "reasoning_tokens": 0,
+    "reasoning_replay_tokens": 0,
+    "cache_write_tokens": 0,
+    "cost_usd": 0.003540312,
+    "cost_cny": 0.02360208,
+    "priced_turns": 1,
+    "unpriced_turns": 0,
+    "cny_priced_turns": 1,
+    "cny_unpriced_turns": 0,
+    "cny_unpriced_reasons": [],
+    "nonmetered_turns": 0,
+    "cost_complete": true,
+    "unpriced_reasons": [],
+    "unpriced_classes": [],
+    "pricing_provenances": ["provider_docs"],
+    "live_pricing_defects": [],
+    "live_pricing_unusable_defects": [],
+    "route_receipts": [
+      "provider=deepseek identity=deepseek model=deepseek-flash surface=first-party-payg endpoint_fp=812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db billing_mode=metered currency=usd+cny"
+    ],
+    "dropped_usage_records": 0,
+    "turns": 1
+  }
+}

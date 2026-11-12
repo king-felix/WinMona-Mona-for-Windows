@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 6,
+  "revision": 7,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P03",
+  "current_prompt": "P04",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -189,7 +189,7 @@
       "blocker_ids": []
     },
     "P03": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-001",
         "MONA-002",
@@ -197,9 +197,51 @@
         "MONA-008",
         "MONA-016"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "adapter package with discover, thread/profile, submit, reconcile, subscribe, interrupt, history, usage, capability allowlist",
+        "compatibility policy: qualified 0.10.2/ff466b2ed0bf, compatible-unqualified drift, unsupported refusal, missing flags false",
+        "submission intent journal before send; idempotent replay; lost-response reconciliation with no second POST",
+        "bounded SSE parser, seq dedup, since_seq reconnect, oversize/malformed tolerance, auth stop",
+        "recorded fixtures, 35 adapter tests, live pinned-runtime smoke with interrupt and priced usage"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P03-adapter.md",
+          "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:31:01Z",
+          "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88"
+        },
+        {
+          "path": "docs/evidence/P03-live.json",
+          "sha256": "ae462f0dad8fb11daada5c63ae8186b2dc1785183fb8637b8eb26f2855d8c379",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:31:01Z",
+          "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88"
+        },
+        {
+          "path": "docs/evidence/P03-live-log.txt",
+          "sha256": "efe3a6026928608981c38f12054950ceb3bcae1bca33cb5abee67328e38bdbd0",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:31:01Z",
+          "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88"
+        },
+        {
+          "path": "docs/evidence/P03-tests.txt",
+          "sha256": "7db2c6c0e06d4165a73bd014ff50e37ee71dd7a56b0d52256d7f0f3e1be16f39",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:31:01Z",
+          "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88"
+        },
+        {
+          "path": "docs/evidence/P03-build.txt",
+          "sha256": "4a78ce6901f7b48eadbabb5728021c6f4d7f53602be5045e72540130f9253e0f",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:31:01Z",
+          "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88"
+        }
+      ],
       "blocker_ids": []
     },
     "P04": {
@@ -461,9 +503,9 @@
     }
   },
   "next_eligible_prompts": [
-    "P03",
+    "P04",
     "P05",
     "P06"
   ],
-  "last_checkpoint_utc": "2026-11-12T01:16:33Z"
+  "last_checkpoint_utc": "2026-11-12T01:31:01Z"
 }

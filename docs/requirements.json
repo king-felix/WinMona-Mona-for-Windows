@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 36,
+  "revision": 47,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -388,6 +388,14 @@
               "recorded_utc": "2026-11-12T00:23:41Z",
               "commit": null,
               "note": "engine identity recorded: 0.10.2 (ff466b2ed0bf), WinGet install, single PATH entry"
+            },
+            {
+              "path": "docs/evidence/P03-live.json",
+              "sha256": "ae462f0dad8fb11daada5c63ae8186b2dc1785183fb8637b8eb26f2855d8c379",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:54Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "P03 adapter re-verified pinned 0.10.2/ff466b2ed0bf through the runtime API"
             }
           ]
         },
@@ -434,11 +442,19 @@
               "recorded_utc": "2026-11-12T00:24:11Z",
               "commit": null,
               "note": "post-checkpoint validate + status captured; exit 0"
+            },
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:54Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "recorded fixtures plus a repeatable live smoke script"
             }
           ]
         }
       ],
-      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "verified_commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -481,6 +497,14 @@
               "recorded_utc": "2026-11-12T01:02:19Z",
               "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
               "note": "durable event journal observed end to end, including usage and workspace snapshots"
+            },
+            {
+              "path": "docs/evidence/P03-live.json",
+              "sha256": "ae462f0dad8fb11daada5c63ae8186b2dc1785183fb8637b8eb26f2855d8c379",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:54Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "adapter projected the durable journal with zero diagnostics and strict seq ordering"
             }
           ]
         },
@@ -496,6 +520,14 @@
               "recorded_utc": "2026-11-12T01:02:19Z",
               "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
               "note": "interrupt converged to interrupted with no owned child left; restart resumed the same thread"
+            },
+            {
+              "path": "docs/evidence/P03-live.json",
+              "sha256": "ae462f0dad8fb11daada5c63ae8186b2dc1785183fb8637b8eb26f2855d8c379",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "live interrupt converged to interrupted through the adapter"
             }
           ]
         },
@@ -511,11 +543,19 @@
               "recorded_utc": "2026-11-12T01:02:19Z",
               "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
               "note": "effective provider deepseek, model deepseek-flash, permission_posture full_access on the turn record"
+            },
+            {
+              "path": "docs/evidence/P03-live.json",
+              "sha256": "ae462f0dad8fb11daada5c63ae8186b2dc1785183fb8637b8eb26f2855d8c379",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "effective profile deepseek/deepseek-flash/full_access observed on a real thread"
             }
           ]
         }
       ],
-      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "verified_commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -748,13 +788,22 @@
         "P08",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "streaming",
           "description": "Turn output streams into the conversation without fabricated content",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "adapter event projection and streaming parser complete; React transcript is P08"
+            }
+          ]
         },
         {
           "id": "drafts",
@@ -789,7 +838,7 @@
         "P16",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "plan-work",
@@ -800,14 +849,32 @@
         {
           "id": "permission-display",
           "description": "Effective permission posture and Full Access badge reflect the running runtime",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "effective permission/model profile exposed by the adapter; full UI display is P08/P16"
+            }
+          ]
         },
         {
           "id": "no-silent-widening",
           "description": "No UI action widens permissions without an explicit recorded decision",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "adapter reads and displays observed posture; it never changes provider, model, or permissions"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -1175,25 +1242,52 @@
         "P20",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "crash-reconnect",
           "description": "Renderer/main restart reconnects and reconciles without replaying tool work",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:55Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "bounded reconnect and dedup tested; process-crash ownership is P04/P20"
+            }
+          ]
         },
         {
           "id": "dedupe",
           "description": "Duplicate events are suppressed by identity and cursor",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:56Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "seq-based dedup across replay and reconnect tested, live replay strictly increasing"
+            }
+          ]
         },
         {
           "id": "uncertain-submission",
           "description": "A lost submission is reported as unknown and reconciled, never blindly retried",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P03-adapter.md",
+              "sha256": "e53acfccc2064eed38b5f51de5abac9addd2354d8dd996c8f5efbec8db95ace8",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:30:56Z",
+              "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
+              "note": "lost response becomes outcome_unknown and reconciles by read-only lookup without a second POST"
+            }
+          ]
         }
       ],
       "verified_commit": null,

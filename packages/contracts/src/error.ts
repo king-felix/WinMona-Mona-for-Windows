@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 
 /**
  * Typed failure returned across every Mona boundary. No stack traces, file
@@ -11,6 +11,12 @@ export const ErrorCode = z.enum([
   'capability_unsupported',
   'outcome_unknown',
   'schema_drift',
+  'authentication_failed',
+  'thread_mismatch',
+  'oversize_event',
+  'transport_failed',
+  'stream_closed',
+  'not_found',
   'internal',
 ]);
 export type ErrorCode = z.infer<typeof ErrorCode>;

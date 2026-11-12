@@ -234,3 +234,52 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   `.mona/build/attempts.jsonl`, `BLOCKERS.md`.
 - **Constrains:** the window/process-footprint acceptance item stays unverified
   until the binary is available; no runtime-compatibility claim may be made.
+
+## D-0021 — Adapter lives in `packages/adapter`, not the renderer
+
+- **Decision:** the versioned adapter is a Node-only workspace package with a
+  typed `Result` surface and a small capability allowlist. The Electron main
+  process will own it; the renderer never imports it.
+- **Why:** P03 requires a reusable, contract-tested client independent of the
+  UI and of the P01 spike. Keeping it Node-only preserves the P02 process
+  boundary.
+- **Evidence:** `docs/evidence/P03-adapter.md`, `packages/adapter/src`.
+- **Constrains:** any new capability needs a contract test and a compatibility
+  gate; unsupported operations return typed reasons.
+
+## D-0022 — Persist intent, never retry a possibly accepted write
+
+- **Decision:** a `SubmissionJournal` record is written before the POST; a lost
+  response becomes `outcome_unknown`; reconciliation uses only the read-only
+  operation lookup. The POST is never repeated automatically.
+- **Why:** the runtime advertises idempotent operation keys and lookup, but a
+  client cannot prove exactly-once from local journaling alone. P01 observed
+  replay as `200` + same turn and 409 on changed data.
+- **Evidence:** `packages/adapter/src/adapter.test.ts`,
+  `docs/evidence/P03-live.json`.
+- **Constrains:** P05 may swap the journal implementation but not the semantics.
+
+## D-0023 — Event projection is cursor-based, bounded, and tolerant
+
+- **Decision:** dedup by durable `seq`; reconnect with `since_seq`; bounded
+  exponential backoff; drop oversized frames with a diagnostic; keep unknown
+  events; report malformed known payloads as schema drift without killing the
+  stream.
+- **Why:** replay must never re-execute work or double-count charges, and one bad
+  frame must not take down a long job.
+- **Evidence:** `packages/adapter/src/sse.ts`, `adapter.test.ts`,
+  `docs/evidence/P03-live.json`.
+- **Constrains:** the renderer receives projected events, never raw transport
+  frames.
+
+## D-0024 — Usage buckets come from the endpoint that preserves their meaning
+
+- **Decision:** thread usage maps `totals.input_tokens` to cache-miss, `cached_tokens`
+  to cache-hit, and `output_tokens` to output; `turn.usage.input_tokens` is total
+  input and must not be mixed into that projection. Reasoning tokens are already
+  included in output on this route (D-0014).
+- **Why:** the two surfaces use different `input_tokens` semantics; mixing them
+  would double-count or misprice. Unknown cost remains a typed unknown.
+- **Evidence:** `packages/adapter/src/mapping.ts`, P01 cost formula checks.
+- **Constrains:** P12's ledger stores buckets plus source/provenance, not a bare
+  total.

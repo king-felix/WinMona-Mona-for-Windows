@@ -1,0 +1,14 @@
+{
+  "current": "deepseek",
+  "current_provider_id": "deepseek",
+  "providers": [
+    {
+      "id": "deepseek",
+      "model_provider_id": "deepseek",
+      "display_name": "DeepSeek",
+      "default_model": "deepseek-flash",
+      "has_model_catalog": true,
+      "credentialState": "configured"
+    }
+  ]
+}

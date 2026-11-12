@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { ThreadId } from './ids.js';
 
 const Timestamp = z.string().refine((value) => !Number.isNaN(Date.parse(value)), 'invalid ISO timestamp');
@@ -15,8 +15,8 @@ export const EngineIdentity = z
     commit: z.string().min(7),
     runtimeApiVersion: z.string().min(1),
     baseUrl: LoopbackBaseUrl,
-    pid: z.number().int().positive(),
-    workspace: z.string().min(1),
+    pid: z.number().int().positive().nullable(),
+    workspace: z.string().min(1).nullable(),
     startedAt: Timestamp,
   })
   .strict();

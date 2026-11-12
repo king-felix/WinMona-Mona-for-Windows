@@ -1,0 +1,20 @@
+{
+  "thread_id": "thr_0123456789abcdef0123456789abcdef",
+  "totals": {
+    "input_tokens": 900,
+    "output_tokens": 12,
+    "cached_tokens": 0,
+    "reasoning_tokens": 0,
+    "reasoning_replay_tokens": 0,
+    "cache_write_tokens": 0,
+    "cost_usd": null,
+    "cost_cny": null,
+    "priced_turns": 0,
+    "unpriced_turns": 1,
+    "nonmetered_turns": 0,
+    "cost_complete": false,
+    "unpriced_reasons": ["provider did not report pricing for this route"],
+    "pricing_provenances": [],
+    "turns": 1
+  }
+}
