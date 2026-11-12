@@ -16,7 +16,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 4,849 | `e9008c1126c8d5607d0abf82c3fcdb83da8f4638e39deeacacc6d458cd4ac202` |
+| `Mona-0.1.0-x64.msix` | 4,850 | `6b152b1798b58018b4a368720b8c9bb2042d928534a133c87d7a8d3b6f7bc7c1` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -25,7 +25,7 @@ Payload and program identity:
 | Artifact | Value |
 |---|---|
 | Install payload | `build/install-stage`, **1,672 files**, 452,468,362 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `fb18a76517952f7bebd05daf2a6a056e14012f5554c52007c3344e055bd442a8` |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `545c3df2b23927029a4a158e9c18ef043b9fb6077cee8640448efc2fd42cee22` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |
@@ -124,12 +124,12 @@ needs an elevated shell and none was available, so **P23 imported nothing and cl
 no trust existed in any store beforehand. One command remains; it is in `BLOCKERS.md`
 ISSUE-0023 and `P23-human-checklist.md`.
 
-**Memory — 404 MB → 371.4 MB, target still unmet.** The P22 metric was preserved exactly
+**Memory — 404 MB → 371.4–377.1 MB, target still unmet.** The P22 metric was preserved exactly
 (`sum of workingSetSize across app.getAppMetrics()`, 60 s idle, same 20,000-row workload) and
 reproduced at 404.0–404.4 MB before changing anything. The footprint is not Mona's data:
 main JS heap 12.0 MB, renderer JS heap 3.4 MB, and 2,497 DOM nodes. Windowing the rendered
 timeline to the newest 120 rows (with a keyboard-reachable "show earlier" control) cut idle
-working set to **371.4 MB** on the installed candidate; rendering all 500 loaded rows costs
+working set to **371.4–377.1 MB** on the installed candidate; rendering all 500 loaded rows costs
 +27.7 MB. The remaining 21.4 MB is Chromium's own process baseline plus a GPU process inflated
 by this host reporting `gpu_compositing: disabled_software`. The 350 MB target is unchanged and
 MONA-028 stays partial.
@@ -140,7 +140,7 @@ candidate: labelled composer, named controls with an honestly disabled Interrupt
 reveal of older timeline rows, a focusable virtualized diff, and no horizontal overflow at
 200% zoom. Narrator and physical 200% scaling remain human-only.
 
-**Startup — measured on the installed build.** Cold 422 ms and warm 738 ms on the installed
+**Startup — measured on the installed build.** Cold 427 ms and warm 732 ms on the installed
 `Mona.exe` (budgets 5 s / 2 s). The earlier report's 418/722 ms came from the development
 build; that ambiguity is corrected. The packaged harness completed this time, so
 P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
@@ -164,7 +164,7 @@ P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
 - **P23-ISSUE-002 / ISSUE-0023 — the modern Windows 11 menu is not registered.** The package is
   test-signed and its signer is verified, but machine trust has not been provisioned because the
   step needs an elevated shell. Classic menu works; modern menu is unproven.
-- **P23-ISSUE-001 — idle memory 371.4 MB** across four processes against the 350 MB target.
+- **P23-ISSUE-001 — idle memory 371.4–377.1 MB** across four processes against the 350 MB target.
   Improved from 404 MB by windowing rendered timeline rows; still unmet (D-0107).
 - **P22-ISSUE-004 — screen-reader walkthrough and physical 200% scaling** remain human-only.
   The automated accessibility probe passes 12/12 and is not a substitute.
@@ -180,8 +180,8 @@ P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
 ## Superseded notes
 
 The first candidate reported 404–406.4 MB idle memory, a development-build startup timing and
-an unverified Save dialog. The follow-up round above replaces all three: memory is 371.4 MB on
-the installed candidate, startup is 422 ms / 738 ms on the installed build, and the export write
+an unverified Save dialog. The follow-up round above replaces all three: memory is 371.4–377.1 MB on
+the installed candidate, startup is 427 ms / 732 ms on the installed build, and the export write
 path is tested with a real file. The original numbers stay here so the change is auditable
 rather than silently rewritten.
 ## Memory decision
@@ -189,7 +189,7 @@ rather than silently rewritten.
 The 350 MB target stays. It is an engineering budget from the specification, and lowering the
 number to match a measurement would destroy its only function.
 
-Two attempts produced material progress: **404 MB → 371.4 MB** on the installed candidate, by
+Two attempts produced material progress: **404 MB → 371.4–377.1 MB** on the installed candidate, by
 bounding rendered timeline rows to 120 with an explicit "show earlier" control (D-0106). What is
 now known: the cost is not Mona's JavaScript heap (12.0 MB main, 3.4 MB renderer) but rendered
 DOM plus Chromium's process baseline, and this host's GPU process is inflated by software
@@ -223,6 +223,6 @@ evidence-led step in `docs/evidence/P23-followup.md` §2.7 and is not started on
    nothing sent.
 3. Work through `docs/evidence/P23-human-checklist.md`: Narrator walkthrough, physical 200%
    scaling, and the conversation export Save dialog (success and cancel).
-4. Decide the memory question: accept 371.4 MB with the target still unmet, or authorize the
+4. Decide the memory question: accept 371.4–377.1 MB with the target still unmet, or authorize the
    next evidence-led step in `docs/evidence/P23-followup.md` §2.7.
 5. Decide the license before any public distribution. It remains unresolved on purpose.

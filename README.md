@@ -14,7 +14,7 @@ is verified, what is measured, and what is still waiting on a human decision.
 Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 
 - 27 of 30 product requirements **verified** against recorded evidence.
-- **MONA-028 is partial**: idle memory is 371.4 MB on the installed candidate against a 350 MB
+- **MONA-028 is partial**: idle memory is 371.4–377.1 MB on the installed candidate against a 350 MB
   internal target (down from 404 MB after windowing rendered timeline rows), and the Windows
   screen-reader and physical 200% scaling checks need a person.
 - **MONA-027 is blocked**: the Windows 11 modern folder menu is built and test-signed, and its
@@ -23,7 +23,7 @@ Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 - Real engine turn through the installed app: 22/22 probe steps, one turn at 596 µUSD.
 - Automated gates green: 549 Vitest tests (67 files), 14 bootstrap, 12 launch, 25 install,
   8 spike, 7 native; typecheck, lint, formatting and build all pass.
-- Installed-candidate startup: cold 422 ms, warm 738 ms; idle CPU 0.04%.
+- Installed-candidate startup: cold 427 ms, warm 732 ms; idle CPU 0.04%.
 
 The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/release-notes-0.1.0.md),
 [docs/evidence/P23-followup.md](docs/evidence/P23-followup.md) and

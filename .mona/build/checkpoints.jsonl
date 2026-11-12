@@ -72,3 +72,5 @@
 {"utc":"2026-11-12T19:47:18Z","revision":73,"prompt":"P23","status":"completed","note":"refresh MONA-027 modern-menu evidence to the rebuilt candidate hash","commit":"28e0979386e005e1d321b9dd1b772f5f0fb5afec"}
 {"utc":"2026-11-12T19:47:22Z","revision":74,"prompt":"P23","status":"completed","note":"re-hash the clean-install artifact once more after the ledger refresh","commit":"28e0979386e005e1d321b9dd1b772f5f0fb5afec"}
 {"utc":"2026-11-12T19:49:13Z","revision":75,"prompt":"P23","status":"completed","note":"final gate re-run; refresh the automated-QA evidence hash","commit":"28e0979386e005e1d321b9dd1b772f5f0fb5afec"}
+{"utc":"2026-11-12T19:55:22Z","revision":76,"prompt":"P23","status":"completed","note":"re-stage after the a11y probe landed so the payload matches the commit; re-run every installed probe against the final bytes and record the measured range","commit":"bb32d44a58f47690d4533a85076a57ea2a93a6d0"}
+{"utc":"2026-11-12T19:55:27Z","revision":77,"prompt":"P23","status":"completed","note":"refresh the startup evidence hash after the final-byte run","commit":"bb32d44a58f47690d4533a85076a57ea2a93a6d0"}

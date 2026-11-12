@@ -4,8 +4,8 @@
   "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
   "placement": {
     "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
-    "previous": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona.old-20261112193548",
-    "stamp": "20261112193548"
+    "previous": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona.old-20261112195006",
+    "stamp": "20261112195006"
   },
   "closed": null,
   "decision": {
@@ -23,7 +23,7 @@
     "registered": false,
     "packageFullName": null,
     "code": null,
-    "error": "Deployment failed with HRESULT: 0x80073CF0, Package could not be opened.\r\n\r\nerror 0x800B0109: The root certificate of the signature in the app package or bundle must be trusted.\n\nNOTE: For additional information, look for [ActivityId] 9887417d-5e98-0003-2de4-d29a985edd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 9887417d-5e98-0003-2de4-d29a985edd01\n",
+    "error": "Deployment failed with HRESULT: 0x80073CF0, Package could not be opened.\r\n\r\nerror 0x800B0109: The root certificate of the signature in the app package or bundle must be trusted.\n\nNOTE: For additional information, look for [ActivityId] 9887417d-5e98-0003-5f4d-d39a985edd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 9887417d-5e98-0003-5f4d-d39a985edd01\n",
     "msix": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
     "prerequisite": "Windows refused the unsigned/test-signed package. Trust the labelled test certificate for this machine (node tools/install/cli.mjs trust-test-certificate), or sign with a production certificate."
   },

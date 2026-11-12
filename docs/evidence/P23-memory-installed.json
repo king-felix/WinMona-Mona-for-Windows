@@ -4,7 +4,7 @@
     {
       "name": "a real project opens through the catalog",
       "ok": true,
-      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p23-memory-xtbhxj\\memory-project"
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p23-memory-ouvqqu\\memory-project"
     },
     {
       "name": "the P22 history workload is in place and rendered",
@@ -19,14 +19,14 @@
       "ok": true,
       "detail": {
         "samples": 11,
-        "totalMb": 371.4
+        "totalMb": 377.1
       }
     },
     {
       "name": "the renderer JavaScript heap was read after a forced collection",
       "ok": true,
       "detail": {
-        "heapUsedMb": 3.4,
+        "heapUsedMb": 3.3,
         "heapTotalMb": 4,
         "documents": 1,
         "nodes": 2497,
@@ -38,10 +38,10 @@
       "name": "every Mona process is attributed to a named process type",
       "ok": true,
       "detail": [
-        "Browser:113.9MB",
-        "GPU:102.6MB",
-        "Utility:51.1MB",
-        "Tab:103.8MB"
+        "Browser:113.8MB",
+        "GPU:108.9MB",
+        "Utility:51MB",
+        "Tab:103.4MB"
       ]
     },
     {
@@ -56,7 +56,7 @@
       "name": "the diff rendered and was measured with the panel open",
       "ok": true,
       "detail": {
-        "totalMb": 380.5,
+        "totalMb": 386.1,
         "rendererHeapMb": 3.1,
         "domNodes": 431,
         "jsEventListeners": 169
@@ -77,7 +77,7 @@
         "fullRows": 500,
         "expansionClicks": 4,
         "windowed": {
-          "totalWorkingSetMb": 377.2,
+          "totalWorkingSetMb": 382.5,
           "renderer": {
             "heapUsedMb": 3.5,
             "heapTotalMb": 4,
@@ -88,25 +88,25 @@
           },
           "processes": [
             {
-              "pid": 39508,
+              "pid": 23768,
               "type": "Browser",
               "serviceName": null,
               "name": "",
-              "workingSetMb": 117.6,
-              "privateMb": 81.1,
+              "workingSetMb": 117.5,
+              "privateMb": 81.4,
               "cpuPercent": 0.03
             },
             {
-              "pid": 26204,
+              "pid": 34936,
               "type": "GPU",
               "serviceName": "GPU",
               "name": "",
-              "workingSetMb": 105,
-              "privateMb": 303.5,
+              "workingSetMb": 110.7,
+              "privateMb": 271.2,
               "cpuPercent": 0.01
             },
             {
-              "pid": 30792,
+              "pid": 35616,
               "type": "Utility",
               "serviceName": "network.mojom.NetworkService",
               "name": "Network Service",
@@ -115,21 +115,21 @@
               "cpuPercent": 0
             },
             {
-              "pid": 24728,
+              "pid": 29540,
               "type": "Tab",
               "serviceName": null,
               "name": "",
-              "workingSetMb": 103.5,
-              "privateMb": 46.7,
-              "cpuPercent": 0.15
+              "workingSetMb": 103.2,
+              "privateMb": 45.4,
+              "cpuPercent": 0.16
             }
           ]
         },
         "full": {
-          "totalWorkingSetMb": 404.9,
+          "totalWorkingSetMb": 410.5,
           "renderer": {
             "heapUsedMb": 5.9,
-            "heapTotalMb": 6.3,
+            "heapTotalMb": 6.5,
             "documents": 1,
             "nodes": 9382,
             "jsEventListeners": 678,
@@ -137,25 +137,25 @@
           },
           "processes": [
             {
-              "pid": 39508,
+              "pid": 23768,
               "type": "Browser",
               "serviceName": null,
               "name": "",
-              "workingSetMb": 117.6,
-              "privateMb": 81.1,
+              "workingSetMb": 117.5,
+              "privateMb": 81.4,
               "cpuPercent": 0.01
             },
             {
-              "pid": 26204,
+              "pid": 34936,
               "type": "GPU",
               "serviceName": "GPU",
               "name": "",
-              "workingSetMb": 106.7,
-              "privateMb": 287.3,
+              "workingSetMb": 112.2,
+              "privateMb": 277.5,
               "cpuPercent": 0.03
             },
             {
-              "pid": 30792,
+              "pid": 35616,
               "type": "Utility",
               "serviceName": "network.mojom.NetworkService",
               "name": "Network Service",
@@ -164,22 +164,22 @@
               "cpuPercent": 0
             },
             {
-              "pid": 24728,
+              "pid": 29540,
               "type": "Tab",
               "serviceName": null,
               "name": "",
-              "workingSetMb": 129.5,
-              "privateMb": 72.2,
-              "cpuPercent": 0.64
+              "workingSetMb": 129.7,
+              "privateMb": 71.4,
+              "cpuPercent": 0.68
             }
           ]
         },
-        "costOfFullRenderMb": 27.7
+        "costOfFullRenderMb": 28
       }
     }
   ],
   "schema": 1,
-  "capturedAt": "2026-11-12T19:36:11.834Z",
+  "capturedAt": "2026-11-12T19:50:25.129Z",
   "metric": {
     "budget": "sum of workingSetSize across app.getAppMetrics(), the same metric P22 recorded",
     "unit": "MiB (1 MiB = 1024 KiB)",
@@ -271,56 +271,56 @@
   "idle": {
     "seconds": 60,
     "samples": 11,
-    "totalWorkingSetMb": 371.4,
-    "averageWorkingSetMb": 382.9,
+    "totalWorkingSetMb": 377.1,
+    "averageWorkingSetMb": 389,
     "cpuAverage": 0.01,
     "cpuMax": 0.11,
     "processes": [
       {
-        "pid": 39508,
+        "pid": 23768,
         "type": "Browser",
         "serviceName": null,
         "name": "",
-        "workingSetMb": 113.9,
-        "privateMb": 78.2,
+        "workingSetMb": 113.8,
+        "privateMb": 77.9,
         "cpuPercent": 0.01
       },
       {
-        "pid": 26204,
+        "pid": 34936,
         "type": "GPU",
         "serviceName": "GPU",
         "name": "",
-        "workingSetMb": 102.6,
-        "privateMb": 287.4,
+        "workingSetMb": 108.9,
+        "privateMb": 261.5,
         "cpuPercent": 0
       },
       {
-        "pid": 30792,
+        "pid": 35616,
         "type": "Utility",
         "serviceName": "network.mojom.NetworkService",
         "name": "Network Service",
-        "workingSetMb": 51.1,
+        "workingSetMb": 51,
         "privateMb": 11.9,
         "cpuPercent": 0
       },
       {
-        "pid": 24728,
+        "pid": 29540,
         "type": "Tab",
         "serviceName": null,
         "name": "",
-        "workingSetMb": 103.8,
-        "privateMb": 48.8,
+        "workingSetMb": 103.4,
+        "privateMb": 47.5,
         "cpuPercent": 0
       }
     ],
     "mainProcess": {
-      "rssMb": 114.7,
+      "rssMb": 114.6,
       "heapUsedMb": 12,
-      "heapTotalMb": 13.4,
+      "heapTotalMb": 13.2,
       "externalMb": 2.7
     },
     "renderer": {
-      "heapUsedMb": 3.4,
+      "heapUsedMb": 3.3,
       "heapTotalMb": 4,
       "documents": 1,
       "nodes": 2497,
@@ -329,28 +329,28 @@
     }
   },
   "afterLeavingChanges": {
-    "totalWorkingSetMb": 382.8,
+    "totalWorkingSetMb": 388.4,
     "processes": [
       {
-        "pid": 39508,
+        "pid": 23768,
         "type": "Browser",
         "serviceName": null,
         "name": "",
         "workingSetMb": 119.1,
-        "privateMb": 82.8,
-        "cpuPercent": 0.02
+        "privateMb": 83.1,
+        "cpuPercent": 0.03
       },
       {
-        "pid": 26204,
+        "pid": 34936,
         "type": "GPU",
         "serviceName": "GPU",
         "name": "",
-        "workingSetMb": 105.6,
-        "privateMb": 312.6,
-        "cpuPercent": 0.05
+        "workingSetMb": 111.2,
+        "privateMb": 297,
+        "cpuPercent": 0.07
       },
       {
-        "pid": 30792,
+        "pid": 35616,
         "type": "Utility",
         "serviceName": "network.mojom.NetworkService",
         "name": "Network Service",
@@ -359,13 +359,13 @@
         "cpuPercent": 0
       },
       {
-        "pid": 24728,
+        "pid": 29540,
         "type": "Tab",
         "serviceName": null,
         "name": "",
         "workingSetMb": 107,
-        "privateMb": 50.6,
-        "cpuPercent": 0.21
+        "privateMb": 49.7,
+        "cpuPercent": 0.23
       }
     ],
     "renderer": {
@@ -382,7 +382,7 @@
     "fullRows": 500,
     "expansionClicks": 4,
     "windowed": {
-      "totalWorkingSetMb": 377.2,
+      "totalWorkingSetMb": 382.5,
       "renderer": {
         "heapUsedMb": 3.5,
         "heapTotalMb": 4,
@@ -393,25 +393,25 @@
       },
       "processes": [
         {
-          "pid": 39508,
+          "pid": 23768,
           "type": "Browser",
           "serviceName": null,
           "name": "",
-          "workingSetMb": 117.6,
-          "privateMb": 81.1,
+          "workingSetMb": 117.5,
+          "privateMb": 81.4,
           "cpuPercent": 0.03
         },
         {
-          "pid": 26204,
+          "pid": 34936,
           "type": "GPU",
           "serviceName": "GPU",
           "name": "",
-          "workingSetMb": 105,
-          "privateMb": 303.5,
+          "workingSetMb": 110.7,
+          "privateMb": 271.2,
           "cpuPercent": 0.01
         },
         {
-          "pid": 30792,
+          "pid": 35616,
           "type": "Utility",
           "serviceName": "network.mojom.NetworkService",
           "name": "Network Service",
@@ -420,21 +420,21 @@
           "cpuPercent": 0
         },
         {
-          "pid": 24728,
+          "pid": 29540,
           "type": "Tab",
           "serviceName": null,
           "name": "",
-          "workingSetMb": 103.5,
-          "privateMb": 46.7,
-          "cpuPercent": 0.15
+          "workingSetMb": 103.2,
+          "privateMb": 45.4,
+          "cpuPercent": 0.16
         }
       ]
     },
     "full": {
-      "totalWorkingSetMb": 404.9,
+      "totalWorkingSetMb": 410.5,
       "renderer": {
         "heapUsedMb": 5.9,
-        "heapTotalMb": 6.3,
+        "heapTotalMb": 6.5,
         "documents": 1,
         "nodes": 9382,
         "jsEventListeners": 678,
@@ -442,25 +442,25 @@
       },
       "processes": [
         {
-          "pid": 39508,
+          "pid": 23768,
           "type": "Browser",
           "serviceName": null,
           "name": "",
-          "workingSetMb": 117.6,
-          "privateMb": 81.1,
+          "workingSetMb": 117.5,
+          "privateMb": 81.4,
           "cpuPercent": 0.01
         },
         {
-          "pid": 26204,
+          "pid": 34936,
           "type": "GPU",
           "serviceName": "GPU",
           "name": "",
-          "workingSetMb": 106.7,
-          "privateMb": 287.3,
+          "workingSetMb": 112.2,
+          "privateMb": 277.5,
           "cpuPercent": 0.03
         },
         {
-          "pid": 30792,
+          "pid": 35616,
           "type": "Utility",
           "serviceName": "network.mojom.NetworkService",
           "name": "Network Service",
@@ -469,41 +469,41 @@
           "cpuPercent": 0
         },
         {
-          "pid": 24728,
+          "pid": 29540,
           "type": "Tab",
           "serviceName": null,
           "name": "",
-          "workingSetMb": 129.5,
-          "privateMb": 72.2,
-          "cpuPercent": 0.64
+          "workingSetMb": 129.7,
+          "privateMb": 71.4,
+          "cpuPercent": 0.68
         }
       ]
     },
-    "costOfFullRenderMb": 27.7
+    "costOfFullRenderMb": 28
   },
   "changes": {
-    "totalWorkingSetMb": 380.5,
+    "totalWorkingSetMb": 386.1,
     "processes": [
       {
-        "pid": 39508,
+        "pid": 23768,
         "type": "Browser",
         "serviceName": null,
         "name": "",
-        "workingSetMb": 119.1,
-        "privateMb": 82.6,
+        "workingSetMb": 119,
+        "privateMb": 82.9,
         "cpuPercent": 0.19
       },
       {
-        "pid": 26204,
+        "pid": 34936,
         "type": "GPU",
         "serviceName": "GPU",
         "name": "",
-        "workingSetMb": 104.1,
-        "privateMb": 313.9,
+        "workingSetMb": 109.9,
+        "privateMb": 284.2,
         "cpuPercent": 0.05
       },
       {
-        "pid": 30792,
+        "pid": 35616,
         "type": "Utility",
         "serviceName": "network.mojom.NetworkService",
         "name": "Network Service",
@@ -512,18 +512,18 @@
         "cpuPercent": 0
       },
       {
-        "pid": 24728,
+        "pid": 29540,
         "type": "Tab",
         "serviceName": null,
         "name": "",
-        "workingSetMb": 106.2,
-        "privateMb": 49.7,
+        "workingSetMb": 106.1,
+        "privateMb": 48.6,
         "cpuPercent": 0.14
       }
     ],
     "renderer": {
       "heapUsedMb": 3.1,
-      "heapTotalMb": 3.9,
+      "heapTotalMb": 3.7,
       "documents": 1,
       "nodes": 431,
       "jsEventListeners": 169,
@@ -533,58 +533,58 @@
   },
   "history": [
     {
-      "atMs": 5008,
-      "totalMb": 395.8,
+      "atMs": 5004,
+      "totalMb": 401.3,
       "cpuPercent": 0
     },
     {
-      "atMs": 10009,
-      "totalMb": 392.4,
-      "cpuPercent": 0.01
+      "atMs": 10006,
+      "totalMb": 398.9,
+      "cpuPercent": 0.02
     },
     {
-      "atMs": 15021,
-      "totalMb": 392.4,
+      "atMs": 15019,
+      "totalMb": 398.9,
       "cpuPercent": 0
     },
     {
-      "atMs": 20032,
-      "totalMb": 392.4,
+      "atMs": 20024,
+      "totalMb": 398.9,
       "cpuPercent": 0
     },
     {
-      "atMs": 25045,
-      "totalMb": 392.4,
+      "atMs": 25037,
+      "totalMb": 398.9,
       "cpuPercent": 0
     },
     {
-      "atMs": 30061,
-      "totalMb": 374.5,
+      "atMs": 30041,
+      "totalMb": 380.3,
       "cpuPercent": 0.11
     },
     {
-      "atMs": 35066,
-      "totalMb": 374.5,
+      "atMs": 35044,
+      "totalMb": 380.3,
       "cpuPercent": 0
     },
     {
-      "atMs": 40070,
-      "totalMb": 374.5,
+      "atMs": 40045,
+      "totalMb": 380.3,
       "cpuPercent": 0
     },
     {
-      "atMs": 45072,
-      "totalMb": 374.5,
+      "atMs": 45052,
+      "totalMb": 380.3,
       "cpuPercent": 0
     },
     {
-      "atMs": 50074,
-      "totalMb": 374.5,
+      "atMs": 50066,
+      "totalMb": 380.3,
       "cpuPercent": 0
     },
     {
-      "atMs": 55084,
-      "totalMb": 374.5,
+      "atMs": 55081,
+      "totalMb": 380.3,
       "cpuPercent": 0
     }
   ]

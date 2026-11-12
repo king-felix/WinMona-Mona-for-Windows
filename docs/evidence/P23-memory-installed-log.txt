@@ -1,6 +1,6 @@
 executable: C:\Users\victo\AppData\Local\Programs\Mona\Mona.exe
 label: installed-candidate-final
-workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-p23-memory-XTbhXj\memory-project
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-p23-memory-oUvqqU\memory-project
 
 
 mona: applied 7 state migration(s) to version 7

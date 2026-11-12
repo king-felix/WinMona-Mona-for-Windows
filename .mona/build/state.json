@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 75,
+  "revision": 77,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1496,29 +1496,8 @@
           "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2"
         },
         {
-          "path": "docs/evidence/P23-followup.md",
-          "sha256": "e52bca1e7a504bccbf17051f9a42ac324946ec56b5d03a86ce97e302c38de4a6",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T19:47:13Z",
-          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
-        },
-        {
           "path": "docs/evidence/P23-trust-verify.json",
           "sha256": "4f8c627a6460b77237a92909daae372f97f085d96f77d2c62ec9baabad83a866",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T19:47:13Z",
-          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
-        },
-        {
-          "path": "docs/evidence/P23-memory-installed.json",
-          "sha256": "78b748f1c4e19bdf424c244c4f5bfe304e3b4708fcfd041d7952df00b1feffbc",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T19:47:13Z",
-          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
-        },
-        {
-          "path": "docs/evidence/P23-a11y-installed.json",
-          "sha256": "512f45466a78ef37fecc68e83aa88c17d2d7d172ef1d14d3b395fabe91eb26b5",
           "kind": "document",
           "recorded_utc": "2026-11-12T19:47:13Z",
           "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
@@ -1531,18 +1510,53 @@
           "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
         },
         {
-          "path": "docs/evidence/P23-startup-installed.json",
-          "sha256": "8f430ea2d433d341a038ecbe56f72bc316606444fc24d66f538a688d4c85879f",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T19:47:13Z",
-          "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
-        },
-        {
           "path": "docs/evidence/P23-clean-install.json",
           "sha256": "aaf7434aaba53a4fe1b63d8ba94a80065baf2a714f586713e3a6d24269c8af00",
           "kind": "document",
           "recorded_utc": "2026-11-12T19:47:22Z",
           "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec"
+        },
+        {
+          "path": "docs/evidence/P23-followup.md",
+          "sha256": "f3a055ead49d425bf63e66de8f5b17e3615a9accbcc0051d97e0f74e89c99466",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:21Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-changes-installed.json",
+          "sha256": "523b49e82600815021f6f0eb33145ae34e3fc44ea98af17036e84ec6be4bbab7",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:22Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-installed-final.json",
+          "sha256": "32cd4d56095ffabeeb3a27e13571f0abd3d1a2bb998918968cbf62ff8e776c6a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:22Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-a11y-installed.json",
+          "sha256": "512f45466a78ef37fecc68e83aa88c17d2d7d172ef1d14d3b395fabe91eb26b5",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:22Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-memory-installed.json",
+          "sha256": "d93edd02eab167c4aa8785816cddf5f268f4d3fc2ac2059f472fd2ec85949850",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:22Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-startup-installed.json",
+          "sha256": "560e53bdf3d164019550d718ff01fe705da3986c23c9a38102c61cdd5722ccda",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T19:55:26Z",
+          "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
         }
       ],
       "blocker_ids": [
@@ -1551,5 +1565,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-12T19:49:13Z"
+  "last_checkpoint_utc": "2026-11-12T19:55:27Z"
 }

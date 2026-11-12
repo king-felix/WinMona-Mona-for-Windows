@@ -3,7 +3,7 @@
 **Date:** 2026-11-12. **Machine:** Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB, x64.
 **Engine:** Codewhale `0.10.2 (ff466b2ed0bf)` (re-checked; unchanged).
 **Candidate:** 0.1.0, `Mona-0.1.0-x64.msix` sha256
-`e9008c1126c8d5607d0abf82c3fcdb83da8f4638e39deeacacc6d458cd4ac202`, payload 1,672 files.
+`6b152b1798b58018b4a368720b8c9bb2042d928534a133c87d7a8d3b6f7bc7c1`, payload 1,672 files.
 
 This file records the follow-up work Victor authorized: certificate trust, memory
 investigation, accessibility checks, and the startup-measurement ambiguity.
@@ -129,11 +129,11 @@ number reproduces the P22 value, so the comparison basis is sound.
 
 | Process | Working set | Private bytes | Note |
 |---|---|---|---|
-| Browser (main) | 113.9 MB | 78.2 MB | main-process **JS heap is 12.0 MB**; RSS 114.7 MB |
-| GPU | 102.6 MB | 287.4 MB | `gpu_compositing: disabled_software` on this host — see §2.5 |
-| Utility (network service) | 51.1 MB | 11.9 MB | Chromium's network service, not Mona code |
-| Tab (renderer) | 103.8 MB | 48.8 MB | **JS heap 3.4 MB**, 2,497 DOM nodes, 299 listeners |
-| **Total** | **371.4 MB** | — | engine measured separately, never included |
+| Browser (main) | 113.8 MB | 77.9 MB | main-process **JS heap is 12.0 MB**; RSS 114.6 MB |
+| GPU | 108.9 MB | 261.5 MB | `gpu_compositing: disabled_software` on this host — see §2.5 |
+| Utility (network service) | 51.0 MB | 11.9 MB | Chromium's network service, not Mona code |
+| Tab (renderer) | 103.4 MB | 47.5 MB | **JS heap 3.3 MB**, 2,497 DOM nodes, 299 listeners |
+| **Total** | **377.1 MB** | — | engine measured separately, never included |
 
 The JavaScript heap is **not** the problem: 12.0 MB in main and 3.4 MB in the renderer, on a
 406 MB footprint. What is left is Chromium's own process baseline, which Mona inherits by
@@ -154,15 +154,15 @@ Effect on the installed candidate with the P22 workload:
 
 | | Before | After |
 |---|---|---|
-| Total working set, idle | 404 MB | **371.4 MB** |
+| Total working set, idle | 404 MB | **371.4–377.1 MB** |
 | Renderer DOM nodes | 9,382 | 2,497 |
 | Renderer JS heap | 5.8 MB | 3.4 MB |
 | Rendered rows | 500 | 120 |
-| Cold startup | 418 ms (P22, dev) | 422 ms (installed) |
-| Warm startup | 722 ms (P22, dev) | 738 ms (installed) |
+| Cold startup | 418 ms (P22, dev) | 427 ms (installed, final bytes) |
+| Warm startup | 722 ms (P22, dev) | 732 ms (installed, final bytes) |
 | Idle CPU | 0.04% | 0.01–0.04% |
 
-**−32.6 MB, target still unmet: 371.4 MB against 350 MB (gap 21.4 MB).** MONA-028 stays
+**−27 to −33 MB, target still unmet: 371.4–377.1 MB against 350 MB (gap 21.4–27.1 MB).** The two installed runs bracket sampler variance; both are recorded, neither is cherry-picked. MONA-028 stays
 partial; D-0104's target is unchanged.
 
 ### 2.5 Why the GPU process is large here — a machine fact, not a Mona defect
@@ -184,7 +184,7 @@ Two attempts, both with material progress (see `.mona/build/attempts.jsonl`):
    Chromium baseline. **Material progress: yes.**
 2. **Hypothesis:** 500 rendered timeline rows account for tens of MB.
    **Action:** measured full-render cost (+27.7 MB), shipped windowed rendering at 120 rows.
-   **Result:** 404 → 371.4 MB installed. **Material progress: yes.**
+   **Result:** 404 → 371.4–377.1 MB installed. **Material progress: yes.**
 
 One attempt remains open before the three-attempt rule forces a stop. The next attempt is
 named in §2.7 and needs no new authorization; it is not started here because it is not
@@ -251,16 +251,16 @@ used the development build. Both were true; the sentence was wrong. Recorded pre
 |---|---|---|---|---|
 | P22 (`P22-performance.json`) | **development** Electron, 60 s idle | 418 ms | 722 ms | `npm run qa` |
 | P23 earlier (`P23-performance.json`) | **development**, 60 s | 1,093 ms | 741 ms | `npm run qa` |
-| **P23 installed candidate** (`P23-startup-installed.json`) | **installed `Mona.exe`**, 60 s | **422 ms** | **738 ms** | `npm run qa` with `MONA_QA_EXE` |
+| **P23 installed candidate** (`P23-startup-installed.json`) | **installed `Mona.exe`**, 60 s | **427 ms** | **732 ms** | `npm run qa` with `MONA_QA_EXE` |
 
 So: cold and warm startup have now been measured **on the installed release candidate**
-(422 ms / 738 ms, both inside the 5 s / 2 s budgets), and the earlier report's numbers came
+(427 ms / 732 ms, both inside the 5 s / 2 s budgets), and the earlier report's numbers came
 from the development build. The installed run also completes — the P22 packaged-harness stall
 (P22-ISSUE-003) did not reproduce, and its cause is unknown; this is reported as "did not
 reproduce", not as "fixed".
 
 Idle memory from that same harness run: 381.7 MB (its sampling includes the first warm sample;
-the probe's 11-sample mean is the figure used for the budget comparison, 371.4 MB).
+the probe's 11-sample mean is the figure used for the budget comparison, 371.4–377.1 MB).
 
 ---
 
@@ -271,8 +271,8 @@ the probe's 11-sample mean is the figure used for the budget comparison, 371.4 M
 | Core usable release candidate 0.1.0 | **stands**, re-verified on the installed candidate |
 | All 30 requirements verified | no — MONA-027 blocked, MONA-028 partial |
 | Modern menu works locally | **not yet** — one elevated command short; nothing trusted by P23 |
-| Memory budget met | **no** — 371.4 MB vs 350 MB, down from 404 MB |
+| Memory budget met | **no** — 371.4–377.1 MB vs 350 MB, down from 404 MB |
 | Narrator / physical 200% | **not verified** — human checklist prepared |
-| Packaged startup measured | **yes** — 422 ms cold, 738 ms warm |
+| Packaged startup measured | **yes** — 427 ms cold, 732 ms warm |
 | License / public distribution | **unresolved by design**, Victor's decision |
 | Upstream engine check | **unavailable** — `api.github.com` did not resolve; pinned evidence unchanged |
