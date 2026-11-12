@@ -1,97 +1,80 @@
 # Mona build handoff
 
-**Current prompt:** P05 — Build transactional project state and safe migrations
-**Current status:** P00–P04 completed. State revision 12. Next eligible: P05, P06.
+**Current prompt:** P06 — Build Mona's distinctive design system
+**Current status:** P00–P05 completed. State revision 17. Next eligible: P06.
 
-**Last verified commit / dirty work:** the P04 commit covers the supervisor, the
-desktop lifecycle wiring, the ledger updates and the evidence below; the working
-tree is clean after it.
+**Last verified commit / dirty work:** the P05 commit covers the state layer, the
+desktop wiring and the evidence below; the working tree is clean after it.
 
-## P04 result — Mona owns processes, and stopping is truthful
+## P05 result — one durable authority for local state
 
-`packages/adapter/src/supervisor.ts` replaces P03's minimal
-`startOwnedRuntime` (which is now a thin wrapper over the supervisor, kept for
-the P03 live script).
+`packages/project-state` is new and is opened by the desktop at launch
+(`apps/desktop/src/main/local-state.ts`).
 
-- **Ownership is (workspace, pid, creation time), not a pid.** Every record
-  carries executable realpath/size/mtime, engine version+commit, pid, process
-  creation time, parent pid, desktop instance id, loopback endpoint and a token
-  digest. A pid whose creation time changed is a stranger: the record is marked
-  `stale` and the process is left alone. An unreadable creation time is reported
-  as unverifiable rather than guessed.
-- **Readiness is identity, not a 200.** `/health` must say
-  `codewhale-runtime-api`, `/v1/runtime/info` must match the 1.0 contract with
-  `auth_required: true`, loopback `bind_host`, and the port Mona chose, and a
-  stateful route (`/v1/providers`) must accept the token. A child that exits at
-  any point before its record is written fails the start.
-- **Stopping** captures observed descendants, uses `taskkill /PID <pid> /T`
-  (grace, then `/F`), polls only those pids, and returns a receipt with
-  `rollback_claimed: false`. Real engine stops report `stopped_forced` because a
-  console app ignores the polite close — recorded honestly, not dressed up.
-- **Crash → bounded process restart** with capped backoff inside a sliding
-  window; no turn is ever resubmitted. Exhaustion is a terminal `failed` state.
-- **Four transitions, four receipts** (`work-control.ts`): pause-after-task is a
-  queue boundary, interrupt-now needs an engine receipt or reports
-  `outcome_unknown`, cancel-queued refuses the running task, quit-and-stop
-  interrupts then stops and reports `partial` when either half is uncertain.
-- **Desktop** (`apps/desktop/src/main/engine-host.ts`, `lifecycle-probe.ts`,
-  `main.ts`): single owner, second-instance path forwarding, close hides while
-  work is owned, renderer crash destroys the dead window and recreates exactly
-  one, `window-all-closed` quits only when nothing is owned, quit interrupts then
-  stops. External runtimes attach read-only and `stop()` is refused.
-- **No spawn at launch.** Idle Mona starts no process and makes no request.
+- **Engine:** SQLite through `node:sqlite` (`DatabaseSync`, online `backup`).
+  No native module, no toolchain prerequisite.
+- **One write path:** `ProjectStore.write()` enters the maintenance barrier and
+  one `BEGIN IMMEDIATE` transaction. Revision checks fail stale writers
+  (`stale_revision`) instead of overwriting newer state.
+- **Barrier:** `exclusive` (migration, restore) refuses reads and writes until
+  in-flight work drains; `snapshot` (backup) refuses writers but keeps reads.
+  A write during maintenance gets a typed `maintenance` error.
+- **Schema v1:** 16 tables plus `store_meta`, covering projects, runtime
+  bindings, threads, turns, submissions, tasks, dependencies, evidence, attempts,
+  decisions, cursors, usage, capability snapshots, settings versions, artifacts.
+  Migrations are immutable and checksummed; drift fails closed; a failed
+  migration rolls back to the previous version.
+- **Backup/restore:** verified snapshot, digest-checked restore, prior database
+  parked in `recovery/`, recovery files never unlinked.
+- **Artifacts:** content-addressed, 8 MiB bound, disk-reserve refusal, bounded
+  reads, retention that refuses to prune protected evidence.
+- **Identity:** aliases (same folder, junction, same inode) resolve to one
+  project; a moved folder needs an explicit rebind and keeps its id; worktrees
+  are distinct roots sharing the canonical `.git` key; removal never deletes the
+  folder.
+- **Export/import:** digest-covered, revision-aware, free of machine-local
+  bindings.
+- **Journal:** `SqliteSubmissionJournal` replaces the file journal and is bound
+  into `EngineHost`, so quit-and-stop can issue a real interrupt once a project
+  is open.
 
-Two real defects were found by the evidence runs and fixed: a crashed last window
-fired `window-all-closed` → quit → stop (work loss), and an exit during startup
-was reported as a running runtime with a dead pid.
+Proof: `docs/evidence/P05-state.md`, `P05-state-open.json` (the real app opens
+schema v1, 17 tables, integrity ok), `P05-tests.txt` (132 Vitest, 23 new),
+`P05-checks.txt`, `P05-build.txt`. Decisions D-0032…D-0034.
 
-Evidence: `docs/evidence/P04-supervisor.md` (matrix + limits), `P04-live.json`
-(15/15 against the real pinned engine), `P04-lifecycle.json` (10/10 in real
-Electron), `P04-tests.txt` (109 Vitest + 13 bootstrap + 8 spike), `P04-checks.txt`,
-`P04-build.txt`. Decisions D-0028…D-0031.
+## Next exact action (P06)
 
-Also fixed here: the renderer bundle had pulled zod in through the AppInfo
-labels; the label/status vocabulary now lives in
-`apps/desktop/src/shared/engine-status.ts` and the bundle dropped from 286 kB to
-225 kB.
-
-## Next exact action (P05)
-
-Read P05 in `Mona_PROMPTS.md` (spec 8.1–8.3, 10.1, 17) plus D-0003, D-0008 and
-P04's ownership record shape. Build `packages/project-state`: SQLite via
-`node:sqlite` (Node 26 has `DatabaseSync`, `backup`), migrations with a version
-table, foreign keys, one write path, revision checks, and the maintenance barrier
-that all writers respect. Tables per spec 10.1: projects, runtime_bindings,
-threads, turns, submissions, tasks, task_dependencies, requirement_evidence,
-attempts, decisions, event_cursors, usage_records, capability_snapshots,
-settings_versions. Keep engine history authoritative; store projections and
-references. Bind `EngineHost.bindJournal` here so quit-and-stop can interrupt for
-real. Atomic project export/import with digests; bounded artifact files; portable
-handoff bundle; crash injection around transactions; relocation vs. rebinding.
+Read P06 in `Mona_PROMPTS.md` and spec 4, 12, 15. Build the design system in
+`packages/ui` (tokens, typography, spacing, surfaces, focus, density, motion) and
+the components P06 lists, plus a clearly labeled fixture-backed visual harness
+for home, project studio, work board, cost lens, blocker card and settings.
+Validate contrast by measurement rather than assuming the starting palette; keep
+fonts and icons local; honor reduced motion; prove keyboard access and visible
+focus. Capture screenshots in both themes and both densities at 1280×800 and a
+large desktop. The harness must be labeled as visual development data, must not
+fetch anything external, and must make zero inference calls.
 
 ## Relevant files and spec sections
 
-- `packages/adapter/src/{supervisor,ownership,process,work-control,lifecycle}.ts`
-- `apps/desktop/src/main/{engine-host,engine-host-config,lifecycle-probe,main}.ts`,
-  `apps/desktop/src/shared/engine-status.ts`
-- Spec 6.4, 10.3, 13; next: 8.1–8.3, 10.1, 17.
-- `docs/evidence/P04-supervisor.md` for the lifecycle matrix and known limits.
+- `packages/project-state/src/{store,barrier,migrations,backup,artifacts,export,identity}.ts`
+- `apps/desktop/src/main/{local-state,engine-host,main}.ts`
+- `apps/desktop/src/shared/engine-status.ts`, `apps/desktop/src/renderer/App.tsx`
+- Spec 4 (visual experience), 12 (delight), 15 (quality) for P06; 8/10.1 for
+  reference on what the state layer guarantees.
 
 ## Open problem IDs and no-progress counts
 
-No open blocker; `attempts.jsonl` still holds only the closed P02 rows.
+No open blocker; `attempts.jsonl` holds only the closed P02 rows.
 
 - **P01-ISSUE-001** — exec vs runtime endpoint fingerprint drift; P16 resolves.
-- **P01-ISSUE-002** — Windows allows a second runtime in one workspace; Mona now
-  leases one workspace at a time and refuses a second runtime, but the upstream
-  behaviour itself is unchanged and parallel workspaces stay off.
+- **P01-ISSUE-002** — Windows allows a second runtime in one workspace; Mona
+  leases one workspace at a time, parallel workspaces stay off.
 - **P01-ISSUE-003** — terminal capability flags false; P18.
 - **P01-ISSUE-004** — cost sample provisional; re-run after routing changes.
-- **P04-ISSUE-001** — no Job Object on this host (no MSVC toolchain). Cleanup is
-  `taskkill /T` on the verified pid plus reconcile-at-start. Revisit only with a
-  recorded build prerequisite (D-0029).
-- **P04-ISSUE-002** — close-to-tray has no tray affordance until P07; a hidden
-  window is restored by launching Mona again.
+- **P04-ISSUE-001** — no Job Object on this host; `taskkill /T` plus reconcile.
+- **P04-ISSUE-002** — close-to-tray has no tray affordance until P07.
+- **P05-ISSUE-001** — the maintenance barrier is in-process; cross-process
+  safety is SQLite's locking plus the single-instance lock (D-0032).
 
 ## Blocked dependencies
 
@@ -99,16 +82,16 @@ None.
 
 ## Last relevant validation
 
-- `npx vitest run` → 109 pass (25 new for P04); bootstrap 13; spike 8.
+- `npx vitest run` → 132 pass (23 new for P05); bootstrap 13; spike 8.
 - `npm run lint`, `npm run format:check`, `npm run typecheck` → pass.
-- `npm run build` → pass; `check:build` → pass (225 kB renderer, no zod).
-- `npm run smoke -w @mona/desktop` → pass, 332 MB, security assertions intact.
-- `npm run lifecycle -w @mona/desktop` → 10/10 real-Electron checks.
-- `node packages/adapter/scripts/live-supervisor.mjs` → 15/15 real-engine steps.
-- `node tools/build/cli.mjs validate --verbose` → OK, state r12.
-- Spend so far ≈ $0.05 of the $2 pilot ceiling; P04 made no provider request.
+- `npm run build` → contracts, adapter, project-state, desktop; renderer 225 kB.
+- `npm run smoke -w @mona/desktop` → pass, 334 MB, security assertions intact.
+- `npm run lifecycle -w @mona/desktop` → 10/10 lifecycle checks **and** local
+  state opened (schema v1, 17 tables, integrity ok).
+- `node tools/build/cli.mjs validate --verbose` → OK, state r17.
+- Spend ≈ $0.05 of the $2 pilot ceiling; P04 and P05 made no provider request.
 
 ## Human input needed
 
-None. Same caution as before: edit source with byte-safe tools, not PowerShell
+None. Same caution: edit source with byte-safe tools, not PowerShell
 `Get-Content`/`Set-Content` round-trips (D-0027).

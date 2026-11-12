@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 99,
+  "revision": 112,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -676,25 +676,52 @@
         "P07",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "catalog-actions",
           "description": "Create, open, rename label, archive, pin, search, relocate and reveal work",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:27Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "create/open/rename label/pin/archive/search fields and removal exist in the store; reveal and the catalog UI are P07"
+            }
+          ]
         },
         {
           "id": "no-source-delete",
           "description": "Removing a catalog entry never deletes project files",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:27Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "removing a catalog entry never deletes the folder; the marker and files survive removal in tests"
+            }
+          ]
         },
         {
           "id": "relocation",
           "description": "Moved or aliased paths rebind deliberately instead of duplicating a project",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:28Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "alias/junction resolves to one project; a moved folder requires explicit rebind and keeps its project id; worktrees stay distinct with a shared repo key"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -721,11 +748,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:28Z",
-              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
-              "note": "Daybreak tokens rendered in the live Electron window; re-verified during P04 with the same security assertions"
+              "recorded_utc": "2026-11-12T02:22:37Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "re-verified at P05 with local state wired in; Daybreak tokens and security assertions unchanged"
             }
           ]
         },
@@ -924,7 +951,7 @@
         "P10",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "state-schema",
@@ -938,6 +965,14 @@
               "recorded_utc": "2026-11-12T00:23:42Z",
               "commit": null,
               "note": "state v1 validated by ajv against tools/build/schema/state.schema.json"
+            },
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:27Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "versioned schema_migrations with checksums; 16 tables plus store_meta; foreign keys on; real app opens schema v1 (P05-state-open.json)"
             }
           ]
         },
@@ -953,6 +988,14 @@
               "recorded_utc": "2026-11-12T00:23:42Z",
               "commit": null,
               "note": "temp write + fsync + rename; prior revision backed up; interrupted write promoted by recover"
+            },
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:27Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "single BEGIN IMMEDIATE write path with full rollback; crash mid-transaction leaves valid state; verified backups keep a prior copy"
             }
           ]
         },
@@ -1017,8 +1060,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1304,11 +1347,11 @@
             },
             {
               "path": "docs/evidence/P04-lifecycle.json",
-              "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
+              "sha256": "973ccd85c03d2e17cfad785ca94667ab23759a994faaeada4ec2240460779d1a",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:58Z",
-              "commit": "3dfb511",
-              "note": "P04 evidence recorded at commit 3dfb511"
+              "recorded_utc": "2026-11-12T02:22:38Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "re-verified at P05 with local state open: close keeps work, crash recreates one window, relaunch reuses the runtime"
             }
           ]
         },
@@ -1324,6 +1367,14 @@
               "recorded_utc": "2026-11-12T01:30:56Z",
               "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
               "note": "seq-based dedup across replay and reconnect tested, live replay strictly increasing"
+            },
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:28Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "event cursors and submission intent share the single transactional write path; journal lookups are keyed by thread plus operation key"
             }
           ]
         },
@@ -1343,7 +1394,7 @@
           ]
         }
       ],
-      "verified_commit": "3dfb511",
+      "verified_commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1634,19 +1685,37 @@
         "P20",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "backup-restore",
           "description": "Backup and restore use a maintenance lock and verified journals",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:28Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "verified snapshot via the SQLite backup API, digest and integrity checked, restore parks the prior database and never unlinks recovery files; writers quiesced"
+            }
+          ]
         },
         {
           "id": "migration",
           "description": "Migrations are versioned and recoverable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P05-state.md",
+              "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T02:22:28Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "immutable checksummed migrations; failed migration rolls back and keeps the prior version; pre-migration backup retained"
+            }
+          ]
         },
         {
           "id": "diagnostics",
@@ -1683,11 +1752,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:29Z",
-              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
-              "note": "re-verified at P04: sandboxed renderer, one frozen preload key, no Node or ipcRenderer globals, devtools closed"
+              "recorded_utc": "2026-11-12T02:22:37Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "re-verified at P05: sandboxed renderer, one frozen preload key, no Node globals, devtools closed"
             }
           ]
         },
@@ -1698,11 +1767,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:29Z",
-              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
-              "note": "single app-info channel; P04 added no renderer-facing IPC"
+              "recorded_utc": "2026-11-12T02:22:37Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "still a single app-info channel; local state is main-process only"
             }
           ]
         },
@@ -1743,11 +1812,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:29Z",
-              "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a",
-              "note": "remote navigation and popups still refused in the live window after the P04 lifecycle wiring"
+              "recorded_utc": "2026-11-12T02:22:38Z",
+              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
+              "note": "remote navigation and popups still refused after the P05 wiring"
             }
           ]
         }

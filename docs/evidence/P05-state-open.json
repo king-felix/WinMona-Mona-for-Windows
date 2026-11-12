@@ -1,0 +1,25 @@
+{
+  "ok": true,
+  "db_file": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-lifecycle-profile-14yrK7\\state\\mona.sqlite",
+  "schema_version": 1,
+  "tables": [
+    "artifacts",
+    "attempts",
+    "capability_snapshots",
+    "decisions",
+    "event_cursors",
+    "projects",
+    "requirement_evidence",
+    "runtime_bindings",
+    "schema_migrations",
+    "settings_versions",
+    "store_meta",
+    "submissions",
+    "task_dependencies",
+    "tasks",
+    "threads",
+    "turns",
+    "usage_records"
+  ],
+  "integrity": "ok"
+}

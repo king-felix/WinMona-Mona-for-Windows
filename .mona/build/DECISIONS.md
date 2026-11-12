@@ -396,3 +396,45 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** the desktop interrupt path stays honestly unknown until a
   project binds a submission journal (P05/P08). No receipt may claim success
   that the engine did not acknowledge.
+## D-0032 — SQLite through `node:sqlite`, with a single in-process write path
+
+- **Decision:** local project state is SQLite opened through Node's built-in
+  `node:sqlite` (`DatabaseSync`, `backup`), not `better-sqlite3` or a native
+  driver. Every mutation goes through `ProjectStore.write()`, which holds the
+  maintenance barrier and one `BEGIN IMMEDIATE` transaction.
+- **Why:** no native module to compile (there is no MSVC toolchain), the online
+  backup API is built in, and one write path makes revision checks and the
+  maintenance barrier enforceable in one place instead of by convention.
+- **Constrains:** the barrier is in-process. Cross-process safety rests on
+  SQLite's own locking (`BEGIN IMMEDIATE`, `busy_timeout`), and Mona's
+  single-instance lock keeps a second desktop owner from appearing. A future
+  external writer must respect both, not invent a third path.
+- **Evidence:** `packages/project-state/src/{db,store,barrier}.ts`,
+  `P05-tests.txt` (crash, stale revision, maintenance refusal).
+
+## D-0033 — Two maintenance modes: exclusive and snapshot
+
+- **Decision:** `exclusive` (migration, restore) refuses reads and writes until
+  in-flight work drains; `snapshot` (backup) refuses writes but keeps reads
+  available. Both are entered through the same barrier that every writer uses.
+- **Why:** restore replaces the database file, so a read during it could observe
+  a half-written file; backup does not move the file, and blocking the UI for it
+  would be a self-inflicted freeze.
+- **Constrains:** any new maintenance operation must declare which mode it needs.
+  A write that requires the barrier gets a typed `maintenance` error rather than
+  a retry loop inside the store.
+
+## D-0034 — Project identity is path + inode + marker, and moving needs a rebind
+
+- **Decision:** a project is keyed by its canonical path and filesystem identity
+  (device + inode), with an optional marker document at
+  `.mona/project/project.json`. Registration resolves aliases (same folder,
+  junction, same inode) to the existing project, and refuses to create a second
+  project from a marker found at a new path until the caller explicitly rebinds.
+  Git worktrees are separate roots that share the canonical `.git` key.
+- **Why:** the specification requires ids that are stable independently of path,
+  deliberate rebinding after a move, distinct worktree roots, and no accidental
+  duplicates. Copy-and-register would violate all four.
+- **Constrains:** the marker is additive and small; losing it degrades relocation
+  detection to path/inode matching. Removing a catalog entry never deletes user
+  files, and the tests assert the folder and marker survive removal.

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 14,
+  "revision": 17,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P05",
+  "current_prompt": "P06",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -197,10 +197,10 @@
         },
         {
           "path": "docs/evidence/P02-smoke.json",
-          "sha256": "ab042748ff9375e0d8d8bb1f91d6a6daa515df3ea2595dcf08fede59d71ce84b",
+          "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:28Z",
-          "commit": "fb9b748135d5acd008aa9a9d29451eb3e181bc2a"
+          "recorded_utc": "2026-11-12T02:22:36Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         }
       ],
       "blocker_ids": []
@@ -283,72 +283,117 @@
           "path": "docs/evidence/P04-supervisor.md",
           "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-live.json",
           "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-live-log.txt",
           "sha256": "48eafebf4d8052afc0ad7ea71293ca87ef3db93b68ef6c9acce6d407f801d84c",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-lifecycle.json",
-          "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
+          "sha256": "973ccd85c03d2e17cfad785ca94667ab23759a994faaeada4ec2240460779d1a",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-lifecycle-log.txt",
-          "sha256": "de925d14175296f7ef7bc568492658aa55f6d995a904f87c2adfb244469881f2",
+          "sha256": "9817e9c03291141b99df64640a7f989bb1d8e999027cd9b31dd575c3d3a8791e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-tests.txt",
           "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-checks.txt",
           "sha256": "a0678bf2afa20c9a0bd591572fba7086db8b3670fde7be461541e886adb430b3",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         },
         {
           "path": "docs/evidence/P04-build.txt",
           "sha256": "fc410464552be8868c69e82f35d12e5742f01805437114ae812d7d28854519e0",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:57Z",
-          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
+          "recorded_utc": "2026-11-12T02:22:37Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
         }
       ],
       "blocker_ids": []
     },
     "P05": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-005",
         "MONA-010",
         "MONA-016",
         "MONA-025"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "packages/project-state: SQLite via node:sqlite with a single write path, revision checks, foreign keys and a maintenance barrier (exclusive and snapshot modes)",
+        "Versioned immutable migrations with checksums, pre-migration verified backup, rollback on failure, and fail-closed drift detection",
+        "Schema for projects, runtime bindings, threads, turns, submissions, tasks, dependencies, evidence, attempts, decisions, cursors, usage, capability snapshots, settings versions and artifacts",
+        "Verified online backup and restore that parks the prior database; no recovery file is deleted",
+        "Bounded content-addressed artifact store with disk-full refusal, read bounds and protected-evidence retention",
+        "Project identity: alias/junction resolution, deliberate rebind after a move, distinct worktrees sharing one repo key, removal never deletes files",
+        "Portable project export/import with digest and revision checks; no machine-local bindings travel",
+        "Desktop opens state at launch, binds the SQLite submission journal, and isolates evidence runs with MONA_USER_DATA"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P05-state.md",
+          "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:22:43Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+        },
+        {
+          "path": "docs/evidence/P05-state-open.json",
+          "sha256": "966f1a97864d44135bf21fc6f9168e5b047afa14b77851659c83fd4e3287a428",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:22:43Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+        },
+        {
+          "path": "docs/evidence/P05-tests.txt",
+          "sha256": "c0797c8bd7b0afdc03012bb84d6fedcc02050c402d7ecf4d96190773eec0fb4b",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:22:43Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+        },
+        {
+          "path": "docs/evidence/P05-checks.txt",
+          "sha256": "89ed052dd661290997ef8e885a68443c429d829eb568578b551c63ffc16abfae",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:22:43Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+        },
+        {
+          "path": "docs/evidence/P05-build.txt",
+          "sha256": "e7a9a1298511605c0b6c9eee38a0891bde5640492e9269001e357c2b60c4f849",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T02:22:43Z",
+          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+        }
+      ],
       "blocker_ids": []
     },
     "P06": {
@@ -585,8 +630,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P05",
     "P06"
   ],
-  "last_checkpoint_utc": "2026-11-12T02:12:57Z"
+  "last_checkpoint_utc": "2026-11-12T02:22:43Z"
 }

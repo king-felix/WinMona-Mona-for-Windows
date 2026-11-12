@@ -3,7 +3,8 @@
 // and the window makes no network request of its own.
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdir, readFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -27,9 +28,10 @@ if (!electronPath || !existsSync(electronPath)) {
   process.exit(3);
 }
 
+const userData = await mkdtemp(path.join(tmpdir(), 'mona-smoke-profile-'));
 const child = spawn(electronPath, ['.', '--smoke-test'], {
   cwd: appDir,
-  env: { ...process.env, MONA_SMOKE_OUT: out },
+  env: { ...process.env, MONA_SMOKE_OUT: out, MONA_USER_DATA: userData },
   stdio: ['ignore', 'pipe', 'pipe'],
   windowsHide: true,
 });
@@ -37,6 +39,7 @@ let stderr = '';
 child.stderr.on('data', (chunk) => (stderr += chunk.toString('utf8')));
 child.stdout.on('data', () => {});
 const code = await new Promise((resolve) => child.on('exit', (value) => resolve(value)));
+await rm(userData, { recursive: true, force: true, maxRetries: 3 }).catch(() => undefined);
 if (stderr.trim()) console.error(stderr.trim().slice(-2000));
 if (code !== 0) {
   console.error(`electron exited with ${code}`);

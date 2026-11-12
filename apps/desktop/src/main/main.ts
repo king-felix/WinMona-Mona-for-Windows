@@ -6,6 +6,7 @@ import { parseLaunchArgs } from '@mona/adapter';
 import { createAppInfo, registerIpc } from './ipc.js';
 import { EngineHost } from './engine-host.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
+import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
@@ -21,6 +22,12 @@ const lifecycleOut = process.env.MONA_LIFECYCLE_OUT ?? path.join(process.cwd(), 
 const lifecycleWorkspace = process.env.MONA_LIFECYCLE_WORKSPACE ?? null;
 const trustOptions = { indexPath: rendererIndex, ...(devServerUrl ? { devServerUrl } : {}) };
 
+// Evidence runs and tests must never write into the real user profile.
+const userDataOverride = process.env.MONA_USER_DATA;
+if (userDataOverride && userDataOverride.trim()) {
+  app.setPath('userData', path.resolve(userDataOverride));
+}
+
 const engineHost = new EngineHost({
   ownershipDir: path.join(app.getPath('userData'), 'runtime'),
   executable: resolveEngineExecutable(),
@@ -28,6 +35,7 @@ const engineHost = new EngineHost({
 });
 
 const pendingLaunchPaths: string[] = [];
+let localState: LocalState | null = null;
 let quitRequested = false;
 
 function delay(ms: number): Promise<void> {
@@ -100,6 +108,21 @@ if (!app.requestSingleInstanceLock()) {
 
     // Reconciliation never starts inference or a runtime: it inspects ownership
     // records and terminates only processes this install can still identify.
+    // Local state opens before any project work: migrations run under the
+    // maintenance barrier and a pre-migration backup is kept. A state failure is
+    // reported, never hidden, and it never starts inference.
+    try {
+      localState = await openLocalState(path.join(app.getPath('userData'), 'state'));
+      engineHost.bindJournal(localState.journal);
+      if (localState.migrations.applied.length > 0) {
+        process.stderr.write(
+          `mona: applied ${localState.migrations.applied.length} state migration(s) to version ${localState.schemaVersion}\n`,
+        );
+      }
+    } catch (error) {
+      process.stderr.write(`mona: local state unavailable: ${String(error)}\n`);
+    }
+
     const reconciled = await engineHost.reconcile();
     if (reconciled.unverifiable > 0) {
       process.stderr.write(
@@ -150,6 +173,11 @@ if (!app.requestSingleInstanceLock()) {
       .finally(() => {
         app.quit();
       });
+  });
+
+  app.on('will-quit', () => {
+    localState?.close();
+    localState = null;
   });
 
   app.on('window-all-closed', () => {
