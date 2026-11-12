@@ -21,7 +21,8 @@ const REPS = Number(process.argv[process.argv.indexOf('--reps') + 1] || 2);
 const outIndex = process.argv.indexOf('--out');
 const OUT = outIndex === -1 ? null : process.argv[outIndex + 1];
 const RATES = {
-  source: 'engine bundled model catalog: deepseek-flash cost {input: 0.15, cache_read: 0.003, output: 0.6} USD per million tokens',
+  source:
+    'engine bundled model catalog: deepseek-flash cost {input: 0.15, cache_read: 0.003, output: 0.6} USD per million tokens',
   input_per_m_usd: 0.15,
   cache_read_per_m_usd: 0.003,
   output_per_m_usd: 0.6,
@@ -47,7 +48,10 @@ const TASKS = [
       }
       const pass = Number(output.match(/pass\s+(\d+)/i)?.[1] ?? 0);
       const fail = Number(output.match(/fail\s+(\d+)/i)?.[1] ?? 1);
-      return { accepted: Boolean(sum && test) && pass >= 1 && fail === 0, evidence: { sum_bytes: sum?.length ?? 0, test_bytes: test?.length ?? 0, pass, fail } };
+      return {
+        accepted: Boolean(sum && test) && pass >= 1 && fail === 0,
+        evidence: { sum_bytes: sum?.length ?? 0, test_bytes: test?.length ?? 0, pass, fail },
+      };
     },
   },
   {
@@ -57,7 +61,10 @@ const TASKS = [
     async accept(workspace, response) {
       const sum = await readFile(join(workspace, 'sum.js'), 'utf8').catch(() => null);
       const unchanged = sum === 'export function sum(a, b) { return a + b; }\n';
-      return { accepted: unchanged && /\bsum\b/i.test(response || ''), evidence: { unchanged, response_chars: response?.length ?? 0 } };
+      return {
+        accepted: unchanged && /\bsum\b/i.test(response || ''),
+        evidence: { unchanged, response_chars: response?.length ?? 0 },
+      };
     },
   },
   {
@@ -71,7 +78,10 @@ const TASKS = [
       const a = await readFile(join(workspace, 'a.txt'), 'utf8').catch(() => null);
       const b = await readFile(join(workspace, 'b.txt'), 'utf8').catch(() => null);
       const accepted = a?.trim() === '1' && b?.trim() === '2';
-      return { accepted, evidence: { a: a?.trim() ?? null, b: b?.trim() ?? null, response_chars: response?.length ?? 0 } };
+      return {
+        accepted,
+        evidence: { a: a?.trim() ?? null, b: b?.trim() ?? null, response_chars: response?.length ?? 0 },
+      };
     },
   },
 ];
@@ -93,11 +103,17 @@ const report = {
 };
 
 function price(hit, miss, output) {
-  return (miss * RATES.input_per_m_usd + hit * RATES.cache_read_per_m_usd + output * RATES.output_per_m_usd) / 1_000_000;
+  return (
+    (miss * RATES.input_per_m_usd + hit * RATES.cache_read_per_m_usd + output * RATES.output_per_m_usd) / 1_000_000
+  );
 }
 
 async function makeWorkspace(taskId, arm, rep) {
-  const workspace = join(tmpdir(), 'mona-p01-bench', `${taskId}-${arm}-${rep}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
+  const workspace = join(
+    tmpdir(),
+    'mona-p01-bench',
+    `${taskId}-${arm}-${rep}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`,
+  );
   await mkdir(workspace, { recursive: true });
   return workspace;
 }
@@ -157,7 +173,9 @@ async function runDirect(task, workspace) {
       output: row.output_tokens,
       finish_reason: row.finish_reason,
     })),
-    tool: tools ? { count: tools.tool_count, schema_bytes: tools.tool_schema_bytes, schema_sha256: tools.tool_schema_sha256 } : null,
+    tool: tools
+      ? { count: tools.tool_count, schema_bytes: tools.tool_schema_bytes, schema_sha256: tools.tool_schema_sha256 }
+      : null,
     endpointFingerprint: receipts[0]?.receipt?.wire_observations?.[0]?.endpoint_fingerprint ?? null,
     wireModel: receipts[0]?.receipt?.wire_observations?.[0]?.wire_model ?? null,
     metadata: metadata
@@ -184,7 +202,9 @@ async function runAdapter(task, workspace, port) {
   const api = new RuntimeClient({ baseUrl: runtime.baseUrl, token });
   const frames = [];
   const controller = new AbortController();
-  const until = (frame) => frame.event === 'turn.completed' || ['completed', 'interrupted', 'failed', 'canceled'].includes(frame.data?.payload?.status);
+  const until = (frame) =>
+    frame.event === 'turn.completed' ||
+    ['completed', 'interrupted', 'failed', 'canceled'].includes(frame.data?.payload?.status);
   try {
     const { thread } = await api.createThread({ operationKey: `bench-thread-${crypto.randomUUID()}` });
     const stream = (async () => {
@@ -205,9 +225,17 @@ async function runAdapter(task, workspace, port) {
     const turn = detail.turns?.find((row) => row.id === turnId);
     const usage = await api.threadUsage(thread.id);
     const usageEvents = frames.filter((frame) => frame.event === 'turn.usage' && frame.data?.turn_id === turnId);
-    const providerEvents = frames.filter((frame) => frame.event === 'turn.provider_request' && frame.data?.turn_id === turnId);
-    const hit = usageEvents.reduce((sum, frame) => sum + Number(frame.data?.payload?.usage?.prompt_cache_hit_tokens ?? 0), 0);
-    const miss = usageEvents.reduce((sum, frame) => sum + Number(frame.data?.payload?.usage?.prompt_cache_miss_tokens ?? 0), 0);
+    const providerEvents = frames.filter(
+      (frame) => frame.event === 'turn.provider_request' && frame.data?.turn_id === turnId,
+    );
+    const hit = usageEvents.reduce(
+      (sum, frame) => sum + Number(frame.data?.payload?.usage?.prompt_cache_hit_tokens ?? 0),
+      0,
+    );
+    const miss = usageEvents.reduce(
+      (sum, frame) => sum + Number(frame.data?.payload?.usage?.prompt_cache_miss_tokens ?? 0),
+      0,
+    );
     const output = usageEvents.reduce((sum, frame) => sum + Number(frame.data?.payload?.usage?.output_tokens ?? 0), 0);
     const toolObs = providerEvents[0]?.data?.payload?.wire_observations?.[0]?.tools ?? null;
     const response = frames
@@ -222,12 +250,30 @@ async function runAdapter(task, workspace, port) {
       status: turn?.status ?? null,
       requests: providerEvents.length,
       transportRetries: providerEvents.reduce((sum, frame) => sum + (frame.data?.payload?.transport_retries ?? 0), 0),
-      usage: { hit, miss, output, reasoning: usageEvents.reduce((sum, frame) => sum + Number(frame.data?.payload?.usage?.reasoning_tokens ?? 0), 0) },
+      usage: {
+        hit,
+        miss,
+        output,
+        reasoning: usageEvents.reduce(
+          (sum, frame) => sum + Number(frame.data?.payload?.usage?.reasoning_tokens ?? 0),
+          0,
+        ),
+      },
       engineCostUsd: usage.totals?.cost_usd ?? null,
       costComplete: usage.totals?.cost_complete ?? null,
       pricingProvenances: usage.totals?.pricing_provenances ?? [],
-      totalsSemantics: { input_tokens: usage.totals?.input_tokens, cached_tokens: usage.totals?.cached_tokens, note: 'thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input' },
-      tool: toolObs ? { count: toolObs.tool_count, schema_bytes: toolObs.tool_schema_bytes, schema_sha256: toolObs.tool_schema_sha256 } : null,
+      totalsSemantics: {
+        input_tokens: usage.totals?.input_tokens,
+        cached_tokens: usage.totals?.cached_tokens,
+        note: 'thread usage reports miss-only input_tokens plus cached_tokens; turn.usage reports total input',
+      },
+      tool: toolObs
+        ? {
+            count: toolObs.tool_count,
+            schema_bytes: toolObs.tool_schema_bytes,
+            schema_sha256: toolObs.tool_schema_sha256,
+          }
+        : null,
       endpointFingerprint: providerEvents[0]?.data?.payload?.wire_observations?.[0]?.endpoint_fingerprint ?? null,
       wireModel: providerEvents[0]?.data?.payload?.wire_observations?.[0]?.wire_model ?? null,
       requestUsage: usageEvents.map((frame) => ({
@@ -236,7 +282,9 @@ async function runAdapter(task, workspace, port) {
         output: frame.data?.payload?.usage?.output_tokens,
         duration_ms: frame.data?.payload?.duration_ms,
       })),
-      toolCatalogHash: frames.find((frame) => frame.event === 'model.tools.snapshot')?.data?.payload?.snapshot?.active_tool_catalog_sha256 ?? null,
+      toolCatalogHash:
+        frames.find((frame) => frame.event === 'model.tools.snapshot')?.data?.payload?.snapshot
+          ?.active_tool_catalog_sha256 ?? null,
       response,
     };
   } finally {
@@ -264,8 +312,12 @@ for (const task of TASKS) {
       result.workspace = workspace;
       result.accepted = acceptance.accepted;
       result.acceptance = acceptance;
-      result.costUsd = result.arm === 'adapter' ? result.engineCostUsd ?? price(result.usage.hit, result.usage.miss, result.usage.output) : price(result.usage.hit, result.usage.miss, result.usage.output);
-      result.costBasis = result.arm === 'adapter' ? 'engine-reported priced usage' : 'estimated with engine bundled rates';
+      result.costUsd =
+        result.arm === 'adapter'
+          ? (result.engineCostUsd ?? price(result.usage.hit, result.usage.miss, result.usage.output))
+          : price(result.usage.hit, result.usage.miss, result.usage.output);
+      result.costBasis =
+        result.arm === 'adapter' ? 'engine-reported priced usage' : 'estimated with engine bundled rates';
       report.runs.push({ task: task.id, rep, ...result });
       pair[arm] = {
         accepted: result.accepted,
@@ -317,9 +369,7 @@ function median(values) {
 }
 
 function verdict(current) {
-  const toolHashes = current.runs
-    .map((run) => run.tool?.schema_sha256)
-    .filter(Boolean);
+  const toolHashes = current.runs.map((run) => run.tool?.schema_sha256).filter(Boolean);
   const toolParity = new Set(toolHashes).size === 1 && toolHashes.length > 1;
   const allAccepted = current.totals.acceptedDirect === current.totals.acceptedAdapter;
   const gate = typeof current.totals.medianPairedDeltaPct === 'number' && current.totals.medianPairedDeltaPct <= 5;

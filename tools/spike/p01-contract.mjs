@@ -6,11 +6,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
-import {
-  RuntimeClient,
-  makeToken,
-  startOwnedRuntime,
-} from './runtime/client.mjs';
+import { RuntimeClient, makeToken, startOwnedRuntime } from './runtime/client.mjs';
 
 const ENGINE = process.env.MONA_ENGINE ?? 'C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe';
 const PORT = Number(process.env.MONA_PORT ?? 7891);
@@ -24,12 +20,17 @@ const report = {
   engine: { path: ENGINE },
   checks: [],
   observations: {},
-  inference: { expected: 'none', mechanism: 'token/cost counters unchanged across discovery, thread create, history, events reconnect' },
+  inference: {
+    expected: 'none',
+    mechanism: 'token/cost counters unchanged across discovery, thread create, history, events reconnect',
+  },
 };
 
 function record(name, ok, detail) {
   report.checks.push({ name, ok, detail });
-  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` :: ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`);
+  console.log(
+    `${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` :: ${typeof detail === 'string' ? detail : JSON.stringify(detail)}` : ''}`,
+  );
 }
 
 const workspace = join(tmpdir(), 'mona-p01-contract', String(Date.now()));
@@ -50,7 +51,9 @@ try {
   const noAuth = await fetch(`${runtime.baseUrl}/v1/sessions`);
   record('unauthenticated stateful /v1 route refused', noAuth.status === 401, { status: noAuth.status });
   const noAuthInfo = await fetch(`${runtime.baseUrl}/v1/runtime/info`);
-  record('runtime identity is unauthenticated discovery metadata', noAuthInfo.status === 200, { status: noAuthInfo.status });
+  record('runtime identity is unauthenticated discovery metadata', noAuthInfo.status === 200, {
+    status: noAuthInfo.status,
+  });
   const health = await fetch(`${runtime.baseUrl}/health`);
   record('unauthenticated /health is liveness only', health.status === 200, {
     status: health.status,
@@ -70,10 +73,14 @@ try {
   // --- discovery ----------------------------------------------------------
   const info = await api.runtimeInfo();
   report.observations.runtime_info = info;
-  record('runtime identity pinned to installed binary', info.codewhale_version === '0.10.2' && info.codewhale_commit?.startsWith('ff466b2ed0bf'), {
-    version: info.codewhale_version,
-    commit: info.codewhale_commit,
-  });
+  record(
+    'runtime identity pinned to installed binary',
+    info.codewhale_version === '0.10.2' && info.codewhale_commit?.startsWith('ff466b2ed0bf'),
+    {
+      version: info.codewhale_version,
+      commit: info.codewhale_commit,
+    },
+  );
   const caps = info.capabilities ?? {};
   report.observations.capabilities = caps;
   record('capability: turn_operation_idempotency', caps.turn_operation_idempotency === true);
@@ -88,11 +95,15 @@ try {
 
   const config = await api.effectiveConfig();
   report.observations.effective_config = config;
-  record('configured route preserved: deepseek / deepseek-flash', config.provider === 'deepseek' && config.model === 'deepseek-flash', {
-    provider: config.provider,
-    model: config.model,
-    base_url: config.base_url,
-  });
+  record(
+    'configured route preserved: deepseek / deepseek-flash',
+    config.provider === 'deepseek' && config.model === 'deepseek-flash',
+    {
+      provider: config.provider,
+      model: config.model,
+      base_url: config.base_url,
+    },
+  );
 
   const providers = await api.providers();
   report.observations.providers = providers;
@@ -121,14 +132,18 @@ try {
   // the replay check below reuses it deliberately.
   const threadOperationKey = `p01-contract-${crypto.randomUUID()}`;
   const created = await api.createThread({ operationKey: threadOperationKey });
-  record('thread create returns effective profile', created.status === 201 && created.thread?.permission_posture === 'full_access', {
-    status: created.status,
-    id: created.thread?.id,
-    posture: created.thread?.permission_posture,
-    model: created.thread?.model,
-    provider: created.thread?.model_provider,
-    workspace: created.thread?.workspace,
-  });
+  record(
+    'thread create returns effective profile',
+    created.status === 201 && created.thread?.permission_posture === 'full_access',
+    {
+      status: created.status,
+      id: created.thread?.id,
+      posture: created.thread?.permission_posture,
+      model: created.thread?.model,
+      provider: created.thread?.model_provider,
+      workspace: created.thread?.workspace,
+    },
+  );
   const threadId = created.thread.id;
   record('thread workspace matches owned runtime cwd', created.thread.workspace === workspace, {
     thread: created.thread.workspace,
@@ -156,15 +171,23 @@ try {
   });
 
   const detail = await api.getThread(threadId);
-  record('thread detail exposes latest_seq and empty turn list', detail.latest_seq >= 1 && Array.isArray(detail.turns) && detail.turns.length === 0, {
-    latest_seq: detail.latest_seq,
-  });
+  record(
+    'thread detail exposes latest_seq and empty turn list',
+    detail.latest_seq >= 1 && Array.isArray(detail.turns) && detail.turns.length === 0,
+    {
+      latest_seq: detail.latest_seq,
+    },
+  );
 
   const history = await api.history(threadId);
-  record('history is readable and engine-owned', history.runtime_thread_id === threadId && Array.isArray(history.session?.messages), {
-    data_dir: history.data_dir,
-    messages: history.session?.messages?.length ?? null,
-  });
+  record(
+    'history is readable and engine-owned',
+    history.runtime_thread_id === threadId && Array.isArray(history.session?.messages),
+    {
+      data_dir: history.data_dir,
+      messages: history.session?.messages?.length ?? null,
+    },
+  );
 
   // Event subscription without inference: read the replayed journal, require
   // a stream that opens and can be aborted.

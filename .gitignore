@@ -1,9 +1,12 @@
 ﻿# Dependencies and build output
 node_modules/
-/dist/
+dist/
+**/dist/
+**/.vite/
 /out/
 /build/
 *.tsbuildinfo
+mona-smoke.json
 
 # Local machine state (never committed)
 .mona/build/tmp/

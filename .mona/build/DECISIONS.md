@@ -185,3 +185,52 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Evidence:** `docs/evidence/P01-feasibility.md`, `P01-bench.json`.
 - **Constrains:** P03 displays the runtime fingerprint actually used; P16 must
   explain or resolve the difference with Victor's consent.
+
+## D-0017 — Desktop stack pinned; TypeScript held at 6.0.3
+
+- **Decision:** npm workspaces; Electron 45.3.0, React 19.3.1, Vite 8.3.8,
+  Zod 4.6.7, Vitest 5.1.0, ESLint 10.14.0, Prettier 3.10.0, esbuild 0.28.2.
+  TypeScript is 6.0.3 because typescript-eslint 8.72.2 declares a peer range
+  below 6.1 and 7.0.2 breaks the lint chain.
+- **Why:** one package manager, one schema library, one product test runner, and
+  a lockfile are required by P02. Pinning exact versions makes the build
+  reproducible; the TS downgrade is a compatibility decision, not a preference.
+- **Evidence:** `docs/evidence/P02-foundation.md`, `package-lock.json`.
+- **Constrains:** upgrades are deliberate decisions with a green `npm run ci`.
+
+## D-0018 — One narrow preload channel, validated in main
+
+- **Decision:** the renderer receives one frozen API (`getAppInfo`) on
+  `mona:app-info`. The main process validates the sender frame and an empty
+  payload schema; the preload is a single esbuild CJS bundle because sandboxed
+  preloads cannot be ESM.
+- **Why:** sandbox + context isolation + no Node integration are only meaningful
+  if the bridge is narrow. A typed `IpcResult` keeps failures structured.
+- **Evidence:** `apps/desktop/src/preload/preload.ts`,
+  `apps/desktop/src/main/ipc.ts`, `security.test.ts`, `ipc.test.ts`.
+- **Constrains:** every later IPC addition needs its own channel, schema, sender
+  check, and test; no generic `invoke` bridge.
+
+## D-0019 — Vitest is the product test runner; node:test stays for P00 tooling
+
+- **Decision:** product/contract/renderer tests run under Vitest (with
+  happy-dom for renderer DOM tests). The P00 bootstrap and P01 spike suites stay
+  on `node:test` because they exercise the bootstrap utility and the throwaway
+  spike, not the product.
+- **Why:** P02 requires one test runner for the product; rewriting working
+  bootstrap tests would add risk without value.
+- **Constrains:** `npm test` runs all three groups; product code must not depend
+  on `node:test`.
+
+## D-0020 — Electron runtime download is an external blocker, not a code gap
+
+- **Decision:** do not switch desktop shells, fake the window smoke test, or
+  weaken the runtime check. Record `P02-ELECTRON-BINARY` after three
+  no-progress attempts and continue build/test evidence that does not require
+  the binary.
+- **Why:** only `registry.npmjs.org` resolves here; GitHub, objects storage, and
+  every tested mirror fail DNS. The npm tarball contains no runtime.
+- **Evidence:** `docs/evidence/P02-electron-blocker.txt`,
+  `.mona/build/attempts.jsonl`, `BLOCKERS.md`.
+- **Constrains:** the window/process-footprint acceptance item stays unverified
+  until the binary is available; no runtime-compatibility claim may be made.

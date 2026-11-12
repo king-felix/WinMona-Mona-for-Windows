@@ -1,82 +1,88 @@
 # Mona build handoff
 
-**Current prompt:** P02 — Create the desktop foundation and strict contracts
-**Current status:** P01 completed (state revision 5). Next eligible: P02.
+**Current prompt:** P03 — Implement the real versioned engine adapter
+**Current status:** P01 completed; P02 delivered with one unverified runtime check
+(state revision 6). Next eligible: P03.
 
-**Last verified commit / dirty work:** P01 work is in this session's local
+**Last verified commit / dirty work:** P02 work is in this session's local
 commit (see `git log`); working tree is clean after it.
 
-## P01 result
+## P02 result (read this before trusting the desktop app)
 
-The installed engine is usable through the local HTTP/SSE runtime API, and the
-economics hold.
+The Electron/React/TypeScript foundation is built, typechecked, linted, tested,
+and statically security-checked:
 
-- **G0 pass.** A real Full Access tool turn created `sum.js` + `sum.test.js`,
-  ran its own test (1 pass / 0 fail), streamed the full journal, survived a
-  runtime restart, resumed in the same thread, and was interruptible with no
-  owned child process left behind. Effective route on the turn record:
-  `deepseek` / `deepseek-flash` / `full_access` / `first-party-payg` / `metered`.
-- **G1 pass, provisional.** Matched direct `exec` and adapter turns used the
-  identical wire tool schema (`bf3cf7cb…`, 15 tools, 35,883 bytes) and the same
-  request counts. Median paired cost delta **+1.45%** over 6 pairs; two pairs
-  exceeded 5% from model-side extra requests/longer output, not adapter overhead.
-  Idle, discovery, history, and reconnect moved **zero** tokens. Pilot spend
-  ≈ **$0.04** total (ceiling $2).
-- **G2 pass for the discovered surface.** 250 `/v1/*` routes extracted from the
-  binary; 43 commands captured with help; capability flags recorded, including
-  honest `false` values for terminal streaming.
+- npm workspaces: `apps/desktop` + `packages/contracts`; lockfile committed.
+- Electron 45.3.0, React 19.3.1, Vite 8.3.8, TypeScript 6.0.3, Zod 4.6.7,
+  Vitest 5.1.0. TypeScript is held at 6.0.3 because typescript-eslint 8.72 does
+  not accept 7.x.
+- Sandboxed, context-isolated renderer; Node integration and webviews disabled;
+  one frozen preload method over `mona:app-info`; sender-frame and payload
+  validation; CSP injected at build time and sent as a header; navigation,
+  redirects, window opens, webviews, and permission requests denied.
+- Contracts: branded opaque IDs, engine identity/capabilities, effective profile,
+  event envelope + known payloads, usage with explicit unknown cost, submission
+  state machine with reconciliation, project/task, typed errors, upstream wire
+  types mapped at the boundary, and labeled fixtures.
+- 38 Vitest + 11 bootstrap + 8 spike tests pass; production build passes; the
+  built renderer has no fixture marker, credential, remote origin, or engine
+  route; one preload channel only.
+- Bundle baseline: renderer JS 224.22 kB (70.18 kB gzip), CSS 4.74 kB, preload
+  327 B, main 9.58 kB total.
 
-Decisions D-0011…D-0016 record transport, serialization, submission safety,
-cost buckets, token handling, and the route-fingerprint discrepancy.
+**Unverified, blocked:** the Electron runtime binary cannot be downloaded here.
+Only `registry.npmjs.org` resolves; GitHub and every tested mirror return
+`ENOTFOUND`, and the npm tarball has no binary. The window launch, navigation
+refusal in a live process, and process-footprint measurement did **not** run.
+`npm run smoke` exits 3 with guidance. See `BLOCKERS.md` P02-ELECTRON-BINARY and
+`docs/evidence/P02-electron-blocker.txt`. Do not claim Electron runtime
+compatibility until this runs.
 
-## Next exact action (P02)
+## Next exact action (P03)
 
-Read P02 in `Mona_PROMPTS.md` (spec sections 3, 6, 8.1, 13) and the P01
-decisions. First concrete step: scaffold the pinned Electron/React/TypeScript
-project with one package manager, one schema library, one state approach and one
-test runner; confirm Electron prebuilt binaries install on this machine (no MSVC
-Build Tools detected at P00). No inference calls belong to P02.
+Read P03 in `Mona_PROMPTS.md` (spec 6, 7.1, 10.2) plus P01 decisions and
+fixtures. Build the reusable adapter in `packages/` over the qualified HTTP
+transport, preserving the P01 contracts: operation key persisted before send,
+no blind retry, event cursor/replay, typed unsupported capabilities, bounded
+stream parsing. Use the P01 spike client and contract JSON as the reference, not
+prose.
 
 ## Relevant files and spec sections
 
-- `Mona_PROMPTS.md` — P02 section (~line 224), operating contract O1–O5.
-- `Mona_Project.md` — sections 3 (stack), 6 (architecture), 8.1 (state layers),
-  13 (security).
-- `docs/evidence/P01-feasibility.md` — gates, benchmark, gaps.
-- `docs/codewhale-capabilities.json` — qualified surface and UI-route proposals.
-- `tools/spike/runtime/client.mjs` — P01 client, superseded by P03.
-- `tools/spike/p01-{contract,g0,bench}.mjs` — evidence generators.
+- `apps/desktop/src/main/{main,security,ipc}.ts`, `src/preload/preload.ts`.
+- `packages/contracts/src/*` — schemas, fixtures, upstream mapping.
+- `tools/spike/runtime/client.mjs` — P01 client to replace.
+- `docs/evidence/P01-{contract,g0,bench}.json` — observed wire behavior.
+- `Mona_Project.md` sections 6, 7.1, 10.2.
 
 ## Open problem IDs and no-progress counts
 
-No blocker. `attempts.jsonl` is empty: P01 had no dead-end hypothesis cycles.
-Non-blocking issues recorded in `P01-feasibility.md`:
-
-- **P01-ISSUE-001** — CLI exec and runtime report different endpoint
-  fingerprints for the same route. Display the runtime fingerprint; resolve at
-  P16.
-- **P01-ISSUE-002** — Windows does not refuse a second runtime in an owned
-  workspace. Serialized execution remains the default until P04/P07.
-- **P01-ISSUE-003** — terminal capability flags are false on this build; expose
-  as unsupported, complete at P18.
-- **P01-ISSUE-004** — cost sample is small and provisional; re-run after adapter
-  or routing changes.
+- **P02-ELECTRON-BINARY** — 3 consecutive no-progress attempts, recorded in
+  `attempts.jsonl`; exact help in `BLOCKERS.md`. Not reset by this session.
+- **P01-ISSUE-001** — endpoint fingerprint drift (exec vs runtime); P03 displays
+  the runtime fingerprint, P16 resolves.
+- **P01-ISSUE-002** — serialize per workspace until P04/P07 own a lease.
+- **P01-ISSUE-003** — terminal capability flags false; P18.
+- **P01-ISSUE-004** — cost sample provisional.
 
 ## Blocked dependencies
 
-None. The DeepSeek credential now has live evidence: `doctor --probe-api`
-reported “the live deepseek API check passed” and the model resolved to
-`deepseek-flash`.
+The desktop **runtime** proof waits on the Electron binary. The adapter (P03)
+does not need it, which is why P03 proceeds; its dependency on the repository and
+contracts is satisfied. Do not mark MONA-006 or MONA-026 verified while the
+runtime check is unrun.
 
 ## Last relevant validation
 
-- `node tools/build/cli.mjs validate --verbose` → OK, state r5.
-- `npm test` → 19/19 (11 bootstrap + 8 spike client/SSE tests).
-- Evidence: `docs/evidence/P01-{contract,g0,bench}.json`, logs, feasibility,
-  `P01-tests.txt`.
+- `npm run typecheck`, `npm run lint`, `npm run format:check` → pass.
+- `npm test` → 38 + 11 + 8 pass.
+- `npm run build` + `apps/desktop/scripts/check-build.mjs` → pass.
+- `npm audit` → 10 moderate dev-only (ESLint/minimatch), 0 high/critical.
+- `node tools/build/cli.mjs validate --verbose` → run after checkpoint.
 
 ## Human input needed
 
-None for P02 start. Later: a decision on release signing at P21/P23; a decision
-if the endpoint fingerprint difference must be resolved by a config change
-(do not change Victor’s working route without it).
+One of: allow GitHub/objects.githubusercontent.com egress; provide a reachable
+`ELECTRON_MIRROR`; or seed `%LOCALAPPDATA%\electron\Cache` with
+`electron-v45.3.0-win32-x64.zip`. Then run `node node_modules/electron/install.js`
+and `npm run smoke -w @mona/desktop`.

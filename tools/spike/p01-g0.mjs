@@ -9,11 +9,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { promisify } from 'node:util';
-import {
-  RuntimeClient,
-  makeToken,
-  startOwnedRuntime,
-} from './runtime/client.mjs';
+import { RuntimeClient, makeToken, startOwnedRuntime } from './runtime/client.mjs';
 
 const execFileAsync = promisify(execFile);
 const ENGINE = process.env.MONA_ENGINE ?? 'C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe';
@@ -26,7 +22,8 @@ const report = {
   captured_utc: new Date().toISOString(),
   engine_path: ENGINE,
   pilot_ceiling_usd: 2,
-  methodology: 'live Codewhale 0.10.2 HTTP Runtime API, Victor\'s deepseek/deepseek-flash route, Full Access thread profile',
+  methodology:
+    "live Codewhale 0.10.2 HTTP Runtime API, Victor's deepseek/deepseek-flash route, Full Access thread profile",
   steps: [],
   spend: [],
   events: [],
@@ -34,7 +31,9 @@ const report = {
 
 function step(name, ok, detail) {
   report.steps.push({ name, ok, detail });
-  console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` :: ${typeof detail === 'string' ? detail : JSON.stringify(detail).slice(0, 500)}` : ''}`);
+  console.log(
+    `${ok ? 'PASS' : 'FAIL'} ${name}${detail ? ` :: ${typeof detail === 'string' ? detail : JSON.stringify(detail).slice(0, 500)}` : ''}`,
+  );
 }
 
 async function collect(api, threadId, { sinceSeq = 0, until, timeoutMs = TURN_TIMEOUT_MS }) {
@@ -98,7 +97,9 @@ async function runTurn(api, threadId, prompt, { operationKey, label }) {
   report.spend.push({ label, turnId, usage: usage.totals, elapsedMs });
   report.spend_cost_usd_running = report.spend.reduce((sum, row) => sum + (row.usage?.cost_usd ?? 0), 0);
   if (report.spend_cost_usd_running > 1.5) {
-    throw new Error(`pilot guard: reported spend $${report.spend_cost_usd_running.toFixed(4)} exceeds the software guard inside the $2 ceiling`);
+    throw new Error(
+      `pilot guard: reported spend $${report.spend_cost_usd_running.toFixed(4)} exceeds the software guard inside the $2 ceiling`,
+    );
   }
   return { submitted, terminal, turn, usage, elapsedMs, frames: collected.frames, operationKey };
 }
@@ -116,12 +117,18 @@ let api = new RuntimeClient({ baseUrl: runtime.baseUrl, token });
 try {
   const { thread } = await api.createThread({ operationKey: `g0-thread-${crypto.randomUUID()}` });
   const threadId = thread.id;
-  step('thread created with effective Full Access profile', thread.permission_posture === 'full_access' && thread.model_provider === 'deepseek' && thread.model === 'deepseek-flash', {
-    threadId,
-    posture: thread.permission_posture,
-    provider: thread.model_provider,
-    model: thread.model,
-  });
+  step(
+    'thread created with effective Full Access profile',
+    thread.permission_posture === 'full_access' &&
+      thread.model_provider === 'deepseek' &&
+      thread.model === 'deepseek-flash',
+    {
+      threadId,
+      posture: thread.permission_posture,
+      provider: thread.model_provider,
+      model: thread.model,
+    },
+  );
 
   // --- real tool task -----------------------------------------------------
   const taskPrompt = [
@@ -148,26 +155,42 @@ try {
   } catch (error) {
     independentTest = `${error.stdout ?? ''}\n${error.stderr ?? ''}`;
   }
-  step('tool wrote both files', Boolean(sumJs && testJs), { sum_bytes: sumJs?.length ?? 0, test_bytes: testJs?.length ?? 0 });
+  step('tool wrote both files', Boolean(sumJs && testJs), {
+    sum_bytes: sumJs?.length ?? 0,
+    test_bytes: testJs?.length ?? 0,
+  });
   const passMatch = independentTest.match(/pass\s+(\d+)/i);
   const failMatch = independentTest.match(/fail\s+(\d+)/i);
-  step('Mona-independent `node --test` passes the written test', Number(passMatch?.[1] ?? 0) >= 1 && Number(failMatch?.[1] ?? 1) === 0, {
-    pass: passMatch?.[1] ?? null,
-    fail: failMatch?.[1] ?? null,
-    output: independentTest.slice(-400),
-  });
+  step(
+    'Mona-independent `node --test` passes the written test',
+    Number(passMatch?.[1] ?? 0) >= 1 && Number(failMatch?.[1] ?? 1) === 0,
+    {
+      pass: passMatch?.[1] ?? null,
+      fail: failMatch?.[1] ?? null,
+      output: independentTest.slice(-400),
+    },
+  );
 
   const effective = task.turn;
-  step('effective route and posture verified on the turn record', effective?.effective_provider === 'deepseek' && effective?.effective_model === 'deepseek-flash' && effective?.permission_posture === 'full_access', {
-    provider: effective?.effective_provider,
-    model: effective?.effective_model,
-    endpoint_fingerprint: effective?.effective_endpoint_fingerprint,
-    posture: effective?.permission_posture,
-    billing: effective?.effective_billing_surface,
-  });
+  step(
+    'effective route and posture verified on the turn record',
+    effective?.effective_provider === 'deepseek' &&
+      effective?.effective_model === 'deepseek-flash' &&
+      effective?.permission_posture === 'full_access',
+    {
+      provider: effective?.effective_provider,
+      model: effective?.effective_model,
+      endpoint_fingerprint: effective?.effective_endpoint_fingerprint,
+      posture: effective?.permission_posture,
+      billing: effective?.effective_billing_surface,
+    },
+  );
 
   const toolFrame = task.frames.find((f) => f.event === 'item.started' && f.data?.payload?.tool);
-  step('tool execution events are observable', Boolean(toolFrame), { tool: toolFrame?.data?.payload?.tool?.name ?? null, frames: task.frames.length });
+  step('tool execution events are observable', Boolean(toolFrame), {
+    tool: toolFrame?.data?.payload?.tool?.name ?? null,
+    frames: task.frames.length,
+  });
 
   const usage = task.usage.totals;
   step('usage is reported for the turn', usage.turns >= 1 && usage.priced_turns + usage.unpriced_turns >= 1, {
@@ -185,13 +208,17 @@ try {
   const turnsBeforeReplay = (await api.getThread(threadId)).turns.length;
   const replay = await api.submitTurn(threadId, { prompt: taskPrompt, operationKey: taskOperationKey });
   const turnsAfterReplay = (await api.getThread(threadId)).turns.length;
-  step('replay with the original operation key does not create a second turn', replay.replayed === true && turnsAfterReplay === turnsBeforeReplay, {
-    replayStatus: replay.status,
-    idempotent_replay: replay.receipt?.idempotent_replay ?? null,
-    sameTurnId: replay.receipt?.turn?.id === task.submitted.receipt?.turn?.id,
-    turnsBeforeReplay,
-    turnsAfterReplay,
-  });
+  step(
+    'replay with the original operation key does not create a second turn',
+    replay.replayed === true && turnsAfterReplay === turnsBeforeReplay,
+    {
+      replayStatus: replay.status,
+      idempotent_replay: replay.receipt?.idempotent_replay ?? null,
+      sameTurnId: replay.receipt?.turn?.id === task.submitted.receipt?.turn?.id,
+      turnsBeforeReplay,
+      turnsAfterReplay,
+    },
+  );
 
   // --- durable resume after runtime restart ------------------------------
   const beforeStopSeq = (await api.getThread(threadId)).latest_seq;
@@ -201,14 +228,19 @@ try {
   api = new RuntimeClient({ baseUrl: runtime.baseUrl, token });
   const reopened = await api.getThread(threadId);
   const history = await api.history(threadId);
-  step('thread survives runtime restart with the same projected state', reopened.thread?.id === threadId && reopened.latest_seq >= beforeStopSeq, {
-    beforeStopSeq,
-    afterSeq: reopened.latest_seq,
-    messages: history.session?.messages?.length ?? 0,
-    model: reopened.thread?.model,
-  });
+  step(
+    'thread survives runtime restart with the same projected state',
+    reopened.thread?.id === threadId && reopened.latest_seq >= beforeStopSeq,
+    {
+      beforeStopSeq,
+      afterSeq: reopened.latest_seq,
+      messages: history.session?.messages?.length ?? 0,
+      model: reopened.thread?.model,
+    },
+  );
 
-  const followPrompt = 'Append a line `// resumed` to sum.js, then run `node --test` again and report the passing count.';
+  const followPrompt =
+    'Append a line `// resumed` to sum.js, then run `node --test` again and report the passing count.';
   const follow = await runTurn(api, threadId, followPrompt, {
     label: 'resume turn',
     operationKey: `g0-turn-resume-${crypto.randomUUID()}`,
@@ -228,16 +260,25 @@ try {
     until: (frame) => frame.event === 'item.started' && frame.data?.payload?.tool,
   });
   const intSubmit = api.submitTurn(interruptThread.id, {
-    prompt: 'Run this shell command exactly: Start-Sleep -Seconds 300; Write-Output MONA_P01_SENTINEL. Then report that it finished.',
+    prompt:
+      'Run this shell command exactly: Start-Sleep -Seconds 300; Write-Output MONA_P01_SENTINEL. Then report that it finished.',
     operationKey: `g0-turn-int-${crypto.randomUUID()}`,
   });
-  const intTurn = await Promise.race([intCollected.task, new Promise((r) => setTimeout(() => r('timeout'), 90000))]).then(() => intSubmit);
+  const intTurn = await Promise.race([
+    intCollected.task,
+    new Promise((r) => setTimeout(() => r('timeout'), 90000)),
+  ]).then(() => intSubmit);
   const interruptTurnId = intTurn.receipt?.turn?.id;
-  step('long command reached the tool stage before interrupt', Boolean(intTurn.receipt?.turn?.id), { turnId: interruptTurnId, stage: intCollected.frames.at(-1)?.event });
+  step('long command reached the tool stage before interrupt', Boolean(intTurn.receipt?.turn?.id), {
+    turnId: interruptTurnId,
+    stage: intCollected.frames.at(-1)?.event,
+  });
 
   let interruptReceipt = null;
   if (interruptTurnId) {
-    interruptReceipt = await api.interrupt(interruptThread.id, interruptTurnId).catch((error) => ({ error: error.message }));
+    interruptReceipt = await api
+      .interrupt(interruptThread.id, interruptTurnId)
+      .catch((error) => ({ error: error.message }));
   }
   // Wait for terminal state on the interrupted turn.
   const intDeadline = Date.now() + 60000;
@@ -253,10 +294,14 @@ try {
   }
   intCollected.controller.abort();
   await intCollected.task.catch(() => {});
-  step('interrupt is honoured by the engine', interruptedDetail?.turn?.status === 'interrupted' || interruptedDetail?.turn?.status === 'canceled', {
-    status: interruptedDetail?.turn?.status ?? 'not terminal within 60s',
-    receipt: interruptReceipt,
-  });
+  step(
+    'interrupt is honoured by the engine',
+    interruptedDetail?.turn?.status === 'interrupted' || interruptedDetail?.turn?.status === 'canceled',
+    {
+      status: interruptedDetail?.turn?.status ?? 'not terminal within 60s',
+      receipt: interruptReceipt,
+    },
+  );
 
   const lingering = await findSentinelProcesses();
   step('interrupted command left no owned child process running', lingering.length === 0, { processes: lingering });
@@ -268,7 +313,12 @@ try {
   const otherWorkspace = join(tmpdir(), 'mona-p01-g0b', String(Date.now()));
   await mkdir(otherWorkspace, { recursive: true });
   const tokenB = makeToken();
-  const runtimeB = await startOwnedRuntime({ executable: ENGINE, workspace: otherWorkspace, port: 7895, token: tokenB });
+  const runtimeB = await startOwnedRuntime({
+    executable: ENGINE,
+    workspace: otherWorkspace,
+    port: 7895,
+    token: tokenB,
+  });
   const apiB = new RuntimeClient({ baseUrl: runtimeB.baseUrl, token: tokenB });
   try {
     const { thread: otherThread } = await apiB.createThread({ operationKey: `g0-thread-b-${crypto.randomUUID()}` });
@@ -313,17 +363,26 @@ try {
         const statusC = turnStatus(runC.turn, runC.terminal);
         const historyA = await api.history(threadA2.id);
         const historyC = await apiC.history(threadC2.id);
-        step('two owned runtimes completed simultaneous turns without cross-thread corruption', statusA === 'completed' && statusC === 'completed' && historyA.runtime_thread_id === threadA2.id && historyC.runtime_thread_id === threadC2.id, {
-          statusA,
-          statusC,
-          messagesA: historyA.session?.messages?.length ?? 0,
-          messagesC: historyC.session?.messages?.length ?? 0,
-          note: 'one observation is not a safety proof; serialized execution remains the default until P04/P07 own the lease explicitly',
-        });
+        step(
+          'two owned runtimes completed simultaneous turns without cross-thread corruption',
+          statusA === 'completed' &&
+            statusC === 'completed' &&
+            historyA.runtime_thread_id === threadA2.id &&
+            historyC.runtime_thread_id === threadC2.id,
+          {
+            statusA,
+            statusC,
+            messagesA: historyA.session?.messages?.length ?? 0,
+            messagesC: historyC.session?.messages?.length ?? 0,
+            note: 'one observation is not a safety proof; serialized execution remains the default until P04/P07 own the lease explicitly',
+          },
+        );
       }
       await sameWorkspace.stop().catch(() => {});
     }
-    step('workspace concurrency posture recorded honestly', true, { mode: 'serialized default pending P04/P07 lease ownership' });
+    step('workspace concurrency posture recorded honestly', true, {
+      mode: 'serialized default pending P04/P07 lease ownership',
+    });
   } finally {
     await runtimeB.stop().catch(() => {});
   }
@@ -344,9 +403,12 @@ try {
 
 async function findSentinelProcesses() {
   // Exclude this query process: its own command line contains the marker.
-  const script = "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'Start-Sleep -Seconds 300' -and $_.CommandLine -notmatch 'Get-CimInstance' } | Select-Object ProcessId,Name,CreationDate | ConvertTo-Json -Compress";
+  const script =
+    "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'Start-Sleep -Seconds 300' -and $_.CommandLine -notmatch 'Get-CimInstance' } | Select-Object ProcessId,Name,CreationDate | ConvertTo-Json -Compress";
   try {
-    const { stdout } = await execFileAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { timeout: 20000 });
+    const { stdout } = await execFileAsync('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], {
+      timeout: 20000,
+    });
     if (!stdout.trim()) return [];
     const parsed = JSON.parse(stdout);
     return Array.isArray(parsed) ? parsed : [parsed];

@@ -87,13 +87,7 @@ export class RuntimeClient {
     return (await this.request('GET', '/v1/providers')).json;
   }
 
-  async createThread({
-    mode = 'agent',
-    allowShell = true,
-    trustMode = true,
-    autoApprove = true,
-    operationKey,
-  } = {}) {
+  async createThread({ mode = 'agent', allowShell = true, trustMode = true, autoApprove = true, operationKey } = {}) {
     const body = {
       mode,
       allow_shell: allowShell,
@@ -110,18 +104,11 @@ export class RuntimeClient {
   }
 
   async threadSummary(limit = 20) {
-    return (
-      await this.request(
-        'GET',
-        `/v1/threads/summary?limit=${limit}&include_archived=false`,
-      )
-    ).json;
+    return (await this.request('GET', `/v1/threads/summary?limit=${limit}&include_archived=false`)).json;
   }
 
   async history(threadId) {
-    return (
-      await this.request('GET', `/v1/threads/${encodeURIComponent(threadId)}/history`)
-    ).json;
+    return (await this.request('GET', `/v1/threads/${encodeURIComponent(threadId)}/history`)).json;
   }
 
   /**
@@ -129,10 +116,7 @@ export class RuntimeClient {
    * key the runtime answers 200 with idempotent_replay instead of creating a
    * second turn (capability turn_operation_idempotency).
    */
-  async submitTurn(
-    threadId,
-    { prompt, allowShell = true, trustMode = true, autoApprove = true, operationKey },
-  ) {
+  async submitTurn(threadId, { prompt, allowShell = true, trustMode = true, autoApprove = true, operationKey }) {
     const body = {
       prompt,
       allow_shell: allowShell,
@@ -140,11 +124,7 @@ export class RuntimeClient {
       auto_approve: autoApprove,
     };
     if (operationKey) body.operation_key = operationKey;
-    const res = await this.request(
-      'POST',
-      `/v1/threads/${encodeURIComponent(threadId)}/turns`,
-      body,
-    );
+    const res = await this.request('POST', `/v1/threads/${encodeURIComponent(threadId)}/turns`, body);
     return { status: res.status, receipt: res.json, replayed: res.json?.idempotent_replay === true };
   }
 
@@ -184,9 +164,7 @@ export class RuntimeClient {
   }
 
   async threadUsage(threadId) {
-    return (
-      await this.request('GET', `/v1/threads/${encodeURIComponent(threadId)}/usage`)
-    ).json;
+    return (await this.request('GET', `/v1/threads/${encodeURIComponent(threadId)}/usage`)).json;
   }
 
   /**

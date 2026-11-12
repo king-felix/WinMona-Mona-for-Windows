@@ -26,7 +26,10 @@ node tools/build/cli.mjs validate   # schema, hashes, graph, evidence, secret sc
 node tools/build/cli.mjs status     # compact state summary
 node tools/build/cli.mjs checkpoint --prompt P00 --status completed --expected-revision <N> ...
 node tools/build/cli.mjs recover    # after an interrupted write
-npm test                            # bootstrap tests (node --test)
+npm test                            # product (vitest) + bootstrap/spike (node --test)
+npm run build                       # contracts + main + preload + renderer
+npm run typecheck                   # contracts and desktop programs
+npm run lint                        # ESLint flat config
 ```
 
 ## Non-negotiables
@@ -94,9 +97,10 @@ tools/build/                        bootstrap utility, schemas, seeders, tests
 tests/bootstrap/                    P00 utility tests
 ```
 
-Later planned layout (`apps/desktop`, `packages/*`, `native/windows-shell`,
-`tests/integration`) is created by P02+. The bootstrap CLI must not grow into the
-product framework, and the product must never depend on it to boot.
+Layout now includes `apps/desktop` (Electron main, preload, React renderer) and
+`packages/contracts` (Zod schemas and fixtures). `native/windows-shell` and
+`tests/integration` arrive in later prompts. The bootstrap CLI must not grow into
+the product framework, and the product must never depend on it to boot.
 
 ## Reporting
 

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 5,
+  "revision": 6,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P02",
+  "current_prompt": "P03",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -128,14 +128,64 @@
       "blocker_ids": []
     },
     "P02": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-006",
         "MONA-026"
       ],
-      "completed_steps": [],
-      "remaining_steps": [],
-      "evidence": [],
+      "completed_steps": [
+        "npm workspaces, pinned deps and lockfile; contracts package with branded schemas, fixtures and upstream mapping",
+        "sandboxed Electron main/preload with one validated IPC channel, CSP, navigation and permission denial",
+        "React renderer shell with Daybreak/Afterglow tokens, version display, placeholder navigation and no inference",
+        "38 Vitest + 11 bootstrap + 8 spike tests; build and static bundle checks pass"
+      ],
+      "remaining_steps": [
+        "run the Electron window smoke test and measure process footprint once the runtime binary is available (P02-ELECTRON-BINARY)"
+      ],
+      "evidence": [
+        {
+          "path": "docs/evidence/P02-foundation.md",
+          "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        },
+        {
+          "path": "docs/evidence/P02-tests.txt",
+          "sha256": "d648b3d0d1e7d67878a9ba6f81dc91aac5d72c19cb5b72654bd1d00b4b4ace2a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        },
+        {
+          "path": "docs/evidence/P02-build.txt",
+          "sha256": "22f7cdacb535c69718913b4436803de8c445c80367efc81b49101b4d12190835",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        },
+        {
+          "path": "docs/evidence/P02-electron-blocker.txt",
+          "sha256": "24c9e526f429d3c964561e63123fd7090c546962644c276d5486c70bf41a1ea3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        },
+        {
+          "path": "docs/evidence/P02-smoke-blocked.txt",
+          "sha256": "1bb7b6198363bc8c7e6bf43a9575042b0c188310076f935e4c4e86f4fdea6c15",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        },
+        {
+          "path": "docs/evidence/P02-audit.json",
+          "sha256": "982b8936a1bff7343fe96ffcaa602c0ca071dc36b344a2dd7419e987e311c512",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T01:16:33Z",
+          "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af"
+        }
+      ],
       "blocker_ids": []
     },
     "P03": {
@@ -411,7 +461,9 @@
     }
   },
   "next_eligible_prompts": [
-    "P02"
+    "P03",
+    "P05",
+    "P06"
   ],
-  "last_checkpoint_utc": "2026-11-12T01:02:31Z"
+  "last_checkpoint_utc": "2026-11-12T01:16:33Z"
 }

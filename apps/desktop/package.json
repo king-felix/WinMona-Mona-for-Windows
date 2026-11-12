@@ -1,0 +1,32 @@
+﻿{
+  "name": "@mona/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "build": "npm run clean \u0026\u0026 npm run build:main \u0026\u0026 npm run build:preload \u0026\u0026 npm run build:renderer",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:preload": "esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs",
+    "build:renderer": "vite build",
+    "typecheck": "tsc -p tsconfig.main.json --noEmit \u0026\u0026 tsc -p tsconfig.preload.json \u0026\u0026 tsc -p tsconfig.renderer.json --noEmit \u0026\u0026 tsc -p tsconfig.test.json --noEmit",
+    "start": "electron .",
+    "smoke": "node scripts/smoke.mjs",
+    "check:build": "node scripts/check-build.mjs",
+    "verify": "npm run build \u0026\u0026 npm run check:build",
+    "clean": "node -e \"require(\u0027node:fs\u0027).rmSync(\u0027dist\u0027,{recursive:true,force:true})\""
+  },
+  "dependencies": {
+    "@mona/contracts": "0.1.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "electron": "45.3.0",
+    "esbuild": "0.28.2",
+    "vite": "8.3.8"
+  }
+}

@@ -1,0 +1,12 @@
+﻿node_modules/
+**/dist/
+**/.vite/
+coverage/
+docs/
+tools/build/
+.mona/build/
+.codewhale/state/
+package-lock.json
+Mona_Project.md
+Mona_PROMPTS.md
+

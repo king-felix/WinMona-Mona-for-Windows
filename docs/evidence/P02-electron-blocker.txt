@@ -1,0 +1,53 @@
+﻿P02 — Electron runtime binary blocker
+Captured: 2026-11-12
+Engine: Codewhale 0.10.2, Node 26.13.1, npm 11.20.0, Windows 11 x64
+
+Symptom
+  `npm install` fails at electron@45.3.0 postinstall and no Electron runtime is
+  available to launch the built app for the window smoke test.
+
+Attempt 1 — direct installer
+  $ node node_modules/electron/install.js
+  TypeError: fetch failed
+  $ node -e "fetch('https://github.com')..."
+  github fail ENOTFOUND
+  Result: no binary; release host does not resolve.
+
+Attempt 2 — mirrors
+  https://registry.npmmirror.com/-/binary/electron/45.3.0/  -> ENOTFOUND
+  https://cdn.npmmirror.com/binaries/electron/45.3.0/       -> ENOTFOUND
+  https://mirrors.huaweicloud.com/electron/45.3.0/          -> ENOTFOUND
+  https://objects.githubusercontent.com/                    -> ENOTFOUND
+  Result: no mirror is reachable from this machine.
+
+Attempt 3 — npm registry alternatives
+  npm view electron@45.3.0 dist.unpackedSize -> 1214835 bytes, fileCount 9
+  npm pack electron@45.3.0 --dry-run          -> 9 files, no dist/electron.exe
+  registry search for electron-win32-x64 / @electron/win32-x64 / electron-binary
+    -> no such packages
+  electron-prebuilt@1.4.13 exists but is Electron 1.x and downloads from the
+    same blocked release host; not a safe or compatible substitute.
+  Result: the registry tarball does not contain the runtime.
+
+Narrowed cause
+  Only registry.npmjs.org resolves in this environment. Electron's prebuilt
+  runtime (and every mirror) is unavailable, so the desktop window cannot be
+  launched. This is an environment/network prerequisite, not a code defect.
+
+What was still verified without Electron
+  - contracts + desktop typecheck (tsc)
+  - production build (tsc main, esbuild preload, Vite renderer)
+  - 38 unit/schema/DOM tests (Vitest + happy-dom)
+  - renderer bundle static checks: CSP replaced, no fixtures, no credentials,
+    one preload channel, no remote origin, no engine route
+  - bundle baseline: renderer JS 224.22 kB (70.18 kB gzip), CSS 4.74 kB
+  - bootstrap + spike suites still pass
+
+Exact help required (any one)
+  1. Allow outbound HTTPS/DNS to github.com and objects.githubusercontent.com,
+     then run: node node_modules/electron/install.js
+  2. Provide a reachable ELECTRON_MIRROR serving electron-v45.3.0-win32-x64.zip,
+     then run the same installer.
+  3. Place electron-v45.3.0-win32-x64.zip in
+     %LOCALAPPDATA%\electron\Cache\<sha256-of-zip>\ and run the installer.
+  After either path: npm run smoke -w @mona/desktop

@@ -21,7 +21,23 @@ function sandbox() {
     },
   });
   // Build an independent baseline (revision 1, every prompt pending) so these
-  // tests stay valid as the real build progresses through later prompts.
+  // tests stay valid as the real build progresses through later prompts. Reset
+  // the copied ledger's progress too; otherwise a requirement verified by a
+  // later prompt changes what `evidence` derives here.
+  const ledgerPath = path.join(root, 'docs', 'requirements.json');
+  const baseline = JSON.parse(fs.readFileSync(ledgerPath, 'utf8'));
+  baseline.revision = 1;
+  for (const requirement of baseline.requirements) {
+    requirement.status = 'pending';
+    requirement.verified_commit = null;
+    requirement.tested_environment = null;
+    requirement.open_issue_ids = requirement.open_issue_ids ?? [];
+    for (const criterion of requirement.criteria) {
+      criterion.status = 'pending';
+      criterion.evidence = [];
+    }
+  }
+  fs.writeFileSync(ledgerPath, `${JSON.stringify(baseline, null, 2)}\n`);
   const seeded = cli(root, ['init']);
   assert.equal(seeded.code, 0, seeded.err);
   return root;
@@ -49,12 +65,18 @@ test('checkpoint advances revision atomically and journals the boundary', () => 
 
   const r = cli(root, [
     'checkpoint',
-    '--prompt', 'P00',
-    '--status', 'completed',
-    '--expected-revision', '1',
-    '--completed-step', 'bootstrap test step',
-    '--evidence', 'docs/requirements.json',
-    '--note', 'unit test boundary',
+    '--prompt',
+    'P00',
+    '--status',
+    'completed',
+    '--expected-revision',
+    '1',
+    '--completed-step',
+    'bootstrap test step',
+    '--evidence',
+    'docs/requirements.json',
+    '--note',
+    'unit test boundary',
   ]);
   assert.equal(r.code, 0, r.err);
 
@@ -78,7 +100,10 @@ test('checkpoint advances revision atomically and journals the boundary', () => 
 
 test('stale expected revision is refused and state is untouched', () => {
   const root = sandbox();
-  assert.equal(cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1']).code, 0);
+  assert.equal(
+    cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1']).code,
+    0,
+  );
   const snapshot = readState(root);
 
   const r = cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1']);
@@ -89,11 +114,9 @@ test('stale expected revision is refused and state is untouched', () => {
 
 test('a write interrupted after the temp file is promoted by recover', () => {
   const root = sandbox();
-  const r = cli(
-    root,
-    ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1'],
-    { MONA_FAULT_AFTER_TEMP_WRITE: '1' },
-  );
+  const r = cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1'], {
+    MONA_FAULT_AFTER_TEMP_WRITE: '1',
+  });
   assert.equal(r.code, 70, 'fault must abort before rename');
   assert.equal(readState(root).revision, 1, 'committed state stays at the last complete revision');
   const temps = fs.readdirSync(path.join(root, '.mona', 'build', 'tmp')).filter((f) => f.endsWith('.tmp'));
@@ -126,7 +149,10 @@ test('a torn temp file is quarantined and the committed state survives', () => {
 
 test('a corrupt state file is restored from the newest verified backup', () => {
   const root = sandbox();
-  assert.equal(cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1']).code, 0);
+  assert.equal(
+    cli(root, ['checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1']).code,
+    0,
+  );
   fs.writeFileSync(path.join(root, '.mona', 'build', 'state.json'), '{"torn":');
 
   const rec = cli(root, ['recover']);
@@ -185,12 +211,18 @@ test('evidence command records a hash and derives requirement status', () => {
   const before = readLedger(root).revision;
   const r = cli(root, [
     'evidence',
-    '--requirement', 'MONA-001',
-    '--criterion', 'identity',
-    '--path', 'docs/requirements.json',
-    '--status', 'passed',
-    '--expected-revision', String(before),
-    '--note', 'bootstrap test',
+    '--requirement',
+    'MONA-001',
+    '--criterion',
+    'identity',
+    '--path',
+    'docs/requirements.json',
+    '--status',
+    'passed',
+    '--expected-revision',
+    String(before),
+    '--note',
+    'bootstrap test',
   ]);
   assert.equal(r.code, 0, r.err);
   const ledger = readLedger(root);
@@ -205,11 +237,17 @@ test('evidence command records a hash and derives requirement status', () => {
 test('checkpoint refuses evidence paths that do not exist', () => {
   const root = sandbox();
   const r = cli(root, [
-    'checkpoint', '--prompt', 'P00', '--status', 'completed', '--expected-revision', '1',
-    '--evidence', 'docs/evidence/does-not-exist.md',
+    'checkpoint',
+    '--prompt',
+    'P00',
+    '--status',
+    'completed',
+    '--expected-revision',
+    '1',
+    '--evidence',
+    'docs/evidence/does-not-exist.md',
   ]);
   assert.equal(r.code, 2);
   assert.match(r.err, /does not exist/);
   assert.equal(readState(root).revision, 1);
 });
-

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 27,
+  "revision": 36,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -672,31 +672,67 @@
         "P22",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "daybreak",
           "description": "Daybreak theme meets measured contrast and hierarchy requirements",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:03Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "Daybreak tokens implemented in the renderer; full design system and contrast validation are P06"
+            }
+          ]
         },
         {
           "id": "afterglow",
           "description": "Afterglow theme meets the same accessibility bar",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "Afterglow tokens implemented; equal accessibility testing is P06"
+            }
+          ]
         },
         {
           "id": "accessibility",
           "description": "Keyboard access, visible focus, 200% scaling and screen-reader checks recorded",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "semantic nav, aria-current, aria-live, focus-visible, system typography; screen-reader and 200% QA are P06/P22"
+            }
+          ]
         },
         {
           "id": "density-motion",
           "description": "Density modes share one information architecture; reduced motion respected",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "reduced-motion media query and compact density foundation; full density modes are P06"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -1491,37 +1527,82 @@
         "P20",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "renderer-isolation",
           "description": "Renderer is sandboxed with context isolation and no Node integration",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "sandbox, context isolation, Node disabled, webview disabled, devtools prod off; unit-tested, Electron launch blocked by P02-ELECTRON-BINARY"
+            }
+          ]
         },
         {
           "id": "narrow-ipc",
           "description": "Named, schema-validated IPC operations replace general exec/fs access",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "one frozen preload method, one channel, sender and payload validation, typed errors"
+            }
+          ]
         },
         {
           "id": "runtime-auth",
           "description": "Runtime binds loopback with a token that never appears in URLs or renderer state",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:04Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "runtime bearer token handling qualified at P01; desktop adapter integration is P03"
+            }
+          ]
         },
         {
           "id": "redaction",
           "description": "Secrets are redacted from logs, diagnostics and exports",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-build.txt",
+              "sha256": "22f7cdacb535c69718913b4436803de8c445c80367efc81b49101b4d12190835",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:05Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "built renderer scanned for credentials, fixtures and remote origins; diagnostics redaction is P19"
+            }
+          ]
         },
         {
           "id": "content-safety",
           "description": "Markdown, links and paths are constrained against traversal and injection",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P02-foundation.md",
+              "sha256": "c0ddca9a71cec815cc1c970ec04fa1fe8d2bdc57295c305800c76ce28121faef",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T01:16:05Z",
+              "commit": "b19ed70eb089ba5b8fae72f9c372566ccf0288af",
+              "note": "CSP injected and checked, navigation/window-open/webview denied, permissions denied at code level"
+            }
+          ]
         }
       ],
       "verified_commit": null,
