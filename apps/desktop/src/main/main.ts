@@ -1,4 +1,16 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, Notification, session, shell, Tray } from 'electron';
+import {
+  app,
+  BrowserWindow,
+  clipboard,
+  dialog,
+  ipcMain,
+  Menu,
+  nativeImage,
+  Notification,
+  session,
+  shell,
+  Tray,
+} from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -21,7 +33,11 @@ import { ExtensionsService } from './extensions-service.js';
 import { registerExtensionIpc } from './extensions-ipc.js';
 import { CapabilityService } from './capability-service.js';
 import { registerCapabilityIpc } from './capability-ipc.js';
+import { TerminalHost } from './terminal-host.js';
+import { TerminalService } from './terminal-service.js';
+import { registerTerminalIpc } from './terminal-ipc.js';
 import { STUDIO_CHANNELS, type StudioEvent, type StudioRun } from '../shared/studio.js';
+import { TERMINAL_CHANNELS } from '../shared/terminal.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
 import {
   ATTENTION_CHANNELS,
@@ -37,6 +53,7 @@ import { runStudioProbe } from './studio-probe.js';
 import { runLaunchProbe } from './launch-probe.js';
 import { runShots } from './shots.js';
 import { runPolishProbe } from './polish-probe.js';
+import { runTerminalProbe, writeTerminalProbe } from './terminal-probe.js';
 import { UiStateStore } from './ui-state.js';
 import {
   DEFAULT_ATTENTION_SETTINGS,
@@ -85,9 +102,13 @@ const launchTest = process.env.MONA_LAUNCH_TEST === '1';
 const launchOut = process.env.MONA_LAUNCH_OUT ?? path.join(process.cwd(), 'mona-launch.json');
 const launchShots = process.env.MONA_LAUNCH_SHOTS ?? path.join(process.cwd(), 'mona-launch-shots');
 const launchFixturesFile = process.env.MONA_LAUNCH_FIXTURES ?? null;
+const terminalTest = process.argv.includes('--terminal-test');
+const terminalOut = process.env.MONA_TERMINAL_OUT ?? path.join(process.cwd(), 'mona-terminal.json');
+const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
+const terminalShots = process.env.MONA_TERMINAL_SHOTS ?? path.join(process.cwd(), 'mona-terminal-shots');
 // Screenshot capture needs deterministic compositing on a headless or remote
 // desktop; the P08 probe captures five live frames.
-if (shotsTest || studioTest || launchTest || polishTest) app.disableHardwareAcceleration();
+if (shotsTest || studioTest || launchTest || polishTest || terminalTest) app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
 const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
@@ -124,6 +145,7 @@ let observatoryService: AgentObservatoryService | null = null;
 let providerService: ProviderWorkbenchService | null = null;
 let extensionsService: ExtensionsService | null = null;
 let capabilityService: CapabilityService | null = null;
+let terminalService: TerminalService | null = null;
 let uiStateStore: UiStateStore | null = null;
 let briefingService: BriefingService | null = null;
 let tray: Tray | null = null;
@@ -576,6 +598,18 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         engine: enginePort,
       });
       capabilityService = new CapabilityService({ engine: enginePort });
+      // A local ConPTY driven by the user. It never talks to the runtime API and
+      // no tool output, Markdown or hook can reach it.
+      terminalService = new TerminalService({
+        store: localState.store,
+        host: new TerminalHost({
+          emit: (event) => {
+            for (const window of BrowserWindow.getAllWindows()) {
+              if (!window.isDestroyed()) window.webContents.send(TERMINAL_CHANNELS.event, event);
+            }
+          },
+        }),
+      });
     }
 
     // Launches share one serialized queue: the path is resolved and validated,
@@ -661,6 +695,12 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: () => capabilityService,
+    });
+    registerTerminalIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => terminalService,
+      clipboard: (text) => clipboard.writeText(text),
     });
     registerLaunchIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
@@ -769,6 +809,26 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       return;
     }
 
+    if (terminalTest && terminalWorkspace) {
+      runTerminalProbe({
+        window: mainWindow,
+        rendererIndex,
+        workspace: terminalWorkspace,
+        shotsDirectory: terminalShots,
+        outputPath: terminalOut,
+      })
+        .then((result) => {
+          writeTerminalProbe(result, terminalOut);
+          const probeWindow = mainWindow as BrowserWindow | null;
+          if (probeWindow && !probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(terminalOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+      return;
+    }
     if (smokeTest) {
       runSmoke(mainWindow, smokeOut).catch((error: unknown) => {
         fs.writeFileSync(smokeOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
@@ -906,6 +966,9 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
     providerService = null;
     extensionsService = null;
     capabilityService = null;
+    // No owned shell may outlive the app that started it.
+    terminalService?.closeAll();
+    terminalService = null;
     localState?.close();
     localState = null;
   });

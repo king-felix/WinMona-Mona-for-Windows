@@ -14,12 +14,32 @@ _None._
 |---|---|---|---|
 | Verifiable DeepSeek route | P01 (G0/G1) | **verified** at P01: `doctor --probe-api` passed; model resolved to `deepseek-flash`; live turns priced | nothing; re-probe only if the key is rotated |
 | Native build toolchain | P05+ if a native binary is needed | no MSVC Build Tools; Electron and esbuild prebuilts supply everything used so far | a verified prebuilt for the specific native module, or installing VS Build Tools |
-| Windows PTY support | MONA-023 / P18 | **unavailable in the pinned engine**: `terminal_stream/input/resize/kill` are false and the route returns HTTP 501 (Unix-only) | Victor accepts terminal as platform-unavailable for 1.0, or authorizes a native Windows PTY path (likely P21) |
 | Code-signing certificate | P21/P23 release packaging | not present, not requested | Victor's explicit decision at release time; unsigned test packages are labeled until then |
 | Windows 11 modern context-menu qualification | P21 | untested | a clean per-user install and Explorer test on this machine |
 | Human click on the classic menu | P21/P22 acceptance | registered live at P09 and exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
 
 ## Resolved
+
+### ISSUE-0018 — Windows terminal, resolved 2026-11-12 by authorizing a native PTY
+
+- **Original problem:** the pinned engine reports `terminal_stream/input/resize/
+  kill` as false and `/v1/terminal/{name}/output` returns HTTP 501 (“terminal
+  sessions are Unix-only in this build”). MONA-023/terminal could not be met by
+  the engine on Windows.
+- **Victor's decision:** authorize a native Windows PTY path rather than accept
+  terminal as unavailable for 1.0.
+- **Resolution:** Mona now owns a ConPTY terminal (`node-pty@1.1.0` shipped N-API
+  prebuild + xterm.js) in a bottom drawer. The package install script is denied;
+  no compiler was installed. Verified with 18 live checks in real Electron:
+  typing, output, resize, search, clipboard write read back from the OS, drawer
+  reconnect, and exit.
+- **Still true:** the engine's own terminal route remains unavailable and is
+  reported as `unavailable-on-platform` (CAP-0053). No engine claim was
+  upgraded.
+- **Proof:** `docs/evidence/P18-terminal.md`, `docs/evidence/P18-terminal.json`.
+- **Follow-ups:** ISSUE-0019 (screen-reader pass), ISSUE-0020 (node-pty console
+  helper logs on forced kill), ISSUE-0021 (pointer drag selection needs a human
+  check), and node-pty unpacking in the P21 installer.
 
 ### P02-ELECTRON-BINARY — resolved 2026-11-12 by transient-DNS recovery
 

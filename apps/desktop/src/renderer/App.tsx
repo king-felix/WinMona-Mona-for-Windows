@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, lazy, Suspense } from 'react';
 import {
   Badge,
   Button,
@@ -18,6 +18,10 @@ import { StudioPanel } from './StudioPanel.js';
 import { AgentsPanel } from './AgentsPanel.js';
 import { ExtensionsPanel } from './ExtensionsPanel.js';
 import { CapabilitiesPanel } from './CapabilitiesPanel.js';
+
+// The terminal renderer (xterm) is loaded only when the drawer opens; idle Mona
+// must not pay for a terminal it is not showing.
+const TerminalDrawer = lazy(() => import('./TerminalDrawer.js').then((module) => ({ default: module.TerminalDrawer })));
 import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
@@ -112,6 +116,7 @@ export function App(): React.JSX.Element {
   const [showArchived, setShowArchived] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [terminalOpen, setTerminalOpen] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [draftText, setDraftText] = useState('');
@@ -672,6 +677,11 @@ export function App(): React.JSX.Element {
         }
         return;
       }
+      if (ctrl && (event.key === '`' || event.code === 'Backquote')) {
+        event.preventDefault();
+        setTerminalOpen((value) => !value);
+        return;
+      }
       if (ctrl && event.shiftKey) {
         const key = event.key.toLowerCase();
         if (key === 'f') {
@@ -730,6 +740,12 @@ export function App(): React.JSX.Element {
         disabled: !selected,
       },
       { id: 'action:shortcuts', label: 'Show keyboard shortcuts', group: 'Help' },
+      {
+        id: 'action:terminal',
+        label: terminalOpen ? 'Hide the terminal' : 'Show the terminal',
+        group: 'Terminal',
+        disabled: !selected,
+      },
     ];
     if (selected) {
       items.push(
@@ -762,7 +778,7 @@ export function App(): React.JSX.Element {
       });
     }
     return items;
-  }, [capabilities, engine?.state, focusMode, projects, selected, theme]);
+  }, [capabilities, engine?.state, focusMode, projects, selected, terminalOpen, theme]);
 
   const runPaletteAction = useCallback(
     (id: string) => {
@@ -817,6 +833,9 @@ export function App(): React.JSX.Element {
           break;
         case 'action:shortcuts':
           setShortcutsOpen(true);
+          break;
+        case 'action:terminal':
+          setTerminalOpen((value) => !value);
           break;
         case 'action:reveal':
           if (selected) void reveal(selected);
@@ -1279,11 +1298,19 @@ export function App(): React.JSX.Element {
             <section>
               <h3>Terminal and tests</h3>
               <p className="mona-muted">
-                The integrated terminal arrives with P23; test output is wired to the live studio.
+                The terminal is a local Windows shell (ConPTY) opened in this project; press Ctrl+` or use the Terminal
+                button. It is separate from the engine and from the renderer bridge. Test output is wired to the live
+                studio.
               </p>
             </section>
           </div>
         </aside>
+      ) : null}
+
+      {terminalOpen && selected ? (
+        <Suspense fallback={<p className="terminal-notice">Loading the terminal…</p>}>
+          <TerminalDrawer project={selected} open onClose={() => setTerminalOpen(false)} />
+        </Suspense>
       ) : null}
 
       <footer className="statusbar">
@@ -1303,6 +1330,18 @@ export function App(): React.JSX.Element {
           ) : null}
         </span>
         <div className="statusbar-actions">
+          <button
+            type="button"
+            className="ghost-button"
+            aria-expanded={terminalOpen}
+            aria-controls="terminal-drawer"
+            disabled={!selected}
+            onClick={() => setTerminalOpen((value) => !value)}
+            data-testid="terminal-toggle"
+            title="A local Windows shell in this project. Ctrl+` toggles it."
+          >
+            {terminalOpen ? 'Hide terminal' : 'Terminal'}
+          </button>
           <button
             type="button"
             className="ghost-button"

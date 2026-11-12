@@ -1,0 +1,37 @@
+
+PASS the fixture project opens in the real catalog :: {"status":"created"}
+PASS the Terminal control opens the drawer
+PASS the drawer is visible
+PASS a shell starts in the open project folder :: {"cwd":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project · 160×11"}
+PASS the terminal rendered through xterm
+PASS a command typed at the prompt produces real shell output :: {"typedVia":"keyboard","screen":"PS X:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project> echo MONA_TERMINAL_OKMONA_TERMINAL_OKPS X:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project>  "}
+PASS terminal output contains no clickable links
+PASS terminal output contains no images or frames
+PASS resizing the window resizes the terminal and the PTY reports it :: {"before":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project · 160×11","after":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project · 138×15"}
+PASS Copy with no selection explains what to do :: {"notice":"Select text in the terminal first, or use Copy all."}
+PASS search reports a real hit and a real miss :: {"hit":"No match"}
+PASS Copy all puts the real terminal buffer on the OS clipboard :: {"chars":215,"hasCommand":true}
+PASS closing the drawer releases the renderer surface :: {"sessionId":"term_2831c0b92f9b4252"}
+PASS the shell keeps running in main after the drawer closes :: {"state":"running","bytes":991}
+PASS reopening the drawer replays bounded scrollback :: {"screen":"PS X:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-terminal-project> echo MONA_TERMINAL_OKMONA_TERMINAL_OKPS X:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p18-terminal-1csua9\\p18-termi"}
+PASS End session is available
+PASS ending the session reports an exit instead of a silent close :: {"exit":"exit -1073741510","notice":"Session ended. Start a new one when you need it."}
+PASS the bridge exposes only named terminal methods and no shell or Node globals :: {"keys":["terminalCreate","terminalInput","terminalResize","terminalKill","terminalRefresh","terminalCopy"],"hasExec":false}
+mona: applied 6 state migration(s) to version 6
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13
+var consoleProcessList = getConsoleProcessList(shellPid);
+                         ^
+
+Error: AttachConsole failed
+    at Object.<anonymous> (X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13:26)
+    at Module._compile (node:internal/modules/cjs/loader:1937:14)
+    at Object..js (node:internal/modules/cjs/loader:2070:10)
+    at Module.load (node:internal/modules/cjs/loader:1658:32)
+    at Module._load (node:internal/modules/cjs/loader:1450:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:268:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.22.2

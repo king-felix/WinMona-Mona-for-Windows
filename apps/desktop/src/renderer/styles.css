@@ -1188,3 +1188,142 @@ body {
   font-size: var(--text-sm);
   overflow-wrap: anywhere;
 }
+
+/*
+ * The terminal drawer sits above the status bar. It is a local shell: its
+ * surface is a plain container that xterm owns, and nothing in it can render
+ * Markdown, HTML or clickable application links.
+ */
+.terminal-drawer {
+  display: flex;
+  flex-direction: column;
+  min-height: 240px;
+  min-width: 0;
+  overflow: hidden;
+  height: 42vh;
+  border-top: 1px solid var(--border-strong);
+  background: #0b1220;
+  color: #e8eef7;
+  flex: 0 0 auto;
+}
+
+.terminal-drawer[hidden] {
+  display: none;
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: #111b2c;
+  border-bottom: 1px solid #23324a;
+  font-size: var(--text-sm);
+  overflow: hidden;
+}
+
+.terminal-bar > strong {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.terminal-bar > [data-testid='terminal-cwd'] {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminal-bar .mona-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* The terminal strip is dark in both themes, so its controls get their own colours. */
+.terminal-bar .mona-button[data-variant='secondary'] {
+  background: #1b2b45;
+  color: #e8eef7;
+  border-color: #2f4668;
+}
+
+.terminal-bar .mona-button[data-variant='secondary']:hover:not(:disabled) {
+  background: #23375a;
+}
+
+.terminal-bar .mona-button[data-variant='ghost'] {
+  background: transparent;
+  color: #cbd7e6;
+  border-color: transparent;
+}
+
+.terminal-bar .mona-button:disabled {
+  opacity: 0.5;
+}
+
+.terminal-bar .ghost-button {
+  color: #cbd7e6;
+  border-color: #2f4668;
+}
+
+.terminal-bar .mona-button[data-size='sm'] {
+  min-height: 1.9rem;
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.terminal-bar .mona-muted {
+  color: #9fb0c6;
+}
+
+.terminal-bar > [data-testid='terminal-exit'] {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.terminal-bar > [data-testid='terminal-search-status'] {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.terminal-spacer {
+  flex: 1 1 auto;
+}
+
+.terminal-search {
+  flex: 0 1 12rem;
+  min-width: 5rem;
+  max-width: 14rem;
+  min-height: 1.9rem;
+  padding: 0 var(--space-2);
+  font-size: var(--text-sm);
+  background: #0b1220;
+  color: #e8eef7;
+  border: 1px solid #23324a;
+}
+
+.terminal-surface {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--space-1) var(--space-2);
+  overflow: hidden;
+}
+
+.terminal-surface .xterm {
+  height: 100%;
+}
+
+.terminal-notice {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  color: #cbd7e6;
+  background: #132038;
+  border-top: 1px solid #23324a;
+  font-size: var(--text-sm);
+}
+
+.terminal-notice .ghost-button {
+  color: #8fd0ff;
+}

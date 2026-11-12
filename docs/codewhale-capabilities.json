@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "captured_utc": "2026-11-12T15:31:38.050Z",
+  "captured_utc": "2026-11-12T16:14:06.599Z",
   "engine": {
     "product": "Codewhale",
     "version": "0.10.2",
@@ -47,11 +47,11 @@
       "notes": "Qualified as a one-shot benchmark/diagnostic path only. It emits per-request usage and wire tool-schema evidence."
     }
   ],
-  "inventory_scope": "Top-level CLI commands with captured help, the runtime route table extracted from the installed binary, effective configuration, transports, extension surfaces (P17), and the capability-explorer inputs (P18: runtime info, process, logs, terminal). The explorer reports every row with its own status; unsupported rows stay visible.",
+  "inventory_scope": "Top-level CLI commands with captured help, the runtime route table extracted from the installed binary, effective configuration, transports, extension surfaces, the capability-explorer inputs, and the Mona-owned Windows terminal (CAP-0057, marked native rather than engine). Unsupported rows stay visible.",
   "coverage_notes": {
     "upstream_overlap": "This build already ships a browser client (`codewhale web`, `codewhale rc`) and a runtime server (`serve`, `app-server`). Per spec section 2.3, reassess upstream desktop progress at G0 and before release instead of duplicating it blindly.",
-    "rows": 56,
-    "qualified": 5,
+    "rows": 57,
+    "qualified": 6,
     "read_qualified": 20,
     "discovered": 27,
     "unavailable_by_choice": 3,
@@ -1404,7 +1404,7 @@
       "chosen_integration": "Unavailable",
       "ui_location": "Capabilities → Integrated terminal",
       "status": "unavailable-on-platform",
-      "gap": "The runtime reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. A direct route check returned HTTP 501: \"terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet\". Mona shows the exact limitation and does not fake a PTY. A native Windows PTY path is a release blocker for MONA-023/terminal."
+      "gap": "The runtime reports terminal_stream, terminal_input, terminal_resize and terminal_kill as false. A direct route check returned HTTP 501: \"terminal sessions are Unix-only in this build; native Windows PTY support is not implemented yet\". Mona now provides its own ConPTY terminal (CAP-0057); this engine route is still unavailable and is not claimed."
     },
     {
       "platform": "windows-x64",
@@ -1495,6 +1495,36 @@
       "ui_location": "Capabilities → identity and live flags",
       "status": "read-qualified",
       "gap": "Reports runtime API version, engine version/commit, bind host/port, auth requirement and the capability-flag map. Mona compares the live version/commit with the ledger and reports drift; it does not inherit ledger claims across a version change."
+    },
+    {
+      "id": "CAP-0057",
+      "upstream": {
+        "name": "terminal (Mona ConPTY)",
+        "surface": "native",
+        "source": "node-pty 1.1.0 ConPTY + @xterm/xterm 6.0.0",
+        "version": "node-pty 1.1.0"
+      },
+      "platform": "windows-x64",
+      "class": "read/write",
+      "permission_implications": "A local shell runs with the user’s own rights inside the open project folder. Mona applies no per-command approval inside the shell; it enforces that model output, Markdown, hooks, MCP content and tool output cannot reach it, and strips injected runtime/provider credentials from its environment.",
+      "cost_implications": "none (no provider request)",
+      "required_arguments": "projectId, cols, rows",
+      "chosen_integration": "Native view",
+      "ui_location": "Bottom drawer — Ctrl+` or the Terminal button",
+      "tests": [
+        "apps/desktop/src/main/terminal-host.test.ts",
+        "apps/desktop/src/main/terminal-service.test.ts",
+        "apps/desktop/src/main/terminal-ipc.test.ts",
+        "apps/desktop/src/renderer/TerminalDrawer.test.tsx",
+        "docs/evidence/P18-terminal.json"
+      ],
+      "status": "qualified",
+      "gap": "Mona-owned, not an engine feature. No sandbox or per-command approval inside the shell. node-pty must be unpacked from the installer archive at P21. Screen-reader mode, OSC 52 copy intent and pointer drag-selection still need a human pass (ISSUE-0019, ISSUE-0021). node-pty’s console-list helper can print AttachConsole failed during a forced kill; the process still exits (ISSUE-0020).",
+      "evidence": {
+        "help_capture": null,
+        "captured_utc": "2026-11-12T16:14:06.599Z",
+        "contract_report": "docs/evidence/P18-terminal.json"
+      }
     }
   ],
   "runtime_api": {

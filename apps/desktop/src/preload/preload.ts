@@ -9,6 +9,7 @@ import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
+import { TERMINAL_CHANNELS, type TerminalEvent } from '../shared/terminal.js';
 
 /**
  * The entire renderer-facing surface. Named methods only: no generic invoke, no
@@ -121,6 +122,24 @@ const bridge = Object.freeze({
   capabilitiesReadLog: (input: { name: string; offset?: number; limit?: number }) =>
     ipcRenderer.invoke(CAPABILITY_CHANNELS.readLog, input),
   capabilitiesCheckTerminal: () => ipcRenderer.invoke(CAPABILITY_CHANNELS.checkTerminal, {}),
+  terminalCreate: (input: { projectId: string; cols: number; rows: number }) =>
+    ipcRenderer.invoke(TERMINAL_CHANNELS.create, input),
+  terminalInput: (input: { projectId: string; sessionId: string; data: string }) =>
+    ipcRenderer.invoke(TERMINAL_CHANNELS.input, input),
+  terminalResize: (input: { projectId: string; sessionId: string; cols: number; rows: number }) =>
+    ipcRenderer.invoke(TERMINAL_CHANNELS.resize, input),
+  terminalKill: (input: { projectId: string; sessionId: string }) => ipcRenderer.invoke(TERMINAL_CHANNELS.kill, input),
+  terminalRefresh: (input: { projectId: string; sessionId: string }) =>
+    ipcRenderer.invoke(TERMINAL_CHANNELS.refresh, input),
+  terminalCopy: (input: { data: string }) => ipcRenderer.invoke(TERMINAL_CHANNELS.copy, input),
+  /** Terminal output and lifecycle. The only channel a terminal can reach. */
+  onTerminalEvent: (handler: (event: TerminalEvent) => void) => {
+    const listener = (_event: unknown, payload: TerminalEvent): void => handler(payload);
+    ipcRenderer.on(TERMINAL_CHANNELS.event, listener);
+    return () => {
+      ipcRenderer.removeListener(TERMINAL_CHANNELS.event, listener);
+    };
+  },
   /** The latest Explorer launch, and pushes for new ones. Returns no path to execute. */
   getLaunchState: () => ipcRenderer.invoke(LAUNCH_CHANNELS.state, {}),
   onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {

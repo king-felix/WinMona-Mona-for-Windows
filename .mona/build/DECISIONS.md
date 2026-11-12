@@ -1057,3 +1057,64 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** palette actions for local UI commands keep their existing
   behavior; capability items only navigate and can be selected even when the row
   is unavailable, because the explanation is the useful destination.
+
+## D-0084 - The terminal is Mona's own ConPTY, not an engine claim
+
+- **Decision:** Mona ships a Windows terminal built on `node-pty` (ConPTY) and
+  xterm.js, in a bottom drawer. The engine's `/v1/terminal` routes stay reported
+  as unavailable-on-platform and are never used.
+- **Why:** the pinned engine returns HTTP 501 on every terminal route on
+  Windows. Victor authorized a native PTY path instead of accepting the gap.
+  Writing our own ConPTY host keeps the terminal real (job control, resize, ^C,
+  full-screen apps) without pretending the engine provides it.
+- **Constrains:** the terminal is project-bound (main resolves the folder from
+  the catalog; the renderer never sends a path), input is capped at 8 KiB per
+  call, scrollback is capped at 256 KiB in main, and no model output, Markdown,
+  hook, MCP payload or tool result can reach a terminal input channel. The
+  packaged installer must unpack `node-pty` (P21).
+
+## D-0085 - `node-pty` uses its shipped prebuilt binary and runs no install script
+
+- **Decision:** `node-pty@1.1.0` is installed with `allowScripts: { "node-pty":
+  false }`. The package's N-API prebuild for `win32-x64` is used as shipped; no
+  node-gyp build, no MSVC, no postinstall action.
+- **Why:** the prebuild loads and spawns a real ConPTY (verified in plain Node,
+  then in Electron). Running the install script would add a build step and a
+  trust surface for no benefit on this machine.
+- **Constrains:** if a future upgrade ships no prebuild for the target ABI, the
+  upgrade is a deliberate decision with a toolchain prerequisite, not a silent
+  compile. Re-verify with `npm run terminal` after any node-pty change.
+
+## D-0086 - Terminal exit state comes from the PTY, never from the kill reply
+
+- **Decision:** End session sends the kill, the badge shows `closing`, and only
+  the PTY's own exit event sets `exited` with the exit code. The buffer is not
+  cleared.
+- **Why:** on Windows the kill reply arrives before the process is gone. Trusting
+  it left the drawer claiming `running` after the user ended the session — a
+  false state, and exactly the kind of claim this project refuses. Keeping the
+  buffer also lets the user copy output after the shell dies.
+- **Constrains:** a shell that ignores the kill shows `closing` until the exit
+  event or until the app quits; the drawer must not invent an exit code.
+
+## D-0087 - Screen-reader mode stays off until a human pass qualifies it
+
+- **Decision:** xterm runs with `screenReaderMode: false` by default, even though
+  the drawer has an accessible label and a labelled search field.
+- **Why:** the live probe proved that `screenReaderMode: true` silently disables
+  xterm's textarea input path, so typed characters were dropped. Turning it on by
+  default would trade real input for unverified accessibility.
+- **Constrains:** a human screen-reader pass (ISSUE-0019) must decide how to
+  offer the mode, probably as a setting, before it is enabled for users.
+
+## D-0088 - Clipboard writes go through a narrow terminal channel
+
+- **Decision:** `Copy` and `Copy all` try `navigator.clipboard`, then fall back to
+  `mona:terminal-copy`, which writes through Electron's clipboard in main.
+  Payloads are capped at 256 KiB and validated by schema.
+- **Why:** an unfocused window refuses the async clipboard API, so copy silently
+  failed in the live probe. A one-purpose channel that only writes text is
+  narrower than exposing a generic clipboard bridge and is user-initiated.
+- **Constrains:** the channel cannot read the clipboard, cannot run commands, and
+  is not used by model output or terminal escape sequences; OSC 52 remains
+  consumed and ignored.
