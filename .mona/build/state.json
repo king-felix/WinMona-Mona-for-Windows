@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 13,
+  "revision": 14,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -283,57 +283,57 @@
           "path": "docs/evidence/P04-supervisor.md",
           "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-live.json",
           "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-live-log.txt",
           "sha256": "48eafebf4d8052afc0ad7ea71293ca87ef3db93b68ef6c9acce6d407f801d84c",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-lifecycle.json",
           "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-lifecycle-log.txt",
           "sha256": "de925d14175296f7ef7bc568492658aa55f6d995a904f87c2adfb244469881f2",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-tests.txt",
           "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-checks.txt",
           "sha256": "a0678bf2afa20c9a0bd591572fba7086db8b3670fde7be461541e886adb430b3",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         },
         {
           "path": "docs/evidence/P04-build.txt",
           "sha256": "fc410464552be8868c69e82f35d12e5742f01805437114ae812d7d28854519e0",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:12:47Z",
-          "commit": "00eb166ac410a0e1ebb31daf155560767772b64c"
+          "recorded_utc": "2026-11-12T02:12:57Z",
+          "commit": "3dfb511b298022bc78723b5f46302327fa9050e1"
         }
       ],
       "blocker_ids": []
@@ -588,5 +588,5 @@
     "P05",
     "P06"
   ],
-  "last_checkpoint_utc": "2026-11-12T02:12:48Z"
+  "last_checkpoint_utc": "2026-11-12T02:12:57Z"
 }

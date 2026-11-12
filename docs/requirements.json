@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 93,
+  "revision": 99,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1081,9 +1081,9 @@
               "path": "docs/evidence/P04-supervisor.md",
               "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:57Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         },
@@ -1096,9 +1096,9 @@
               "path": "docs/evidence/P04-supervisor.md",
               "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:58Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         },
@@ -1111,9 +1111,9 @@
               "path": "docs/evidence/P04-tests.txt",
               "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:58Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         },
@@ -1126,9 +1126,9 @@
               "path": "docs/evidence/P04-live.json",
               "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:58Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         },
@@ -1141,9 +1141,9 @@
               "path": "docs/evidence/P04-supervisor.md",
               "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:58Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         }
@@ -1306,9 +1306,9 @@
               "path": "docs/evidence/P04-lifecycle.json",
               "sha256": "a3382d58286e0e45a4575897cc942d9e377e19cb47655f102ca952cf3c31e41e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:12:48Z",
-              "commit": "00eb166",
-              "note": "P04 evidence recorded at commit 00eb166"
+              "recorded_utc": "2026-11-12T02:12:58Z",
+              "commit": "3dfb511",
+              "note": "P04 evidence recorded at commit 3dfb511"
             }
           ]
         },
@@ -1343,7 +1343,7 @@
           ]
         }
       ],
-      "verified_commit": "00eb166",
+      "verified_commit": "3dfb511",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
