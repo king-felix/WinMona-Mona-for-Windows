@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 3,
+  "revision": 4,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -22,24 +22,11 @@
         "11 bootstrap tests pass; interrupted checkpoint recovery verified",
         "capability inventory seeded (43 command rows, 4 transports, all unqualified)",
         "discovery report, DECISIONS D-0001..D-0008, BLOCKERS (none open), first handoff",
-        "post-checkpoint audit recorded (validate OK, state revision 2)"
+        "post-checkpoint audit recorded (validate OK, state revision 2)",
+        "bootstrap tests made self-contained; evidence hashes refreshed"
       ],
       "remaining_steps": [],
       "evidence": [
-        {
-          "path": "docs/evidence/P00-bootstrap.md",
-          "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T00:23:57Z",
-          "commit": null
-        },
-        {
-          "path": "docs/evidence/P00-tests.txt",
-          "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
-          "kind": "document",
-          "recorded_utc": "2026-11-12T00:23:57Z",
-          "commit": null
-        },
         {
           "path": "docs/evidence/P00-validation.txt",
           "sha256": "5d6dab1e0d3ec631c3562c366de6146f0ed0e2c1dff9c7f57ca6572024c3a295",
@@ -60,6 +47,20 @@
           "kind": "document",
           "recorded_utc": "2026-11-12T00:24:11Z",
           "commit": null
+        },
+        {
+          "path": "docs/evidence/P00-bootstrap.md",
+          "sha256": "d0acf780cba85e1a8d92c72612aeff32827bae40f289c968f843b6fec073673a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:26:05Z",
+          "commit": "cbd5f229af693c2cc4775887f9e06c0da1dfe820"
+        },
+        {
+          "path": "docs/evidence/P00-tests.txt",
+          "sha256": "eab57494fb1df9fb04baa9eb615c0a69b5ee8487f53732febbb6b80222c072e8",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:26:05Z",
+          "commit": "cbd5f229af693c2cc4775887f9e06c0da1dfe820"
         }
       ],
       "blocker_ids": []
@@ -363,5 +364,5 @@
   "next_eligible_prompts": [
     "P01"
   ],
-  "last_checkpoint_utc": "2026-11-12T00:24:11Z"
+  "last_checkpoint_utc": "2026-11-12T00:26:05Z"
 }

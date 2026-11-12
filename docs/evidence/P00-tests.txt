@@ -1,17 +1,17 @@
 ﻿# node --test tests/bootstrap
-# captured 2026-11-12T00:23:27Z  node v26.13.1  windows-x64
+# captured 2026-11-12T00:26:00Z  node v26.13.1  windows-x64
 
-✔ checkpoint advances revision atomically and journals the boundary (421.7235ms)
-✔ stale expected revision is refused and state is untouched (337.5362ms)
-✔ a write interrupted after the temp file is promoted by recover (452.8547ms)
-✔ a torn temp file is quarantined and the committed state survives (165.0381ms)
-✔ a corrupt state file is restored from the newest verified backup (500.4256ms)
-✔ validation rejects a dependency cycle (199.2017ms)
-✔ validation rejects an unregistered requirement and an unknown owner (204.8577ms)
-✔ validation rejects a changed specification whose recorded hash is stale (199.1111ms)
-✔ validation rejects a passed criterion with no evidence (200.7772ms)
-✔ evidence command records a hash and derives requirement status (377.0458ms)
-✔ checkpoint refuses evidence paths that do not exist (157.4325ms)
+✔ checkpoint advances revision atomically and journals the boundary (573.6353ms)
+✔ stale expected revision is refused and state is untouched (479.5904ms)
+✔ a write interrupted after the temp file is promoted by recover (606.3411ms)
+✔ a torn temp file is quarantined and the committed state survives (301.7273ms)
+✔ a corrupt state file is restored from the newest verified backup (642.9764ms)
+✔ validation rejects a dependency cycle (344.3387ms)
+✔ validation rejects an unregistered requirement and an unknown owner (353.0535ms)
+✔ validation rejects a changed specification whose recorded hash is stale (351.1067ms)
+✔ validation rejects a passed criterion with no evidence (352.6178ms)
+✔ evidence command records a hash and derives requirement status (517.0415ms)
+✔ checkpoint refuses evidence paths that do not exist (296.014ms)
 ℹ tests 11
 ℹ suites 0
 ℹ pass 11
@@ -19,4 +19,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 3283.804
+ℹ duration_ms 4881.2886

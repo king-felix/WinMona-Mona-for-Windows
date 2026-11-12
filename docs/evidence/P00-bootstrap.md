@@ -30,7 +30,8 @@ tooling are in place and verified on this machine.
    pre-existing repository instructions existed, so no conflict had to be
    reconciled (recorded in `docs/discovery-report.md` section 5).
 5. **Durable state files and the requirement ledger.**
-   - `.mona/build/state.json` — 24 tasks (P00–P23), schema v1, revision 2.
+   - `.mona/build/state.json` — 24 tasks (P00–P23), schema v1; the revision
+     advances at each checkpoint (`node tools/build/cli.mjs status`).
    - `.mona/build/attempts.jsonl` — append-only attempt ledger (empty; no
      attempts needed at P00).
    - `.mona/build/HANDOFF.md`, `DECISIONS.md` (D-0001…D-0008), `BLOCKERS.md`.

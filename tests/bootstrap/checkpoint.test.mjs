@@ -1,4 +1,4 @@
-// P00 bootstrap tests: atomicity, revision conflicts, recovery, graph and hash validation.
+﻿// P00 bootstrap tests: atomicity, revision conflicts, recovery, graph and hash validation.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -12,19 +12,18 @@ const CLI = path.join(REPO, 'tools', 'build', 'cli.mjs');
 
 function sandbox() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'mona-p00-'));
-  for (const f of ['Mona_Project.md', 'Mona_PROMPTS.md']) {
-    fs.copyFileSync(path.join(REPO, f), path.join(root, f));
-  }
-  fs.cpSync(path.join(REPO, 'docs'), path.join(root, 'docs'), { recursive: true });
-  fs.mkdirSync(path.join(root, '.mona', 'build'), { recursive: true });
-  fs.copyFileSync(
-    path.join(REPO, '.mona', 'build', 'state.json'),
-    path.join(root, '.mona', 'build', 'state.json'),
-  );
-  fs.mkdirSync(path.join(root, 'tools', 'build', 'schema'), { recursive: true });
-  fs.cpSync(path.join(REPO, 'tools', 'build', 'schema'), path.join(root, 'tools', 'build', 'schema'), {
+  const skip = /(^|[\\/])(node_modules|\.git|\.mona[\\/]build|dist|out)([\\/]|$)/;
+  fs.cpSync(REPO, root, {
     recursive: true,
+    filter: (src) => {
+      const r = path.relative(REPO, src);
+      return r === '' || !skip.test(r);
+    },
   });
+  // Build an independent baseline (revision 1, every prompt pending) so these
+  // tests stay valid as the real build progresses through later prompts.
+  const seeded = cli(root, ['init']);
+  assert.equal(seeded.code, 0, seeded.err);
   return root;
 }
 
@@ -173,6 +172,7 @@ test('validation rejects a passed criterion with no evidence', () => {
   const root = sandbox();
   const ledger = readLedger(root);
   ledger.requirements[0].criteria[0].status = 'passed';
+  ledger.requirements[0].criteria[0].evidence = [];
   writeJson(path.join(root, 'docs', 'requirements.json'), ledger);
 
   const r = cli(root, ['validate']);
@@ -182,18 +182,19 @@ test('validation rejects a passed criterion with no evidence', () => {
 
 test('evidence command records a hash and derives requirement status', () => {
   const root = sandbox();
+  const before = readLedger(root).revision;
   const r = cli(root, [
     'evidence',
     '--requirement', 'MONA-001',
     '--criterion', 'identity',
     '--path', 'docs/requirements.json',
     '--status', 'passed',
-    '--expected-revision', '1',
+    '--expected-revision', String(before),
     '--note', 'bootstrap test',
   ]);
   assert.equal(r.code, 0, r.err);
   const ledger = readLedger(root);
-  assert.equal(ledger.revision, 2);
+  assert.equal(ledger.revision, before + 1);
   const req = ledger.requirements.find((x) => x.id === 'MONA-001');
   assert.equal(req.criteria[0].status, 'passed');
   assert.match(req.criteria[0].evidence[0].sha256, /^[a-f0-9]{64}$/);
@@ -211,3 +212,4 @@ test('checkpoint refuses evidence paths that do not exist', () => {
   assert.match(r.err, /does not exist/);
   assert.equal(readState(root).revision, 1);
 });
+

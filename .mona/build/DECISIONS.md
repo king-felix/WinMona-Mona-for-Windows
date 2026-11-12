@@ -90,3 +90,23 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   depending on the product, and the product must not depend on the bootstrap
   utility.
 - **Constrains:** shared schemas are allowed; shared runtime dependencies are not.
+
+## D-0009 — Repository checks out bytes exactly (no EOL rewriting)
+
+- **Decision:** `.gitattributes` sets `* -text` and `core.autocrlf=false`.
+- **Why:** evidence digests are recorded over working-tree bytes. Git's EOL
+  normalization would change file hashes on a fresh checkout and make every
+  recorded evidence hash appear stale.
+- **Constrains:** text files keep whatever line endings they were authored with;
+  editors and scripts must not rewrite line endings gratuitously.
+
+## D-0010 — Bootstrap tests build their own baseline
+
+- **Decision:** `tests/bootstrap` copies the repository (excluding
+  `node_modules`, `.git`, `dist`, `out`, `.mona/build`) into a temporary
+  directory and runs `cli.mjs init` there instead of asserting against the live
+  build state.
+- **Why:** the first version asserted `revision 1` against real state and broke
+  the moment P00 itself completed. Tests must not depend on build progress.
+- **Constrains:** test evidence is fixture-based by nature; runtime/engine
+  compatibility claims still require tests against the real binary (P01+).

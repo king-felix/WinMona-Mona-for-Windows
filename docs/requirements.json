@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 12,
+  "revision": 14,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -383,7 +383,7 @@
           "evidence": [
             {
               "path": "docs/evidence/P00-bootstrap.md",
-              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "sha256": "d0acf780cba85e1a8d92c72612aeff32827bae40f289c968f843b6fec073673a",
               "kind": "document",
               "recorded_utc": "2026-11-12T00:23:41Z",
               "commit": null,
@@ -774,7 +774,7 @@
           "evidence": [
             {
               "path": "docs/evidence/P00-tests.txt",
-              "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
+              "sha256": "eab57494fb1df9fb04baa9eb615c0a69b5ee8487f53732febbb6b80222c072e8",
               "kind": "document",
               "recorded_utc": "2026-11-12T00:23:42Z",
               "commit": null,
@@ -789,7 +789,7 @@
           "evidence": [
             {
               "path": "docs/evidence/P00-tests.txt",
-              "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
+              "sha256": "eab57494fb1df9fb04baa9eb615c0a69b5ee8487f53732febbb6b80222c072e8",
               "kind": "document",
               "recorded_utc": "2026-11-12T00:23:42Z",
               "commit": null,
@@ -804,7 +804,7 @@
           "evidence": [
             {
               "path": "docs/evidence/P00-bootstrap.md",
-              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "sha256": "d0acf780cba85e1a8d92c72612aeff32827bae40f289c968f843b6fec073673a",
               "kind": "document",
               "recorded_utc": "2026-11-12T00:23:53Z",
               "commit": null,
@@ -819,7 +819,7 @@
           "evidence": [
             {
               "path": "docs/evidence/P00-bootstrap.md",
-              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "sha256": "d0acf780cba85e1a8d92c72612aeff32827bae40f289c968f843b6fec073673a",
               "kind": "document",
               "recorded_utc": "2026-11-12T00:23:53Z",
               "commit": null,
@@ -833,12 +833,12 @@
           "status": "passed",
           "evidence": [
             {
-              "path": ".mona/build/attempts.jsonl",
-              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "path": "docs/evidence/P00-bootstrap.md",
+              "sha256": "d0acf780cba85e1a8d92c72612aeff32827bae40f289c968f843b6fec073673a",
               "kind": "document",
-              "recorded_utc": "2026-11-12T00:23:42Z",
+              "recorded_utc": "2026-11-12T00:25:39Z",
               "commit": null,
-              "note": "append-only ledger exists and is empty because no attempt was needed; product-level state/migrations remain P05/P10"
+              "note": "attempt-ledger format documented; the append-only .mona/build/attempts.jsonl is intentionally not hash-pinned because it must grow"
             }
           ]
         }
