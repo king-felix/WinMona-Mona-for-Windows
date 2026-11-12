@@ -18,6 +18,7 @@ import {
   packageVersion,
   pidAlive,
   pngSolid,
+  missingComServerPayloads,
   renderManifest,
   resolveLayout,
   sha256File,
@@ -72,6 +73,24 @@ describe('identity package manifest', () => {
     assert.match(manifest, /uap10:RuntimeBehavior="win32App"/);
     assert.match(manifest, /<rescap:Capability Name="runFullTrust" \/>/);
     assert.match(manifest, new RegExp(`<Identity Name="${IDENTITY_NAME}"`));
+  });
+
+  it('requires the COM server it declares to be present in the payload', () => {
+    const identity = temporary('mona-identity-');
+    const empty = temporary('mona-empty-');
+    try {
+      writeFileSync(path.join(identity, 'AppxManifest.xml'), manifest, 'utf8');
+      // Manifest and payload must not diverge: the package should satisfy the
+      // declarations it ships, whatever an external location also provides.
+      assert.deepEqual(missingComServerPayloads(identity), ['MonaMenu.dll']);
+      writeFileSync(path.join(identity, 'MonaMenu.dll'), 'placeholder');
+      assert.deepEqual(missingComServerPayloads(identity), []);
+      // No manifest at all: nothing can prove the payload, so it is reported.
+      assert.deepEqual(missingComServerPayloads(empty), ['MonaMenu.dll']);
+    } finally {
+      rmSync(identity, { recursive: true, force: true, maxRetries: 3 });
+      rmSync(empty, { recursive: true, force: true, maxRetries: 3 });
+    }
   });
 });
 

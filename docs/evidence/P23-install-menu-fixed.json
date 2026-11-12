@@ -1,0 +1,93 @@
+{
+  "ok": true,
+  "version": "0.1.0",
+  "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+  "placement": {
+    "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "previous": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona.old-20261112204848",
+    "stamp": "20261112204848"
+  },
+  "closed": null,
+  "decision": {
+    "action": "proceed",
+    "reason": "Mona is not running."
+  },
+  "registryFailures": [],
+  "classic": {
+    "ok": true,
+    "status": 0,
+    "verified": true
+  },
+  "identity": {
+    "ok": true,
+    "registered": true,
+    "packageFullName": "MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p",
+    "code": null,
+    "error": null,
+    "msix": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+    "prerequisite": null
+  },
+  "checks": {
+    "exe": {
+      "ok": true,
+      "path": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe"
+    },
+    "menuDll": {
+      "ok": true
+    },
+    "renderer": {
+      "ok": true
+    },
+    "pty": {
+      "ok": true,
+      "directory": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app\\node_modules\\node-pty\\prebuilds\\win32-x64",
+      "missing": [],
+      "files": [
+        "conpty.node",
+        "conpty_console_list.node",
+        "pty.node"
+      ]
+    },
+    "checksums": {
+      "ok": true,
+      "files": 1673,
+      "problems": []
+    },
+    "registry": {
+      "ok": true,
+      "values": {
+        "MonaExe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "MonaMenuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+        "Version": "0.1.0",
+        "InstallRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "UserData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop"
+      }
+    },
+    "uninstallEntry": {
+      "ok": true,
+      "values": {
+        "DisplayName": "Mona",
+        "DisplayVersion": "0.1.0",
+        "Publisher": "Mona",
+        "InstallLocation": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "DisplayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "UninstallString": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\uninstall.cmd\"",
+        "NoModify": "0x1",
+        "NoRepair": "0x1"
+      }
+    },
+    "package": {
+      "ok": true,
+      "packages": [
+        {
+          "status": "Ok",
+          "fullName": "MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p",
+          "location": "C:\\Program Files\\WindowsApps\\MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p"
+        }
+      ],
+      "installed": 1,
+      "exit": 0
+    },
+    "ok": true
+  }
+}

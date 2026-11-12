@@ -23,8 +23,10 @@ What the installer does:
   folder backgrounds, using the exact registered command line — no script strings are built.
 - Writes a per-user uninstall entry (`Apps & features` → Mona).
 - Attempts to register the Windows 11 modern menu identity package and **reports the result**.
-  On a machine that does not trust the test certificate it reports `0x800B0109` and leaves the
-  classic entry in place. It never imports a root certificate silently.
+  Windows refuses a test-signed package (`0x800B0109`) until the machine trusts the certificate;
+  after the verified elevated `trust-test-certificate` step the package registers and the menu
+  entry is declared for folders and folder backgrounds. It never imports a root certificate
+  silently and never enables developer mode.
 - Leaves `~/.codewhale`, your projects and any existing Codewhale installation untouched.
 
 Exit codes: `0` success, `3` deferred (Mona is running with work in flight), `4` a prerequisite
@@ -178,9 +180,11 @@ intend to lose the history.
 
 ## 15. Known limits in 0.1.0
 
-- The Windows 11 modern menu needs a trusted signing certificate or developer mode.
+- The Windows 11 modern menu needs a trusted signing certificate; on this reference machine the
+  verified elevated import is done and the package registers. A human right-click confirming the
+  entry has not been recorded, so treat first appearance as unconfirmed.
 - The screen-reader walkthrough and physical 200% scaling check are human-only and outstanding.
-- Idle memory measured 404 MB across four processes (internal target 350 MB).
+- Idle memory measured 370.5 MB across four processes (internal target 350 MB).
 - Paint frame timing was not measured; the measurement window was not presented.
 - Restore covers HEAD only; arbitrary-commit restore is not implemented.
 - The engine's own terminal route is unavailable on Windows; Mona's own ConPTY terminal is used

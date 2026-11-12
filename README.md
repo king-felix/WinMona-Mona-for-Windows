@@ -13,13 +13,14 @@ is verified, what is measured, and what is still waiting on a human decision.
 
 Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 
-- 27 of 30 product requirements **verified** against recorded evidence.
-- **MONA-028 is partial**: idle memory is 371.4–377.1 MB on the installed candidate against a 350 MB
-  internal target (down from 404 MB after windowing rendered timeline rows), and the Windows
-  screen-reader and physical 200% scaling checks need a person.
-- **MONA-027 is blocked**: the Windows 11 modern folder menu is built and test-signed, and its
-  signer is verified, but Windows will not register the identity package until this machine
-  trusts the signing certificate — one elevated command. The classic menu works today.
+- 28 of 30 product requirements **verified** against recorded evidence.
+- **MONA-028 is partial**: idle memory is 370.5–377.1 MB on the installed candidate against a
+  350 MB internal target (down from 404 MB after windowing rendered timeline rows), and the
+  Windows screen-reader and physical 200% scaling checks need a person.
+- **MONA-027 is registered, not yet seen**: the certificate is trusted on this reference
+  machine through the verified elevated import, the identity package registers (`Status: Ok`)
+  with both modern-menu verbs declared, and the classic menu is verified. A human right-click
+  confirming the modern entry is still outstanding, so no complete claim is made.
 - Real engine turn through the installed app: 22/22 probe steps, one turn at 596 µUSD.
 - Automated gates green: 549 Vitest tests (67 files), 14 bootstrap, 12 launch, 25 install,
   8 spike, 7 native; typecheck, lint, formatting and build all pass.
@@ -51,11 +52,12 @@ node tools/install/cli.mjs verify --smoke
 
 `install` places the program at `%LOCALAPPDATA%\Programs\Mona`, registers the classic Explorer
 entry, writes the per-user uninstall entry, and preserves `~/.codewhale` and your project
-folders. It reports the identity-package result honestly: on a machine that does not trust the
-test certificate the modern menu entry reports `0x800B0109` and stays unregistered. To enable
-it on a development machine, verify and trust the certificate first — see
-`node tools/install/cli.mjs trust-test-certificate`, which checks the signer, manifest and build
-record before importing anything, and writes only to `LocalMachine\TrustedPeople`.
+folders. It reports the identity-package result honestly: Windows refuses a test-signed package
+with `0x800B0109` until the machine trusts the certificate. To enable the Windows 11 modern menu
+on a development machine, run `node tools/install/cli.mjs trust-test-certificate` **in an
+elevated shell**; it checks the signer, manifest and build record, writes only to
+`LocalMachine\TrustedPeople`, and `untrust-test-certificate` removes exactly that thumbprint
+from both `TrustedPeople` stores. It never touches `Root`, and never enables developer mode.
 
 Uninstall removes Mona-owned files and registration and keeps your projects, the project
 database and the engine's history:
@@ -94,6 +96,8 @@ node tools/install/cli.mjs uninstall
   issues, rollback.
 - [P23 follow-up](docs/evidence/P23-followup.md) — trust verification, memory breakdown,
   accessibility observations, startup measurements.
+- [Elevated trust round](docs/evidence/P23-elevated-round.md) — the elevated import, package
+  registration, the packaging guard, and the probe that proved nothing.
 - [Human checklist](docs/evidence/P23-human-checklist.md) — the checks that need a person.
 - [Third-party notices](THIRD_PARTY_NOTICES.md), [contributing](CONTRIBUTING.md),
   [security](SECURITY.md).

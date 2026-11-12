@@ -1,0 +1,36 @@
+{
+  "packed": {
+    "ok": true,
+    "msix": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+    "status": 0,
+    "output": "Microsoft (R) MakeAppx Tool\r\r\nVersion 10.0.28000.2957\r\r\nCopyright (C) Microsoft. All rights reserved.\r\r\n\r\r\nThe path (/p) parameter is: \"\\\\?\\C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix\"\r\r\nThe content directory (/d) parameter is: \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\"\r\r\nEnumerating files from directory \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\"\r\r\nPacking 5 file(s) in \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\" (content directory) to \"\\\\?\\C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix\" (output file name).\r\r\nMemory limit defaulting to 17137815552 bytes.\r\r\nUsing \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\\AppxManifest.xml\" as the manifest for the package.\r\r\nProcessing \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\\MonaMenu.dll\" as a payload file.  Its path in the package will be \"MonaMenu.dll\".\r\r\nProcessing \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\\Assets\\StoreLogo.png\" as a payload file.  Its path in the package will be \"Assets\\StoreLogo.png\".\r\r\nProcessing \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\\Assets\\Square44x44Logo.png\" as a payload file.  Its path in the package will be \"Assets\\Square44x44Logo.png\".\r\r\nProcessing \"\\\\?\\X:\\AI_projects\\Mona\\build\\install-stage\\identity\\Assets\\Square150x150Logo.png\" as a payload file.  Its path in the package will be \"Assets\\Square150x150Logo.png\".\r\r\nPackage creation succeeded."
+  },
+  "certificate": {
+    "ok": true,
+    "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+    "labeledTestCertificate": true
+  },
+  "signed": {
+    "ok": true,
+    "status": 0,
+    "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+    "labeledTestCertificate": true,
+    "timestamped": false,
+    "output": "Done Adding Additional Store\r\nSuccessfully signed: C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix"
+  },
+  "verification": {
+    "trustedChain": true,
+    "status": 0,
+    "output": "File: C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix\nIndex  Algorithm  Timestamp    \n========================================\n0      sha256     None         \n\nSuccessfully verified: C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+    "sha256": "5a7a645582602d80bb389c252b7b465fc4808c722a957fc7367ed8dfc46544ee"
+  },
+  "checksums": {
+    "ok": true,
+    "file": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\SHA256SUMS-0.1.0.txt",
+    "entries": [
+      "5a7a645582602d80bb389c252b7b465fc4808c722a957fc7367ed8dfc46544ee  Mona-0.1.0-x64.msix",
+      "3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d  Mona-test-signing-0.1.0.cer"
+    ]
+  },
+  "signingStatus": "test-signed with a self-created certificate; not a production signature"
+}

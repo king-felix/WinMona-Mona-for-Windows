@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "removed": [
+    "LocalMachine\\TrustedPeople"
+  ],
+  "alreadyAbsent": false,
+  "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+  "store": "Cert:\\LocalMachine\\TrustedPeople",
+  "presence": {
+    "LocalMachine\\TrustedPeople": false,
+    "LocalMachine\\Root": false,
+    "CurrentUser\\TrustedPeople": false,
+    "CurrentUser\\Root": false
+  },
+  "rootUntouched": true,
+  "error": null
+}

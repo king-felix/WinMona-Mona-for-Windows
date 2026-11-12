@@ -74,12 +74,29 @@ the notes say so.
   were not restored after restart. All sections now share one list, with a test.
 - Packaged argv stripping found by the installed launch probe.
 
+### Changed in the elevation round
+
+- **The trust gate was cleared with an elevated, verified import.** `trust-test-certificate`
+  wrote the certificate thumbprint `5C0AD0D7…4C95` into `LocalMachine\TrustedPeople` after
+  re-checking the certificate, the package signer, the manifest Publisher and the build record.
+  `Add-AppxPackage` now accepts the MSIX and the identity package registers (`Status: Ok`).
+- **Removal clears both TrustedPeople scopes.** `untrust-test-certificate` removes the exact
+  thumbprint from the machine and per-user `TrustedPeople` stores (the per-user entry is Windows
+  mirroring the machine entry) and never touches `Root`. Verified by a full remove/re-add round
+  trip.
+- **The identity package ships the menu DLL its manifest declares.** Staging and packing now
+  refuse a package whose `com:Class` path is absent from the payload, so manifest and payload
+  cannot diverge. This is hardening, not a proven fix: direct CLSID activation is not a valid
+  test for packaged shell commands (a known-good third-party package fails it identically).
+- **Memory re-measured on the final bytes:** 370.5 MB idle with the 20,000-row workload; the
+  350 MB target is still unmet and nothing was relabelled.
+
 ### Known issues
 
-- **Modern Windows 11 menu is blocked on machine policy.** The identity package is built and
-  test-signed; Windows refuses registration without developer mode or a trusted certificate
-  (`0x800B0109`). The classic menu works.
-- **Idle memory 404 MB** across four processes, against an internal 350 MB target. Recorded, not
+- **Modern Windows 11 menu: registered, not yet seen.** The package registers and both verbs are
+  declared for folders and folder backgrounds, but no human right-click capturing the entry in
+  the Windows 11 menu has been recorded. Other machines still need the same trust decision.
+- **Idle memory 370.5 MB** across four processes, against an internal 350 MB target. Recorded, not
   adjusted away.
 - **Screen-reader walkthrough and physical 200% scaling** remain human-only checks.
 - **Paint frame timing** was not measured (the measurement window was not presented).

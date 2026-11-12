@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 77,
+  "revision": 80,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1463,15 +1463,18 @@
         "memory: per-process and JS-heap probe, P22 baseline reproduced at 404 MB, windowed timeline rendering shipped, installed candidate measured at 371.4 MB",
         "accessibility: real-window probe passing 12/12 (names, dialog focus trap and restoration, keyboard reveal, virtualized diff, 200% zoom) plus a 21-row human checklist",
         "startup measured on the installed candidate: cold 422 ms, warm 738 ms; development-build ambiguity corrected in the release notes",
-        "artifact rebuilt and re-qualified: 1672 files, MSIX e9008c11..., clean-root install/verify/uninstall and all installed probes re-run"
+        "artifact rebuilt and re-qualified: 1672 files, MSIX e9008c11..., clean-root install/verify/uninstall and all installed probes re-run",
+        "elevated verified import of the test certificate into LocalMachine\\TrustedPeople only; identity package registers with Status Ok; untrust round trip proved and now clears both TrustedPeople scopes",
+        "identity payload now ships the MonaMenu.dll its manifest declares, guarded at stage and package time and covered by a test",
+        "recorded that direct CLSID activation is invalid evidence for packaged shell commands (a known-good third-party package fails it identically)",
+        "installed probes re-run on the rebuilt bytes: a11y 12/12, idle memory 370.5 MB, cold 421 ms / warm 722 ms, install verify ok",
+        "artifact rebuilt and re-qualified: 1,673 files / 452,709,537 bytes; MSIX sha256 5a7a6455...44ee; install verify exits 0 and the identity package reports Status Ok"
       ],
       "remaining_steps": [
-        "modern menu needs Victor's trust decision (developer mode, test-certificate trust, or production certificate) before MONA-027 can move",
-        "memory decision: accept 406.4 MB for 0.1.0 or authorise a heap profile; the 350 MB target is unchanged",
-        "human checks: Narrator walkthrough and physical 200% scaling",
-        "Victor runs the one elevated Import-Certificate command, then install --force, then tests the modern menu by right-clicking a folder and a folder background",
+        "human right-click on a folder and a folder background confirming the modern menu entry; registration is proven, appearance is not",
+        "memory decision: accept 370.5-377.1 MB with the 350 MB target unmet, or authorize the next evidence-led step",
         "human checks: Narrator walkthrough, physical 200% scaling, conversation export through the real Save dialog",
-        "memory decision: accept 371.4 MB with the 350 MB target unmet, or authorize the next evidence-led step"
+        "license decision before any public distribution; nothing was published"
       ],
       "evidence": [
         {
@@ -1557,6 +1560,83 @@
           "kind": "document",
           "recorded_utc": "2026-11-12T19:55:26Z",
           "commit": "bb32d44a58f47690d4533a85076a57ea2a93a6d0"
+        },
+        {
+          "path": "docs/evidence/P23-trust-elevated.json",
+          "sha256": "1577ed8253d36a9ecf88d5b131060be8370f7059b7b19c49b071adcd762d0a09",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-untrust-check.json",
+          "sha256": "29b721b48c144b49a0812b9006b4266c953524e2193039cc72d7bb9af39a722d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-install-after-trust.json",
+          "sha256": "30844a11dbab4d04b4b39a6780b3c4c87f5d2831a813b7bcf97cd167604e52f4",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-install-menu-fixed.json",
+          "sha256": "1fe4676a7b5ed6dc6c097e376eb780de572a8bdd99a69644f3b695c00af47973",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-package-fixed.json",
+          "sha256": "577eb2087d526886ca3f43e910d7480a0f7178b2cc6c2d9c2db56d2ca4f7471d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-a11y-installed-2.json",
+          "sha256": "512f45466a78ef37fecc68e83aa88c17d2d7d172ef1d14d3b395fabe91eb26b5",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-memory-installed-2.json",
+          "sha256": "f5089d33a9929b0bf31baa758185c3880cc08df8b3ba8c968bdca42dd7fbfc2e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-qa-installed-2.json",
+          "sha256": "a8e919e7bcc7e43053cfbc04e3176e0e6cb59f337f20e24b612fae4282135402",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T20:59:16Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-package-final.json",
+          "sha256": "eb03a8887c8723db8549d7071226d748cd10ae336b62b09c2fbc9400d054135e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T21:03:44Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-install-final.json",
+          "sha256": "16e5c1534ef5776abfcddf89162b68a2082556fa417f3a825e341a67e7db98b0",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T21:03:44Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-elevated-round.md",
+          "sha256": "60138765ea50183f1703a92acb4e3284dd5239c61cc6061c96ba44b97c3780a3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T21:04:03Z",
+          "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
         }
       ],
       "blocker_ids": [
@@ -1565,5 +1645,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-12T19:55:27Z"
+  "last_checkpoint_utc": "2026-11-12T21:04:03Z"
 }

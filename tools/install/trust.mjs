@@ -354,7 +354,13 @@ export function provisionTrust(layout, options = {}) {
   };
 }
 
-/** Remove exactly this certificate from TrustedPeople. Refuses to touch Root. */
+/** Remove exactly this certificate from the TrustedPeople stores. Never touches Root.
+ *
+ * Both the machine store (the one the MSIX path reads, written by the elevated
+ * provisioning step) and the per-user copy are cleared, so `untrust` leaves no
+ * Mona-issued trust behind in either scope. The removal is by exact thumbprint
+ * and reports what was actually present.
+ */
 export function removeTrust(layout) {
   const artifacts = artifactPaths(layout);
   const facts = collectTrustFacts(layout);
@@ -371,17 +377,25 @@ export function removeTrust(layout) {
     };
   }
   const before = trustPresence(thumbprint);
-  if (!before['LocalMachine\\TrustedPeople']) {
-    return { ok: true, removed: false, alreadyAbsent: true, thumbprint, store: TRUST_STORE, presence: before };
-  }
-  const result = powershell(
-    `$path = Join-Path 'Cert:\\LocalMachine\\TrustedPeople' '${thumbprint}'; Remove-Item -Path $path -Force -ErrorAction Stop; "removed"`,
-  );
+  const script = [
+    "$ErrorActionPreference='Stop'",
+    `$thumb = '${thumbprint}'`,
+    '$removed = @()',
+    "foreach ($store in @('LocalMachine\\TrustedPeople','CurrentUser\\TrustedPeople')) {",
+    '  $path = "Cert:\\$store\\$thumb"',
+    '  if (Test-Path $path) { Remove-Item -Path $path -Force; $removed += $store }',
+    '}',
+    '@{ removed = $removed } | ConvertTo-Json -Compress',
+  ].join('; ');
+  const result = powershell(script);
   const after = trustPresence(thumbprint);
-  const removed = result.ok && after['LocalMachine\\TrustedPeople'] === false;
+  const removed =
+    result.ok && after['LocalMachine\\TrustedPeople'] === false && after['CurrentUser\\TrustedPeople'] === false;
   return {
     ok: removed,
-    removed,
+    removed: result.ok ? (lastJson(result.stdout)?.removed ?? []) : [],
+    alreadyAbsent:
+      Object.values(before).every((present) => present === false) && after['LocalMachine\\TrustedPeople'] === false,
     thumbprint,
     store: TRUST_STORE,
     presence: after,

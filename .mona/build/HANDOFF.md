@@ -1,12 +1,13 @@
 # Mona build handoff
 
-**Current prompt:** P23 — release candidate and final handoff. **Status: completed**, plus an
-authorized follow-up round (trust, memory, accessibility, startup). State revision 77;
-ledger revision 341. All 24 prompts are delivered; there is no next eligible prompt.
+**Current prompt:** P23 — release candidate and final handoff. **Status: completed**, plus the
+elevated round. State revision 80; ledger revision 350. All 24 prompts are delivered; there is no
+next eligible prompt.
 
-**The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027
-is blocked on one elevated trust command, MONA-028 is partial on memory (371.4–377.1 MB vs 350 MB)
-and on the human-only checks. Nothing was relabelled.
+**The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027's
+`modern-menu` criterion is registered but not seen (a human right-click is owed), MONA-028 is
+partial on memory (370.5–377.1 MB vs 350 MB) and on the human-only checks. Nothing was
+relabelled and no complete claim was made.
 
 Nothing was published: no remote, no package feed, no certificate purchase, no public repo.
 Local commits only. The license decision is deliberately unresolved.
@@ -14,91 +15,94 @@ Local commits only. The license decision is deliberately unresolved.
 Verify before trusting this file: `node tools/build/cli.mjs validate` (expect OK, 0 warnings)
 and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
 
-## Follow-up round result
+## Elevated round result
 
-- **Certificate trust — verified, paused at exactly one step.** The `.cer` (subject
-  `CN=Mona Development`, thumbprint `5C0AD0D7…4C95`, code-signing EKU, no private key, valid
-  to 2027-11-12), the MSIX's own signer, the manifest Publisher read from inside the package,
-  and the build signing record all agree. `tools/install/trust.mjs` now enforces that before
-  any import and writes only `LocalMachine\TrustedPeople`; the old Root-store import was
-  removed. The import needs elevation and this shell is a standard user, so **no trust was
-  added** (all four stores were absent) and no modern-menu claim is made.
-- **Memory — 404 → 371.4–377.1 MB, target still unmet.** P22's metric was preserved (`workingSetSize`
-  sum over `app.getAppMetrics()`, 60 s idle, same 20,000-row workload) and reproduced at 404 MB.
-  The cost is not Mona's heap (main 12.0 MB, renderer 3.4 MB) but rendered DOM: 500 rendered
-  rows cost +27.7 MB. Windowing to 120 rows with a "show earlier" control cut idle memory to
-  **371.4–377.1 MB** on the installed candidate. Remaining cost is Chromium's baseline plus a GPU
-  process inflated by this host's software compositing. Two attempts with material progress
-  are in `attempts.jsonl`; attempt 3 is reserved for the named next step.
-- **Accessibility — automated half done.** `npm run a11y` passes 12/12 against the installed
-  candidate: labelled composer, named controls with an honestly disabled Interrupt, `role=log`
-  + `aria-live=polite`, dialog focus trap and restoration, keyboard reveal of older rows,
-  focusable virtualized diff, no horizontal overflow at 200% zoom. Narrator and physical 200%
-  scaling remain human.
-- **Startup — measured on the installed build.** Cold 427 ms, warm 732 ms (budgets 5 s / 2 s).
-  The earlier 418/722 ms came from the development build; that ambiguity is corrected in the
-  release notes. The packaged harness completed, so P22-ISSUE-003 "did not reproduce".
-- **Gate:** `npm run ci` exit 0 — 549 Vitest (67 files), 14 bootstrap, 12 launch, 25 install,
-  8 spike; `npm run native:test` 7/7; `validate` OK.
-- **Artifact:** payload 1,672 files / 452,468,362 bytes; `Mona-0.1.0-x64.msix` sha256
-  `6b152b1798b58018b4a368720b8c9bb2042d928534a133c87d7a8d3b6f7bc7c1`, test-signed, untrusted
-  root reported honestly; clean-root install/verify/uninstall and the installed probes were all
-  re-run against these bytes.
+- **Machine trust — done, verified, and reversible.** The one command that every earlier round
+  was blocked on ran in an elevated shell: `trust-test-certificate` re-checked the certificate,
+  the package signer, the manifest Publisher and the build record, then imported thumbprint
+  `5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95` into `Cert:\LocalMachine\TrustedPeople` **only**.
+  `Root` stayed absent; developer mode stayed off. `untrust-test-certificate` was exercised as a
+  round trip: both `TrustedPeople` scopes went absent, `Root` untouched, then the import was
+  repeated. (Windows mirrors machine trust into the user's TrustedPeople view, so removal now
+  clears both — D-0110.)
+- **The identity package registers.** `install --force` completed with
+  `MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p`, `Status: Ok`, `SignatureKind: Developer`, both
+  verbs declared for `Directory` and `Directory\Background`. The `0x800B0109` refusal is gone on
+  this machine.
+- **Packaging guard.** The identity payload now contains the `MonaMenu.dll` its manifest declares
+  by path, and `missingComServerPayloads` makes `stage`/`package` fail if manifest and payload
+  diverge (D-0109). This is hardening, not a diagnosed fix — see the next point.
+- **A probe that proved nothing, recorded so it is not repeated.** Direct `CoCreateInstance` of
+  the CLSID returns `REGDB_E_CLASSNOTREG` for Mona **and** for Notepad++'s shipped packaged
+  shell command. Plain CLSID activation is not a valid test of packaged shell commands, in either
+  direction. No menu claim rests on it.
+- **Probes re-run on the rebuilt bytes.** `install verify` ok (1,673 files, 0 checksum
+  problems); `npm run a11y` 12/12; `npm run memory` 370.5 MB idle (average 382.5 MB, 20,000
+  rows, renderer heap 3.3 MB); `npm run qa` cold 421 ms / warm 722 ms. The 350 MB target is
+  still unmet.
+- **Artifact:** payload 1,673 files / 452,709,537 bytes; `Mona-0.1.0-x64.msix` (127,926 bytes)
+  sha256 `5a7a645582602d80bb389c252b7b465fc4808c722a957fc7367ed8dfc46544ee`, test-signed, now
+  reported with a trusted chain **because this machine trusts the test certificate**. Rebuilt and
+  reinstalled after the last source edits so the payload matches the commit; `install verify`
+  exits 0.
 
 ## Next exact action (needs Victor)
 
-1. **One elevated command** to enable the modern menu, then the click test:
-   `Import-Certificate -FilePath 'C:\Users\victo\AppData\Local\Mona\artifacts\Mona-test-signing-0.1.0.cer' -CertStoreLocation 'Cert:\LocalMachine\TrustedPeople'`,
-   then `node tools/install/cli.mjs trust-test-certificate`, then `install --force`, then
-   right-click a folder and a folder background. Removal:
-   `node tools/install/cli.mjs untrust-test-certificate` (elevated).
-2. **Work through `docs/evidence/P23-human-checklist.md`** — 21 rows: modern menu (after 1),
-   Narrator walkthrough, physical 200% scaling, conversation export through the real Save
-   dialog.
-3. **Decide memory:** accept 371.4–377.1 MB with the target still unmet, or authorize the next
-   evidence-led step (`docs/evidence/P23-followup.md` §2.7). The 350 MB target is unchanged.
+1. **Right-click a folder, then a folder background**, and confirm **Start new DS project with
+   Mona** appears in the Windows 11 menu (not only under **Show more options**). Record the
+   result in `docs/evidence/P23-human-checklist.md`. This is the only thing between MONA-027 and
+   a verified `modern-menu` criterion.
+2. **Remaining human checks** in the same checklist: Narrator walkthrough, physical 200% scaling,
+   conversation export through the real Save dialog.
+3. **Decide memory:** accept 370.5–377.1 MB with the 350 MB target unmet, or authorize the next
+   evidence-led step (`docs/evidence/P23-followup.md` §2.7). The target is unchanged.
 4. **Decide the license** before any public distribution.
-5. Later-scope features (mobile, cloud sync, multi-provider routing, background summarisation)
+5. Keep the trust scoped: `node tools/install/cli.mjs untrust-test-certificate` (elevated) removes
+   exactly this thumbprint from both `TrustedPeople` stores when it is no longer wanted.
+6. Later-scope features (mobile, cloud sync, multi-provider routing, background summarisation)
    are not started and must not be started automatically.
 
 ## Where the pieces are
 
-- Follow-up evidence: `docs/evidence/P23-followup.md`, `P23-human-checklist.md`,
-  `P23-trust-verify.json`, `P23-memory-installed.json`, `P23-memory-dev.json`,
-  `P23-a11y.json`, `P23-a11y-installed.json`, `P23-a11y-shots.json`, `P23-polish.json`,
-  `P23-startup-installed.json`, `P23-installed-final.json`, `P23-installed-verify.json`,
-  `P23-clean-install.json`, `P23-clean-uninstall.json`, `P23-gate-ci.txt`,
-  `shots-p23-installed/`.
-- Probes: `npm run memory`, `npm run a11y`, `npm run changes`, `npm run qa`, `npm run shots`,
-  `npm run polish` — the first four accept an installed-executable env var (`MONA_*_EXE`);
-  shots and polish run the development build.
-- Decisions added this round: D-0105 (verified, narrowly scoped trust), D-0106 (windowed
-  timeline), D-0107 (memory target unchanged, progress recorded).
+- Elevation round: `docs/evidence/P23-elevated-round.md`, `P23-trust-elevated.json`,
+  `P23-untrust-check.json`, `P23-install-after-trust.json`, `P23-package-fixed.json`,
+  `P23-install-menu-fixed.json`, `P23-package-final.json`, `P23-install-final.json`,
+  `P23-a11y-installed-2.json`, `P23-memory-installed-2.json`, `P23-qa-installed-2.json`.
+- Earlier rounds: `docs/evidence/P23-followup.md`, `P23-human-checklist.md`,
+  `P23-trust-verify.json`, `P23-release-candidate.md`, `P22-product-QA.md`.
+- Code touched this round: `tools/install/installer.mjs` (identity payload + guard),
+  `tools/install/trust.mjs` (both TrustedPeople scopes on removal),
+  `tests/install/installer.test.mjs` (one new test).
+- Decisions added: D-0108 (verified machine-scope trust), D-0109 (packaged helper + no claim
+  from CLSID activation), D-0110 (`untrust` clears both scopes).
+- Probes: `npm run memory`, `npm run a11y`, `npm run qa` accept `MONA_MEMORY_EXE` /
+  `MONA_A11Y_EXE` / `MONA_QA_EXE` plus `*_OUT` / `*_LOG` overrides. **Set
+  `MONA_MEMORY_HISTORY=10000`** for the P22-comparable workload; without it the probe measures an
+  empty timeline and fails its own window experiment.
 
 ## Requirement matrix
 
-- 28 verified. **MONA-027 blocked** (modern menu needs the elevated trust step). **MONA-028
-  partial** (memory 371.4–377.1 MB vs 350 MB; Narrator and physical scaling human-only).
-- Issues: P23-ISSUE-001 (memory, improved not met), P23-ISSUE-002 (= ISSUE-0023),
-  P23-ISSUE-003 (export dialog not automated), P23-ISSUE-004 (packaged startup now measured;
-  P22-ISSUE-003 did not reproduce), P22-ISSUE-004/005.
+- 28 verified. **MONA-027 blocked** at the requirement level: `installer`, `uninstall` and
+  `signing` pass; `modern-menu` is registered and awaiting the human click. **MONA-028 partial**
+  (memory 370.5–377.1 MB vs 350 MB; Narrator and physical scaling human-only).
 - No three-attempt blocker is open. `attempts.jsonl` holds the closed P02 rows and two
-  P23-IDLE-MEMORY rows with material progress.
+  P23-IDLE-MEMORY rows with material progress. ISSUE-0023 is resolved and recorded as such;
+  the state's `blocker_ids` on P21/P23 remain the historical reference to it.
 
 ## Last relevant validation
 
-- `npm run ci` exit 0 (549 Vitest / 67 files + 14 + 12 + 25 + 8).
-- `npm run native:test` 7/7. `node tools/build/cli.mjs validate` OK.
-- Installed candidate: `npm run memory` 371.4–377.1 MB, `npm run a11y` 12/12, `npm run changes`
-  20/20, `npm run qa` cold 427 ms / warm 732 ms.
-- Spend this round: **0 µUSD**. No paid turn was run; no adapter, context or orchestration path
-  changed. P22's 596 µUSD remains the last recorded real turn.
+- `npm run ci` exit 0 for the functional change (format, lint, typecheck, 549 Vitest in 67
+  files, 14 bootstrap, 12 launch, 26 install, 8 spike, build); after the final comment edits,
+  `format:check`, `lint` and the 26 install tests were re-run green.
+- `node tools/build/cli.mjs validate` OK; checkpoint r80.
+- Installed candidate: `install verify` exit 0, `npm run memory` 370.5 MB, `npm run a11y` 12/12,
+  `npm run qa` cold 421 ms / warm 722 ms.
+- Spend this round: **0 µUSD**. No provider request; no adapter, context or orchestration change.
 
 ## Cautions
 
 - Edit source with byte-safe tools; a PowerShell `Get-Content`/`Set-Content` round trip
   double-encoded a file once, and a blank-line filter can silently destroy Markdown structure.
-  `check-build.mjs` catches mojibake in the renderer, not in documents.
-- Never overwrite a previous prompt's evidence artifact; the probe scripts now accept path
-  overrides — use them.
-- Do not "fix" memory by moving the target, and do not publish anything.
+- Never overwrite a previous prompt's evidence artifact; the probe scripts accept path overrides.
+- Do not claim the modern menu is visible until a person has seen it. Do not "fix" memory by
+  moving the target, and do not publish anything.

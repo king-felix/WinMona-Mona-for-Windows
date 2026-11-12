@@ -35,6 +35,7 @@ export const MENU_LABEL = 'Start new DS project with Mona';
 export const UNINSTALL_KEY = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Mona';
 export const INSTALL_KEY = 'HKCU\\Software\\Mona\\Install';
 export const IDENTITY_NAME = 'MonaWorkbench';
+export const MENU_DLL_FILE = 'MonaMenu.dll';
 export const SDK_VERSION = '10.0.28000.0';
 
 /* ------------------------------------------------------------------------- */
@@ -173,6 +174,31 @@ export function verifyChecksumManifest(root, manifest) {
 /* ------------------------------------------------------------------------- */
 /* Identity package                                                           */
 /* ------------------------------------------------------------------------- */
+
+/**
+ * COM servers the identity manifest declares by package-relative path, minus
+ * the ones actually present in the payload.
+ *
+ * The point is structural: a package should be able to satisfy the declarations
+ * in its own manifest. Windows does not fail deployment when a declared
+ * `com:Class` path is absent (observed on 2026-11-12: the package registered and
+ * the machine ClassIndex held the CLSID), and whether activation later depends on
+ * external-location resolution is not something this repository can assume. A
+ * known-good third-party package resolves the same shape externally, so neither
+ * behaviour is used as evidence here; the build simply refuses to let manifest
+ * and payload drift apart.
+ */
+export function missingComServerPayloads(identityDir) {
+  const manifestPath = path.join(identityDir, 'AppxManifest.xml');
+  if (!existsSync(manifestPath)) return [MENU_DLL_FILE];
+  const xml = readFileSync(manifestPath, 'utf8');
+  const missing = [];
+  for (const match of xml.matchAll(/<com:Class\b[^>]*\bPath="([^"]+)"/g)) {
+    const relative = match[1].replace(/\\/g, '/');
+    if (!existsSync(path.join(identityDir, relative))) missing.push(relative);
+  }
+  return missing;
+}
 
 export function renderManifest({ version }) {
   return `<?xml version="1.0" encoding="utf-8"?>
@@ -402,13 +428,21 @@ export async function buildStage(layout, options = {}) {
   writeFileSync(path.join(installerDir, 'package.ps1'), PACKAGE_PS1, 'utf8');
   writeFileSync(path.join(stage, 'uninstall.cmd'), UNINSTALL_CMD, 'ascii');
 
-  // 5. Identity package source (manifest + logos).
+  // 5. Identity package source (manifest, logos, and the COM server the
+  // manifest declares). Carrying the DLL with the manifest means the package can
+  // satisfy its own declaration instead of relying on external-location
+  // resolution, which is plausible but unverified here (D-0109).
   const identity = path.join(stage, 'identity');
   mkdirSync(path.join(identity, 'Assets'), { recursive: true });
   writeFileSync(path.join(identity, 'AppxManifest.xml'), renderManifest({ version: layout.version }), 'utf8');
   writeFileSync(path.join(identity, 'Assets', 'StoreLogo.png'), pngSolid(50, 50));
   writeFileSync(path.join(identity, 'Assets', 'Square44x44Logo.png'), pngSolid(44, 44));
   writeFileSync(path.join(identity, 'Assets', 'Square150x150Logo.png'), pngSolid(150, 150));
+  cpSync(menuDll, path.join(identity, MENU_DLL_FILE));
+  const missingPayload = missingComServerPayloads(identity);
+  if (missingPayload.length > 0) {
+    throw new Error(`Identity package is missing a COM server it declares: ${missingPayload.join(', ')}`);
+  }
 
   const manifest = buildChecksumManifest(stage);
   writeFileSync(path.join(stage, 'checksums.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
@@ -704,6 +738,13 @@ export function packIdentityPackage(layout, options = {}, run = runExe) {
   if (!existsSync(layout.makeappx)) throw new Error(`makeappx.exe is missing at ${layout.makeappx}`);
   const identity = path.join(options.stage ?? layout.stage, 'identity');
   if (!existsSync(path.join(identity, 'AppxManifest.xml'))) throw new Error('The staged identity manifest is missing.');
+  const missingPayload = missingComServerPayloads(identity);
+  if (missingPayload.length > 0) {
+    throw new Error(
+      `The identity package would declare a COM server it does not contain: ${missingPayload.join(', ')}. ` +
+        'Re-run `node tools/install/cli.mjs stage` so the payload is rebuilt.',
+    );
+  }
   // /nv skips payload validation, which is required because Mona's binaries live
   // in the external location by design. The manifest is schema-checked
   // separately by a registration probe, which reports schema errors first.

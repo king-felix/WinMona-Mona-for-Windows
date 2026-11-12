@@ -16,7 +16,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 4,850 | `6b152b1798b58018b4a368720b8c9bb2042d928534a133c87d7a8d3b6f7bc7c1` |
+| `Mona-0.1.0-x64.msix` | 127,926 | `5a7a645582602d80bb389c252b7b465fc4808c722a957fc7367ed8dfc46544ee` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -24,8 +24,8 @@ Payload and program identity:
 
 | Artifact | Value |
 |---|---|
-| Install payload | `build/install-stage`, **1,672 files**, 452,468,362 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `545c3df2b23927029a4a158e9c18ef043b9fb6077cee8640448efc2fd42cee22` |
+| Install payload | `build/install-stage`, **1,673 files**, 452,709,537 bytes |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `2d052cda2a987b60b5214ce5e6fd90beaf7acebe80e801c06b9ceedc9c0b610e` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |
@@ -33,19 +33,30 @@ Payload and program identity:
 ### Signing status — read this precisely
 
 The MSIX is **test-signed** with a self-created certificate (`CN=Mona Development`, thumbprint
-`5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95`). `signtool verify` reports **no trusted chain**
-because the certificate's root is not in a trust store on this machine. No production
-signature exists, none is claimed, and no root certificate was imported.
+`5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95`). No production signature exists, none is claimed,
+and no certificate was bought.
 
-Consequence: `Add-AppxPackage` refuses the package with `0x800B0109`, so the Windows 11 modern
-folder menu cannot be registered here. The classic Explorer entry is registered and verified.
-See "Known issues" and `.mona/build/BLOCKERS.md` ISSUE-0023.
+On **this reference machine** the certificate is trusted in `LocalMachine\TrustedPeople` by the
+elevated, verified `trust-test-certificate` step (D-0105). That is why `Add-AppxPackage` now
+accepts the package and the Windows 11 modern folder menu registers. `signtool verify` reports
+a trusted chain only because of that local import.
+
+Consequences, stated plainly:
+
+- Any other machine refuses the package with `0x800B0109` until it makes the same trust
+  decision; a machine without this certificate trusts nothing Mona signs, by design.
+- The trust covers any package signed by this key on this machine, not just Mona's.
+- The menu entry's **appearance has not been captured**; registration is proven, a right-click
+  is not. See `docs/evidence/P23-elevated-round.md` and the human checklist.
+- Removal is exact and elevated: `node tools/install/cli.mjs untrust-test-certificate` clears
+  the thumbprint from both `TrustedPeople` stores and never touches `Root`.
 
 ## Provenance and reproducibility
 
 The artifact is what the repository builds: the stage is assembled from `apps/desktop` and the
 installed Electron distribution by `node tools/install/cli.mjs stage`, and the MSIX contains
-only the identity package (manifest plus four logo assets), not the program.
+only the identity package (manifest, four logo assets, and the menu DLL the manifest declares),
+not the program.
 
 Reproducing the candidate from a clean checkout:
 

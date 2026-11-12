@@ -1380,3 +1380,48 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** attempt 3 is reserved for the next evidence-led step (hardware-GPU
   host comparison, then the network-service process). No further memory work may
   claim a pass without a measurement on the installed candidate.
+
+## D-0108 - Trust is provisioned once, verified, at machine scope, and removable by thumbprint
+
+- **Decision:** the elevated round performed the one authorized import: thumbprint
+  `5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95` into `Cert:\LocalMachine\TrustedPeople`, after the
+  D-0105 checks re-passed against the rebuilt artifact. The identity package then registered
+  (`Status: Ok`). Nothing else was trusted: `Root` stayed absent, developer mode stayed off, and
+  signature validation stayed on.
+- **Why:** this was the last machine-policy gate on MONA-027. It was cleared by performing the
+  recorded step in the environment it required, not by weakening validation or relabelling the
+  requirement.
+- **Constrains:** trust applies to the whole machine for any package signed by this key until it
+  is removed; the evidence says so. Other machines need their own decision. A human right-click
+  is still required before any claim that the menu is visible.
+- **Verified by:** `docs/evidence/P23-trust-elevated.json`, `P23-install-after-trust.json`, and
+  the round-trip removal in `P23-untrust-check.json`.
+
+## D-0109 - The identity package carries the COM server its manifest declares, and the build refuses divergence
+
+- **Decision:** `buildStage` copies the built `MonaMenu.dll` into the identity payload, and
+  `missingComServerPayloads` makes both `stage` and `package` fail when the manifest names a
+  `com:Class` path that the payload does not contain.
+- **Why:** the manifest declares the server by a package-relative path, so the package should be
+  able to satisfy its own declaration without depending on external-location resolution. This is
+  hardening, not a diagnosed fix: Notepad++'s shipped sparse package resolves the same shape
+  externally, so external resolution is plausible. The invariant (manifest and payload cannot
+  diverge) is the part that is certainly worth having.
+- **Constrains:** no evidence here claims the previous package could not have worked, and none
+  claims the menu appears. Direct CLSID activation is explicitly **not** valid evidence for
+  packaged shell commands: a known-good third-party package fails it identically
+  (`REGDB_E_CLASSNOTREG`), so it may not be used in either direction.
+- **Verified by:** `tests/install/installer.test.mjs` (payload guard) and the packaged content
+  listing in `docs/evidence/P23-elevated-round.md`.
+
+## D-0110 - `untrust` clears both TrustedPeople scopes and never Root
+
+- **Decision:** `removeTrust` removes the exact thumbprint from `LocalMachine\TrustedPeople` and
+  `CurrentUser\TrustedPeople`, reports what was present, and asserts `Root` is untouched.
+- **Why:** importing to the machine store makes Windows mirror the certificate into the user's
+  TrustedPeople view. Leaving that mirror behind after an `untrust` would be a half-removal that
+  looks complete.
+- **Constrains:** no other store is written or deleted; the per-user `My` store is handled by the
+  uninstaller's owned-certificate cleanup.
+- **Verified by:** `P23-untrust-check.json` (both stores absent after removal, `rootUntouched:
+  true`) followed by a successful re-import.

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "stage": "trust",
+  "added": true,
+  "alreadyPresent": false,
+  "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+  "store": "Cert:\\LocalMachine\\TrustedPeople",
+  "presence": {
+    "LocalMachine\\TrustedPeople": true,
+    "LocalMachine\\Root": false,
+    "CurrentUser\\TrustedPeople": true,
+    "CurrentUser\\Root": false
+  },
+  "certificate": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-test-signing-0.1.0.cer",
+  "error": null
+}
