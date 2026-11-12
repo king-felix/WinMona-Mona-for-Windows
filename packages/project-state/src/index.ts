@@ -15,6 +15,12 @@ export * from './costs.js';
 export * from './git.js';
 export * from './changes.js';
 export * from './briefing.js';
+export * from './redaction.js';
+export * from './memory.js';
+export * from './prompts.js';
+export * from './handoff.js';
+export * from './settings.js';
+export * from './diagnostics-bundle.js';
 
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

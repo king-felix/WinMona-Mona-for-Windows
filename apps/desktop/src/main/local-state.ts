@@ -14,6 +14,7 @@ export type LocalState = {
   schemaVersion: number;
   migrations: MigrationReport;
   backupRoot: string;
+  artifactRoot: string;
   close: () => void;
 };
 
@@ -32,6 +33,7 @@ export async function openLocalState(directory: string): Promise<LocalState> {
     schemaVersion: opened.schemaVersion,
     migrations: opened.migrations,
     backupRoot: opened.backupRoot,
+    artifactRoot: opened.artifactRoot,
     close: () => opened.store.close(),
   };
 }

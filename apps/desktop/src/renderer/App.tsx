@@ -24,6 +24,7 @@ import { CapabilitiesPanel } from './CapabilitiesPanel.js';
 const TerminalDrawer = lazy(() => import('./TerminalDrawer.js').then((module) => ({ default: module.TerminalDrawer })));
 import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
+import { MemoryPanel } from './MemoryPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
 import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
 import type { BriefingView } from '../shared/briefing.js';
@@ -50,6 +51,7 @@ const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'work', label: 'Work', hint: 'Prompt board and queue' },
   { id: 'agents', label: 'Agents', hint: 'Native goals, fleets, runs and child agents' },
   { id: 'extensions', label: 'Extensions', hint: 'MCP servers, skills, plugins, hooks and project rules' },
+  { id: 'memory', label: 'Memory', hint: 'Local search, prompt shelf, portable handoff and diagnostics' },
   { id: 'cost', label: 'Cost', hint: 'Recorded usage and spend' },
   { id: 'capabilities', label: 'Capabilities', hint: 'Pinned-engine capability map, live flags, terminal and logs' },
   { id: 'settings', label: 'Settings', hint: 'Route, permission, appearance, diagnostics' },
@@ -669,6 +671,7 @@ export function App(): React.JSX.Element {
           '6': 'cost',
           '7': 'capabilities',
           '8': 'settings',
+          '9': 'memory',
         };
         const target = targets[event.key];
         if (target) {
@@ -717,6 +720,7 @@ export function App(): React.JSX.Element {
       { id: 'action:work', label: 'Go to Work board', group: 'Navigate' },
       { id: 'action:agents', label: 'Go to Agents observatory', group: 'Navigate' },
       { id: 'action:extensions', label: 'Go to Extensions', group: 'Navigate' },
+      { id: 'action:memory', label: 'Go to Memory', group: 'Navigate' },
       { id: 'action:cost', label: 'Go to Cost lens', group: 'Navigate' },
       { id: 'action:capabilities', label: 'Go to Capabilities', group: 'Navigate' },
       { id: 'action:settings', label: 'Go to Settings', group: 'Navigate' },
@@ -1228,6 +1232,24 @@ export function App(): React.JSX.Element {
                 <AgentsPanel project={selected} sessionId={sessionId} />
               ) : screen === 'extensions' ? (
                 <ExtensionsPanel project={selected} />
+              ) : screen === 'memory' ? (
+                <MemoryPanel
+                  project={selected}
+                  prompts={selected ? (ui?.projects[selected.id]?.favorites ?? []) : []}
+                  onUsePrompt={(text) => {
+                    if (!selected) return;
+                    setDraftText(text);
+                    if (sessionId) void window.mona.saveDraft({ projectId: selected.id, sessionId, text });
+                    setScreen('studio');
+                    void window.mona.setProjectView({ projectId: selected.id, view: 'studio' }).then((result) => {
+                      if (result.ok) setUi(result.data);
+                    });
+                  }}
+                  onPromptsChanged={(next) => setUi(next)}
+                  onCatalogChanged={async () => {
+                    await refreshCatalog();
+                  }}
+                />
               ) : screen === 'cost' ? (
                 <CostView info={info} project={selected} spend={spend} />
               ) : screen === 'capabilities' ? (
@@ -1546,7 +1568,8 @@ export function App(): React.JSX.Element {
             <kbd>Ctrl</kbd>+<kbd>K</kbd> command palette
           </li>
           <li>
-            <kbd>Alt</kbd>+<kbd>1…8</kbd> Home, Studio, Work, Agents, Extensions, Cost, Capabilities, Settings
+            <kbd>Alt</kbd>+<kbd>1…8</kbd> Home, Studio, Work, Agents, Extensions, Cost, Capabilities, Settings;{' '}
+            <kbd>Alt</kbd>+<kbd>9</kbd> Memory
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> toggle Focus Mode

@@ -1,0 +1,23 @@
+PASS  an unindexed project reports indexed=false — no invented hits
+PASS  reindex indexes permitted state — 5 documents, 45 terms
+PASS  history search finds a decision — decision
+PASS  credential-shaped text is not searchable — redacted documents: 1
+PASS  state and memory remain readable with no runtime — engine was never started
+PASS  file search reads the folder on demand — 2 files scanned
+PASS  credential-shaped files are skipped — .env skipped (1)
+PASS  prompt preview is exact and includes the checklist — 98 characters, sha 54a5c09391e3…
+PASS  prompt pack round-trips with a verified digest — 756bfa5046ed…
+PASS  prompt import stays inert — no engine call, no submission
+PASS  handoff omits machine bindings and the absolute path — 1 tasks, 1 decisions
+PASS  handoff digest matches its contents — f9be84d51051…
+PASS  clean-profile import requalifies a folder and reconstructs pointers — clean-workspace → clean-workspace
+PASS  import does not execute work — no claim, no dispatch, no turn
+PASS  matching evidence stays fresh — digest checked against the new folder
+PASS  missing local files are identified — missing: docs/proof.txt
+PASS  resume packet is concise and carries pointers — 1 tasks, 1 decisions, no files
+PASS  resume packet re-imports pointers inertly — 1 task(s) reconstructed
+PASS  a traversal path is refused — ../escape.txt
+PASS  extraction cannot escape its root — no file written outside the root
+PASS  settings backup redacts credentials — 1 scope(s), 1 redacted path(s)
+PASS  restore holds the maintenance barrier — concurrent write refused; settings version 2 appended
+PASS  diagnostics redact the home path and credentials — 3 redaction(s), sha 4218b884260b…

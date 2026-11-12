@@ -544,6 +544,45 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX restore_receipts_project ON restore_receipts(project_id, at);
     `,
   },
+  {
+    version: 7,
+    name: 'project-memory',
+    sql: `
+      -- Local project memory is an explicit, deterministic text index. It holds
+      -- permitted metadata, decisions, task evidence and bounded history
+      -- projections. Repository files are never copied here: they are searched
+      -- on demand by MemoryIndex.searchFiles.
+      CREATE TABLE memory_documents (
+        doc_id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        kind TEXT NOT NULL,
+        ref_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        retention TEXT NOT NULL DEFAULT 'task',
+        source_digest TEXT NOT NULL,
+        redacted INTEGER NOT NULL DEFAULT 0,
+        indexed_at TEXT NOT NULL,
+        UNIQUE(project_id, kind, ref_id),
+        CHECK (retention IN ('ephemeral', 'task', 'evidence', 'permanent')),
+        CHECK (redacted IN (0, 1))
+      );
+      CREATE INDEX memory_documents_project ON memory_documents(project_id, kind);
+      CREATE INDEX memory_documents_retention ON memory_documents(project_id, retention);
+
+      -- One row per term per document with a small integer weight (title hits
+      -- rank above body hits). No embedding service and no model call is
+      -- involved in indexing or search.
+      CREATE TABLE memory_terms (
+        term TEXT NOT NULL,
+        doc_id TEXT NOT NULL REFERENCES memory_documents(doc_id) ON DELETE CASCADE,
+        weight INTEGER NOT NULL DEFAULT 1,
+        PRIMARY KEY (term, doc_id),
+        CHECK (weight BETWEEN 1 AND 9)
+      );
+      CREATE INDEX memory_terms_query ON memory_terms(term);
+    `,
+  },
 ];
 
 export type MigrationReport = {

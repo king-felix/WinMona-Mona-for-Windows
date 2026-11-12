@@ -7,6 +7,7 @@ import { CATALOG_CHANNELS } from '../shared/catalog.js';
 import { CAPABILITY_CHANNELS } from '../shared/capabilities.js';
 import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
+import { MEMORY_CHANNELS } from '../shared/memory.js';
 import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 import { TERMINAL_CHANNELS, type TerminalEvent } from '../shared/terminal.js';
@@ -45,6 +46,19 @@ const bridge = Object.freeze({
   removeFavorite: (input: { projectId: string; favoriteId: string }) =>
     ipcRenderer.invoke(CATALOG_CHANNELS.uiRemoveFavorite, input),
   briefingGet: (input: { projectId: string; markSeen?: boolean }) => ipcRenderer.invoke(BRIEFING_CHANNELS.get, input),
+  memorySearch: (input: unknown) => ipcRenderer.invoke(MEMORY_CHANNELS.search, input),
+  memoryReindex: (projectId: string) => ipcRenderer.invoke(MEMORY_CHANNELS.reindex, { projectId }),
+  promptSave: (input: unknown) => ipcRenderer.invoke(MEMORY_CHANNELS.promptSave, input),
+  promptRemove: (input: { projectId: string; promptId: string }) =>
+    ipcRenderer.invoke(MEMORY_CHANNELS.promptRemove, input),
+  promptPreview: (input: { projectId: string; promptId: string; values: Record<string, string> }) =>
+    ipcRenderer.invoke(MEMORY_CHANNELS.promptPreview, input),
+  promptImport: (projectId: string) => ipcRenderer.invoke(MEMORY_CHANNELS.promptImport, { projectId }),
+  promptExport: (projectId: string) => ipcRenderer.invoke(MEMORY_CHANNELS.promptExport, { projectId }),
+  portableExport: (input: unknown) => ipcRenderer.invoke(MEMORY_CHANNELS.portableExport, input),
+  portableImport: (input: { kind: 'handoff' | 'resume' | 'settings'; replaceExisting?: boolean }) =>
+    ipcRenderer.invoke(MEMORY_CHANNELS.portableImport, input),
+  diagnosticsPreview: (input: unknown = {}) => ipcRenderer.invoke(MEMORY_CHANNELS.diagnosticsPreview, input),
   attentionGet: () => ipcRenderer.invoke(ATTENTION_CHANNELS.get, {}),
   attentionSet: (patch: object) => ipcRenderer.invoke(ATTENTION_CHANNELS.set, patch),
   attentionQuitStop: () => ipcRenderer.invoke(ATTENTION_CHANNELS.quitStop, {}),

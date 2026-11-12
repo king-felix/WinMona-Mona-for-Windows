@@ -32,7 +32,8 @@ export const CATALOG_CHANNELS = {
 
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: ErrorResult };
 
-export type ProjectView = 'home' | 'studio' | 'work' | 'agents' | 'extensions' | 'cost' | 'capabilities' | 'settings';
+export type ProjectView =
+  'home' | 'studio' | 'work' | 'agents' | 'extensions' | 'memory' | 'cost' | 'capabilities' | 'settings';
 
 export type RepoKind = 'none' | 'git' | 'worktree';
 
@@ -95,11 +96,40 @@ export type DraftSession = {
 
 export type ProjectLayout = 'standard' | 'focus';
 
+export type PromptVariable = {
+  name: string;
+  description: string;
+  required: boolean;
+  defaultValue: string | null;
+};
+
+export type PromptAcceptance = { id: string; text: string };
+
+export type PromptVersionSnapshot = {
+  version: number;
+  template: string;
+  variables: PromptVariable[];
+  acceptance: PromptAcceptance[];
+  replacedAt: string;
+};
+
+/**
+ * A prompt shelf entry. `text` stays for the composer shortcut and always equals
+ * the current `template`; `variables`, `acceptance` and `history` make the same
+ * entry a versioned, previewable shelf item.
+ */
 export type PromptFavorite = {
   id: string;
   label: string;
   text: string;
   createdAt: string;
+  description: string;
+  template: string;
+  variables: PromptVariable[];
+  acceptance: PromptAcceptance[];
+  version: number;
+  updatedAt: string;
+  history: PromptVersionSnapshot[];
 };
 
 export type ProjectUiState = {

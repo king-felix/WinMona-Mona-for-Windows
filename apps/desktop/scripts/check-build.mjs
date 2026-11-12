@@ -1,4 +1,4 @@
-﻿// Static checks on the built renderer. These do not prove Electron runtime
+// Static checks on the built renderer. These do not prove Electron runtime
 // compatibility; they prove that test fixtures, secrets, remote origins, and an
 // un-replaced CSP placeholder cannot ship in the bundle.
 import { readdir, readFile } from 'node:fs/promises';
@@ -94,6 +94,16 @@ const expectedChannels = [
   'mona:extensions-set-mcp',
   'mona:launch-event',
   'mona:launch-state',
+  'mona:memory-diagnostics-preview',
+  'mona:memory-portable-export',
+  'mona:memory-portable-import',
+  'mona:memory-prompt-export',
+  'mona:memory-prompt-import',
+  'mona:memory-prompt-preview',
+  'mona:memory-prompt-remove',
+  'mona:memory-prompt-save',
+  'mona:memory-reindex',
+  'mona:memory-search',
   'mona:project-spend',
   'mona:provider-apply-mode',
   'mona:provider-apply-permission',

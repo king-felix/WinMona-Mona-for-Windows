@@ -700,7 +700,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           <summary>Prompt shelf · {props.favorites?.length ?? 0} saved</summary>
           <p className="mona-muted">
             A favorite fills the composer exactly as written. It is a draft until you press Submit; nothing is sent by
-            using one.
+            using one. Prompts with variables are previewed and filled in the Memory section.
           </p>
           <div className="mona-row">
             <label className="mona-field-label" htmlFor="favorite-label">
@@ -733,15 +733,28 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
                 <li key={favorite.id} className="favorite-row">
                   <div>
                     <strong>{favorite.label}</strong>
-                    <p className="mona-muted mona-truncate" title={favorite.text}>
-                      {favorite.text}
+                    <p className="mona-muted mona-truncate" title={favorite.template}>
+                      {favorite.template}
+                    </p>
+                    <p className="mona-muted">
+                      v{favorite.version}
+                      {favorite.variables.length > 0
+                        ? ` · ${favorite.variables.length} variable(s) — fill in Memory`
+                        : ''}
+                      {favorite.acceptance.length > 0 ? ` · ${favorite.acceptance.length} check(s)` : ''}
                     </p>
                   </div>
                   <div className="mona-row">
                     <Button
                       size="sm"
+                      disabled={favorite.variables.length > 0}
+                      title={
+                        favorite.variables.length > 0
+                          ? 'This prompt has variables; preview and fill it in the Memory section.'
+                          : 'Insert this prompt into the composer'
+                      }
                       onClick={() => {
-                        props.onDraft(favorite.text);
+                        props.onDraft(favorite.template);
                         composerRef.current?.focus();
                       }}
                     >

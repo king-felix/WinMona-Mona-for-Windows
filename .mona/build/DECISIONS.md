@@ -1118,3 +1118,74 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** the channel cannot read the clipboard, cannot run commands, and
   is not used by model output or terminal escape sequences; OSC 52 remains
   consumed and ignored.
+
+## D-0089 - Portable bundles are digest-checked JSON envelopes, not ZIP archives
+
+- **Decision:** a handoff, resume packet, prompt pack and settings backup are
+  JSON documents with a canonical-JSON sha256 digest. Selected files travel as
+  entries with a relative path, digest, size and base64/utf8 content. Extraction
+  validates every member path and digest before writing with exclusive-create.
+- **Why:** the project has no archive dependency and P19 forbids adding a new
+  runtime surface casually. A JSON envelope is inspectable with ordinary tools,
+  works offline, and the acceptance requirement is about unsafe member paths —
+  which are validated explicitly at parse, import and extraction time. Shipping
+  a home-grown ZIP writer would add binary parsing risk for no user-visible gain.
+- **Constrains:** a bundle is larger than a compressed archive, and ZIP tooling
+  sees one JSON file. If compression becomes necessary, it is a new format
+  version with the same path and digest rules, not a silent change.
+
+## D-0090 - Project memory is a term table; prompt text and bindings stay out
+
+- **Decision:** migration v7 indexes permitted metadata, decisions, task
+  acceptance/evidence, requirement evidence, problems, attempts and bounded
+  timeline items into `memory_documents`/`memory_terms`. There is no FTS
+  extension and no embedding service. Task `prompt_text`, submissions intent and
+  runtime bindings are never indexed. Repository files are searched on demand
+  and never copied into the database.
+- **Why:** deterministic local behaviour is testable and cheap; an embedding
+  service is a hidden inference path. A prompt can contain pasted credentials,
+  so indexing the full dispatch text would create a second secret surface.
+- **Constrains:** search is lexical (plus one term per CJK character), not
+  semantic. Rebuild is explicit; there is no background indexer.
+
+## D-0091 - P14 favorites become the one versioned prompt shelf
+
+- **Decision:** the per-project favorites array is upgraded in place into shelf
+  prompts with template, variables, acceptance criteria, version and bounded
+  history. `text` remains as an alias for the current template so the Studio
+  shortcut keeps working. There is no second prompt store.
+- **Why:** two shelves would split the user's prompts and double the migration
+  surface. Legacy entries are read as version-1 prompts, so no saved text is
+  lost. Prompts with variables are previewed in Memory rather than inserted raw
+  into the Studio composer.
+- **Constrains:** the UI state file remains machine-local; portability is by
+  prompt pack. Version history is capped at ten snapshots per prompt.
+
+## D-0092 - Handoff import preserves ids and refuses a non-empty target
+
+- **Decision:** an imported handoff keeps task, decision and evidence ids, binds
+  the chosen folder, and refuses a target project that already has recorded work
+  unless replacement is explicit. Evidence is re-hashed against the new folder;
+  stale evidence reopens a completed task to `verifying`.
+- **Why:** preserving ids is what makes pointers and dependency graphs
+  reconstructable without a remapping scheme. Remapping would have to rewrite
+  criteria, steps, evidence and dependencies atomically; refusing a collision is
+  more honest than performing a partial remap. The supported flow is a clean
+  profile or empty folder.
+- **Constrains:** importing a copy of a project that still exists in the same
+  profile is a `conflict` (P19-ISSUE-002). A future id-remap design would need
+  its own decision and round-trip tests.
+
+## D-0093 - Settings restore appends versions under exclusive maintenance
+
+- **Decision:** restore verifies the backup digest and store schema, then holds
+  the maintenance barrier and writes a new settings version per scope inside one
+  `BEGIN IMMEDIATE` transaction. It never rewrites recorded history. Credentials
+  are redacted at backup time; the restore cannot recover a value that was
+  removed.
+- **Why:** settings can change runtime behaviour, so restore is a maintenance
+  operation, not an ordinary write. Appending keeps the audit trail honest and
+  makes a failed restore a rollback rather than a half-applied configuration.
+- **Constrains:** a redacted backup restores `[redacted]` placeholders where a
+  credential value lived; the user must re-enter the credential through the
+  engine's credential store, which Mona does not own.

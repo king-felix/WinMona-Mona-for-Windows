@@ -7,9 +7,13 @@ import type {
   ProjectLayout,
   ProjectUiState,
   ProjectView,
+  PromptAcceptance,
   PromptFavorite,
+  PromptVariable,
+  PromptVersionSnapshot,
   UiStateView,
 } from '../shared/catalog.js';
+import { ShelfPrompt, revisePrompt, type PromptPackEntry } from '@mona/project-state';
 import { DEFAULT_ATTENTION_SETTINGS, validMinute, validTimeZone } from './attention.js';
 
 /**
@@ -32,6 +36,7 @@ const VIEWS: readonly ProjectView[] = [
   'work',
   'agents',
   'extensions',
+  'memory',
   'cost',
   'capabilities',
   'settings',
@@ -39,10 +44,13 @@ const VIEWS: readonly ProjectView[] = [
 const LAYOUTS: readonly ProjectLayout[] = ['standard', 'focus'];
 const DENSITIES: readonly Density[] = ['comfortable', 'compact'];
 const MAX_SESSIONS = 20;
-const MAX_FAVORITES = 12;
+const MAX_PROMPTS = 60;
 const MAX_DRAFT_CHARS = 200_000;
 const MAX_FAVORITE_CHARS = 20_000;
 const MAX_FAVORITE_LABEL = 120;
+const MAX_PROMPT_VARIABLES = 24;
+const MAX_PROMPT_ACCEPTANCE = 50;
+const MAX_PROMPT_HISTORY = 10;
 
 export type UiStateStoreOptions = {
   file: string;
@@ -142,34 +150,112 @@ export class UiStateStore {
     return this.view();
   }
 
-  /** Prompt favorites are inserted into the composer; nothing is sent. */
+  /**
+   * A prompt is inserted into the composer only after explicit use; nothing is
+   * sent. `saveFavorite` is the simple form, `savePrompt` is the versioned one.
+   */
   saveFavorite(projectId: string, input: { label: string; text: string }): UiStateView {
     const entry = this.ensure(projectId);
+    const duplicate = entry.favorites.find((favorite) => favorite.template === input.text);
+    return this.savePrompt(projectId, {
+      ...(duplicate ? { id: duplicate.id } : {}),
+      label: input.label,
+      template: input.text,
+    });
+  }
+
+  savePrompt(
+    projectId: string,
+    input: {
+      id?: string;
+      label: string;
+      description?: string;
+      template: string;
+      variables?: PromptVariable[];
+      acceptance?: PromptAcceptance[];
+    },
+  ): UiStateView {
+    const entry = this.ensure(projectId);
+    const now = this.timestamp();
     const label = input.label.trim().slice(0, MAX_FAVORITE_LABEL);
-    const text = input.text.slice(0, MAX_FAVORITE_CHARS);
-    if (!label) throw new Error('A prompt favorite needs a label.');
-    if (!text.trim()) throw new Error('A prompt favorite needs text.');
-    const duplicate = entry.favorites.find((favorite) => favorite.text === text);
-    if (duplicate) {
-      duplicate.label = label;
-      duplicate.createdAt = this.timestamp();
-    } else {
-      const favorite: PromptFavorite = {
-        id: `pfv_${randomUUID().replaceAll('-', '')}`,
-        label,
-        text,
-        createdAt: this.timestamp(),
-      };
-      entry.favorites.unshift(favorite);
-      if (entry.favorites.length > MAX_FAVORITES) entry.favorites.length = MAX_FAVORITES;
+    if (!label) throw new Error('A prompt needs a label.');
+    if (!input.template.trim()) throw new Error('A prompt needs text.');
+    const variables = normalizeVariables(input.variables ?? []);
+    const acceptance = normalizeAcceptance(input.acceptance ?? []);
+
+    if (input.id) {
+      const existing = entry.favorites.find((favorite) => favorite.id === input.id);
+      if (!existing) throw new Error('That prompt is no longer on the shelf.');
+      const revised = revisePrompt(
+        existing,
+        {
+          label,
+          description: input.description ?? existing.description,
+          template: input.template.slice(0, MAX_FAVORITE_CHARS),
+          variables,
+          acceptance,
+        },
+        now,
+      );
+      if (revised.changed) {
+        Object.assign(existing, revised.prompt, { text: revised.prompt.template });
+        this.persist();
+      }
+      return this.view();
     }
+
+    const parsed = ShelfPrompt.parse({
+      id: `pfv_${randomUUID().replaceAll('-', '')}`,
+      label,
+      description: input.description ?? '',
+      template: input.template.slice(0, MAX_FAVORITE_CHARS),
+      variables,
+      acceptance,
+      version: 1,
+      createdAt: now,
+      updatedAt: now,
+      history: [],
+    });
+    const prompt: PromptFavorite = { ...parsed, text: parsed.template };
+    entry.favorites.unshift(prompt);
+    if (entry.favorites.length > MAX_PROMPTS) entry.favorites.length = MAX_PROMPTS;
     this.persist();
     return this.view();
   }
 
-  removeFavorite(projectId: string, favoriteId: string): UiStateView {
+  /** Import parsed pack entries. This stores text; it never executes or sends it. */
+  importPrompts(projectId: string, entries: readonly PromptPackEntry[]): { imported: number; labels: string[] } {
     const entry = this.ensure(projectId);
-    entry.favorites = entry.favorites.filter((favorite) => favorite.id !== favoriteId);
+    const labels: string[] = [];
+    for (const item of entries) {
+      const parsed = ShelfPrompt.parse({
+        id: `pfv_${randomUUID().replaceAll('-', '')}`,
+        label: item.label,
+        description: item.description,
+        template: item.template,
+        variables: item.variables,
+        acceptance: item.acceptance,
+        version: item.version,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        history: item.history,
+      });
+      const prompt: PromptFavorite = { ...parsed, text: parsed.template };
+      entry.favorites.unshift(prompt);
+      labels.push(prompt.label);
+    }
+    if (entry.favorites.length > MAX_PROMPTS) entry.favorites.length = MAX_PROMPTS;
+    this.persist();
+    return { imported: labels.length, labels };
+  }
+
+  removeFavorite(projectId: string, favoriteId: string): UiStateView {
+    return this.removePrompt(projectId, favoriteId);
+  }
+
+  removePrompt(projectId: string, promptId: string): UiStateView {
+    const entry = this.ensure(projectId);
+    entry.favorites = entry.favorites.filter((favorite) => favorite.id !== promptId);
     this.persist();
     return this.view();
   }
@@ -306,17 +392,11 @@ function validate(value: unknown): StoredUiState {
       const favorites: PromptFavorite[] = [];
       if (Array.isArray(entry.favorites)) {
         for (const favorite of entry.favorites) {
-          if (!isRecord(favorite) || typeof favorite.id !== 'string' || typeof favorite.text !== 'string') continue;
-          favorites.push({
-            id: favorite.id,
-            label:
-              typeof favorite.label === 'string' && favorite.label.trim()
-                ? favorite.label.slice(0, MAX_FAVORITE_LABEL)
-                : 'Saved prompt',
-            text: favorite.text.slice(0, MAX_FAVORITE_CHARS),
-            createdAt: typeof favorite.createdAt === 'string' ? favorite.createdAt : new Date(0).toISOString(),
-          });
-          if (favorites.length >= MAX_FAVORITES) break;
+          if (!isRecord(favorite)) continue;
+          const normalized = normalizeStoredPrompt(favorite);
+          if (!normalized) continue;
+          favorites.push(normalized);
+          if (favorites.length >= MAX_PROMPTS) break;
         }
       }
       const currentSessionId =
@@ -371,10 +451,110 @@ function cloneProjects(projects: Record<string, ProjectUiState>): Record<string,
     copy[id] = {
       ...entry,
       sessions: entry.sessions.map((session) => ({ ...session })),
-      favorites: entry.favorites.map((favorite) => ({ ...favorite })),
+      favorites: entry.favorites.map((favorite) => ({
+        ...favorite,
+        variables: favorite.variables.map((variable) => ({ ...variable })),
+        acceptance: favorite.acceptance.map((criterion) => ({ ...criterion })),
+        history: favorite.history.map((snapshot) => ({
+          ...snapshot,
+          variables: snapshot.variables.map((variable) => ({ ...variable })),
+          acceptance: snapshot.acceptance.map((criterion) => ({ ...criterion })),
+        })),
+      })),
     };
   }
   return copy;
+}
+
+const VARIABLE_NAME = /^[A-Za-z][A-Za-z0-9_]{0,39}$/;
+
+function normalizeVariables(input: readonly unknown[]): PromptVariable[] {
+  const variables: PromptVariable[] = [];
+  for (const entry of input) {
+    if (!isRecord(entry) || typeof entry.name !== 'string' || !VARIABLE_NAME.test(entry.name)) continue;
+    if (variables.some((variable) => variable.name === entry.name)) continue;
+    variables.push({
+      name: entry.name,
+      description: typeof entry.description === 'string' ? entry.description.slice(0, 500) : '',
+      required: typeof entry.required === 'boolean' ? entry.required : true,
+      defaultValue:
+        typeof entry.defaultValue === 'string' && entry.defaultValue.length > 0
+          ? entry.defaultValue.slice(0, 2_000)
+          : null,
+    });
+    if (variables.length >= MAX_PROMPT_VARIABLES) break;
+  }
+  return variables;
+}
+
+function normalizeAcceptance(input: readonly unknown[]): PromptAcceptance[] {
+  const acceptance: PromptAcceptance[] = [];
+  for (const [index, entry] of input.entries()) {
+    if (!isRecord(entry) || typeof entry.text !== 'string' || !entry.text.trim()) continue;
+    acceptance.push({
+      id: typeof entry.id === 'string' && entry.id ? entry.id.slice(0, 80) : `acc_${index + 1}`,
+      text: entry.text.slice(0, 500),
+    });
+    if (acceptance.length >= MAX_PROMPT_ACCEPTANCE) break;
+  }
+  return acceptance;
+}
+
+function normalizeHistory(input: readonly unknown[]): PromptVersionSnapshot[] {
+  const history: PromptVersionSnapshot[] = [];
+  for (const entry of input) {
+    if (
+      !isRecord(entry) ||
+      typeof entry.version !== 'number' ||
+      !Number.isInteger(entry.version) ||
+      entry.version < 1 ||
+      typeof entry.template !== 'string' ||
+      typeof entry.replacedAt !== 'string'
+    ) {
+      continue;
+    }
+    history.push({
+      version: entry.version,
+      template: entry.template.slice(0, MAX_FAVORITE_CHARS),
+      variables: normalizeVariables(Array.isArray(entry.variables) ? entry.variables : []),
+      acceptance: normalizeAcceptance(Array.isArray(entry.acceptance) ? entry.acceptance : []),
+      replacedAt: entry.replacedAt,
+    });
+    if (history.length >= MAX_PROMPT_HISTORY) break;
+  }
+  return history;
+}
+
+/** Read both the P14 favorite shape and the richer shelf shape without losing text. */
+function normalizeStoredPrompt(value: Record<string, unknown>): PromptFavorite | null {
+  if (typeof value.id !== 'string' || !value.id) return null;
+  const template =
+    typeof value.template === 'string' ? value.template : typeof value.text === 'string' ? value.text : null;
+  if (template === null || !template.trim()) return null;
+  const createdAt = typeof value.createdAt === 'string' ? value.createdAt : new Date(0).toISOString();
+  const updatedAt = typeof value.updatedAt === 'string' ? value.updatedAt : createdAt;
+  const label =
+    typeof value.label === 'string' && value.label.trim() ? value.label.slice(0, MAX_FAVORITE_LABEL) : 'Saved prompt';
+  const description = typeof value.description === 'string' ? value.description.slice(0, 1_000) : '';
+  const version =
+    typeof value.version === 'number' && Number.isInteger(value.version) && value.version > 0 ? value.version : 1;
+  const candidate = {
+    id: value.id.slice(0, 80),
+    label,
+    description,
+    template: template.slice(0, MAX_FAVORITE_CHARS),
+    variables: normalizeVariables(Array.isArray(value.variables) ? value.variables : []),
+    acceptance: normalizeAcceptance(Array.isArray(value.acceptance) ? value.acceptance : []),
+    version,
+    createdAt,
+    updatedAt,
+    history: normalizeHistory(Array.isArray(value.history) ? value.history : []),
+  };
+  const parsed = ShelfPrompt.safeParse(candidate);
+  if (parsed.success) return { ...parsed.data, text: parsed.data.template };
+  // A damaged rich prompt keeps its text as a simple prompt instead of vanishing.
+  const fallback = ShelfPrompt.safeParse({ ...candidate, variables: [], acceptance: [], version: 1, history: [] });
+  return fallback.success ? { ...fallback.data, text: fallback.data.template } : null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

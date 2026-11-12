@@ -161,4 +161,72 @@ describe('UI state store', () => {
     store.select('prj_a');
     expect(await readFile(file, 'utf8')).toContain('"schemaVersion": 2');
   });
+
+  it('upgrades legacy favorites into versioned shelf prompts', async () => {
+    const file = await tempFile('legacy-prompts');
+    await writeFile(
+      file,
+      JSON.stringify({
+        schemaVersion: 2,
+        currentProjectId: null,
+        preferences: {},
+        projects: {
+          prj_a: {
+            view: 'studio',
+            currentSessionId: 'ses_1',
+            sessions: [],
+            favorites: [
+              {
+                id: 'pfv_legacy',
+                label: 'Legacy prompt',
+                text: 'Review {{file}} for the failure.',
+                createdAt: '2026-11-11T00:00:00.000Z',
+              },
+            ],
+            lastOpenedAt: null,
+          },
+        },
+      }),
+      'utf8',
+    );
+    const store = new UiStateStore({ file });
+    const legacy = store.view().projects['prj_a']?.favorites[0];
+    expect(legacy).toMatchObject({ id: 'pfv_legacy', template: 'Review {{file}} for the failure.', version: 1 });
+    expect(legacy?.variables).toEqual([]);
+    expect(legacy?.history).toEqual([]);
+
+    store.savePrompt('prj_a', {
+      id: 'pfv_legacy',
+      label: 'Legacy prompt v2',
+      template: 'Review {{file}} for the failure and propose a fix.',
+      variables: [{ name: 'file', description: 'Path', required: true, defaultValue: null }],
+      acceptance: [{ id: 'acc_1', text: 'The failure is explained' }],
+    });
+    const revised = store.view().projects['prj_a']?.favorites[0];
+    expect(revised?.version).toBe(2);
+    expect(revised?.history).toHaveLength(1);
+    expect(revised?.history[0]?.template).toBe('Review {{file}} for the failure.');
+    expect(revised?.text).toBe('Review {{file}} for the failure and propose a fix.');
+
+    const imported = store.importPrompts('prj_a', [
+      {
+        label: 'Imported prompt',
+        description: 'From a pack',
+        template: 'Summarize {{topic}}',
+        variables: [{ name: 'topic', description: '', required: true, defaultValue: null }],
+        acceptance: [],
+        version: 3,
+        createdAt: '2026-11-10T00:00:00.000Z',
+        updatedAt: '2026-11-10T00:00:00.000Z',
+        history: [],
+      },
+    ]);
+    expect(imported.imported).toBe(1);
+    const shelf = store.view().projects['prj_a']?.favorites ?? [];
+    expect(shelf).toHaveLength(2);
+    expect(shelf[0]).toMatchObject({ label: 'Imported prompt', version: 3 });
+    expect(shelf[0]?.id).not.toBe('pfv_legacy');
+
+    expect(() => store.savePrompt('prj_a', { label: '', template: 'x' })).toThrow();
+  });
 });

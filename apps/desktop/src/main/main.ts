@@ -65,6 +65,8 @@ import {
 } from './attention.js';
 import { registerAttentionIpc } from './attention-ipc.js';
 import { registerBriefingIpc } from './briefing-ipc.js';
+import { MemoryService } from './memory-service.js';
+import { registerMemoryIpc } from './memory-ipc.js';
 import { TRAY_ICON_DATA_URL } from './tray-icon.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
@@ -510,6 +512,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
     };
 
     let catalogService: CatalogService | null = null;
+    let memoryService: MemoryService | null = null;
     if (localState) {
       uiStateStore = new UiStateStore({ file: path.join(app.getPath('userData'), 'state', 'ui-state.json') });
       // P14 reads the same rows the task, attempt, cost and change services
@@ -598,6 +601,63 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         engine: enginePort,
       });
       capabilityService = new CapabilityService({ engine: enginePort });
+      // Project memory is local and deterministic: search, the prompt shelf,
+      // portable handoff/resume bundles, settings backup and a redacted
+      // diagnostic preview. It never talks to the provider.
+      memoryService = new MemoryService({
+        store: localState.store,
+        ui: uiStateStore,
+        artifactRoot: localState.artifactRoot,
+        app: () => ({
+          name: 'Mona',
+          version: app.getVersion(),
+          electron: process.versions.electron ?? 'unknown',
+          chrome: process.versions.chrome ?? 'unknown',
+          node: process.versions.node ?? 'unknown',
+          platform: process.platform,
+          arch: process.arch,
+        }),
+        engine: () => {
+          const summary = engineHost.summary();
+          return {
+            status: summary.state,
+            detail: summary.detail,
+            version: null,
+            commit: null,
+            endpoint: summary.endpoint,
+            pid: summary.pid,
+            compatibility: summary.compatibility,
+          };
+        },
+        dialogs: {
+          saveFile: async ({ title, defaultName, extensions }) => {
+            const options = {
+              title,
+              defaultPath: path.join(app.getPath('documents'), defaultName),
+              filters: [{ name: 'Mona files', extensions }],
+            };
+            const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+            const picked = owner ? await dialog.showSaveDialog(owner, options) : await dialog.showSaveDialog(options);
+            return picked.canceled || !picked.filePath ? null : picked.filePath;
+          },
+          openFile: async ({ title, extensions }) => {
+            const options = {
+              title,
+              properties: ['openFile'] as Array<'openFile'>,
+              filters: [{ name: 'Mona files', extensions }],
+            };
+            const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+            const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
+            return picked.canceled ? null : (picked.filePaths[0] ?? null);
+          },
+          chooseFolder: async ({ title }) => {
+            const options = { title, properties: ['openDirectory'] as Array<'openDirectory'> };
+            const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+            const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
+            return picked.canceled ? null : (picked.filePaths[0] ?? null);
+          },
+        },
+      });
       // A local ConPTY driven by the user. It never talks to the runtime API and
       // no tool output, Markdown or hook can reach it.
       terminalService = new TerminalService({
@@ -728,6 +788,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       isTrustedSender: trustedSender,
       service: () => briefingService,
       ui: () => uiStateStore,
+    });
+    registerMemoryIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => memoryService,
     });
 
     const reconciled = await engineHost.reconcile();

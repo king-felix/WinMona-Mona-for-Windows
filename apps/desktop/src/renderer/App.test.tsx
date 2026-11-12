@@ -756,7 +756,22 @@ function bridgeFor(store: Store): Window['mona'] {
           ...store.ui.projects,
           [projectId]: {
             ...entry,
-            favorites: [{ id: `pfv_${label}`, label, text, createdAt: '2026-11-12T00:00:00.000Z' }, ...entry.favorites],
+            favorites: [
+              {
+                id: `pfv_${label}`,
+                label,
+                text,
+                createdAt: '2026-11-12T00:00:00.000Z',
+                description: '',
+                template: text,
+                variables: [],
+                acceptance: [],
+                version: 1,
+                updatedAt: '2026-11-12T00:00:00.000Z',
+                history: [],
+              },
+              ...entry.favorites,
+            ],
           },
         },
       };

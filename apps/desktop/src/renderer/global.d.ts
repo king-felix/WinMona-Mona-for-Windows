@@ -6,6 +6,7 @@ import type { CapabilityBridge } from '../shared/capabilities.js';
 import type { ExtensionBridge } from '../shared/extensions.js';
 import type { AppInfo, IpcResult } from '../shared/ipc.js';
 import type { LaunchBridge } from '../shared/launch.js';
+import type { MemoryBridge } from '../shared/memory.js';
 import type { ProviderBridge } from '../shared/provider.js';
 import type { StudioBridge } from '../shared/studio.js';
 import type { TerminalBridge } from '../shared/terminal.js';
@@ -21,7 +22,8 @@ declare global {
       TerminalBridge &
       LaunchBridge &
       AttentionBridge &
-      BriefingBridge & {
+      BriefingBridge &
+      MemoryBridge & {
         getAppInfo(): Promise<IpcResult<AppInfo>>;
       };
   }
