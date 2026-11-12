@@ -67,3 +67,4 @@
 {"utc":"2026-11-12T18:53:00Z","revision":68,"prompt":"P23","status":"completed","note":null,"commit":"0fc121e96617efae4acd5c1b1510417dcd7cc8b5"}
 {"utc":"2026-11-12T18:54:20Z","revision":69,"prompt":"P23","status":"completed","note":"re-checkpoint after fixing the CLI eligibility back-fill; next_eligible_prompts is now derived, not padded","commit":"0fc121e96617efae4acd5c1b1510417dcd7cc8b5"}
 {"utc":"2026-11-12T18:56:37Z","revision":70,"prompt":"P23","status":"completed","note":"refresh evidence hashes after the final gate and the bootstrap CLI fix","commit":"0fc121e96617efae4acd5c1b1510417dcd7cc8b5"}
+{"utc":"2026-11-12T18:58:47Z","revision":71,"prompt":"P23","status":"completed","note":"rebuild the candidate from the committed source so the payload matches the committed build; refresh evidence hashes","commit":"205a104ad3f0238ea64fb4b68bdb23d3c7b319f2"}

@@ -16,7 +16,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 4,850 | `0c7446e71fcf9ea7124ae49ee97c0459ecc63c719295fce4f11032ae10f91a6a` |
+| `Mona-0.1.0-x64.msix` | 4,850 | `7795b5877515b3772a5a0a8f276eb9f5d7fb16c95122f55100f552c32f17bc31` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -25,7 +25,7 @@ Payload and program identity:
 | Artifact | Value |
 |---|---|
 | Install payload | `build/install-stage`, **1,668 files**, 452,401,443 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `b78ea8a0e116ed40a6b424ad1558eed03e886737fa6d84294d48f5facba09398` |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `38b5ca1a758c2aa90e2a1a8bc660880935f6f1c9a3d617e72ecf57d60a550c62` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |

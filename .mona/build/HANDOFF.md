@@ -1,7 +1,7 @@
 # Mona build handoff
 
 **Current prompt:** P23 — release candidate and final handoff. **Status: completed.**
-State revision 70; ledger revision 323. All 24 prompts are delivered.
+State revision 71; ledger revision 325. All 24 prompts are delivered.
 
 **The claim Mona can support today is "Core usable release candidate 0.1.0".** A 1.0-complete
 claim is not available: MONA-027 is blocked on a machine trust decision and MONA-028 is partial
@@ -30,7 +30,7 @@ contains it. Verify with `node tools/build/cli.mjs validate` (expect OK, 0 warni
 - **Gate:** `npm run ci` exit 0 — 546 Vitest (66 files), 14 bootstrap, 12 launch, 14 install,
   8 spike, typecheck/lint/format/build all pass; `npm run native:test` 7/7; `validate` OK.
 - **Candidate:** stage 1,668 files / 452,401,443 bytes; MSIX `Mona-0.1.0-x64.msix` sha256
-  `0c7446e7...f91a6a`, test-signed, untrusted root reported honestly; clean-root install, smoke,
+  `7795b587...17bc31`, test-signed, untrusted root reported honestly; clean-root install, smoke,
   verify and uninstall all documented in `docs/evidence/P23-clean-*.json`.
 - **Measured on this build:** cold 1,093 ms, warm 741 ms, idle CPU 0.04%, idle memory 406.4 MB,
   engine 256.4 MB separately, 500 of 20,000 history rows in 1 ms.

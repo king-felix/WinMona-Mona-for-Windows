@@ -1,18 +1,18 @@
 {
   "schema": 1,
-  "capturedAt": "2026-11-12T18:49:54.831Z",
+  "capturedAt": "2026-11-12T18:58:30.562Z",
   "ok": true,
   "providerRequests": 0,
   "steps": [
     {
       "name": "a real Git repository exists with one committed file",
       "ok": true,
-      "detail": "9069ef1fa063"
+      "detail": "d05f755c0b95"
     },
     {
       "name": "the project opens through the real catalog",
       "ok": true,
-      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p23-changes-ws-lchdlv"
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p23-changes-ws-ygmado"
     },
     {
       "name": "the Changes section is reachable from the rail",
@@ -30,11 +30,11 @@
       "name": "the baseline is captured through the real IPC channel",
       "ok": true,
       "detail": {
-        "baselineId": "bsl_1126905ce97b4aa68da96eb59d29fd80",
+        "baselineId": "bsl_579c049d20734a518dadc6792c85416f",
         "label": "P23 probe baseline",
         "fileCount": 1,
         "truncated": false,
-        "capturedAt": "2026-11-12T18:49:49.491Z"
+        "capturedAt": "2026-11-12T18:58:25.420Z"
       }
     },
     {
@@ -63,7 +63,7 @@
       "name": "a real test receipt is recorded with its command and outcome",
       "ok": true,
       "detail": {
-        "id": "tst_a8f1a850f79540aeac502a5918d6da58",
+        "id": "tst_75aae058e08a49c4b17e8a9ee9150c5c",
         "outcome": "passed"
       }
     },

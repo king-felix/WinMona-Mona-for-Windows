@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 323,
+  "revision": 325,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1791,11 +1791,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P23-changes.json",
-              "sha256": "20337cf2524f4411e09bc8cd6f60c00d54efb5bcaf727124d5eb1e2530a5aa5e",
+              "sha256": "51233293159ffe64db24b60309cff744846419bcf9c58021262e936b7f7ce139",
               "kind": "document",
-              "recorded_utc": "2026-11-12T18:52:21Z",
-              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
-              "note": "real Electron probe: change list against a captured baseline, Git's own diff text rendered, an 8007-line diff rendered as 29 DOM rows with its tail reachable, traversal path refused (20/20 steps, 5 screenshots, 0 provider requests)"
+              "recorded_utc": "2026-11-12T18:58:44Z",
+              "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
+              "note": "rebuilt release candidate: 20/20 real-Electron steps, 5 screenshots, 0 provider requests; change list against a captured baseline, Git's own diff text, an 8007-line diff as 29 DOM rows with its tail reachable, traversal refused"
             }
           ]
         },
@@ -1861,7 +1861,7 @@
           ]
         }
       ],
-      "verified_commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+      "verified_commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2810,11 +2810,11 @@
             },
             {
               "path": "docs/evidence/P23-clean-install.json",
-              "sha256": "90d4bb330ae674bb7618c49ae3f6d6425e045635b50beceecfb6b011ccbd60e9",
+              "sha256": "49f0ada0c829adb5b06aaf0274394c41b9b8754fbe2c335482d2c56d52eaaebe",
               "kind": "document",
-              "recorded_utc": "2026-11-12T18:52:31Z",
-              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
-              "note": "clean-root install of the release candidate re-confirms Windows refusing the test-signed identity package with 0x800B0109 (untrusted root); the classic menu is registered and verified"
+              "recorded_utc": "2026-11-12T18:58:44Z",
+              "commit": "205a104ad3f0238ea64fb4b68bdb23d3c7b319f2",
+              "note": "clean-root install of the rebuilt candidate: 1668 files with 0 checksum problems, app smoke ok, classic menu verified; Windows still refuses the test-signed identity package with 0x800B0109"
             }
           ]
         },
