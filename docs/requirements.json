@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 309,
+  "revision": 314,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -2836,31 +2836,67 @@
         "P22",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "automated-qa",
           "description": "Automated unit and integration suites run on the reference machine",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P22-product-QA.md",
+              "sha256": "13357e706ec95edfa19cade7aca2455bb15bed1b25ac1fdeab25d892a5396f3f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:21:52Z",
+              "commit": "7cf416d",
+              "note": "Full suite and live probes re-run on the reference machine: 513 Vitest, 13 bootstrap, 12 launch, 14 install, 8 spike, 7 native; typecheck, lint, format and build pass"
+            }
+          ]
         },
         {
           "id": "human-qa",
           "description": "Keyboard, screen-reader and scaling walkthroughs are recorded",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P22-product-QA.md",
+              "sha256": "13357e706ec95edfa19cade7aca2455bb15bed1b25ac1fdeab25d892a5396f3f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:21:52Z",
+              "commit": "7cf416d",
+              "note": "Focus trail, keyboard sweep, both themes, densities and 200% zoom captured automatically; Windows screen-reader walkthrough remains human-only"
+            }
+          ]
         },
         {
           "id": "performance",
           "description": "Startup, idle CPU, memory and shutdown budgets are measured",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P22-performance.json",
+              "sha256": "e907ad1cd1d5359c8f4a6c4977f340869b73413cde2ae371026412b139eb5bc3",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:21:52Z",
+              "commit": "7cf416d",
+              "note": "Cold 418 ms and warm 722 ms startup pass; idle CPU 0.04% over 60 s passes; idle memory 404 MB misses the 350 MB budget by 54 MB; paint frame timing not measured because the window was not presented"
+            }
+          ]
         },
         {
           "id": "feature-matrix",
           "description": "Release evidence ties each supported feature to a passing check",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P22-product-QA.md",
+              "sha256": "13357e706ec95edfa19cade7aca2455bb15bed1b25ac1fdeab25d892a5396f3f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:21:52Z",
+              "commit": "7cf416d",
+              "note": "Requirement audit across all 30 rows with the P22 changes listed; capability coverage unchanged from the pinned-engine ledger"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -2970,7 +3006,7 @@
         "P22",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "unsupported-states",
@@ -3013,7 +3049,7 @@
         {
           "id": "upgrade-qualification",
           "description": "Upgrades are explicit tested compatibility decisions",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P01-feasibility.md",
@@ -3022,6 +3058,14 @@
               "recorded_utc": "2026-11-12T01:02:20Z",
               "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
               "note": "no upgrade exercised; compatibility policy begins in P03"
+            },
+            {
+              "path": "docs/evidence/P21-upgrade-idle.json",
+              "sha256": "3863285c1f0f9cba6be024acef5d8f885fd2f72674884b70d2ce70f84dc5e21a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:21:52Z",
+              "commit": "7cf416d",
+              "note": "Idle replace-in-place 0.1.0 to 0.1.1 with smoke verification, and an active run deferred the upgrade (exit 3) without interruption"
             }
           ]
         },
@@ -3041,8 +3085,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "7cf416d",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     }
   ]

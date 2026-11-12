@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 66,
+  "revision": 67,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P22",
+  "current_prompt": "P23",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -1380,16 +1380,41 @@
       ]
     },
     "P22": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-003",
         "MONA-006",
         "MONA-028",
         "MONA-030"
       ],
-      "completed_steps": [],
-      "remaining_steps": [],
-      "evidence": [],
+      "completed_steps": [
+        "full automated gate re-run on the reference machine",
+        "installed-app measurement harness: startup, idle CPU, memory, 20000-row history bound",
+        "one real engine turn through the installed app with recorded cost and no phantom inference",
+        "theme, density, scaling and focus evidence refreshed",
+        "requirement audit with the memory miss and paint-timing gap recorded"
+      ],
+      "remaining_steps": [
+        "idle memory 404 MB exceeds the 350 MB budget; needs a profiling pass or a recorded target decision",
+        "paint frame timing requires a presented window or GPU capture",
+        "Windows screen-reader walkthrough is human-only"
+      ],
+      "evidence": [
+        {
+          "path": "docs/evidence/P22-product-QA.md",
+          "sha256": "13357e706ec95edfa19cade7aca2455bb15bed1b25ac1fdeab25d892a5396f3f",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:21:57Z",
+          "commit": "7cf416d17d64114faaea3d5573f702e8df3e0502"
+        },
+        {
+          "path": "docs/evidence/P22-performance.json",
+          "sha256": "e907ad1cd1d5359c8f4a6c4977f340869b73413cde2ae371026412b139eb5bc3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:21:57Z",
+          "commit": "7cf416d17d64114faaea3d5573f702e8df3e0502"
+        }
+      ],
       "blocker_ids": []
     },
     "P23": {
@@ -1433,7 +1458,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P22"
+    "P23"
   ],
-  "last_checkpoint_utc": "2026-11-12T17:38:34Z"
+  "last_checkpoint_utc": "2026-11-12T18:21:57Z"
 }

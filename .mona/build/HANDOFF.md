@@ -1,96 +1,79 @@
 # Mona build handoff
 
-**Current prompt:** P22 — Run whole-product QA and prove the remaining claims
-**Current status:** P00–P21 completed. State revision will advance at the P21
-checkpoint; ledger revision 309. MONA-027 is **blocked** on one named prerequisite
-(modern-menu package trust), so a 1.0-complete claim is not available.
+**Current prompt:** P23 — Package the release candidate and finish the handoff
+**Current status:** P00–P22 completed. State revision 67; ledger revision 314.
+MONA-027 is **blocked** (modern-menu package trust) and MONA-028 is **partial**
+(idle memory over budget, human screen-reader check). A 1.0-complete claim is
+therefore not available.
 
 `last_verified_commit` stays null because a state file cannot contain the hash of
 the commit that contains it. Verify with `node tools/build/cli.mjs validate`
 (expect OK, 0 warnings) before trusting this file.
 
-## P21 result — modern Windows menu and installation lifecycle
+## P22 result — whole-product QA
 
-- **Native helper** `native/windows-shell/`: a 239 KB x64 COM DLL implementing only
-  `IExplorerCommand`, built with pinned Zig 0.17.1 (`zig cc -target
-  x86_64-windows-gnu`) after `node tools/install/fetch-tools.mjs` verifies both
-  toolchain downloads by SHA-256. 7/7 native checks pass, including real
-  `CoCreateInstance` activation, hidden state for files and multi-selection, and a
-  byte-exact argv check on a folder named `a & b (café) — 'quoted' 中文`.
-- **Sparse identity package**: `AppxManifest.xml` with `windows.comServer` +
-  `windows.fileExplorerContextMenus` verbs for `Directory` and
-  `Directory\Background`, `uap10:AllowExternalContent`, `runFullTrust`. Packed with
-  pinned MakeAppx and test-signed with a labelled self-created certificate.
-  `Mona-0.1.0-x64.msix` sha256 `3a397745…`, package signed but **untrusted root**.
-- **Per-user installer** `tools/install/`: `stage`, `package`, `install`, `upgrade`,
-  `uninstall`, `status`, `verify`. 1,656 checksummed files; atomic tree replacement;
-  only Mona keys written; classic menu re-registered against the installed exe;
-  uninstaller runs from the installed copy, removes its own directory after exit,
-  and leaves `%APPDATA%\@mona\desktop` and `~/.codewhale` byte-identical.
-- **Upgrade gate**: `apps/desktop/src/main/install-gate.ts` publishes
-  `runtime/activity.json`; an active run defers the upgrade with exit 3, an idle
-  running app needs `--close-running`, `--force` is explicit.
-- **Packaged-argv bug fixed**: Electron reports
-  `[Mona.exe, <install>\resources\app, project, open, …]`; `stripLauncherArgs` now
-  removes the app directory in both packaged and unpackaged modes. This was found by
-  the installed launch probe, which then passed 20/20 in-app steps.
-- **Requirement effect**: MONA-004 is **verified**. MONA-027 is **blocked** —
-  installer, uninstall and signing criteria pass; the modern-menu criterion cannot
-  be shown working until Windows will register the package.
+- **Measured on this machine** (Ryzen 7 5800X, 32 GB, Windows 11 26200): cold
+  startup 418 ms, warm 722 ms, idle CPU 0.04% over 60 s, idle memory **404 MB**
+  across 4 processes, engine 270.8 MB separately, history query 1 ms for the newest
+  500 of 20,000 rows, 500 items rendered.
+- **Real engine turn through the installed app**: 22/22 steps, `hello.txt` written,
+  project test passed, one turn at **596 µUSD**, replay sent nothing.
+- **Accessibility**: focus trail has a solid outline on every stop, no duplicate
+  ids, no unnamed controls, no colour-only statuses; both themes, both densities,
+  1280×800, 1920×1080 and 200% zoom captured; Alt+2, Focus Mode and notification
+  focus are keyboard-only.
+- **Findings recorded, not smoothed over**: memory misses its 350 MB budget by
+  54 MB (P22-ISSUE-001); paint frame timing is invalid because the harness window
+  was not presented (P22-ISSUE-002); the packaged QA harness stalled and needs the
+  watchdog (P22-ISSUE-003); screen-reader and engine-under-load memory remain
+  unmeasured (P22-ISSUE-004/005).
+- **Requirement effect**: MONA-030 verified; MONA-028 partial; MONA-027 still
+  blocked.
+
+## Next exact action (P23)
+
+P23 packages the release candidate and closes the project. Work from what exists:
+
+1. Re-run the gate: `npm run ci`, `npm run native:test`, `node tools/build/cli.mjs
+   validate`.
+2. Build the candidate: `node tools/install/cli.mjs stage`,
+   `node tools/install/cli.mjs package --test-sign`, `install --smoke`, and record
+   checksums in the release notes.
+3. Write the release documentation the spec asks for: README, third-party notices,
+   contribution and security-report instructions, compatibility policy,
+   reproducible-build steps, and screenshots of actual builds (reuse
+   `docs/evidence/shots-p22/`).
+4. Publish nothing. No public repository, package, release, certificate, or
+   purchase. Local commits only.
+5. Produce the final report with the honest matrix: MONA-027 blocked on
+   ISSUE-0023, MONA-028 partial on the measured memory miss and the human checks,
+   and the remaining human checklist from `docs/evidence/P22-product-QA.md`.
+6. Decide the memory question explicitly: accept 404 MB with a recorded reason, or
+   schedule profiling. Do not move the 350 MB target to match the number.
 
 ## The one blocking prerequisite (Victor's decision)
 
-Windows refuses the identity package in every non-elevated path on this machine:
-
-- unsigned `Add-AppxPackage -Register` → `0x80073CFF` (developer licence/sideloading);
-- test-signed `Add-AppxPackage -Path` → `0x800B0109` (untrusted root);
-- `Import-Certificate` into `CurrentUser\Root` → "UI is not allowed in this
-  operation"; `certutil -addstore -user Root` waits for a consent dialog;
-- developer mode is an `HKLM` policy and this account is not an administrator.
-
-Victor picks one: **(A)** enable developer mode, **(B)** accept the labelled test
-certificate into the current-user Root store once (then `node tools/install/cli.mjs
-trust-test-certificate` in an interactive terminal and re-run `install`), or
-**(C)** supply a production certificate for `MONA_SIGN_PFX`. Details and exact
-observed errors: `docs/evidence/P21-windows.md`, `.mona/build/BLOCKERS.md`.
-
-## Next exact action (P22)
-
-P22 is whole-product QA, not more implementation. Start from the existing probes
-rather than inventing new ones:
-
-1. `npm test`, `npm run typecheck`, `npm run lint`, `npm run format:check`,
-   `npm run build`, `node tools/build/cli.mjs validate` — establish the gate baseline.
-2. Re-run the live probes with fresh output paths under `docs/evidence/P22-*`:
-   `apps/desktop/scripts/{smoke,polish,shots,studio,catalog,terminal}.mjs` and
-   `apps/desktop/scripts/launch.mjs` with `MONA_LAUNCH_EXE` set to the installed
-   `Mona.exe`.
-3. Measure cold/warm startup, typing/scrolling on a 10,000-event fixture, idle CPU
-   over 60 s, and total Mona memory with the engine reported separately. Record the
-   hardware and method; do not move the budget to match the number.
-4. Re-run the zero-inference checks; state cost confidence without spending.
-5. Audit all 30 requirement rows and the capability ledger; write
-   `docs/evidence/P22-product-QA.md` with the remaining human checklist.
+The modern-menu identity package cannot register until one of these happens: enable
+developer mode (administrator), accept the labelled test certificate into the
+current-user Root store once
+(`node tools/install/cli.mjs trust-test-certificate`, interactive), or supply a
+production certificate for `MONA_SIGN_PFX`. Details: `.mona/build/BLOCKERS.md`
+ISSUE-0023 and `docs/evidence/P21-windows.md`.
 
 ## Relevant files and spec sections
 
-- `native/windows-shell/`, `tools/install/`, `tests/install/`, `tests/native/`
-- `apps/desktop/src/main/install-gate.ts`, `apps/desktop/scripts/launch.mjs`
-- `packages/adapter/src/cli.ts` (`stripLauncherArgs`)
-- `docs/evidence/P21-windows.md` and `P21-*.json`, `docs/evidence/shots-p21/`
-- Spec 14, 15, 16, 17; prompt P22.
+- `tools/install/` (lifecycle), `native/windows-shell/` (menu helper)
+- `apps/desktop/scripts/qa.mjs`, `apps/desktop/src/main/qa-probe.ts`
+- `docs/evidence/P21-windows.md`, `P22-product-QA.md`, `P22-performance.json`
+- Spec 14–17; prompt P23.
 
 ## Open problem IDs and no-progress counts
 
 No open three-attempt blocker. `attempts.jsonl` holds only the closed P02 rows.
 
-New in P21: **P21-ISSUE-001** (modern menu not seen in Explorer — trust gate),
-**P21-ISSUE-002** (no Windows VM), **P21-ISSUE-003** (package registration
-blocked), **P21-ISSUE-004** (packaged app keeps the `@mona/desktop` identity),
-**P21-ISSUE-005** (452 MB staged payload due to full Electron locales),
-**P21-ISSUE-006** (uninstall directory removal is deferred by a few seconds).
-
-Carried: P20-ISSUE-001..003, P19-ISSUE-001..004, P18-ISSUE-002/003,
+P22-ISSUE-001..005 (memory miss, paint timing, packaged harness stall,
+screen-reader, engine-under-load memory). P21-ISSUE-001..006. Carried from P20 and
+earlier: P20-ISSUE-001..003, P19-ISSUE-001..004, P18-ISSUE-002/003,
 P17-ISSUE-001..005, P16-ISSUE-001..004, P15-ISSUE-001..003, P14-ISSUE-001..004,
 P13-ISSUE-001..003, P12-ISSUE-001..003, P11-ISSUE-001, P10-ISSUE-001..003,
 P09-ISSUE-001..002, P08-ISSUE-001..003, P07-ISSUE-001, P06-ISSUE-002,
@@ -99,22 +82,19 @@ P05-ISSUE-001, P01-ISSUE-001..004, terminal ISSUE-0019..0022.
 ## Last relevant validation
 
 - `npm test` → 513 Vitest (61 files) + 13 bootstrap + 12 launch + 14 install + 8 spike.
-- `npm run native:test` → 7/7 pass (compiled helper; `npm run tools:fetch` +
-  `npm run native:build` first).
-- `npm run typecheck`, `npm run lint`, `npm run format:check`, `npm run build` → pass.
+- `npm run native:test` → 7/7. `npm run typecheck`, `lint`, `format:check`, `build` pass.
 - `node tools/build/cli.mjs validate` → OK, 0 warnings.
-- Spend: zero for P21. P15's delegated run remains the last paid run
-  (5,731.872 µUSD).
+- Spend this prompt: 596 µUSD (one real turn). P15's delegated run (5,731.872 µUSD)
+  remains the largest single paid run; the $2 pilot ceiling is not approached.
 
 ## Human input needed
 
-- The modern-menu choice A/B/C above, then a right-click check in Explorer.
-- A by-hand classic-menu right-click (registered and verified only by argv).
-- P19-ISSUE-001 Memory click-through, ISSUE-0019 screen reader, ISSUE-0021 pointer
-  drag selection.
+- Modern-menu choice A/B/C, then a right-click in Explorer for both the modern and
+  classic entries.
+- Screen-reader walkthrough; 200% scaling on a physical display.
+- A decision on the 404 MB idle footprint.
 
 Standing caution unchanged: edit source with byte-safe tools. A PowerShell
 `Get-Content`/`Set-Content` round-trip double-encoded `App.tsx` and one test string
 in P14; Prettier does not repair that. `check-build.mjs` fails on mojibake in the
-renderer bundle. The `Â·`/`â€™` sequences in `DECISIONS.md` and older handoff text
-are quoted examples of that incident, not corrupted text.
+renderer bundle.
