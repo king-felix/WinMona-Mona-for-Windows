@@ -1,0 +1,155 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "uninstall on a clean machine is a verified no-op",
+      "ok": true,
+      "detail": {
+        "removed": [
+          "folder",
+          "background"
+        ],
+        "absent": []
+      }
+    },
+    {
+      "name": "the classic folder and background menus register",
+      "ok": true,
+      "detail": {
+        "changed": true,
+        "command": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access"
+      }
+    },
+    {
+      "name": "registering again repairs in place and changes nothing",
+      "ok": true,
+      "detail": {
+        "verified": true,
+        "changed": false
+      }
+    },
+    {
+      "name": "Explorer would run exactly the documented launcher command",
+      "ok": true,
+      "detail": {
+        "folderCommand": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access",
+        "expectedCommand": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access"
+      }
+    },
+    {
+      "name": "folder and folder-background use the same quoted %V command",
+      "ok": true,
+      "detail": {
+        "backgroundCommand": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access"
+      }
+    },
+    {
+      "name": "the registration quotes the placeholder instead of a path",
+      "ok": true,
+      "detail": {
+        "command": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access"
+      }
+    },
+    {
+      "name": "a foreign menu entry exists for the uninstall check",
+      "ok": true,
+      "detail": {
+        "status": 0
+      }
+    },
+    {
+      "name": "the app exited after the launch probe",
+      "ok": true,
+      "detail": {
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "every in-app launch step passed",
+      "ok": true,
+      "detail": {
+        "steps": 20,
+        "failures": []
+      }
+    },
+    {
+      "name": "the probe captured live screenshots",
+      "ok": true,
+      "detail": {
+        "shots": 3
+      }
+    },
+    {
+      "name": "uninstall removes Mona registration only",
+      "ok": true,
+      "detail": {
+        "removed": [
+          "folder",
+          "background"
+        ],
+        "foreignSurvived": true
+      }
+    },
+    {
+      "name": "both Mona keys are gone after uninstall",
+      "ok": true,
+      "detail": {
+        "remaining": [
+          {
+            "name": "folder",
+            "key": "HKCU\\Software\\Classes\\Directory\\shell\\Mona.StartNewProject",
+            "exists": false
+          },
+          {
+            "name": "background",
+            "key": "HKCU\\Software\\Classes\\Directory\\Background\\shell\\Mona.StartNewProject",
+            "exists": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "the milestone leaves a verified classic registration in place",
+      "ok": true,
+      "detail": {
+        "command": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access",
+        "keys": {
+          "folder": "HKCU\\Software\\Classes\\Directory\\shell\\Mona.StartNewProject",
+          "background": "HKCU\\Software\\Classes\\Directory\\Background\\shell\\Mona.StartNewProject"
+        }
+      }
+    },
+    {
+      "name": "the final read-back matches every value Mona owns",
+      "ok": true,
+      "detail": {
+        "problems": []
+      }
+    }
+  ],
+  "registration": {
+    "executable": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "appPath": null,
+    "command": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access",
+    "folderCommand": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access",
+    "backgroundCommand": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"%V\" --profile ds-full-access",
+    "firstChanged": true,
+    "secondChanged": false,
+    "uninstall": {
+      "removed": [
+        "folder",
+        "background"
+      ],
+      "verified": true,
+      "foreignKeySurvived": true
+    },
+    "finalVerified": true,
+    "keys": {
+      "folder": "HKCU\\Software\\Classes\\Directory\\shell\\Mona.StartNewProject",
+      "background": "HKCU\\Software\\Classes\\Directory\\Background\\shell\\Mona.StartNewProject"
+    }
+  },
+  "probeReport": "docs/evidence/P21-launch-installed.json",
+  "log": "docs/evidence/P21-launch-installed-log.txt",
+  "capturedAt": "2026-11-12T17:27:24.109Z"
+}

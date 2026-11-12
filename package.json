@@ -18,7 +18,11 @@
     "bootstrap:test": "node --test tests/bootstrap",
     "launch:test": "node --test tests/launch",
     "spike:test": "node --test tests/spike",
-    "test": "vitest run && npm run bootstrap:test && npm run launch:test && npm run spike:test",
+    "install:test": "node --test tests/install",
+    "native:build": "node native/windows-shell/build.mjs",
+    "native:test": "node --test tests/native",
+    "tools:fetch": "node tools/install/fetch-tools.mjs",
+    "test": "vitest run && npm run bootstrap:test && npm run launch:test && npm run install:test && npm run spike:test",
     "build": "npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop",
     "typecheck": "npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/project-state && npm run typecheck -w @mona/ui && npm run typecheck -w @mona/desktop",
     "lint": "eslint .",
@@ -29,7 +33,11 @@
     "launch": "npm run launch -w @mona/desktop",
     "polish": "npm run polish -w @mona/desktop",
     "terminal": "npm run terminal -w @mona/desktop",
-    "launch:menu": "node tools/launch/context-menu.mjs"
+    "launch:menu": "node tools/launch/context-menu.mjs",
+    "mona:stage": "node tools/install/cli.mjs stage",
+    "mona:install": "node tools/install/cli.mjs install",
+    "mona:uninstall": "node tools/install/cli.mjs uninstall",
+    "mona:status": "node tools/install/cli.mjs status"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

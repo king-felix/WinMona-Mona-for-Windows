@@ -1,0 +1,84 @@
+{
+  "ok": true,
+  "version": "0.1.1",
+  "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+  "placement": {
+    "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "previous": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona.old-20261112172704",
+    "stamp": "20261112172704"
+  },
+  "closed": null,
+  "decision": {
+    "action": "proceed",
+    "reason": "Mona is not running."
+  },
+  "registryFailures": [],
+  "classic": {
+    "ok": true,
+    "status": 0,
+    "verified": true
+  },
+  "identity": {
+    "ok": false,
+    "registered": false,
+    "reason": "No identity package has been built. Run: node tools/install/cli.mjs package",
+    "prerequisite": "Build and sign the sparse package, then either enable Windows developer mode or trust the local test certificate once."
+  },
+  "checks": {
+    "exe": {
+      "ok": true,
+      "path": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe"
+    },
+    "menuDll": {
+      "ok": true
+    },
+    "renderer": {
+      "ok": true
+    },
+    "pty": {
+      "ok": true,
+      "directory": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app\\node_modules\\node-pty\\prebuilds\\win32-x64",
+      "missing": [],
+      "files": [
+        "conpty.node",
+        "conpty_console_list.node",
+        "pty.node"
+      ]
+    },
+    "checksums": {
+      "ok": true,
+      "files": 1656,
+      "problems": []
+    },
+    "registry": {
+      "ok": true,
+      "values": {
+        "MonaExe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "MonaMenuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+        "Version": "0.1.1",
+        "InstallRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "UserData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop"
+      }
+    },
+    "uninstallEntry": {
+      "ok": true,
+      "values": {
+        "DisplayName": "Mona",
+        "DisplayVersion": "0.1.1",
+        "Publisher": "Mona",
+        "InstallLocation": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "DisplayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "UninstallString": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\uninstall.cmd\"",
+        "NoModify": "0x1",
+        "NoRepair": "0x1"
+      }
+    },
+    "package": {
+      "ok": true,
+      "packages": [],
+      "installed": 0,
+      "exit": 0
+    },
+    "ok": true
+  }
+}

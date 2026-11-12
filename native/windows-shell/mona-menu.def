@@ -1,0 +1,6 @@
+LIBRARY MonaMenu
+EXPORTS
+    DllGetClassObject
+    DllCanUnloadNow
+    DllRegisterServer
+    DllUnregisterServer

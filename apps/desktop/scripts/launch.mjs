@@ -5,6 +5,10 @@
 //     names, a missing folder and two fast launches
 //  4. uninstall while a foreign menu entry exists, and keep that entry
 //  5. register once more, leaving a working right-click for the milestone
+//
+// P21 reuses the same probe against the installed build: set MONA_LAUNCH_EXE to
+// the installed Mona.exe. A packaged Electron app takes no app-directory
+// argument, so the app path is dropped from both the registration and argv.
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
@@ -31,9 +35,12 @@ const FOREIGN_KEY = 'HKCU\\Software\\Classes\\Directory\\shell\\MonaP09ForeignPr
 await mkdir(path.dirname(out), { recursive: true });
 await mkdir(shotsDir, { recursive: true });
 
+const packagedExe = process.env.MONA_LAUNCH_EXE?.trim() || null;
+const appArguments = packagedExe ? [] : [appDir];
+const registeredAppPath = packagedExe ? null : appDir;
 let electronPath;
 try {
-  electronPath = (await import('electron')).default;
+  electronPath = packagedExe ?? (await import('electron')).default;
 } catch (error) {
   console.error('Electron runtime is not installed:', String(error));
   process.exit(3);
@@ -83,18 +90,18 @@ try {
     absent: cleaned.absent,
   });
 
-  const first = await register({ executable: electronPath, appPath: appDir });
+  const first = await register({ executable: electronPath, appPath: registeredAppPath });
   step('the classic folder and background menus register', first.verified, {
     changed: first.changed,
     command: first.command,
   });
-  const second = await register({ executable: electronPath, appPath: appDir });
+  const second = await register({ executable: electronPath, appPath: registeredAppPath });
   step('registering again repairs in place and changes nothing', second.verified && second.changed === false, {
     verified: second.verified,
     changed: second.changed,
   });
 
-  const expectedCommand = buildLaunchCommand({ executable: electronPath, appPath: appDir });
+  const expectedCommand = buildLaunchCommand({ executable: electronPath, appPath: registeredAppPath });
   const folderCommand = second.state.folder?.command?.['@'] ?? null;
   const backgroundCommand = second.state.background?.command?.['@'] ?? null;
   step('Explorer would run exactly the documented launcher command', folderCommand === expectedCommand, {
@@ -113,19 +120,23 @@ try {
   step('a foreign menu entry exists for the uninstall check', foreign.status === 0, { status: foreign.status });
 
   // 3. Start Mona with the launcher argv the command produces.
-  appChild = spawn(electronPath, [appDir, 'project', 'open', '--path', fixtureA, '--profile', 'ds-full-access'], {
-    cwd: appDir,
-    env: {
-      ...process.env,
-      MONA_LAUNCH_TEST: '1',
-      MONA_LAUNCH_OUT: out,
-      MONA_LAUNCH_SHOTS: shotsDir,
-      MONA_LAUNCH_FIXTURES: fixturesFile,
-      MONA_USER_DATA: profile,
+  appChild = spawn(
+    electronPath,
+    [...appArguments, 'project', 'open', '--path', fixtureA, '--profile', 'ds-full-access'],
+    {
+      cwd: appDir,
+      env: {
+        ...process.env,
+        MONA_LAUNCH_TEST: '1',
+        MONA_LAUNCH_OUT: out,
+        MONA_LAUNCH_SHOTS: shotsDir,
+        MONA_LAUNCH_FIXTURES: fixturesFile,
+        MONA_USER_DATA: profile,
+      },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      windowsHide: true,
     },
-    stdio: ['ignore', 'pipe', 'pipe'],
-    windowsHide: true,
-  });
+  );
   appChild.stdout.on('data', (chunk) => {
     stdout += chunk.toString('utf8');
     process.stdout.write(chunk);
@@ -172,19 +183,19 @@ try {
   );
 
   // 5. Leave a working registration for the milestone.
-  const final = await register({ executable: electronPath, appPath: appDir });
+  const final = await register({ executable: electronPath, appPath: registeredAppPath });
   step('the milestone leaves a verified classic registration in place', final.verified, {
     command: final.command,
     keys: MENU_KEYS,
   });
-  const finalStatus = await verifyRegistration({ executable: electronPath, appPath: appDir });
+  const finalStatus = await verifyRegistration({ executable: electronPath, appPath: registeredAppPath });
   step('the final read-back matches every value Mona owns', finalStatus.verified, {
     problems: finalStatus.problems,
   });
 
   Object.assign(registration, {
     executable: electronPath,
-    appPath: appDir,
+    appPath: registeredAppPath,
     command: expectedCommand,
     folderCommand,
     backgroundCommand,

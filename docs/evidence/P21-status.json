@@ -1,0 +1,86 @@
+{
+  "version": "0.1.0",
+  "paths": {
+    "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "dataRoot": "C:\\Users\\victo\\AppData\\Local\\Mona",
+    "userData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop",
+    "stage": "X:\\AI_projects\\Mona\\build\\install-stage"
+  },
+  "installed": {
+    "schema": 1,
+    "version": "0.1.0",
+    "installedUtc": "2026-11-12T17:32:43.317Z",
+    "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "exe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "menuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+    "userData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop",
+    "files": 1656,
+    "classMenu": {
+      "ok": true,
+      "status": 0,
+      "verified": true
+    },
+    "identity": {
+      "ok": false,
+      "registered": false,
+      "packageFullName": null,
+      "code": null,
+      "error": "Deployment failed with HRESULT: 0x80073CF0, Package could not be opened.\r\n\r\nerror 0x800B0109: The root certificate of the signature in the app package or bundle must be trusted.\n\nNOTE: For additional information, look for [ActivityId] 9887417d-5e98-0003-4fcb-cf9a985edd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 9887417d-5e98-0003-4fcb-cf9a985edd01\n",
+      "msix": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+      "prerequisite": "Windows refused the unsigned/test-signed package. Enable developer mode, import the labelled test certificate into Trusted People, or sign with a trusted certificate."
+    },
+    "signing": {
+      "testCertificate": false
+    }
+  },
+  "running": {
+    "alive": false,
+    "activity": null
+  },
+  "registry": {
+    "install": {
+      "MonaExe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+      "MonaMenuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+      "Version": "0.1.0",
+      "InstallRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+      "UserData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop"
+    },
+    "uninstall": {
+      "DisplayName": "Mona",
+      "DisplayVersion": "0.1.0",
+      "Publisher": "Mona",
+      "InstallLocation": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+      "DisplayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+      "UninstallString": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\uninstall.cmd\"",
+      "NoModify": "0x1",
+      "NoRepair": "0x1"
+    }
+  },
+  "package": {
+    "ok": true,
+    "packages": [],
+    "installed": 0,
+    "exit": 0
+  },
+  "artifacts": {
+    "msix": {
+      "path": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+      "sha256": "3a397745a901a11020976da96e3cc6b86227eb4f7014bd2dd3eee11a88a95c2c"
+    },
+    "certificate": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-test-signing-0.1.0.cer",
+    "signing": {
+      "subject": "CN=Mona Development",
+      "ok": true,
+      "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+      "notAfter": "2027-11-12T17:32:49.0000000Z",
+      "labeledTestCertificate": true,
+      "createdUtc": "2026-11-12T17:32:49.765Z",
+      "pfxPresent": true
+    }
+  },
+  "stage": {
+    "stage": "X:\\AI_projects\\Mona\\build\\install-stage",
+    "files": 1656,
+    "generatedUtc": "2026-11-12T17:32:02.677Z"
+  }
+}

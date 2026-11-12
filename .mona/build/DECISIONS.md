@@ -1225,3 +1225,56 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   oversight. Event channels are push-only and are not in the handled set.
 - **Constrains:** adding a channel requires updating the checked-in preload list,
   and the audit fails if the wrapper does not check the sender first.
+
+## D-0097 - The modern menu is a sparse package plus one small COM DLL
+
+- **Decision:** Windows 11's context menu is delivered as a sparse MSIX identity
+  package (`windows.fileExplorerContextMenus` + `windows.comServer`) whose
+  `MonaMenu.dll` implements only `IExplorerCommand`. The DLL reads the installed
+  `Mona.exe` path from `HKCU\Software\Mona\Install` and starts it with
+  `CreateProcessW`; registration belongs to the package manifest, never to the DLL.
+- **Why:** the classic per-user key is not the modern menu, and Microsoft documents
+  identity as the only path into it. Keeping the DLL free of registration, network
+  and model code keeps the shell extension small and auditable; the installer can
+  move the executable on upgrade without touching the package identity.
+- **Constrains:** without a trusted signing identity Windows refuses the package
+  (0x800B0109) and without developer mode it refuses an unsigned one (0x80073CFF).
+  Both are recorded as release prerequisites, not worked around.
+
+## D-0098 - Portable pinned tools instead of installing a Windows SDK
+
+- **Decision:** `tools/install/fetch-tools.mjs` downloads Zig 0.17.1 and Windows SDK
+  BuildTools 10.0.28000.2957 into `node_modules/.cache/mona-build-tools` with exact
+  SHA-256 pins. `native/windows-shell/build.mjs` compiles the helper with
+  `zig cc -target x86_64-windows-gnu`.
+- **Why:** no MSVC or Windows SDK exists here, and the work must not require an
+  elevated installer. Zig supplies clang and mingw-w64 headers for the COM and
+  shell interfaces; BuildTools supplies MakeAppx and SignTool. Both are verified by
+  hash before use, so the build is reproducible from a clean checkout.
+- **Constrains:** the compiled DLL is a build product, not a committed binary; a
+  clean checkout runs `npm run tools:fetch` then `npm run native:build`.
+
+## D-0099 - Installation replaces the program tree atomically and preserves user data
+
+- **Decision:** `stage` builds a checksummed payload; `install` copies it to
+  `<installRoot>.new-<stamp>`, renames the previous tree aside, renames the new tree
+  into place, and only then deletes the old one. The installed uninstaller removes
+  the program directory from a detached command after its own process exits.
+- **Why:** a partially copied upgrade must never be launchable, and Windows cannot
+  delete the executable running the uninstaller. User data
+  (`%APPDATA%\@mona\desktop`) and `~/.codewhale` are outside every removed path; the
+  uninstall evidence compares file counts before and after.
+- **Constrains:** an upgrade needs enough free space for one extra copy, and the
+  program directory disappears a few seconds after the uninstaller returns.
+
+## D-0100 - The packaged app keeps the existing application identity
+
+- **Decision:** the installed `resources/app/package.json` keeps
+  `name: "@mona/desktop"` and the current version, so `app.getPath("userData")` is
+  unchanged. `productName: "Mona"` is set for presentation only.
+- **Why:** changing the application name would move the profile directory and
+  detach the user's existing projects and history from the installed app, which the
+  prompt forbids losing.
+- **Constrains:** the on-disk profile directory remains `%APPDATA%\@mona\desktop`;
+  renaming it is a future migration with its own evidence, not a side effect of
+  packaging.

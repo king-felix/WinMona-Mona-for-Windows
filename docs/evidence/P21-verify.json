@@ -1,0 +1,77 @@
+{
+  "checks": {
+    "exe": {
+      "ok": true,
+      "path": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe"
+    },
+    "menuDll": {
+      "ok": true
+    },
+    "renderer": {
+      "ok": true
+    },
+    "pty": {
+      "ok": true,
+      "directory": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app\\node_modules\\node-pty\\prebuilds\\win32-x64",
+      "missing": [],
+      "files": [
+        "conpty.node",
+        "conpty_console_list.node",
+        "pty.node"
+      ]
+    },
+    "checksums": {
+      "ok": true,
+      "files": 1656,
+      "problems": []
+    },
+    "registry": {
+      "ok": true,
+      "values": {
+        "MonaExe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "MonaMenuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+        "Version": "0.1.0",
+        "InstallRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "UserData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop"
+      }
+    },
+    "uninstallEntry": {
+      "ok": true,
+      "values": {
+        "DisplayName": "Mona",
+        "DisplayVersion": "0.1.0",
+        "Publisher": "Mona",
+        "InstallLocation": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "DisplayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "UninstallString": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\uninstall.cmd\"",
+        "NoModify": "0x1",
+        "NoRepair": "0x1"
+      }
+    },
+    "package": {
+      "ok": true,
+      "packages": [],
+      "installed": 0,
+      "exit": 0
+    },
+    "ok": true
+  },
+  "pty": {
+    "ok": true,
+    "directory": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app\\node_modules\\node-pty\\prebuilds\\win32-x64",
+    "missing": [],
+    "files": [
+      "conpty.node",
+      "conpty_console_list.node",
+      "pty.node"
+    ]
+  },
+  "menuDll": "a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd",
+  "smoke": {
+    "ok": true,
+    "exit": 0,
+    "version": "0.1.0",
+    "renderer": "rendered",
+    "stderr": "mona: applied 7 state migration(s) to version 7"
+  }
+}

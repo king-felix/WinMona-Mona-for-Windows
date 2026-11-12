@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app",
+    "project",
+    "open",
+    "--path",
+    "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-MsofAe\\not-a-real-folder",
+    "--profile",
+    "ds-full-access"
+  ],
+  "executable": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+  "appPath": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app"
+}

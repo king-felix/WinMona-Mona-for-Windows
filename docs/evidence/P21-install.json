@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "version": "0.1.0",
+  "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+  "placement": {
+    "installRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "previous": null,
+    "stamp": "20261112173236"
+  },
+  "closed": null,
+  "decision": {
+    "action": "proceed",
+    "reason": "Mona is not running."
+  },
+  "registryFailures": [],
+  "classic": {
+    "ok": true,
+    "status": 0,
+    "verified": true
+  },
+  "identity": {
+    "ok": false,
+    "registered": false,
+    "packageFullName": null,
+    "code": null,
+    "error": "Deployment failed with HRESULT: 0x80073CF0, Package could not be opened.\r\n\r\nerror 0x800B0109: The root certificate of the signature in the app package or bundle must be trusted.\n\nNOTE: For additional information, look for [ActivityId] 9887417d-5e98-0003-4fcb-cf9a985edd01 in the Event Log or use the command line Get-AppPackageLog -ActivityID 9887417d-5e98-0003-4fcb-cf9a985edd01\n",
+    "msix": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+    "prerequisite": "Windows refused the unsigned/test-signed package. Enable developer mode, import the labelled test certificate into Trusted People, or sign with a trusted certificate."
+  },
+  "checks": {
+    "exe": {
+      "ok": true,
+      "path": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe"
+    },
+    "menuDll": {
+      "ok": true
+    },
+    "renderer": {
+      "ok": true
+    },
+    "pty": {
+      "ok": true,
+      "directory": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\resources\\app\\node_modules\\node-pty\\prebuilds\\win32-x64",
+      "missing": [],
+      "files": [
+        "conpty.node",
+        "conpty_console_list.node",
+        "pty.node"
+      ]
+    },
+    "checksums": {
+      "ok": true,
+      "files": 1656,
+      "problems": []
+    },
+    "registry": {
+      "ok": true,
+      "values": {
+        "MonaExe": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "MonaMenuDll": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\MonaMenu.dll",
+        "Version": "0.1.0",
+        "InstallRoot": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "UserData": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop"
+      }
+    },
+    "uninstallEntry": {
+      "ok": true,
+      "values": {
+        "DisplayName": "Mona",
+        "DisplayVersion": "0.1.0",
+        "Publisher": "Mona",
+        "InstallLocation": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+        "DisplayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+        "UninstallString": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\uninstall.cmd\"",
+        "NoModify": "0x1",
+        "NoRepair": "0x1"
+      }
+    },
+    "package": {
+      "ok": true,
+      "packages": [],
+      "installed": 0,
+      "exit": 0
+    },
+    "ok": true
+  },
+  "smoke": {
+    "ok": true,
+    "exit": 0,
+    "version": "0.1.0",
+    "renderer": "rendered",
+    "stderr": "mona: applied 7 state migration(s) to version 7"
+  }
+}

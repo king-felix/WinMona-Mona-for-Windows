@@ -164,6 +164,39 @@ describe('launcher argv normalization', () => {
     ]);
   });
 
+  it('strips the packaged app directory Electron puts before the arguments', () => {
+    // Observed shape for the installed app and for its second-instance argv.
+    const appPath = 'C:\\Users\\v\\AppData\\Local\\Programs\\Mona\\resources\\app';
+    const argv = [
+      'C:\\Users\\v\\AppData\\Local\\Programs\\Mona\\Mona.exe',
+      appPath,
+      'project',
+      'open',
+      '--path',
+      "C:\\Work\\a & b (café) — 'q'",
+      '--profile',
+      'ds-full-access',
+    ];
+    expect(stripLauncherArgs(argv, { isPackaged: true, appPath, platform: 'win32' })).toEqual([
+      'project',
+      'open',
+      '--path',
+      "C:\\Work\\a & b (café) — 'q'",
+      '--profile',
+      'ds-full-access',
+    ]);
+  });
+
+  it('keeps a folder that merely resembles the app directory', () => {
+    const appPath = 'C:\\Programs\\Mona\\resources\\app';
+    const argv = ['Mona.exe', 'C:\\Programs\\Mona\\resources\\application', 'project', 'open'];
+    expect(stripLauncherArgs(argv, { isPackaged: true, appPath, platform: 'win32' })).toEqual([
+      'C:\\Programs\\Mona\\resources\\application',
+      'project',
+      'open',
+    ]);
+  });
+
   it('treats electron . as the app argument, not as a folder to open', () => {
     expect(
       stripLauncherArgs(['electron.exe', '.', 'C:\\Work\\Alpha'], { isPackaged: false, platform: 'win32' }),

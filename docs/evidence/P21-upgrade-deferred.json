@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "deferred": true,
+  "action": "defer-active",
+  "reason": "Mona is running task work in p21-upgrade-probe (running).",
+  "activity": {
+    "schema": 1,
+    "pid": 37452,
+    "version": "0.1.1",
+    "state": "active",
+    "projectId": "p21-upgrade-probe",
+    "runState": "running",
+    "updatedUtc": "2026-11-12T17:24:06.113Z"
+  }
+}

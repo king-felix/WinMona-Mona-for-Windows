@@ -22,6 +22,7 @@ export default tseslint.config(
       '**/dist/**',
       '**/node_modules/**',
       '**/.vite/**',
+      'build/**',
       'docs/**',
       '.mona/**',
       'tests/**',

@@ -205,9 +205,12 @@ export function parseLaunchCommand(
 }
 
 /**
- * Remove the leading executable argument and, when Electron runs unpackaged,
- * the app directory that precedes the user's own arguments. The second-instance
- * argv has the same shape, so both paths use this function.
+ * Remove the leading executable argument and the app directory Electron inserts
+ * after it. That directory appears for development runs and also for a packaged
+ * app whose payload lives in `resources/app`, where Chromium reports
+ * `[Mona.exe, <...>resources\app, ...userArgs]` — including on the
+ * second-instance argv. A user's own path argument can never equal Mona's app
+ * directory, so matching it is unambiguous.
  */
 export function stripLauncherArgs(
   argv: readonly string[],
@@ -215,7 +218,7 @@ export function stripLauncherArgs(
 ): string[] {
   const platform = options.platform ?? process.platform;
   const rest = argv.slice(1);
-  if (options.isPackaged || rest.length === 0) return rest;
+  if (rest.length === 0) return rest;
   const first = rest[0] as string;
   if (first === '.' || first === '..') {
     rest.shift();

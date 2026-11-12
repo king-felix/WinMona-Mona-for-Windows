@@ -14,9 +14,10 @@ _None._
 |---|---|---|---|
 | Verifiable DeepSeek route | P01 (G0/G1) | **verified** at P01: `doctor --probe-api` passed; model resolved to `deepseek-flash`; live turns priced | nothing; re-probe only if the key is rotated |
 | Native build toolchain | P05+ if a native binary is needed | no MSVC Build Tools; Electron and esbuild prebuilts supply everything used so far | a verified prebuilt for the specific native module, or installing VS Build Tools |
-| Code-signing certificate | P21/P23 release packaging | not present, not requested | Victor's explicit decision at release time; unsigned test packages are labeled until then |
-| Windows 11 modern context-menu qualification | P21 | untested | a clean per-user install and Explorer test on this machine |
-| Human click on the classic menu | P21/P22 acceptance | registered live at P09 and exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
+| Code-signing certificate | P21/P23 release packaging | **No production certificate.** A labelled self-created test certificate exists at `%LOCALAPPDATA%\Mona\signing\test-signing.pfx`; the package is test-signed and reported as such | Victor provides a certificate whose subject matches `CN=Mona Development`, or changes the manifest publisher; sign with `MONA_SIGN_PFX` / `MONA_SIGN_PASSWORD` |
+| Windows 11 modern context-menu qualification | P21 | **Built and verified, not registered.** `MonaMenu.dll` passes 7 native checks including real COM activation; the sparse package is packed and test-signed. Windows refuses it: `0x80073CFF` unsigned, `0x800B0109` test-signed, Root-store import needs interactive consent, developer mode needs administrator | Victor picks one: (A) enable developer mode, (B) accept the test certificate into the current-user Root store once, or (C) supply a trusted signing certificate. Then re-run `node tools/install/cli.mjs install` |
+| Human click on the classic menu | P21/P22 acceptance | registered live at P09 and re-registered by the P21 installer against the installed `Mona.exe`; exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
+| Human click on the modern menu | P21/P22 acceptance | cannot be offered until the identity package registers (see above) | after A, B or C: right-click a folder and a folder background and confirm the entry in the Windows 11 menu |
 
 ## Resolved
 

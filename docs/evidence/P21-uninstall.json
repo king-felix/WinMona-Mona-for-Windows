@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "identity": {
+    "removed": 0,
+    "ok": true,
+    "exit": 0
+  },
+  "classic": {
+    "ok": true,
+    "status": 0,
+    "verified": true
+  },
+  "registry": [
+    {
+      "key": "HKCU\\Software\\Mona\\Install",
+      "status": 0,
+      "stdout": "The operation completed successfully.",
+      "stderr": ""
+    },
+    {
+      "key": "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Mona",
+      "status": 0,
+      "stdout": "The operation completed successfully.",
+      "stderr": ""
+    }
+  ],
+  "certificates": {
+    "removed": null,
+    "detail": "No installer-created certificate to remove."
+  },
+  "removed": [
+    "C:\\Users\\victo\\AppData\\Local\\Mona\\logs",
+    "C:\\Users\\victo\\AppData\\Local\\Mona\\install-state.json"
+  ],
+  "program": {
+    "removed": false,
+    "deferred": true,
+    "detail": "The uninstaller runs from this directory; removal completes just after it exits.",
+    "cleanup": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-remove-1794504734886.cmd"
+  },
+  "preserved": [
+    {
+      "path": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop\\state",
+      "present": false,
+      "sha256": null,
+      "stillThere": false
+    },
+    {
+      "path": "C:\\Users\\victo\\AppData\\Roaming\\@mona\\desktop\\projects",
+      "present": false,
+      "sha256": null,
+      "stillThere": false
+    },
+    {
+      "path": "C:\\Users\\victo\\.codewhale",
+      "present": true,
+      "sha256": null,
+      "entries": 2673,
+      "sample": [
+        "audit.log",
+        "automations/dispatch.lock",
+        "automations/state.lock"
+      ],
+      "stillThere": true
+    }
+  ],
+  "artifactsKept": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts",
+  "state": "0.1.0",
+  "codewhaleUntouched": true
+}

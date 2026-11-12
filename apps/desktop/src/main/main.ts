@@ -54,6 +54,7 @@ import { runLaunchProbe } from './launch-probe.js';
 import { runShots } from './shots.js';
 import { runPolishProbe } from './polish-probe.js';
 import { runTerminalProbe, writeTerminalProbe } from './terminal-probe.js';
+import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
   DEFAULT_ATTENTION_SETTINGS,
@@ -202,6 +203,10 @@ const earlyLaunchIntents: LaunchIntent[] = [];
 let launchDispatcher: LaunchDispatcher | null = null;
 let latestLaunch: LaunchReceipt | null = null;
 let launchCount = 0;
+
+// The installer reads this to decide whether an upgrade may proceed. It never
+// changes behaviour: a failed write is ignored rather than failing a task.
+let activityRecorder: ActivityRecorder | null = null;
 
 /** One push per receipt for every live window; the snapshot covers an early event. */
 function broadcastLaunch(receipt: LaunchReceipt): void {
@@ -564,6 +569,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
               run: event.run,
               blocked: event.control.blockedProblem !== null,
             };
+            activityRecorder?.record(event.run.state, event.projectId);
             updateTray();
           }
           for (const window of BrowserWindow.getAllWindows()) {
@@ -807,6 +813,14 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
     mainWindow = createMainWindow();
     createTray();
 
+    // Publish an idle/idle-again record so the installer and a future upgrade
+    // path can tell "not running" from "running with work in flight".
+    activityRecorder = new ActivityRecorder({
+      file: activityFile(app.getPath('userData')),
+      version: app.getVersion(),
+    });
+    activityRecorder.record(latestStudio?.run.state ?? null, latestStudio?.projectId ?? null);
+
     // Drain shell selections in arrival order. A launch that arrived before the
     // catalog existed is still handled; a missing catalog is reported, never
     // silently accepted.
@@ -1025,6 +1039,8 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
   });
 
   app.on('will-quit', () => {
+    activityRecorder?.clear();
+    activityRecorder = null;
     studioService?.close();
     studioService = null;
     observatoryService = null;
