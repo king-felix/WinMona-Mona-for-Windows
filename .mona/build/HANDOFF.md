@@ -1,11 +1,14 @@
 # Mona build handoff
 
 **Current prompt:** P08 — Deliver the live work studio
-**Current status:** P00–P07 completed. State revision 24. Next eligible: P08.
+**Current status:** P00–P07 completed. State revision 26. Next eligible: P08.
 
-**Last verified commit / dirty work:** this session's P07 commit covers the
-catalog, the shell, the probe and the evidence below. Verify with
-`node tools/build/cli.mjs validate` (OK, r24, 0 warnings) before trusting this
+**Last verified commit / dirty work:** the P07 work is commit `9a7d1ad`
+(`P07: project catalog and real desktop shell`); the state and ledger records
+that point at it follow in later commits. `last_verified_commit` stays null
+because a state file cannot contain the hash of the commit that contains it —
+the journal (`checkpoints.jsonl` r25/r26) carries the real hash. Verify with
+`node tools/build/cli.mjs validate` (OK, r26, 0 warnings) before trusting this
 file.
 
 ## P07 result — a real shell over a real catalog
@@ -108,7 +111,7 @@ None.
 - `npm run shots -w @mona/desktop` → 34 harness screenshots, 4 audits clean
   (harness now needs `MONA_ALLOW_HARNESS=1`; the script sets it).
 - `npm run lifecycle -w @mona/desktop` → 10/10, local state schema v1.
-- `node tools/build/cli.mjs validate` → OK, r24, 0 warnings.
+- `node tools/build/cli.mjs validate` → OK, r26, 0 warnings.
 - Spend unchanged: `CatalogService.startEngine` starts a runtime and submits no
   turn; P07 made no provider request.
 

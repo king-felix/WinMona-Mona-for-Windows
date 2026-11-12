@@ -6,7 +6,7 @@
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
   "current_prompt": "P08",
-  "last_verified_commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
+  "last_verified_commit": null,
   "tasks": {
     "P00": {
       "status": "completed",
