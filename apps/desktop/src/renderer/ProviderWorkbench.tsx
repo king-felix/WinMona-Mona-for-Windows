@@ -42,6 +42,8 @@ export function ProviderWorkbench({
         (current) =>
           providerOverride ?? (current || result.data.selectedProviderId || result.data.requested.provider || ''),
       );
+      if (result.data.effective.permissionPosture === 'full_access') setPermission('full-access');
+      if (result.data.effective.mode) setMode(result.data.effective.mode);
       if (providerOverride) {
         setModelId(result.data.models[0]?.id ?? '');
       } else {

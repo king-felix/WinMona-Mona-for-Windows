@@ -1,12 +1,12 @@
 # Mona build handoff
 
 **Current prompt:** P17 — Make tools and extensions manageable
-**Current status:** P00–P16 completed. State revision 49 after the P16 checkpoint.
+**Current status:** P00–P16 completed. State revision 51 after the P16 checkpoint.
 Next eligible: P17.
 
 `last_verified_commit` stays null because a state file cannot contain the hash of
 the commit that contains it. Verify with `node tools/build/cli.mjs validate`
-(expect OK, r49, 0 warnings) before trusting this file.
+(expect OK, r51, 0 warnings) before trusting this file.
 
 ## P15 result — native agents, goals, fleets and workflows
 
