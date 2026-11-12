@@ -1,5 +1,6 @@
 import type { ErrorResult } from '@mona/contracts';
 import type { EngineStatus } from './engine-status.js';
+import type { AttentionPreferences } from './attention.js';
 
 /**
  * Channel names for the project catalog and the small amount of independent UI
@@ -24,6 +25,9 @@ export const CATALOG_CHANNELS = {
   uiSetView: 'mona:ui-set-view',
   uiSaveDraft: 'mona:ui-save-draft',
   uiNewSession: 'mona:ui-new-session',
+  uiSetLayout: 'mona:ui-set-layout',
+  uiSaveFavorite: 'mona:ui-save-favorite',
+  uiRemoveFavorite: 'mona:ui-remove-favorite',
 } as const;
 
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: ErrorResult };
@@ -89,16 +93,29 @@ export type DraftSession = {
   text: string;
 };
 
+export type ProjectLayout = 'standard' | 'focus';
+
+export type PromptFavorite = {
+  id: string;
+  label: string;
+  text: string;
+  createdAt: string;
+};
+
 export type ProjectUiState = {
   view: ProjectView;
+  layout: ProjectLayout;
   currentSessionId: string;
   sessions: DraftSession[];
+  favorites: PromptFavorite[];
   lastOpenedAt: string | null;
+  lastSeenAt: string | null;
 };
 
 export type UiStateView = {
   currentProjectId: string | null;
   projects: Record<string, ProjectUiState>;
+  preferences: AttentionPreferences;
   warning: string | null;
 };
 
@@ -128,6 +145,9 @@ export type CatalogBridge = {
   projectSpend(projectId: string): Promise<IpcResult<ProjectSpend>>;
   getUiState(): Promise<IpcResult<UiStateView>>;
   setProjectView(input: { projectId: string; view: ProjectView }): Promise<IpcResult<UiStateView>>;
+  setProjectLayout(input: { projectId: string; layout: ProjectLayout }): Promise<IpcResult<UiStateView>>;
   saveDraft(input: { projectId: string; sessionId: string; text: string }): Promise<IpcResult<UiStateView>>;
   newSession(projectId: string): Promise<IpcResult<UiStateView>>;
+  saveFavorite(input: { projectId: string; label: string; text: string }): Promise<IpcResult<UiStateView>>;
+  removeFavorite(input: { projectId: string; favoriteId: string }): Promise<IpcResult<UiStateView>>;
 };

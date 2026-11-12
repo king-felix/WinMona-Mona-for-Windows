@@ -1,6 +1,6 @@
 import { errorResult } from '@mona/contracts';
 import { z } from 'zod';
-import { CATALOG_CHANNELS, type IpcResult, type ProjectView } from '../shared/catalog.js';
+import { CATALOG_CHANNELS, type IpcResult, type ProjectLayout, type ProjectView } from '../shared/catalog.js';
 import type { CatalogService } from './catalog-service.js';
 import type { IpcHandle } from './ipc.js';
 
@@ -25,6 +25,12 @@ const UpdateRequest = z
         label: z.string().max(120).optional(),
         pinned: z.boolean().optional(),
         archived: z.boolean().optional(),
+        color: z
+          .string()
+          .regex(/^#[0-9a-fA-F]{6}$/)
+          .nullable()
+          .optional(),
+        monogram: z.string().max(3).nullable().optional(),
       })
       .strict(),
   })
@@ -39,6 +45,19 @@ const RelocateRequest = z
   .strict();
 const SelectRequest = z.object({ projectId: z.string().min(1).max(80).nullable() }).strict();
 const SetViewRequest = z.object({ projectId: z.string().min(1).max(80), view: z.enum(VIEWS) }).strict();
+const SetLayoutRequest = z
+  .object({ projectId: z.string().min(1).max(80), layout: z.enum(['standard', 'focus']) })
+  .strict();
+const FavoriteRequest = z
+  .object({
+    projectId: z.string().min(1).max(80),
+    label: z.string().min(1).max(120),
+    text: z.string().min(1).max(20_000),
+  })
+  .strict();
+const RemoveFavoriteRequest = z
+  .object({ projectId: z.string().min(1).max(80), favoriteId: z.string().min(1).max(80) })
+  .strict();
 const SaveDraftRequest = z
   .object({
     projectId: z.string().min(1).max(80),
@@ -103,7 +122,13 @@ export function registerCatalogIpc(deps: {
     const input = payload as {
       projectId: string;
       expectedRevision: number;
-      patch: { label?: string; pinned?: boolean; archived?: boolean };
+      patch: {
+        label?: string;
+        pinned?: boolean;
+        archived?: boolean;
+        color?: string | null;
+        monogram?: string | null;
+      };
     };
     return service.update(input.projectId, input.expectedRevision, input.patch);
   });
@@ -140,6 +165,18 @@ export function registerCatalogIpc(deps: {
   register(CATALOG_CHANNELS.uiNewSession, ProjectRequest, (payload, service) =>
     service.newSession((payload as { projectId: string }).projectId),
   );
+  register(CATALOG_CHANNELS.uiSetLayout, SetLayoutRequest, (payload, service) => {
+    const input = payload as { projectId: string; layout: ProjectLayout };
+    return service.setLayout(input.projectId, input.layout);
+  });
+  register(CATALOG_CHANNELS.uiSaveFavorite, FavoriteRequest, (payload, service) => {
+    const input = payload as { projectId: string; label: string; text: string };
+    return service.saveFavorite(input.projectId, input.label, input.text);
+  });
+  register(CATALOG_CHANNELS.uiRemoveFavorite, RemoveFavoriteRequest, (payload, service) => {
+    const input = payload as { projectId: string; favoriteId: string };
+    return service.removeFavorite(input.projectId, input.favoriteId);
+  });
 
   return channels;
 }

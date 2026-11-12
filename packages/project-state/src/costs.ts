@@ -613,6 +613,12 @@ export class CostLedger {
     return totalsOf(incrementalRows(await this.records(projectId, 5_000)));
   }
 
+  /** Totals for records strictly after `since`; null means every recorded row. */
+  async totalsSince(projectId: string, since: string | null): Promise<CostTotals> {
+    const rows = (await this.records(projectId, 5_000)).filter((row) => since === null || row.recordedAt > since);
+    return totalsOf(incrementalRows(rows));
+  }
+
   async lens(projectId: string): Promise<CostLens> {
     const all = incrementalRows(await this.records(projectId, 5_000));
     const sessionByThread = await this.store.read((db) => {

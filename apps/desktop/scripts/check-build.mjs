@@ -60,6 +60,11 @@ const preload = await readFile(path.join(repoRoot, 'apps', 'desktop', 'dist', 'p
 const channels = [...new Set([...preload.matchAll(/mona:[a-z-]+/g)].map((match) => match[0]))].sort();
 const expectedChannels = [
   'mona:app-info',
+  'mona:attention-focus',
+  'mona:attention-get',
+  'mona:attention-quit-stop',
+  'mona:attention-set',
+  'mona:briefing-get',
   'mona:catalog-create',
   'mona:catalog-list',
   'mona:catalog-open',
@@ -84,7 +89,10 @@ const expectedChannels = [
   'mona:studio-submit',
   'mona:ui-get',
   'mona:ui-new-session',
+  'mona:ui-remove-favorite',
   'mona:ui-save-draft',
+  'mona:ui-save-favorite',
+  'mona:ui-set-layout',
   'mona:ui-set-view',
 ].sort();
 if (JSON.stringify(channels) !== JSON.stringify(expectedChannels)) {

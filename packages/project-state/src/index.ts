@@ -14,6 +14,7 @@ export * from './attempts.js';
 export * from './costs.js';
 export * from './git.js';
 export * from './changes.js';
+export * from './briefing.js';
 
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -53,16 +54,18 @@ export async function openState(options: OpenStateOptions): Promise<OpenStateRes
 
   const existingVersion = currentVersion(store);
   let preMigrationBackup: BackupRecord | null = null;
-  const migrations = await store.exclusive('migrate', async () => {
-    if (existingVersion > 0 && options.backupBeforeMigration !== false && existsSync(databaseFile)) {
-      preMigrationBackup = await createBackup(store, {
-        directory: backupRoot,
-        label: 'pre-migration',
-        ...(options.now ? { now: options.now } : {}),
-      });
-    }
-    return await applyMigrations(store.database);
-  });
+  // The backup takes its own snapshot barrier; nesting it inside the migration's
+  // exclusive barrier would deadlock the single maintenance lock. At open time
+  // no other writer exists yet, so take the verified backup first and then apply
+  // migrations exclusively.
+  if (existingVersion > 0 && options.backupBeforeMigration !== false && existsSync(databaseFile)) {
+    preMigrationBackup = await createBackup(store, {
+      directory: backupRoot,
+      label: 'pre-migration',
+      ...(options.now ? { now: options.now } : {}),
+    });
+  }
+  const migrations = await store.exclusive('migrate', async () => applyMigrations(store.database));
 
   return {
     store,

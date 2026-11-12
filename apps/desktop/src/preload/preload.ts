@@ -1,5 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
+import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js';
+import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
@@ -31,6 +33,23 @@ const bridge = Object.freeze({
   saveDraft: (input: { projectId: string; sessionId: string; text: string }) =>
     ipcRenderer.invoke(CATALOG_CHANNELS.uiSaveDraft, input),
   newSession: (projectId: string) => ipcRenderer.invoke(CATALOG_CHANNELS.uiNewSession, { projectId }),
+  setProjectLayout: (input: { projectId: string; layout: string }) =>
+    ipcRenderer.invoke(CATALOG_CHANNELS.uiSetLayout, input),
+  saveFavorite: (input: { projectId: string; label: string; text: string }) =>
+    ipcRenderer.invoke(CATALOG_CHANNELS.uiSaveFavorite, input),
+  removeFavorite: (input: { projectId: string; favoriteId: string }) =>
+    ipcRenderer.invoke(CATALOG_CHANNELS.uiRemoveFavorite, input),
+  briefingGet: (input: { projectId: string; markSeen?: boolean }) => ipcRenderer.invoke(BRIEFING_CHANNELS.get, input),
+  attentionGet: () => ipcRenderer.invoke(ATTENTION_CHANNELS.get, {}),
+  attentionSet: (patch: object) => ipcRenderer.invoke(ATTENTION_CHANNELS.set, patch),
+  attentionQuitStop: () => ipcRenderer.invoke(ATTENTION_CHANNELS.quitStop, {}),
+  onAttentionFocus: (handler: (focus: AttentionFocus) => void) => {
+    const listener = (_event: unknown, payload: AttentionFocus): void => handler(payload);
+    ipcRenderer.on(ATTENTION_CHANNELS.focus, listener);
+    return () => {
+      ipcRenderer.removeListener(ATTENTION_CHANNELS.focus, listener);
+    };
+  },
   studioGet: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
     ipcRenderer.invoke(STUDIO_CHANNELS.get, input),
   studioSubmit: (input: {

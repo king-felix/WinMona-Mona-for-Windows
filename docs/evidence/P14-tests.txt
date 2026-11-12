@@ -1,0 +1,224 @@
+
+> mona@0.0.0 test
+> vitest run && npm run bootstrap:test && npm run launch:test && npm run spike:test
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mX:/AI_projects/Mona[39m
+
+ [32m✓[39m apps/desktop/src/main/ui-state.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1084[2mms[22m[39m
+   [32m✓[39m UI state store [2m(8)[22m
+     [33m[2m✓[22m[39m bounds draft text and session count[33m 554[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/studio.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1528[2mms[22m[39m
+   [32m✓[39m studio persistence [2m(6)[22m
+     [33m[2m✓[22m[39m keeps a replayed engine sequence out of the timeline[33m 341[2mms[22m[39m
+     [33m[2m✓[22m[39m advances the thread cursor and records a turn exactly once[33m 332[2mms[22m[39m
+     [33m[2m✓[22m[39m cascades timeline rows when a project is removed from the catalog[33m 302[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/attempts.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 2048[2mms[22m[39m
+   [32m✓[39m three-attempt rule [2m(6)[22m
+     [33m[2m✓[22m[39m blocks a problem at the third consecutive no-progress attempt and gives up the fourth[33m 446[2mms[22m[39m
+     [33m[2m✓[22m[39m resets only the consecutive counter with linked evidence and preserves the total[33m 339[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the counters across a session restart and never resets by acknowledgement[33m 433[2mms[22m[39m
+     [33m[2m✓[22m[39m reopens only with new evidence or a Victor decision, and keeps the total[33m 399[2mms[22m[39m
+     [33m[2m✓[22m[39m blocks the linked task and propagates the block to dependants while independent work continues[33m 430[2mms[22m[39m
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+ [32m✓[39m packages/project-state/src/migrations.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1089[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/renderer/App.test.tsx [2m([22m[2m15 tests[22m[2m)[22m[33m 1684[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/journal.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m packages/ui/src/ui.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/store.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2710[2mms[22m[39m
+   [32m✓[39m single write path and revision checks [2m(4)[22m
+     [33m[2m✓[22m[39m rolls back the whole transaction when a write fails part way[33m 309[2mms[22m[39m
+     [33m[2m✓[22m[39m survives a real process crash during an open transaction[33m 381[2mms[22m[39m
+   [32m✓[39m project identity [2m(5)[22m
+     [33m[2m✓[22m[39m a moved folder requires an explicit rebind instead of a second project[33m 358[2mms[22m[39m
+     [33m[2m✓[22m[39m nested worktrees stay distinct roots sharing one repository key[33m 321[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-target.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 109[2mms[22m[39m
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/adapter/src/adapter.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/http.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 30[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/attention.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2839[2mms[22m[39m
+   [32m✓[39m catalog service [2m(8)[22m
+     [33m[2m✓[22m[39m opens a folder, lists it, and does not start the engine or create a thread[33m 399[2mms[22m[39m
+     [33m[2m✓[22m[39m renames, pins, archives, restores, searches and removes without deleting files[33m 410[2mms[22m[39m
+     [33m[2m✓[22m[39m deduplicates aliases and requires a deliberate rebind after a move[33m 396[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps drafts, views, costs and runtime bindings separate when switching projects[33m 476[2mms[22m[39m
+     [33m[2m✓[22m[39m reports engine start failure and leaves the project usable offline[32m 300[2mms[22m[39m
+     [33m[2m✓[22m[39m survives a restart: catalog and UI state reload from disk[33m 321[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/catalog.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 3044[2mms[22m[39m
+   [32m✓[39m project catalog [2m(9)[22m
+     [33m[2m✓[22m[39m reads a branch from HEAD for a repository and a linked worktree[33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m deduplicates a path alias instead of creating a second project[33m 331[2mms[22m[39m
+     [33m[2m✓[22m[39m renames, pins, archives, restores and searches without touching the folder[33m 454[2mms[22m[39m
+     [33m[2m✓[22m[39m removes only the catalog entry and never deletes the folder or its files[33m 345[2mms[22m[39m
+     [33m[2m✓[22m[39m requires a deliberate rebind after a folder moves[33m 320[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps nested repositories as distinct catalog entries[33m 322[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/contracts.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/adapter/src/cli.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-ipc.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/adapter/src/work-control.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/costs.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 3269[2mms[22m[39m
+   [32m✓[39m cost ledger ingestion [2m(7)[22m
+     [33m[2m✓[22m[39m does not charge a replayed or duplicate usage fact twice[33m 313[2mms[22m[39m
+     [33m[2m✓[22m[39m stores unknown as unknown, never as zero[33m 316[2mms[22m[39m
+     [33m[2m✓[22m[39m does not count a parent aggregate and its children both[33m 357[2mms[22m[39m
+     [33m[2m✓[22m[39m attributes usage by turn, task and session[33m 319[2mms[22m[39m
+     [33m[2m✓[22m[39m labels every exported row as provider-reported, locally estimated or unknown[33m 303[2mms[22m[39m
+   [32m✓[39m budgets [2m(5)[22m
+     [33m[2m✓[22m[39m warns, then blocks the next dispatch, and never promises an invoice cap[33m 306[2mms[22m[39m
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/project-state/src/state.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 3249[2mms[22m[39m
+   [32m✓[39m backup and restore [2m(3)[22m
+     [33m[2m✓[22m[39m backs up, restores, and parks the replaced database without deleting it[33m 543[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a backup whose digest does not match, leaving the live database untouched[33m 393[2mms[22m[39m
+     [33m[2m✓[22m[39m quiesces writers: a write during maintenance is refused, then accepted again[33m 396[2mms[22m[39m
+   [32m✓[39m project export and import [2m(3)[22m
+     [33m[2m✓[22m[39m exports portable status without machine-local bindings and re-imports it atomically[33m 552[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a tampered export by digest before writing anything[33m 497[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/engine-host.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/briefing.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 3255[2mms[22m[39m
+   [32m✓[39m BriefingService.resumeBrief [2m(2)[22m
+     [33m[2m✓[22m[39m projects the recorded task, blocker, test, change and spend rows[33m 2425[2mms[22m[39m
+   [32m✓[39m BriefingService.sinceYouLeft [2m(1)[22m
+     [33m[2m✓[22m[39m groups only rows inside the window and stays deterministic[33m 537[2mms[22m[39m
+ [32m✓[39m packages/ui/src/contrast.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/ui/src/palette.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 111[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/security.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-dispatch.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 3353[2mms[22m[39m
+   [32m✓[39m launch dispatch [2m(11)[22m
+     [33m[2m✓[22m[39m opens a folder, records the studio view, starts the runtime and sends no task[33m 494[2mms[22m[39m
+     [33m[2m✓[22m[39m reuses an existing project and coalesces two identical fast launches[33m 380[2mms[22m[39m
+     [33m[2m✓[22m[39m re-launching after the first launch settles does not duplicate the project[33m 462[2mms[22m[39m
+     [33m[2m✓[22m[39m processes two different fast launches in order and reports the busy runtime honestly[33m 428[2mms[22m[39m
+     [33m[2m✓[22m[39m asks for a project folder when the shell selected a drive root[33m 304[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to create a second project when a moved folder needs a deliberate rebind[32m 300[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-ipc.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/ui/src/markdown.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-service.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 4042[2mms[22m[39m
+   [32m✓[39m live studio service [2m(14)[22m
+     [33m[2m✓[22m[39m streams a real turn into user, assistant and outcome items exactly once[33m 574[2mms[22m[39m
+     [33m[2m✓[22m[39m raises one local attention event per settled turn and per blocked problem[33m 399[2mms[22m[39m
+     [33m[2m✓[22m[39m renders tool calls as cards with the real tool input[33m 344[2mms[22m[39m
+     [33m[2m✓[22m[39m suppresses a replayed engine sequence instead of duplicating the row[33m 378[2mms[22m[39m
+     [33m[2m✓[22m[39m surfaces an approval wait and offers a real interrupt receipt[33m 395[2mms[22m[39m
+     [33m[2m✓[22m[39m truncates oversized output and labels it[33m 307[2mms[22m[39m
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+ [32m✓[39m packages/project-state/src/tasks.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 5052[2mms[22m[39m
+   [32m✓[39m task dependencies and deterministic eligibility [2m(5)[22m
+     [33m[2m✓[22m[39m rejects dependency cycles, self-links and cross-workspace links without losing prior edges[33m 425[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps a blocked prompt from starting until its prerequisite is verified[33m 420[2mms[22m[39m
+     [33m[2m✓[22m[39m does not change an independent task status when work runs out of order[33m 414[2mms[22m[39m
+     [33m[2m✓[22m[39m allows one active task per workspace but one per workspace across two workspaces[33m 399[2mms[22m[39m
+   [32m✓[39m task state machine and evidence-gated completion [2m(8)[22m
+     [33m[2m✓[22m[39m refuses completion until every required check and human item is satisfied[33m 325[2mms[22m[39m
+     [33m[2m✓[22m[39m records a failing check without satisfying the criterion and reopens verification[33m 327[2mms[22m[39m
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/project-state/src/changes.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 8578[2mms[22m[39m
+   [32m✓[39m workspace change receipts [2m(3)[22m
+     [33m[2m✓[22m[39m reports added, modified and deleted paths against a baseline without claiming authorship[33m 467[2mms[22m[39m
+     [33m[2m✓[22m[39m does not present pre-existing user edits as agent changes[33m 321[2mms[22m[39m
+     [33m[2m✓[22m[39m says plainly that a missing baseline is not an empty diff[33m 301[2mms[22m[39m
+   [32m✓[39m git selection and restore [2m(5)[22m
+     [33m[2m✓[22m[39m commits only the selected path and preserves unrelated staged work[33m 3037[2mms[22m[39m
+     [33m[2m✓[22m[39m shows a text diff from Git instead of inventing one[33m 1272[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a restore when the file changed after the preview[33m 1625[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to restore paths that would discard staged changes[33m 1137[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/supervisor.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 25168[2mms[22m[39m
+   [32m✓[39m process tree ownership [2m(1)[22m
+     [33m[2m✓[22m[39m stops a real owned process tree and leaves an unrelated node process alive[33m 3170[2mms[22m[39m
+   [32m✓[39m RuntimeSupervisor [2m(9)[22m
+     [33m[2m✓[22m[39m starts the runtime with an authenticated loopback identity and a token-free ownership record[33m 4249[2mms[22m[39m
+     [33m[2m✓[22m[39m stops a real descendant spawned by the owned runtime[33m 4401[2mms[22m[39m
+     [33m[2m✓[22m[39m clears a stale pid record and starts a fresh runtime[33m 4350[2mms[22m[39m
+     [33m[2m✓[22m[39m does not kill a live pid whose creation identity changed[33m 328[2mms[22m[39m
+     [33m[2m✓[22m[39m restarts a crashed runtime a bounded number of times without submitting work[33m 7952[2mms[22m[39m
+     [33m[2m✓[22m[39m fails the start when the runtime exits before it is usable[33m 445[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m34 passed[39m[22m[90m (34)[39m
+[2m      Tests [22m [1m[32m349 passed[39m[22m[90m (349)[39m
+[2m   Start at [22m 01:25:42
+[2m   Duration [22m 25.58s[2m (tests 91%, import 4%, environment 4%, transform 1%)[22m
+
+
+> mona@0.0.0 bootstrap:test
+> node --test tests/bootstrap
+
+✔ checkpoint advances revision atomically and journals the boundary (1096.892ms)
+✔ stale expected revision is refused and state is untouched (993.6751ms)
+✔ a write interrupted after the temp file is promoted by recover (1122.465ms)
+✔ a torn temp file is quarantined and the committed state survives (815.5336ms)
+✔ a corrupt state file is restored from the newest verified backup (1149.368ms)
+✔ validation rejects a dependency cycle (841.0901ms)
+✔ validation rejects an unregistered requirement and an unknown owner (861.5406ms)
+✔ validation rejects a changed specification whose recorded hash is stale (875.7861ms)
+✔ validation rejects a passed criterion with no evidence (863.0201ms)
+✔ evidence command records a hash and derives requirement status (1032.8326ms)
+✔ checkpoint refuses evidence paths that do not exist (805.7887ms)
+✔ a recorded remaining step can be explicitly cleared when it is finished (1029.928ms)
+✔ evidence can prune stale references left on sibling criteria (863.5958ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12415.35
+
+> mona@0.0.0 launch:test
+> node --test tests/launch
+
+✔ the registered command quotes the executable, the app directory and %V (0.733ms)
+✔ a hostile folder name cannot appear in the registration at all (0.104ms)
+✔ relative or quote-bearing executable paths are refused (0.2915ms)
+✔ registration names both keys with the exact label and command (0.5409ms)
+✔ removal names only Mona keys and never their parents (0.1965ms)
+✔ the executor passes argument arrays and stops at the first refusal by default (0.243ms)
+✔ reg export parsing reads escaped quotes, backslashes and empty values (0.3536ms)
+✔ verification compares every value Mona owns on both keys (38.6511ms)
+✔ uninstall removes Mona keys only and leaves a foreign menu entry alone (0.4979ms)
+✔ uninstalling when nothing is registered is a verified no-op (0.228ms)
+✔ registration is expressed identically on a repeat run (0.1813ms)
+✔ the module never builds a shell command string (0.9025ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 108.5457
+
+> mona@0.0.0 spike:test
+> node --test tests/spike
+
+✔ parseSseFrame reads event, id, and JSON data (13.8757ms)
+✔ parseSseFrame joins multi-line data and ignores comments (0.149ms)
+✔ parseSseFrame tolerates malformed payloads without throwing (0.1359ms)
+✔ parseSseFrame returns null for an empty frame (0.0971ms)
+✔ RuntimeClient refuses a non-loopback base URL (0.4019ms)
+✔ RuntimeClient requires a real bearer token (0.1216ms)
+✔ startOwnedRuntime refuses an invalid port before spawning (0.2781ms)
+✔ startOwnedRuntime keeps the token out of argv (0.375ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 75.6727

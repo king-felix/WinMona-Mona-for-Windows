@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 230,
+  "revision": 244,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1978,35 +1978,71 @@
         "P14",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "deterministic-digest",
           "description": "Digest is computed locally from recorded events",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.md",
+              "sha256": "0651a633f2c6e12c61f56e176f25ddb5329ed0b29da91441d9da8e820cd2f561",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:25:09Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "BriefingService composes Resume Brief and Since-you-left from task, attempt, test, cost and Git rows; live probe matches the seeded records (40 steps)"
+            }
+          ]
         },
         {
           "id": "tray-attention",
           "description": "Tray state reflects running, blocked and completed work",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:07Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "real Electron probe: tray exists, tooltip/menu reflect running, blocked, completed and idle; live steps recorded"
+            }
+          ]
         },
         {
           "id": "quiet-hours",
           "description": "Notifications respect quiet hours and deduplicate",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:07Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "timezone/DST unit tests plus live quiet-hours suppression, dedupe and scoped settings screenshot"
+            }
+          ]
         },
         {
           "id": "no-inference",
           "description": "No notification or digest path calls a model",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:07Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "probe providerRequests 0; engine not_started; briefing/attention tests use no adapter"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -2502,25 +2538,52 @@
         "P14",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "resume-brief",
           "description": "Resume Brief is generated from state without inference",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.md",
+              "sha256": "0651a633f2c6e12c61f56e176f25ddb5329ed0b29da91441d9da8e820cd2f561",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:25:09Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "Resume Brief matches seeded task, blocker, test, spend and Git rows; generated locally with no model call"
+            }
+          ]
         },
         {
           "id": "focus-mode",
           "description": "Focus Mode reduces panels without hiding required controls",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:11Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "live Focus Mode step: inspector hidden, execution controls and Interrupt now present, layout saved per project"
+            }
+          ]
         },
         {
           "id": "evidence-cards",
           "description": "Completion claims link to the governing evidence",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:12Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "evidence links focus the matching card and are marked aria-pressed; notification focus highlights the recorded evidence"
+            }
+          ]
         },
         {
           "id": "keyboard-flow",
@@ -2542,12 +2605,20 @@
               "recorded_utc": "2026-11-12T04:36:57Z",
               "commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
               "note": "harness Tab traversal re-run in P07 after the gate change: 14 focus stops, ring visible in all four theme/density combinations"
+            },
+            {
+              "path": "docs/evidence/P14-polish.json",
+              "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T08:23:12Z",
+              "commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+              "note": "live Alt+2 navigation, Ctrl+Shift+F Focus Mode, Ctrl+K palette and the shortcut list; no destructive single-key action"
             }
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "6decd12f11b31b76adb064935881b69cb157fa75",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {

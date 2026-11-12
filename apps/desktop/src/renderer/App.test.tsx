@@ -11,6 +11,8 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { AttentionFocus, AttentionView } from '../shared/attention.js';
+import type { BriefingView } from '../shared/briefing.js';
 import type { LaunchReceipt } from '../shared/launch.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
 import { App } from './App.js';
@@ -69,7 +71,175 @@ function project(id: string, label: string, overrides: Partial<CatalogProject> =
 }
 
 function emptyUi(): UiStateView {
-  return { currentProjectId: null, projects: {}, warning: null };
+  return {
+    currentProjectId: null,
+    projects: {},
+    preferences: {
+      notificationsEnabled: true,
+      quietHours: { enabled: false, startMinute: 22 * 60, endMinute: 7 * 60, timeZone: 'local' },
+      density: 'comfortable',
+      firstCloseNotified: false,
+    },
+    warning: null,
+  };
+}
+
+function defaultAttention(): AttentionView {
+  return {
+    settings: {
+      notificationsEnabled: true,
+      quietHours: { enabled: false, startMinute: 22 * 60, endMinute: 7 * 60, timeZone: 'local' },
+      density: 'comfortable',
+      firstCloseNotified: false,
+    },
+    tray: { tone: 'idle', tooltip: 'Mona is idle', detail: 'No runtime is running.' },
+    quietNow: false,
+    quietDetail: 'Quiet hours are off. Notifications can be delivered at any time.',
+    lastEvent: null,
+  };
+}
+
+function emptyBriefing(projectId: string): BriefingView {
+  const generatedAt = '2026-11-12T00:00:00.000Z';
+  return {
+    resume: {
+      projectId,
+      projectLabel: 'project',
+      generatedAt,
+      currentPrompt: null,
+      blockers: [],
+      lastTest: null,
+      changes: { count: null, added: 0, modified: 0, deleted: 0, basis: 'none', truncated: false, detail: 'unknown' },
+      spend: { knownMicros: 0, unknownRecords: 0, records: 0, confidence: 'none', label: 'No usage recorded' },
+      nextStep: { taskId: null, text: 'No eligible task.' },
+      progress: {
+        tasksTotal: 0,
+        completed: 0,
+        blocked: 0,
+        verifying: 0,
+        verifiedEvidence: 0,
+        note: 'Counts, not percentages.',
+      },
+      evidence: [],
+      disclosure: ['Generated locally; no model was called.'],
+    },
+    since: {
+      projectId,
+      since: null,
+      until: generatedAt,
+      empty: true,
+      groups: [],
+      counts: {
+        events: 0,
+        tasksCompleted: 0,
+        tasksBlocked: 0,
+        testsPassed: 0,
+        testsFailed: 0,
+        changedFiles: null,
+        knownMicros: 0,
+        unknownRecords: 0,
+        timelineItems: 0,
+      },
+      note: 'Grouped from recorded rows only.',
+    },
+  };
+}
+
+function richBriefing(projectId: string): BriefingView {
+  const base = emptyBriefing(projectId);
+  return {
+    resume: {
+      ...base.resume,
+      projectLabel: 'alpha',
+      currentPrompt: {
+        id: 'tsk_alpha',
+        title: 'Ship the briefing panel',
+        status: 'running',
+        owner: 'mona_queue',
+        step: 'render the brief',
+        requirementIds: ['MONA-029'],
+        dependencies: [],
+        evidencePaths: ['docs/evidence/P14-polish.md'],
+      },
+      blockers: [
+        {
+          kind: 'problem',
+          id: 'prb_alpha',
+          title: 'import fails',
+          detail: '3 consecutive no-progress attempts of 3.',
+          helpNeeded: 'confirm the fixture contents',
+          evidencePaths: ['docs/evidence/P11-attempts.md'],
+        },
+      ],
+      lastTest: {
+        outcome: 'failed',
+        command: 'npm test',
+        finishedAt: '2026-11-12T00:00:00.000Z',
+        recordedAt: '2026-11-12T00:00:00.000Z',
+        commit: 'abc123',
+        outputPath: 'docs/evidence/P14-tests.txt',
+        outputSha256: 'f'.repeat(64),
+      },
+      changes: {
+        count: 2,
+        added: 1,
+        modified: 1,
+        deleted: 0,
+        basis: 'git_status',
+        truncated: false,
+        detail: '2 path(s) differ from HEAD according to Git status.',
+      },
+      spend: {
+        knownMicros: 2_500,
+        unknownRecords: 1,
+        records: 2,
+        confidence: 'partial',
+        label: '$0.0025 + 1 unknown record(s)',
+      },
+      nextStep: { taskId: 'tsk_alpha', text: 'Resume tsk_alpha at: render the brief (running).' },
+      progress: {
+        tasksTotal: 3,
+        completed: 1,
+        blocked: 1,
+        verifying: 0,
+        verifiedEvidence: 2,
+        note: 'Counts of recorded task states. Mona does not infer a completion percentage.',
+      },
+      evidence: [{ label: 'tsk_alpha', path: 'docs/evidence/P14-polish.md', at: null }],
+    },
+    since: {
+      ...base.since,
+      since: '2026-11-11T00:00:00.000Z',
+      empty: false,
+      groups: [
+        {
+          id: 'completed',
+          label: 'Finished',
+          items: [
+            {
+              at: '2026-11-12T00:00:00.000Z',
+              summary: 'tsk_prev completed: earlier work',
+              tone: 'success',
+              taskId: 'tsk_prev',
+              evidencePath: 'docs/evidence/P10-continuity.md',
+              kind: 'task_completed',
+            },
+          ],
+        },
+      ],
+      counts: {
+        events: 1,
+        tasksCompleted: 1,
+        tasksBlocked: 0,
+        testsPassed: 0,
+        testsFailed: 0,
+        changedFiles: 2,
+        knownMicros: 2_500,
+        unknownRecords: 1,
+        timelineItems: 0,
+      },
+    },
+  };
 }
 
 function engine(overrides: Partial<EngineView> = {}): EngineView {
@@ -94,6 +264,10 @@ type Store = {
   submitted?: Array<{ text: string; mode: string; references: string[] }>;
   launchHandlers?: Array<(receipt: LaunchReceipt) => void>;
   launch?: LaunchReceipt | null;
+  attention?: AttentionView;
+  briefing?: BriefingView;
+  focusHandlers?: Array<(focus: AttentionFocus) => void>;
+  layouts?: Array<{ projectId: string; layout: string }>;
 };
 
 function emptyStudio(): StudioView {
@@ -155,9 +329,12 @@ function bridgeFor(store: Store): Window['mona'] {
           ...store.ui.projects,
           [id]: {
             view: 'studio',
+            layout: 'standard',
             currentSessionId: `ses_${id}`,
             sessions: [],
+            favorites: [],
             lastOpenedAt: '2026-11-12T00:00:00.000Z',
+            lastSeenAt: null,
           },
         },
       };
@@ -213,9 +390,12 @@ function bridgeFor(store: Store): Window['mona'] {
     setProjectView: async ({ projectId, view }: { projectId: string; view: ProjectView }) => {
       const entry = store.ui.projects[projectId] ?? {
         view: 'studio' as const,
+        layout: 'standard' as const,
         currentSessionId: `ses_${projectId}`,
         sessions: [],
+        favorites: [],
         lastOpenedAt: null,
+        lastSeenAt: null,
       };
       store.ui = { ...store.ui, projects: { ...store.ui.projects, [projectId]: { ...entry, view } } };
       return ok(store.ui);
@@ -223,9 +403,12 @@ function bridgeFor(store: Store): Window['mona'] {
     saveDraft: async ({ projectId, sessionId, text }: { projectId: string; sessionId: string; text: string }) => {
       const entry = store.ui.projects[projectId] ?? {
         view: 'studio' as const,
+        layout: 'standard' as const,
         currentSessionId: sessionId,
         sessions: [],
+        favorites: [],
         lastOpenedAt: null,
+        lastSeenAt: null,
       };
       const sessions = [...entry.sessions];
       const index = sessions.findIndex((session) => session.sessionId === sessionId);
@@ -324,6 +507,56 @@ function bridgeFor(store: Store): Window['mona'] {
         if (index >= 0) list.splice(index, 1);
       };
     },
+    setProjectLayout: async ({ projectId, layout }: { projectId: string; layout: 'standard' | 'focus' }) => {
+      (store.layouts ??= []).push({ projectId, layout });
+      ensure(projectId);
+      const entry = store.ui.projects[projectId] as NonNullable<(typeof store.ui.projects)[string]>;
+      store.ui = { ...store.ui, projects: { ...store.ui.projects, [projectId]: { ...entry, layout } } };
+      return ok(store.ui);
+    },
+    saveFavorite: async ({ projectId, label, text }: { projectId: string; label: string; text: string }) => {
+      ensure(projectId);
+      const entry = store.ui.projects[projectId] as NonNullable<(typeof store.ui.projects)[string]>;
+      store.ui = {
+        ...store.ui,
+        projects: {
+          ...store.ui.projects,
+          [projectId]: {
+            ...entry,
+            favorites: [{ id: `pfv_${label}`, label, text, createdAt: '2026-11-12T00:00:00.000Z' }, ...entry.favorites],
+          },
+        },
+      };
+      return ok(store.ui);
+    },
+    removeFavorite: async ({ projectId, favoriteId }: { projectId: string; favoriteId: string }) => {
+      ensure(projectId);
+      const entry = store.ui.projects[projectId] as NonNullable<(typeof store.ui.projects)[string]>;
+      store.ui = {
+        ...store.ui,
+        projects: {
+          ...store.ui.projects,
+          [projectId]: { ...entry, favorites: entry.favorites.filter((item) => item.id !== favoriteId) },
+        },
+      };
+      return ok(store.ui);
+    },
+    briefingGet: async ({ projectId }: { projectId: string }) => ok(store.briefing ?? emptyBriefing(projectId)),
+    attentionGet: async () => ok(store.attention ?? defaultAttention()),
+    attentionSet: async (patch: Partial<AttentionView['settings']>) => {
+      const base = store.attention ?? defaultAttention();
+      store.attention = { ...base, settings: { ...base.settings, ...patch } };
+      return ok(store.attention);
+    },
+    attentionQuitStop: async () => ok({ requested: true, detail: 'Quit requested.' }),
+    onAttentionFocus: (handler: (focus: AttentionFocus) => void) => {
+      const list = (store.focusHandlers ??= []);
+      list.push(handler);
+      return () => {
+        const index = list.indexOf(handler);
+        if (index >= 0) list.splice(index, 1);
+      };
+    },
   } as unknown as Window['mona'];
 }
 
@@ -359,6 +592,14 @@ async function typeInto(textarea: HTMLTextAreaElement, value: string): Promise<v
   await act(async () => {
     setter?.call(textarea, value);
     textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
+async function typeIntoInput(input: HTMLInputElement, value: string): Promise<void> {
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+  await act(async () => {
+    setter?.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
 
@@ -435,8 +676,8 @@ describe('Mona shell', () => {
     expect(draft.value).toBe('alpha draft');
 
     await act(async () => {
-      const recentBeta = Array.from(document.querySelectorAll('.rail-recent')).find(
-        (node) => node.textContent === 'beta',
+      const recentBeta = Array.from(document.querySelectorAll('.rail-recent')).find((node) =>
+        node.textContent?.trim().endsWith('beta'),
       );
       recentBeta?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -446,8 +687,8 @@ describe('Mona shell', () => {
     await typeInto(switched as HTMLTextAreaElement, 'beta draft');
 
     await act(async () => {
-      const recentAlpha = Array.from(document.querySelectorAll('.rail-recent')).find(
-        (node) => node.textContent === 'alpha',
+      const recentAlpha = Array.from(document.querySelectorAll('.rail-recent')).find((node) =>
+        node.textContent?.trim().endsWith('alpha'),
       );
       recentAlpha?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await new Promise((resolve) => setTimeout(resolve, 10));
@@ -759,6 +1000,160 @@ describe('Mona shell', () => {
     } as unknown as Window['mona'];
     const { root } = await render();
     expect(document.querySelector('[role="alert"]')?.textContent).toContain('IPC sender is not trusted.');
+    await act(async () => root.unmount());
+  });
+
+  it('renders the Resume Brief from recorded rows and focuses evidence without submitting', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      briefing: richBriefing('prj_alpha'),
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      button('Home').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('[data-testid="brief-current"]')?.textContent).toContain('Ship the briefing panel');
+    expect(document.querySelector('[data-testid="brief-spend"]')?.textContent).toContain('$0.0025');
+    expect(document.querySelector('[data-testid="brief-changes"]')?.textContent).toContain('2 path(s)');
+    expect(document.querySelector('[data-testid="brief-next"]')?.textContent).toContain('render the brief');
+    expect(document.querySelector('[data-testid="digest-window"]')?.textContent).toContain('Since');
+    const link = document.querySelector<HTMLButtonElement>(
+      '[data-testid="evidence-link"][data-path="docs/evidence/P14-polish.md"]',
+    );
+    expect(link).not.toBeNull();
+    await act(async () => {
+      link?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(link?.getAttribute('aria-pressed')).toBe('true');
+    expect(link?.className).toContain('focused');
+    expect(store.submitted?.length ?? 0).toBe(0);
+    await act(async () => root.unmount());
+  });
+
+  it('saves Focus Mode per project and keeps the emergency controls visible', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      studio: {
+        ...emptyStudio(),
+        run: {
+          state: 'running',
+          detail: 'A turn is running.',
+          turnId: 'turn_live',
+          submission: { submissionId: 'sub_live', state: 'accepted', replayed: false },
+          startedAt: '2026-11-12T00:00:00.000Z',
+        },
+      },
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      button('Studio').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('aside[aria-label="Inspector"]')).not.toBeNull();
+    await act(async () => {
+      button('Focus').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('.app-shell')?.className).toContain('focus-mode');
+    expect(document.querySelector('aside[aria-label="Inspector"]')).toBeNull();
+    expect(document.querySelector('[data-testid="studio-run-state"]')?.textContent).toContain('Running');
+    expect(button('Interrupt now')).toBeTruthy();
+    expect(store.layouts).toContainEqual({ projectId: 'prj_alpha', layout: 'focus' });
+    await act(async () => root.unmount());
+  });
+
+  it('focuses the right project and evidence from a notification without starting work', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const beta = project('prj_beta', 'beta');
+    const store: Store = {
+      projects: [alpha, beta],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      briefing: richBriefing('prj_beta'),
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      for (const handler of store.focusHandlers ?? [])
+        handler({ projectId: 'prj_beta', evidencePath: 'docs/evidence/P14-polish.md', kind: 'blocker' });
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    });
+    expect(document.querySelector('[data-testid="context-project"]')?.textContent).toBe('beta');
+    expect(document.body.textContent).toContain('Blocker needs attention');
+    expect(document.body.textContent).toContain('No task was started');
+    expect(
+      document.querySelector('[data-testid="evidence-link"][data-path="docs/evidence/P14-polish.md"]')?.className,
+    ).toContain('focused');
+    expect(store.submitted?.length ?? 0).toBe(0);
+    await act(async () => root.unmount());
+  });
+
+  it('saves a prompt favorite, fills the composer with it, and keeps density', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = { projects: [alpha], ui: emptyUi(), engine: engine(), spends: {} };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      button('Studio').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    const composer = document.querySelector<HTMLTextAreaElement>('#draft') as HTMLTextAreaElement;
+    await typeInto(composer, 'Review the failing test and report the exact command.');
+    const label = document.querySelector<HTMLInputElement>('#favorite-label') as HTMLInputElement;
+    await typeIntoInput(label, 'Review failing test');
+    await act(async () => {
+      document
+        .querySelector<HTMLButtonElement>('[data-testid="save-favorite"]')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.body.textContent).toContain('Review failing test');
+    await act(async () => {
+      button('Use').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(document.querySelector<HTMLTextAreaElement>('#draft')?.value).toBe(
+      'Review the failing test and report the exact command.',
+    );
+    expect(store.submitted?.length ?? 0).toBe(0);
+    await act(async () => {
+      button('Settings').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    await act(async () => {
+      document
+        .querySelector<HTMLButtonElement>('[data-testid="density-compact"]')
+        ?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.documentElement.dataset.density).toBe('compact');
     await act(async () => root.unmount());
   });
 });

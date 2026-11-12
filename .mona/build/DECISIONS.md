@@ -900,3 +900,63 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   overwriting an externally edited buffer.
 - **Constrains:** callers must keep the hash they read; there is no
   "force overwrite" escape hatch in the service.
+
+## D-0072 — The brief is a projection, never a summarizer
+
+- **Decision:** `BriefingService` reads the task board, attempt cards, cost
+  totals, test receipts and Git status and assembles a typed structure. It never
+  calls a model, never generates prose, and never computes a completion
+  percentage. Unknown spend is labeled `unknown`; changed files are `unknown`
+  rather than zero when neither Git nor a baseline exists.
+- **Why:** spec 12 and the P14 economics rule forbid a background summarizer or
+  an inference-shaped convenience. A deterministic projection can be checked
+  against its source rows; a summary cannot.
+- **Constrains:** every field must name a recorded source. New brief fields need
+  a service or row that already exists, not a new inference path.
+
+## D-0073 — Quiet hours silence delivery, not computation
+
+- **Decision:** `NotificationPlanner` evaluates quiet hours at event time in
+  the configured zone (`local` by default, so travel and DST move the window).
+  A suppressed event is remembered and is not delivered later.
+- **Why:** spec 12 says quiet hours silence notification delivery without
+  pausing computation unless Victor asks for the separate behavior. Replaying a
+  stale completion later would be worse than silence.
+- **Constrains:** quiet hours cannot stop a turn, interrupt a runtime, or change
+  a budget decision. Those remain explicit actions.
+
+## D-0074 — Lock-screen content carries no project detail
+
+- **Decision:** native notification titles/bodies are generic (finished, needs
+  attention, could not finish, limit). Project name, prompt text, file paths,
+  task titles and turn ids stay in the app after a click.
+- **Why:** a notification is visible on a lock screen; spec 12 requires default
+  content not to expose sensitive prompt or file details. Focusing the project
+  after a click still carries the useful context locally.
+- **Constrains:** new notification kinds must use `publicNotification`; the
+  planner test asserts the private fields are absent.
+
+## D-0075 — Focus Mode is a saved layout with non-negotiable controls
+
+- **Decision:** Focus Mode is a per-project `standard | focus` layout stored in
+  UI state. It hides the inspector, project search and recents; the topbar,
+  navigation, composer, execution strip and Interrupt now remain.
+- **Why:** spec 12 wants one task and fewer panels, but an emergency control
+  that disappears with a layout is a safety defect. Saving the layout per
+  project avoids re-toggling on every open.
+- **Constrains:** Focus Mode must never hide the interrupt, stop, quit or
+  approval-wait surfaces. Density is a separate persisted preference.
+
+## D-0076 — Back up before taking the migration barrier
+
+- **Decision:** `openState()` takes the verified pre-migration backup under its
+  own snapshot barrier, then applies migrations under the exclusive migration
+  barrier. It no longer nests `createBackup` inside `exclusive('migrate')`.
+- **Why:** both operations use the one maintenance barrier; nesting them raised
+  `maintenance already in progress (migrate)` on every launch that had an
+  existing database. Fresh profiles hid the bug because no backup was due. The
+  P14 seeded probe exposed it.
+- **Constrains:** no other writer exists at open time; if a future startup path
+  admits concurrent writers before migration, it must take one barrier that
+  covers both operations rather than reintroducing the nested lock. A regression
+  test opens an existing database twice and verifies the backup.

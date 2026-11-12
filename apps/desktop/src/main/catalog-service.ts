@@ -6,6 +6,7 @@ import type {
   CatalogProject,
   EngineView,
   OpenProjectResult,
+  ProjectLayout,
   ProjectSpend,
   ProjectView,
   UiStateView,
@@ -166,10 +167,22 @@ export class CatalogService {
   async update(
     projectId: string,
     expectedRevision: number,
-    patch: { label?: string; pinned?: boolean; archived?: boolean },
+    patch: {
+      label?: string;
+      pinned?: boolean;
+      archived?: boolean;
+      color?: string | null;
+      monogram?: string | null;
+    },
   ): Promise<ServiceResult<CatalogProject>> {
     return this.attempt(async () => {
-      const next: { label?: string; pinned?: boolean; archived?: boolean } = {};
+      const next: {
+        label?: string;
+        pinned?: boolean;
+        archived?: boolean;
+        color?: string | null;
+        monogram?: string | null;
+      } = {};
       if (patch.label !== undefined) {
         const label = patch.label.trim();
         if (!label || label.length > LABEL_MAX) {
@@ -179,6 +192,23 @@ export class CatalogService {
       }
       if (patch.pinned !== undefined) next.pinned = Boolean(patch.pinned);
       if (patch.archived !== undefined) next.archived = Boolean(patch.archived);
+      if (patch.color !== undefined) {
+        if (patch.color !== null && !/^#[0-9a-fA-F]{6}$/.test(patch.color)) {
+          throw new ServiceFailure(errorResult('invalid_request', 'A project color must be a #RRGGBB value.'));
+        }
+        next.color = patch.color === null ? null : patch.color.toUpperCase();
+      }
+      if (patch.monogram !== undefined) {
+        if (patch.monogram === null) {
+          next.monogram = null;
+        } else {
+          const monogram = patch.monogram.trim();
+          if (!monogram || monogram.length > 3) {
+            throw new ServiceFailure(errorResult('invalid_request', 'A monogram must be 1–3 characters.'));
+          }
+          next.monogram = monogram.toUpperCase();
+        }
+      }
       const row = await this.store.updateProject(projectId, expectedRevision, next);
       const entry = await this.catalog.describe(row);
       return toCatalogProject(entry);
@@ -316,6 +346,26 @@ export class CatalogService {
 
   newSession(projectId: string): ServiceResult<UiStateView> {
     return { ok: true, data: this.ui.newSession(projectId) };
+  }
+
+  setLayout(projectId: string, layout: ProjectLayout): ServiceResult<UiStateView> {
+    try {
+      return { ok: true, data: this.ui.setLayout(projectId, layout) };
+    } catch (error) {
+      return { ok: false, error: errorResult('invalid_request', String((error as Error).message)) };
+    }
+  }
+
+  saveFavorite(projectId: string, label: string, text: string): ServiceResult<UiStateView> {
+    try {
+      return { ok: true, data: this.ui.saveFavorite(projectId, { label, text }) };
+    } catch (error) {
+      return { ok: false, error: errorResult('invalid_request', String((error as Error).message)) };
+    }
+  }
+
+  removeFavorite(projectId: string, favoriteId: string): ServiceResult<UiStateView> {
+    return { ok: true, data: this.ui.removeFavorite(projectId, favoriteId) };
   }
 
   private engineView(): EngineView {

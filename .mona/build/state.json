@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 41,
+  "revision": 45,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P14",
+  "current_prompt": "P15",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -961,14 +961,66 @@
       "blocker_ids": []
     },
     "P14": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-017",
         "MONA-029"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "schema-free BriefingService: deterministic Resume Brief and Since-you-left from task, attempt, test, cost and Git rows; unknown spend and unknown changes stay labeled",
+        "Resume Brief, digest and focusable evidence cards in the real shell; no completion percentage",
+        "Focus Mode saved per project with execution controls and Interrupt now retained; density persisted",
+        "project color/monogram identities, per-project prompt favorites and keyboard flow with a shortcut list",
+        "tray state, completion/blocker notifications, quiet hours, dedupe across reconnect, generic lock-screen payload",
+        "close-to-tray explanation, explicit quit-and-stop dialog and tray action",
+        "fixed a nested maintenance-barrier launch bug on existing databases and added a regression test",
+        "40-step live Electron probe with 9 screenshots, 349 Vitest and zero provider requests"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P14-polish.md",
+          "sha256": "0651a633f2c6e12c61f56e176f25ddb5329ed0b29da91441d9da8e820cd2f561",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        },
+        {
+          "path": "docs/evidence/P14-polish.json",
+          "sha256": "c508d3a2671babc7e387d89273e18b93b7fe76d74b64342a6f76f2e6318a05ab",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        },
+        {
+          "path": "docs/evidence/P14-polish-log.txt",
+          "sha256": "895dbcda163f65c842a89224266a3896f84de76327ca17bd5993f80820bf6929",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        },
+        {
+          "path": "docs/evidence/P14-tests.txt",
+          "sha256": "0e00b0e5d03abfe6b7c327fcba9990d7cf38366bf276b0f5cf0b8cdeac0a6109",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        },
+        {
+          "path": "docs/evidence/P14-checks.txt",
+          "sha256": "2812b696082d7e2c62e8c5ddbc5902835a85dbdcafe349c88d0cb3fb67e12819",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        },
+        {
+          "path": "docs/evidence/P14-build.txt",
+          "sha256": "8e80264447e065f56c7a28b23882ab723a38ecc313c046ef1ab5c472a1a1e627",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T08:26:53Z",
+          "commit": "6decd12f11b31b76adb064935881b69cb157fa75"
+        }
+      ],
       "blocker_ids": []
     },
     "P15": {
@@ -1103,9 +1155,8 @@
     }
   },
   "next_eligible_prompts": [
-    "P14",
     "P15",
     "P16"
   ],
-  "last_checkpoint_utc": "2026-11-12T07:52:36Z"
+  "last_checkpoint_utc": "2026-11-12T08:26:53Z"
 }

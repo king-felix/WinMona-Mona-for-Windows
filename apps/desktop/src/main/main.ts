@@ -1,18 +1,25 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, Notification, session, shell, Tray } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { coerceLaunchCommand, parseLaunchCommand, stripLauncherArgs, type LaunchCommand } from '@mona/adapter';
+import { AttemptService, BriefingService, ChangeService, CostLedger, TaskService } from '@mona/project-state';
 import { CatalogService } from './catalog-service.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { createAppInfo, registerIpc } from './ipc.js';
 import { EngineHost } from './engine-host.js';
 import { LaunchDispatcher, type LaunchIntent } from './launch-dispatch.js';
 import { registerLaunchIpc } from './launch-ipc.js';
-import { StudioService } from './studio-service.js';
+import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
-import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
+import { STUDIO_CHANNELS, type StudioEvent, type StudioRun } from '../shared/studio.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
+import {
+  ATTENTION_CHANNELS,
+  type AttentionEventView,
+  type AttentionFocus,
+  type AttentionView,
+} from '../shared/attention.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
 import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
@@ -20,7 +27,19 @@ import { runCatalogProbe } from './catalog-probe.js';
 import { runStudioProbe } from './studio-probe.js';
 import { runLaunchProbe } from './launch-probe.js';
 import { runShots } from './shots.js';
+import { runPolishProbe } from './polish-probe.js';
 import { UiStateStore } from './ui-state.js';
+import {
+  DEFAULT_ATTENTION_SETTINGS,
+  NotificationPlanner,
+  describeQuiet,
+  isQuietAt,
+  trayView,
+  type AttentionEvent,
+} from './attention.js';
+import { registerAttentionIpc } from './attention-ipc.js';
+import { registerBriefingIpc } from './briefing-ipc.js';
+import { TRAY_ICON_DATA_URL } from './tray-icon.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -47,6 +66,10 @@ const studioShots = process.env.MONA_STUDIO_SHOTS ?? path.join(process.cwd(), 'm
 const studioTask =
   process.env.MONA_STUDIO_TASK ??
   'Create a file named hello.txt in this project containing exactly MONA_STUDIO_OK with no extra text. Then run `node check.mjs` and report the result. Do not change any other file.';
+const polishTest = process.argv.includes('--polish-test');
+const polishOut = process.env.MONA_POLISH_OUT ?? path.join(process.cwd(), 'mona-polish.json');
+const polishShots = process.env.MONA_POLISH_SHOTS ?? path.join(process.cwd(), 'mona-polish-shots');
+const polishFixturesFile = process.env.MONA_POLISH_FIXTURES ?? null;
 // The launch probe uses the real launcher command line, so its mode flag lives
 // in the environment rather than in argv (argv is the thing under test).
 const launchTest = process.env.MONA_LAUNCH_TEST === '1';
@@ -55,7 +78,7 @@ const launchShots = process.env.MONA_LAUNCH_SHOTS ?? path.join(process.cwd(), 'm
 const launchFixturesFile = process.env.MONA_LAUNCH_FIXTURES ?? null;
 // Screenshot capture needs deterministic compositing on a headless or remote
 // desktop; the P08 probe captures five live frames.
-if (shotsTest || studioTest || launchTest) app.disableHardwareAcceleration();
+if (shotsTest || studioTest || launchTest || polishTest) app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
 const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
@@ -88,6 +111,13 @@ const engineHost = new EngineHost({
 
 let localState: LocalState | null = null;
 let studioService: StudioService | null = null;
+let uiStateStore: UiStateStore | null = null;
+let briefingService: BriefingService | null = null;
+let tray: Tray | null = null;
+const attentionPlanner = new NotificationPlanner();
+let lastAttentionEvent: AttentionEventView | null = null;
+let lastCompletedAt: string | null = null;
+let latestStudio: { projectId: string; run: StudioRun; blocked: boolean } | null = null;
 
 /**
  * Victor's DS Full Access profile, recorded once in local state. It states the
@@ -165,6 +195,140 @@ function submitLaunch(intent: LaunchIntent | null): void {
     return;
   }
   earlyLaunchIntents.push(intent);
+}
+
+function showMainWindow(): void {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    mainWindow = createMainWindow();
+    return;
+  }
+  if (mainWindow.isMinimized()) mainWindow.restore();
+  if (!mainWindow.isVisible()) mainWindow.show();
+  mainWindow.focus();
+}
+
+/** A notification click focuses the project and its evidence; it never starts work. */
+function focusAttention(focus: AttentionFocus): void {
+  showMainWindow();
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.isDestroyed()) window.webContents.send(ATTENTION_CHANNELS.focus, focus);
+  }
+}
+
+function attentionSettings() {
+  return (
+    uiStateStore?.preferences() ?? {
+      ...DEFAULT_ATTENTION_SETTINGS,
+      density: 'comfortable' as const,
+      firstCloseNotified: false,
+    }
+  );
+}
+
+function attentionView(): AttentionView {
+  const settings = attentionSettings();
+  const summary = engineHost.summary();
+  const running =
+    latestStudio !== null &&
+    ['preparing', 'running', 'interrupting', 'awaiting_approval'].includes(latestStudio.run.state);
+  const failed = latestStudio?.run.state === 'failed';
+  return {
+    settings,
+    tray: trayView({
+      running,
+      blocked: latestStudio?.blocked ?? false,
+      failed,
+      engineState: summary.state,
+      activeProjectLabel: null,
+      lastCompletedAt,
+    }),
+    quietNow: isQuietAt(new Date(), settings.quietHours),
+    quietDetail: describeQuiet(settings.quietHours),
+    lastEvent: lastAttentionEvent,
+  };
+}
+
+/**
+ * One recorded transition becomes at most one notification. Delivery policy is
+ * local and idempotent; a reconnect that replays the same turn cannot alert
+ * twice, and quiet hours never pause the turn itself.
+ */
+function raiseAttention(event: StudioAttentionEvent): void {
+  const settings = attentionSettings();
+  const key =
+    event.kind === 'blocker'
+      ? `${event.projectId}:problem:${event.outcome ?? 'blocked'}:blocked`
+      : `${event.projectId}:turn:${event.turnId ?? event.at}:${event.outcome ?? event.kind}`;
+  const full: AttentionEvent = {
+    key,
+    kind: event.kind,
+    projectId: event.projectId,
+    projectLabel: '',
+    at: event.at,
+    taskId: event.taskId,
+    turnId: event.turnId,
+    evidencePath: null,
+    outcome: event.outcome,
+  };
+  const foreground = mainWindow !== null && !mainWindow.isDestroyed() && mainWindow.isFocused();
+  const plan = attentionPlanner.plan(full, settings, new Date(), { foreground });
+  lastAttentionEvent = {
+    kind: event.kind,
+    projectId: event.projectId,
+    projectLabel: '',
+    at: event.at,
+    taskId: event.taskId,
+    turnId: event.turnId,
+    evidencePath: null,
+    outcome: event.outcome,
+  };
+  if (event.kind === 'run_completed') lastCompletedAt = event.at;
+  updateTray();
+  if (!plan.deliver) {
+    process.stderr.write(`mona: attention ${event.kind} suppressed (${plan.reason})\n`);
+    return;
+  }
+  const notification = new Notification({ title: plan.title, body: plan.body, silent: false });
+  notification.on('click', () => focusAttention({ projectId: event.projectId, evidencePath: null, kind: event.kind }));
+  notification.show();
+}
+
+function updateTray(): void {
+  if (!tray || tray.isDestroyed()) return;
+  const view = attentionView();
+  tray.setToolTip(view.tray.tooltip);
+  const running =
+    latestStudio !== null &&
+    ['preparing', 'running', 'interrupting', 'awaiting_approval'].includes(latestStudio.run.state);
+  tray.setContextMenu(
+    Menu.buildFromTemplate([
+      { label: 'Show Mona', click: () => showMainWindow() },
+      {
+        label: 'Interrupt now',
+        enabled: running && latestStudio !== null,
+        click: () => {
+          if (latestStudio) void studioService?.interrupt(latestStudio.projectId);
+        },
+      },
+      { type: 'separator' },
+      { label: 'Quit and stop work', click: () => app.quit() },
+    ]),
+  );
+}
+
+function createTray(): void {
+  if (tray && !tray.isDestroyed()) return;
+  try {
+    const image = nativeImage.createFromDataURL(TRAY_ICON_DATA_URL);
+    tray = new Tray(image);
+    tray.on('click', () => {
+      if (mainWindow && mainWindow.isVisible() && mainWindow.isFocused()) mainWindow.hide();
+      else showMainWindow();
+    });
+    updateTray();
+  } catch (error) {
+    process.stderr.write(`mona: tray unavailable: ${String(error).slice(0, 200)}\n`);
+  }
 }
 
 const startupCommand = parseLaunchCommand(
@@ -312,10 +476,22 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
 
     let catalogService: CatalogService | null = null;
     if (localState) {
-      const uiState = new UiStateStore({ file: path.join(app.getPath('userData'), 'state', 'ui-state.json') });
+      uiStateStore = new UiStateStore({ file: path.join(app.getPath('userData'), 'state', 'ui-state.json') });
+      // P14 reads the same rows the task, attempt, cost and change services
+      // already own. No second store and no summarizer is introduced.
+      const taskService = new TaskService(localState.store);
+      const attemptService = new AttemptService(localState.store, { tasks: taskService });
+      const costLedger = new CostLedger(localState.store);
+      const changeService = new ChangeService(localState.store);
+      briefingService = new BriefingService(localState.store, {
+        tasks: taskService,
+        attempts: attemptService,
+        costs: costLedger,
+        changes: changeService,
+      });
       catalogService = new CatalogService({
         store: localState.store,
-        ui: uiState,
+        ui: uiStateStore,
         engine: enginePort,
         pickFolder: async (purpose) => {
           const options = {
@@ -340,7 +516,17 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       studioService = new StudioService({
         store: localState.store,
         engine: enginePort,
+        costs: costLedger,
+        attention: raiseAttention,
         emit: (event: StudioEvent) => {
+          if (event.type === 'state') {
+            latestStudio = {
+              projectId: event.projectId,
+              run: event.run,
+              blocked: event.control.blockedProblem !== null,
+            };
+            updateTray();
+          }
           for (const window of BrowserWindow.getAllWindows()) {
             if (!window.isDestroyed()) window.webContents.send(STUDIO_CHANNELS.event, event);
           }
@@ -427,6 +613,28 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       isTrustedSender: trustedSender,
       state: () => ({ latest: latestLaunch, count: launchCount }),
     });
+    registerAttentionIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      view: () => attentionView(),
+      update: (patch) => {
+        if (!uiStateStore) throw new Error('Local UI state is unavailable.');
+        uiStateStore.updatePreferences(patch);
+        updateTray();
+        return attentionView();
+      },
+      quitAndStop: () => {
+        // The reply reaches the renderer before the quit path starts; stopping
+        // owned work is handled by before-quit with its own receipt.
+        setTimeout(() => app.quit(), 0);
+      },
+    });
+    registerBriefingIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => briefingService,
+      ui: () => uiStateStore,
+    });
 
     const reconciled = await engineHost.reconcile();
     if (reconciled.unverifiable > 0) {
@@ -435,7 +643,10 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       );
     }
 
+    // A failed identify pass leaves the record alone; the working tree is not
+    // a reason to guess. Then the shell appears and the tray reflects state.
     mainWindow = createMainWindow();
+    createTray();
 
     // Drain shell selections in arrival order. A launch that arrived before the
     // catalog existed is still handled; a missing catalog is reported, never
@@ -583,6 +794,39 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
           app.exit(1);
         });
     }
+    if (polishTest && polishFixturesFile) {
+      const polishWindow = mainWindow;
+      let fixtures: Parameters<typeof runPolishProbe>[0]['fixtures'];
+      try {
+        fixtures = JSON.parse(fs.readFileSync(polishFixturesFile, 'utf8')) as typeof fixtures;
+      } catch (error) {
+        fs.writeFileSync(
+          polishOut,
+          JSON.stringify({ ok: false, error: `polish fixtures unavailable: ${String(error)}` }, null, 2),
+          'utf8',
+        );
+        app.exit(1);
+        return;
+      }
+      runPolishProbe({
+        window: polishWindow,
+        rendererIndex,
+        shotsDirectory: polishShots,
+        outputPath: polishOut,
+        engine: engineHost,
+        trayActive: () => tray !== null && !tray.isDestroyed(),
+        fixtures,
+      })
+        .then((result) => {
+          if (!polishWindow.isDestroyed()) polishWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(polishOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+      return;
+    }
   });
 
   // Quit and stop work: interrupt the active turn, then stop owned children.
@@ -639,9 +883,9 @@ function createMainWindow(): BrowserWindow {
     }, 250);
   });
   // Closing the window while Mona still owns a runtime hides it and keeps the
-  // work alive; relaunching the app restores this same window. With no owned
-  // runtime, closing behaves normally. The tray affordance arrives with the
-  // desktop shell (P07); the preservation guarantee does not wait for it.
+  // work alive; relaunching the app restores this same window. The tray says so
+  // and offers explicit Interrupt now and Quit and stop work actions. With no
+  // owned runtime, closing behaves normally.
   window.on('close', (event) => {
     const owned = engineHost.status();
     const hasOwnedRuntime = owned !== null && owned.state !== 'stopped' && owned.state !== 'idle';
@@ -650,6 +894,18 @@ function createMainWindow(): BrowserWindow {
       event.preventDefault();
       window.hide();
       engineHost.handleSignal('window-closed', { closeToTray: true });
+      // Say it once, on the first close, rather than leaving the window's
+      // disappearance unexplained. Work continues; this is not a completion alert.
+      if (uiStateStore?.markFirstCloseNotified()) {
+        const notice = new Notification({
+          title: 'Mona is still running',
+          body: 'Closing the window hides Mona. Work continues in the tray; use Quit and stop work to end it. This message is shown once.',
+          silent: true,
+        });
+        notice.on('click', () => showMainWindow());
+        notice.show();
+      }
+      updateTray();
       return;
     }
     engineHost.handleSignal('window-closed', { closeToTray: false });

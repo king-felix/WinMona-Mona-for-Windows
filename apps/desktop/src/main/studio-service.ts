@@ -31,6 +31,15 @@ export type StudioEnginePort = {
   adapter(): EngineAdapter | null;
 };
 
+export type StudioAttentionEvent = {
+  kind: 'run_completed' | 'run_failed' | 'blocker';
+  projectId: string;
+  at: string;
+  taskId: string | null;
+  turnId: string | null;
+  outcome: string | null;
+};
+
 export type StudioServiceDeps = {
   store: ProjectStore;
   engine: StudioEnginePort;
@@ -45,6 +54,8 @@ export type StudioServiceDeps = {
   nativeDispatcherActive?: (projectId: string) => boolean;
   /** Optional ledger: budgets gate the next dispatch, never mid-flight work. */
   costs?: CostLedger;
+  /** Local attention signal. The main process decides delivery; no model is involved. */
+  attention?: (event: StudioAttentionEvent) => void;
 };
 
 type Success<T> = { ok: true; data: T };
@@ -179,6 +190,7 @@ export class StudioService {
   private readonly pickReferences: StudioServiceDeps['pickReferences'];
   private readonly nativeDispatcherActive: StudioServiceDeps['nativeDispatcherActive'];
   private readonly costs: StudioServiceDeps['costs'];
+  private readonly attention: StudioServiceDeps['attention'];
   private readonly states = new Map<string, ProjectState>();
 
   constructor(deps: StudioServiceDeps) {
@@ -191,6 +203,7 @@ export class StudioService {
     this.pickReferences = deps.pickReferences;
     this.nativeDispatcherActive = deps.nativeDispatcherActive;
     this.costs = deps.costs;
+    this.attention = deps.attention;
   }
 
   async view(projectId: string, sessionId: string, mode?: StudioMode): Promise<ServiceResult<StudioView>> {
@@ -513,6 +526,14 @@ export class StudioService {
     }
     const receipt = state.queue.blockOnProblem(input);
     this.diagnostic(state, `blocked: ${input.problemId} (${receipt.outcome})`);
+    this.attention?.({
+      kind: 'blocker',
+      projectId,
+      at: this.now().toISOString(),
+      taskId: input.taskId ?? null,
+      turnId: null,
+      outcome: input.problemId,
+    });
     this.pushState(state);
     return { ok: true, data: { run: state.run, control: this.controlFor(state) } };
   }
@@ -1163,6 +1184,14 @@ export class StudioService {
       body,
       status: turn.status,
       truncated: false,
+    });
+    this.attention?.({
+      kind: turn.status === 'completed' ? 'run_completed' : 'run_failed',
+      projectId: state.projectId,
+      at: this.now().toISOString(),
+      taskId: null,
+      turnId: turn.id,
+      outcome: turn.status,
     });
     this.pushState(state);
   }

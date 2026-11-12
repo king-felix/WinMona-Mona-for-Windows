@@ -7,7 +7,7 @@ import type { EngineAdapter } from '@mona/adapter';
 import { applyMigrations } from '@mona/project-state';
 import { CostLedger, ProjectStore } from '@mona/project-state';
 import type { EngineSummary } from './engine-host.js';
-import { StudioService, composePrompt } from './studio-service.js';
+import { StudioService, composePrompt, type StudioAttentionEvent } from './studio-service.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
 
 const cleanup: Array<() => Promise<void>> = [];
@@ -213,7 +213,10 @@ type Harness = {
   submit: (text: string, options?: { mode?: 'agent' | 'plan'; references?: string[] }) => Promise<void>;
 };
 
-async function harness(label: string, options: { maxItemChars?: number } = {}): Promise<Harness> {
+async function harness(
+  label: string,
+  options: { maxItemChars?: number; attention?: (event: StudioAttentionEvent) => void } = {},
+): Promise<Harness> {
   const store = await openStore(label);
   const project = await makeProject(store, label);
   const adapter = new FakeAdapter(project.path);
@@ -237,6 +240,7 @@ async function harness(label: string, options: { maxItemChars?: number } = {}): 
     emit: (event) => events.push(event),
     maxItemChars: options.maxItemChars ?? 64 * 1024,
     flushIntervalMs: 0,
+    ...(options.attention ? { attention: options.attention } : {}),
   });
 
   const threadId = (): string => {
@@ -366,6 +370,40 @@ describe('live studio service', () => {
     const usage = await h.store.projectUsage(h.project.id);
     expect(usage.turnCount).toBe(1);
     expect(usage.knownCostMicros).toBe(1200);
+  });
+
+  it('raises one local attention event per settled turn and per blocked problem', async () => {
+    const raised: StudioAttentionEvent[] = [];
+    const h = await harness('attention', { attention: (event) => raised.push(event) });
+    await h.submit('Say MONA_OK');
+    const thread = h.threadId();
+    h.adapter.pushEvent(engineEvent('thread.started', 1, thread, null, { thread: { id: thread } }));
+    h.adapter.pushEvent(
+      engineEvent('turn.started', 2, thread, 'turn_00000000000000000000000000000001', {
+        turn: { id: 'turn_00000000000000000000000000000001', input_summary: 'Say MONA_OK' },
+      }),
+    );
+    h.adapter.pushEvent(
+      engineEvent('turn.completed', 3, thread, 'turn_00000000000000000000000000000001', {
+        turn: { id: 'turn_00000000000000000000000000000001', thread_id: thread, status: 'completed' },
+      }),
+    );
+    await h.waitFor((current) => current.run.state === 'idle');
+    expect(raised).toEqual([
+      expect.objectContaining({
+        kind: 'run_completed',
+        projectId: h.project.id,
+        turnId: 'turn_00000000000000000000000000000001',
+        outcome: 'completed',
+      }),
+    ]);
+
+    h.service.blockOnProblem(h.project.id, {
+      problemId: 'prb_attention',
+      taskId: 'tsk_attention',
+      detail: 'three attempts made no progress',
+    });
+    expect(raised[1]).toMatchObject({ kind: 'blocker', projectId: h.project.id, taskId: 'tsk_attention' });
   });
 
   it('renders tool calls as cards with the real tool input', async () => {

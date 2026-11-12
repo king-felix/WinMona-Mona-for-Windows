@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Badge, Button, EmptyState, ErrorState, Markdown, Notification, type Tone } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
-import type { CatalogProject, EngineView, ProjectSpend, UiStateView } from '../shared/catalog.js';
+import type { CatalogProject, EngineView, ProjectSpend, PromptFavorite, UiStateView } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
 import type { StudioMode, StudioRun, StudioView as StudioState, TimelineItem, TimelineKind } from '../shared/studio.js';
 
@@ -85,6 +85,10 @@ export type StudioPanelProps = {
   busy: string | null;
   /** Increments when a launch lands; the ready composer takes focus. */
   focusToken?: number;
+  identity?: { color: string; monogram: string } | null;
+  favorites?: PromptFavorite[];
+  onSaveFavorite?: (label: string, text: string) => void;
+  onRemoveFavorite?: (favoriteId: string) => void;
   onDraft: (text: string) => void;
   onOpenFolder: () => void;
   onStart: () => void;
@@ -110,6 +114,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [favoriteLabel, setFavoriteLabel] = useState('');
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const lastDelta = useRef<Map<string, number>>(new Map());
@@ -359,11 +364,23 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   return (
     <section className="panel studio-panel" aria-labelledby="studio-title">
       <div className="studio-head">
-        <div>
-          <p className="eyebrow">Studio</p>
-          <h2 id="studio-title" data-testid="studio-title" title={project.canonicalPath}>
-            {project.label}
-          </h2>
+        <div className="studio-title-row">
+          {props.identity ? (
+            <span
+              className="project-mark"
+              style={{ background: props.identity.color }}
+              aria-hidden="true"
+              data-testid="studio-identity"
+            >
+              {props.identity.monogram}
+            </span>
+          ) : null}
+          <div>
+            <p className="eyebrow">Studio</p>
+            <h2 id="studio-title" data-testid="studio-title" title={project.canonicalPath}>
+              {project.label}
+            </h2>
+          </div>
         </div>
         <div className="badge-row">
           <Badge tone={project.branch ? 'success' : 'neutral'}>{project.branch ?? 'No branch'}</Badge>
@@ -679,6 +696,73 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             </span>
           </div>
         </div>
+        <details className="prompt-shelf">
+          <summary>Prompt shelf · {props.favorites?.length ?? 0} saved</summary>
+          <p className="mona-muted">
+            A favorite fills the composer exactly as written. It is a draft until you press Submit; nothing is sent by
+            using one.
+          </p>
+          <div className="mona-row">
+            <label className="mona-field-label" htmlFor="favorite-label">
+              Label
+            </label>
+            <input
+              id="favorite-label"
+              className="mona-input"
+              value={favoriteLabel}
+              maxLength={120}
+              placeholder="e.g. Review the failing test"
+              onChange={(event) => setFavoriteLabel(event.target.value)}
+            />
+            <Button
+              size="sm"
+              disabled={!draft.trim() || !favoriteLabel.trim() || !props.onSaveFavorite}
+              onClick={() => {
+                if (!props.onSaveFavorite || !favoriteLabel.trim() || !draft.trim()) return;
+                props.onSaveFavorite(favoriteLabel.trim(), draft);
+                setFavoriteLabel('');
+              }}
+              data-testid="save-favorite"
+            >
+              Save current draft
+            </Button>
+          </div>
+          {props.favorites && props.favorites.length > 0 ? (
+            <ul className="brief-list" aria-label="Saved prompts">
+              {props.favorites.map((favorite) => (
+                <li key={favorite.id} className="favorite-row">
+                  <div>
+                    <strong>{favorite.label}</strong>
+                    <p className="mona-muted mona-truncate" title={favorite.text}>
+                      {favorite.text}
+                    </p>
+                  </div>
+                  <div className="mona-row">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        props.onDraft(favorite.text);
+                        composerRef.current?.focus();
+                      }}
+                    >
+                      Use
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      aria-label={`Remove ${favorite.label}`}
+                      onClick={() => props.onRemoveFavorite?.(favorite.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="mona-muted">No saved prompts for this project yet.</p>
+          )}
+        </details>
         <p className="mona-muted">
           {blockedReason ??
             `Mona sends this prompt once to ${thread ? `${thread.provider} · ${thread.model}` : 'the configured route'}. A draft is not a task.`}

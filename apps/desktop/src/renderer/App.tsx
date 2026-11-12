@@ -15,6 +15,10 @@ import {
 } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import { StudioPanel } from './StudioPanel.js';
+import { BriefingPanel } from './BriefingPanel.js';
+import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
+import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
+import type { BriefingView } from '../shared/briefing.js';
 import type {
   CatalogProject,
   EngineView,
@@ -116,6 +120,15 @@ export function App(): React.JSX.Element {
   const [createName, setCreateName] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [focusToken, setFocusToken] = useState(0);
+  const [briefing, setBriefing] = useState<BriefingView | null>(null);
+  const [briefingError, setBriefingError] = useState<string | null>(null);
+  const [attention, setAttention] = useState<AttentionView | null>(null);
+  const [focusedEvidence, setFocusedEvidence] = useState<string | null>(null);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
+  const [identityTarget, setIdentityTarget] = useState<CatalogProject | null>(null);
+  const [identityColor, setIdentityColor] = useState('#1F5F8B');
+  const [identityMonogram, setIdentityMonogram] = useState('');
+  const [quitOpen, setQuitOpen] = useState(false);
   const appliedLaunch = useRef(0);
   const liveSelection = useRef<{ projectId: string | null; sessionId: string | null; draft: string }>({
     projectId: null,
@@ -157,6 +170,17 @@ export function App(): React.JSX.Element {
     return result;
   }, [unwrap]);
 
+  const loadBriefing = useCallback(async (projectId: string, markSeen = true) => {
+    const result = await window.mona.briefingGet({ projectId, markSeen });
+    if (result.ok) {
+      setBriefing(result.data);
+      setBriefingError(null);
+    } else {
+      setBriefing(null);
+      setBriefingError(result.error.message);
+    }
+  }, []);
+
   const activateProject = useCallback(
     async (project: CatalogProject, persistDraftFor: { projectId: string; sessionId: string; text: string } | null) => {
       if (persistDraftFor && persistDraftFor.sessionId) {
@@ -173,9 +197,11 @@ export function App(): React.JSX.Element {
       setSessionId(next.sessionId);
       setDraftText(next.text);
       setSpend(null);
+      setFocusedEvidence(null);
       void loadSpend(project.id);
+      void loadBriefing(project.id);
     },
-    [loadSpend, unwrap],
+    [loadBriefing, loadSpend, unwrap],
   );
 
   // Initial load: app info, catalog, persisted UI state and the selected project.
@@ -217,6 +243,7 @@ export function App(): React.JSX.Element {
             setDraftText(next.text);
             const usage = await window.mona.projectSpend(currentId);
             if (alive && usage.ok) setSpend(usage.data);
+            if (alive) void loadBriefing(currentId);
           }
         }
       } catch {
@@ -313,6 +340,22 @@ export function App(): React.JSX.Element {
     }
   }, [theme]);
 
+  // Attention state is local policy: notification toggle, quiet hours, density.
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      const result = await window.mona.attentionGet();
+      if (alive && result.ok) setAttention(result.data);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.density = attention?.settings.density ?? 'comfortable';
+  }, [attention?.settings.density]);
+
   // Success notices are transient confirmations, not state the user must clear.
   // Warnings and failures stay until dismissed.
   useEffect(() => {
@@ -388,7 +431,16 @@ export function App(): React.JSX.Element {
   }, [activateProject, createName, createParent, refreshCatalog, unwrap]);
 
   const updateProject = useCallback(
-    async (project: CatalogProject, patch: { label?: string; pinned?: boolean; archived?: boolean }) => {
+    async (
+      project: CatalogProject,
+      patch: {
+        label?: string;
+        pinned?: boolean;
+        archived?: boolean;
+        color?: string | null;
+        monogram?: string | null;
+      },
+    ) => {
       const updated = await unwrap(
         window.mona.updateProject({ projectId: project.id, expectedRevision: project.revision, patch }),
         'Could not update the project',
@@ -505,6 +557,113 @@ export function App(): React.JSX.Element {
     [flushDraft, selected],
   );
 
+  const layout = selected ? (ui?.projects[selected.id]?.layout ?? 'standard') : 'standard';
+  const focusMode = layout === 'focus';
+
+  const toggleFocus = useCallback(async () => {
+    if (!selected) return;
+    const next = layout === 'focus' ? 'standard' : 'focus';
+    const result = await window.mona.setProjectLayout({ projectId: selected.id, layout: next });
+    if (result.ok) {
+      setUi(result.data);
+      setNotice({
+        tone: 'neutral',
+        title: next === 'focus' ? 'Focus Mode on' : 'Focus Mode off',
+        body: 'The layout is saved for this project. Execution controls and Interrupt now stay available.',
+      });
+    }
+  }, [layout, selected]);
+
+  const saveAttention = useCallback(async (patch: Parameters<typeof window.mona.attentionSet>[0]) => {
+    const result = await window.mona.attentionSet(patch);
+    if (result.ok) setAttention(result.data);
+    else setNotice({ tone: 'critical', title: 'Notification setting not saved', body: result.error.message });
+  }, []);
+
+  const applyAttentionFocus = useCallback(
+    async (focus: AttentionFocus) => {
+      const list = await refreshCatalog();
+      const target = (list ?? projects).find((project) => project.id === focus.projectId);
+      if (target) {
+        await activateProject(
+          target,
+          selected && sessionId ? { projectId: selected.id, sessionId, text: draftText } : null,
+        );
+      }
+      await changeScreen('home');
+      setFocusedEvidence(focus.evidencePath);
+      await loadBriefing(focus.projectId, false);
+      setNotice({
+        tone: focus.kind === 'blocker' ? 'attention' : 'success',
+        title: focus.kind === 'blocker' ? 'Blocker needs attention' : 'Run finished',
+        body: 'Focused this project and its recorded evidence. No task was started.',
+      });
+    },
+    [activateProject, changeScreen, draftText, loadBriefing, projects, refreshCatalog, selected, sessionId],
+  );
+
+  useEffect(() => {
+    const unsubscribe = window.mona.onAttentionFocus((focus) => {
+      void applyAttentionFocus(focus);
+    });
+    return unsubscribe;
+  }, [applyAttentionFocus]);
+
+  const quitAndStop = useCallback(async () => {
+    setQuitOpen(false);
+    const result = await window.mona.attentionQuitStop();
+    if (!result.ok) {
+      setNotice({ tone: 'critical', title: 'Quit was not requested', body: result.error.message });
+    }
+  }, []);
+
+  // Keyboard flow: Alt+1…5 for sections, Ctrl+Shift+F for Focus Mode,
+  // Ctrl+Shift+N for a new session, Ctrl+/ for the shortcut list. Interrupting
+  // work stays a deliberate click on the execution controls.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      const ctrl = event.ctrlKey || event.metaKey;
+      if (event.altKey && !ctrl && !event.shiftKey) {
+        const targets: Record<string, ProjectView> = {
+          '1': 'home',
+          '2': 'studio',
+          '3': 'work',
+          '4': 'cost',
+          '5': 'settings',
+        };
+        const target = targets[event.key];
+        if (target) {
+          event.preventDefault();
+          void changeScreen(target);
+        }
+        return;
+      }
+      if (ctrl && event.shiftKey) {
+        const key = event.key.toLowerCase();
+        if (key === 'f') {
+          event.preventDefault();
+          void toggleFocus();
+        } else if (key === 'n') {
+          event.preventDefault();
+          void newSession();
+        } else if (key === '/') {
+          event.preventDefault();
+          setShortcutsOpen(true);
+        }
+        return;
+      }
+      if (event.key === '?' && !ctrl) {
+        const tag = (event.target as HTMLElement | null)?.tagName;
+        if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+          event.preventDefault();
+          setShortcutsOpen(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [changeScreen, newSession, toggleFocus]);
+
   const paletteItems = useMemo<PaletteItem[]>(() => {
     const items: PaletteItem[] = [
       { id: 'action:open-folder', label: 'Open a folder…', group: 'Projects' },
@@ -527,6 +686,13 @@ export function App(): React.JSX.Element {
         disabled: !selected || engine?.state === 'connected',
       },
       { id: 'action:stop-engine', label: 'Stop the engine', group: 'Studio', disabled: engine?.state !== 'connected' },
+      {
+        id: 'action:toggle-focus',
+        label: focusMode ? 'Leave Focus Mode' : 'Enter Focus Mode',
+        group: 'Appearance',
+        disabled: !selected,
+      },
+      { id: 'action:shortcuts', label: 'Show keyboard shortcuts', group: 'Help' },
     ];
     if (selected) {
       items.push(
@@ -538,6 +704,7 @@ export function App(): React.JSX.Element {
           group: 'Selected project',
         },
         { id: 'action:relocate', label: 'Locate the folder after a move', group: 'Selected project' },
+        { id: 'action:identity', label: 'Edit color and monogram', group: 'Selected project' },
         { id: 'action:remove', label: 'Remove from the catalog…', group: 'Selected project' },
       );
     }
@@ -550,7 +717,7 @@ export function App(): React.JSX.Element {
       });
     }
     return items;
-  }, [engine?.state, projects, selected, theme]);
+  }, [engine?.state, focusMode, projects, selected, theme]);
 
   const runPaletteAction = useCallback(
     (id: string) => {
@@ -592,6 +759,12 @@ export function App(): React.JSX.Element {
         case 'action:stop-engine':
           void stopEngine();
           break;
+        case 'action:toggle-focus':
+          void toggleFocus();
+          break;
+        case 'action:shortcuts':
+          setShortcutsOpen(true);
+          break;
         case 'action:reveal':
           if (selected) void reveal(selected);
           break;
@@ -618,6 +791,14 @@ export function App(): React.JSX.Element {
             });
           }
           break;
+        case 'action:identity':
+          if (selected) {
+            const identity = projectIdentity(selected);
+            setIdentityTarget(selected);
+            setIdentityColor(identity.color);
+            setIdentityMonogram(identity.monogram);
+          }
+          break;
         case 'action:remove':
           if (selected) setConfirmRemove(selected);
           break;
@@ -638,6 +819,7 @@ export function App(): React.JSX.Element {
       sessionId,
       startEngine,
       stopEngine,
+      toggleFocus,
       updateProject,
     ],
   );
@@ -677,7 +859,7 @@ export function App(): React.JSX.Element {
   const engineWorkspaceMatches = Boolean(selected && engine?.workspace && selected.canonicalPath === engine.workspace);
 
   return (
-    <div className="app-shell mona-root">
+    <div className={focusMode ? 'app-shell mona-root focus-mode' : 'app-shell mona-root'}>
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark" aria-hidden="true">
@@ -692,23 +874,43 @@ export function App(): React.JSX.Element {
           <span className="context-item" data-testid="context-project">
             {selected ? selected.label : 'No project open'}
           </span>
-          <span className="context-item" data-testid="context-branch">
-            {selected ? (selected.branch ?? 'No branch') : '—'}
-          </span>
-          <span className="context-item" data-testid="engine-state">
-            {engine ? ENGINE_STATUS_LABEL[engine.state] : 'Engine state unknown'}
-          </span>
-          <span className="context-item" data-testid="context-model">
-            {info?.route.model ?? 'Model unknown'}
-          </span>
-          <span className="context-item" data-testid="context-permission">
-            {info
-              ? `${info.permission.label}${info.permission.profile ? ` · ${info.permission.profile}` : ''}`
-              : 'Permission unknown'}
-          </span>
-          <span className="context-item" data-testid="context-spend">
-            {spendView.label}
-          </span>
+          {!focusMode ? (
+            <>
+              <span className="context-item" data-testid="context-branch">
+                {selected ? (selected.branch ?? 'No branch') : '—'}
+              </span>
+              <span className="context-item" data-testid="engine-state">
+                {engine ? ENGINE_STATUS_LABEL[engine.state] : 'Engine state unknown'}
+              </span>
+              <span className="context-item" data-testid="context-model">
+                {info?.route.model ?? 'Model unknown'}
+              </span>
+              <span className="context-item" data-testid="context-permission">
+                {info
+                  ? `${info.permission.label}${info.permission.profile ? ` · ${info.permission.profile}` : ''}`
+                  : 'Permission unknown'}
+              </span>
+              <span className="context-item" data-testid="context-spend">
+                {spendView.label}
+              </span>
+            </>
+          ) : (
+            <span className="context-item" data-testid="engine-state">
+              {engine ? ENGINE_STATUS_LABEL[engine.state] : 'Engine state unknown'}
+            </span>
+          )}
+          <button
+            type="button"
+            className="ghost-button"
+            onClick={() => void toggleFocus()}
+            disabled={!selected}
+            aria-pressed={focusMode}
+            aria-label={focusMode ? 'Leave Focus Mode' : 'Enter Focus Mode'}
+            data-testid="focus-toggle"
+            title="Focus Mode hides the inspector, search and recents. Execution controls stay available."
+          >
+            {focusMode ? 'Leave focus' : 'Focus'}
+          </button>
           <button
             type="button"
             className="ghost-button"
@@ -723,30 +925,32 @@ export function App(): React.JSX.Element {
 
       <div className="layout">
         <nav className="rail" aria-label="Mona sections">
-          <div className="rail-search">
-            <label className="mona-field-label" htmlFor="project-search">
-              Search projects
-            </label>
-            <input
-              id="project-search"
-              className="mona-input"
-              type="search"
-              value={search}
-              placeholder="Label, path or branch"
-              onChange={(event) => {
-                setSearch(event.target.value);
-                if (screen !== 'home') void changeScreen('home');
-              }}
-            />
-            <label className="rail-check">
+          {!focusMode ? (
+            <div className="rail-search">
+              <label className="mona-field-label" htmlFor="project-search">
+                Search projects
+              </label>
               <input
-                type="checkbox"
-                checked={showArchived}
-                onChange={(event) => setShowArchived(event.target.checked)}
+                id="project-search"
+                className="mona-input"
+                type="search"
+                value={search}
+                placeholder="Label, path or branch"
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  if (screen !== 'home') void changeScreen('home');
+                }}
               />
-              Show archived
-            </label>
-          </div>
+              <label className="rail-check">
+                <input
+                  type="checkbox"
+                  checked={showArchived}
+                  onChange={(event) => setShowArchived(event.target.checked)}
+                />
+                Show archived
+              </label>
+            </div>
+          ) : null}
           <ul>
             {NAV.map((item) => (
               <li key={item.id}>
@@ -763,40 +967,52 @@ export function App(): React.JSX.Element {
               </li>
             ))}
           </ul>
-          <div className="rail-recents">
-            <p className="eyebrow">Recent</p>
-            {projects.filter((project) => !project.archived).length === 0 ? (
-              <p className="mona-muted">No projects yet.</p>
-            ) : (
-              <ul>
-                {[...projects]
-                  .filter((project) => !project.archived)
-                  .sort((a, b) => {
-                    const aOpened = ui?.projects[a.id]?.lastOpenedAt ?? '';
-                    const bOpened = ui?.projects[b.id]?.lastOpenedAt ?? '';
-                    return bOpened.localeCompare(aOpened) || a.label.localeCompare(b.label);
-                  })
-                  .slice(0, 6)
-                  .map((project) => (
-                    <li key={project.id}>
-                      <button
-                        type="button"
-                        className="rail-recent"
-                        aria-current={selected?.id === project.id ? 'true' : undefined}
-                        onClick={() =>
-                          void activateProject(
-                            project,
-                            selected && sessionId ? { projectId: selected.id, sessionId, text: draftText } : null,
-                          )
-                        }
-                      >
-                        {project.label}
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-            )}
-          </div>
+          {!focusMode ? (
+            <div className="rail-recents">
+              <p className="eyebrow">Recent</p>
+              {projects.filter((project) => !project.archived).length === 0 ? (
+                <p className="mona-muted">No projects yet.</p>
+              ) : (
+                <ul>
+                  {[...projects]
+                    .filter((project) => !project.archived)
+                    .sort((a, b) => {
+                      const aOpened = ui?.projects[a.id]?.lastOpenedAt ?? '';
+                      const bOpened = ui?.projects[b.id]?.lastOpenedAt ?? '';
+                      return bOpened.localeCompare(aOpened) || a.label.localeCompare(b.label);
+                    })
+                    .slice(0, 6)
+                    .map((project) => {
+                      const identity = projectIdentity(project);
+                      return (
+                        <li key={project.id}>
+                          <button
+                            type="button"
+                            className="rail-recent"
+                            aria-current={selected?.id === project.id ? 'true' : undefined}
+                            onClick={() =>
+                              void activateProject(
+                                project,
+                                selected && sessionId ? { projectId: selected.id, sessionId, text: draftText } : null,
+                              )
+                            }
+                          >
+                            <span
+                              className="project-mark small"
+                              style={{ background: identity.color }}
+                              aria-hidden="true"
+                            >
+                              {identity.monogram}
+                            </span>
+                            {project.label}
+                          </button>
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
+            </div>
+          ) : null}
           <div className="rail-foot">
             <span className="dot" aria-hidden="true" />
             <span>Idle Mona makes no request</span>
@@ -829,6 +1045,13 @@ export function App(): React.JSX.Element {
                   ui={ui}
                   selected={selected}
                   busy={busy}
+                  briefing={briefing}
+                  briefingError={briefingError}
+                  focusedEvidence={focusedEvidence}
+                  onFocusEvidence={setFocusedEvidence}
+                  onRefreshBrief={() => {
+                    if (selected) void loadBriefing(selected.id, false);
+                  }}
                   onOpenFolder={() => void openFolder()}
                   onCreate={() => void pickCreateParent()}
                   onSelect={(project) =>
@@ -862,6 +1085,12 @@ export function App(): React.JSX.Element {
                     setRenameTarget(project);
                     setRenameValue(project.label);
                   }}
+                  onIdentity={(project) => {
+                    const identity = projectIdentity(project);
+                    setIdentityTarget(project);
+                    setIdentityColor(identity.color);
+                    setIdentityMonogram(identity.monogram);
+                  }}
                   onRemove={(project) => setConfirmRemove(project)}
                   onRelocate={(project) =>
                     setRelocation({
@@ -883,6 +1112,21 @@ export function App(): React.JSX.Element {
                   ui={ui}
                   busy={busy}
                   focusToken={focusToken}
+                  identity={selected ? projectIdentity(selected) : null}
+                  favorites={selected ? (ui?.projects[selected.id]?.favorites ?? []) : []}
+                  onSaveFavorite={(label, text) => {
+                    if (!selected) return;
+                    void window.mona.saveFavorite({ projectId: selected.id, label, text }).then((result) => {
+                      if (result.ok) setUi(result.data);
+                      else setNotice({ tone: 'critical', title: 'Prompt not saved', body: result.error.message });
+                    });
+                  }}
+                  onRemoveFavorite={(favoriteId) => {
+                    if (!selected) return;
+                    void window.mona.removeFavorite({ projectId: selected.id, favoriteId }).then((result) => {
+                      if (result.ok) setUi(result.data);
+                    });
+                  }}
                   onDraft={(text) => setDraftText(text)}
                   onOpenFolder={() => void openFolder()}
                   onStart={() => void startEngine()}
@@ -915,15 +1159,23 @@ export function App(): React.JSX.Element {
                   info={info}
                   theme={theme}
                   onTheme={() => setTheme((value) => (value === 'daybreak' ? 'afterglow' : 'daybreak'))}
+                  attention={attention}
+                  onAttention={(patch) => void saveAttention(patch)}
+                  focusMode={focusMode}
+                  canFocus={selected !== null}
+                  onToggleFocus={() => void toggleFocus()}
+                  onQuit={() => setQuitOpen(true)}
                 />
               )}
             </div>
-            <InspectorPanel
-              project={selected}
-              ui={ui}
-              engine={engine}
-              engineWorkspaceMatches={engineWorkspaceMatches}
-            />
+            {focusMode ? null : (
+              <InspectorPanel
+                project={selected}
+                ui={ui}
+                engine={engine}
+                engineWorkspaceMatches={engineWorkspaceMatches}
+              />
+            )}
           </div>
         </main>
       </div>
@@ -1111,6 +1363,123 @@ export function App(): React.JSX.Element {
         />
         <p className="mona-muted">Mona creates this folder, then records it. No task is invented.</p>
       </Dialog>
+
+      <Dialog
+        open={identityTarget !== null}
+        title="Project identity"
+        onClose={() => setIdentityTarget(null)}
+        actions={
+          <>
+            <Button onClick={() => setIdentityTarget(null)}>Cancel</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (!identityTarget) return;
+                void updateProject(identityTarget, { color: identityColor, monogram: identityMonogram }).then(
+                  (updated) => {
+                    if (!updated) return;
+                    setIdentityTarget(null);
+                    setNotice({
+                      tone: 'success',
+                      title: 'Identity saved',
+                      body: `${updated.label} now uses ${projectIdentity(updated).monogram} ${projectIdentity(updated).color}.`,
+                    });
+                  },
+                );
+              }}
+            >
+              Save identity
+            </Button>
+          </>
+        }
+      >
+        <p className="mona-muted">
+          Identity is curated locally from the project id and label. The palette is fixed; the monogram is yours to
+          edit.
+        </p>
+        <div className="identity-preview">
+          <span className="project-mark" style={{ background: identityColor }} aria-hidden="true">
+            {identityMonogram || 'M'}
+          </span>
+          <span>{identityTarget?.label}</span>
+        </div>
+        <div className="color-row" role="group" aria-label="Project color">
+          {PROJECT_COLORS.map((color) => (
+            <button
+              key={color}
+              type="button"
+              className={color === identityColor ? 'color-chip active' : 'color-chip'}
+              style={{ background: color }}
+              aria-label={`Use color ${color}`}
+              aria-pressed={color === identityColor}
+              onClick={() => setIdentityColor(color)}
+            />
+          ))}
+        </div>
+        <label className="mona-field-label" htmlFor="identity-monogram">
+          Monogram (1–3 characters)
+        </label>
+        <input
+          id="identity-monogram"
+          className="mona-input"
+          value={identityMonogram}
+          maxLength={3}
+          onChange={(event) => setIdentityMonogram(event.target.value.toUpperCase())}
+        />
+        <p className="mona-muted">Saving changes Mona’s catalog metadata only. The folder is untouched.</p>
+      </Dialog>
+
+      <Dialog
+        open={shortcutsOpen}
+        title="Keyboard shortcuts"
+        onClose={() => setShortcutsOpen(false)}
+        actions={<Button onClick={() => setShortcutsOpen(false)}>Close</Button>}
+      >
+        <ul className="shortcut-list">
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>K</kbd> command palette
+          </li>
+          <li>
+            <kbd>Alt</kbd>+<kbd>1…5</kbd> Home, Studio, Work, Cost, Settings
+          </li>
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> toggle Focus Mode
+          </li>
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> new studio session
+          </li>
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>/</kbd> or <kbd>?</kbd> this list
+          </li>
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>Enter</kbd> submit the composed prompt
+          </li>
+        </ul>
+        <p className="mona-muted">
+          Interrupting or quitting is never a single unmodified key. Both remain deliberate actions with visible
+          controls.
+        </p>
+      </Dialog>
+
+      <Dialog
+        open={quitOpen}
+        title="Quit and stop work?"
+        onClose={() => setQuitOpen(false)}
+        actions={
+          <>
+            <Button onClick={() => setQuitOpen(false)}>Keep working</Button>
+            <Button variant="danger" onClick={() => void quitAndStop()}>
+              Quit and stop work
+            </Button>
+          </>
+        }
+      >
+        <p>
+          Mona will interrupt the active turn, then stop the runtimes it owns. Sent work is not rolled back. Closing the
+          window alone keeps work alive in the tray.
+        </p>
+        <p className="mona-muted">The tray menu offers the same action while the window is hidden.</p>
+      </Dialog>
     </div>
   );
 }
@@ -1121,6 +1490,11 @@ function HomeView({
   selected,
   busy,
   showArchived,
+  briefing,
+  briefingError,
+  focusedEvidence,
+  onFocusEvidence,
+  onRefreshBrief,
   onOpenFolder,
   onCreate,
   onSelect,
@@ -1128,6 +1502,7 @@ function HomeView({
   onPin,
   onArchive,
   onRename,
+  onIdentity,
   onRemove,
   onRelocate,
 }: {
@@ -1136,6 +1511,11 @@ function HomeView({
   selected: CatalogProject | null;
   busy: string | null;
   showArchived: boolean;
+  briefing: BriefingView | null;
+  briefingError: string | null;
+  focusedEvidence: string | null;
+  onFocusEvidence: (path: string) => void;
+  onRefreshBrief: () => void;
   onOpenFolder: () => void;
   onCreate: () => void;
   onSelect: (project: CatalogProject) => void;
@@ -1143,6 +1523,7 @@ function HomeView({
   onPin: (project: CatalogProject) => void;
   onArchive: (project: CatalogProject) => void;
   onRename: (project: CatalogProject) => void;
+  onIdentity: (project: CatalogProject) => void;
   onRemove: (project: CatalogProject) => void;
   onRelocate: (project: CatalogProject) => void;
 }): React.JSX.Element {
@@ -1168,6 +1549,16 @@ function HomeView({
         </div>
       </div>
 
+      {selected ? (
+        <BriefingPanel
+          briefing={briefing}
+          error={briefingError}
+          focusedEvidence={focusedEvidence}
+          onFocusEvidence={onFocusEvidence}
+          onRefresh={onRefreshBrief}
+        />
+      ) : null}
+
       {projects.length === 0 ? (
         <EmptyState
           title={showArchived ? 'No archived projects' : 'Choose a folder to begin'}
@@ -1189,9 +1580,13 @@ function HomeView({
             {projects.map((project) => {
               const entry = ui?.projects[project.id];
               const lastOpened = entry?.lastOpenedAt ? new Date(entry.lastOpenedAt).toLocaleString() : 'Never opened';
+              const identity = projectIdentity(project);
               return (
                 <li key={project.id} className="project-card">
                   <div className="project-card-head">
+                    <span className="project-mark" style={{ background: identity.color }} aria-hidden="true">
+                      {identity.monogram}
+                    </span>
                     <h3>{project.label}</h3>
                     <div className="badge-row">
                       {project.pinned ? <Badge tone="info">pinned</Badge> : null}
@@ -1222,6 +1617,9 @@ function HomeView({
                     </Button>
                     <Button size="sm" onClick={() => onRename(project)}>
                       Rename
+                    </Button>
+                    <Button size="sm" onClick={() => onIdentity(project)}>
+                      Identity
                     </Button>
                     <Button size="sm" onClick={() => onArchive(project)}>
                       {project.archived ? 'Restore' : 'Archive'}
@@ -1337,17 +1735,33 @@ function SettingsView({
   info,
   theme,
   onTheme,
+  attention,
+  onAttention,
+  focusMode,
+  canFocus,
+  onToggleFocus,
+  onQuit,
 }: {
   info: AppInfo | null;
   theme: Theme;
   onTheme: () => void;
+  attention: AttentionView | null;
+  onAttention: (patch: Parameters<typeof window.mona.attentionSet>[0]) => void;
+  focusMode: boolean;
+  canFocus: boolean;
+  onToggleFocus: () => void;
+  onQuit: () => void;
 }): React.JSX.Element {
+  const settings = attention?.settings;
+  const quiet = settings?.quietHours;
+  const density: Density = settings?.density ?? 'comfortable';
   return (
     <section className="panel" aria-labelledby="settings-title">
       <p className="eyebrow">Settings</p>
-      <h2 id="settings-title">Route and permission</h2>
+      <h2 id="settings-title">Route, appearance and attention</h2>
       <p className="lede">
-        These values are shown from the running build. Mona does not contact the provider to display them.
+        These values are shown from the running build. Mona does not contact the provider to display them, and nothing
+        on this screen starts inference.
       </p>
       <div className="facts">
         <div>
@@ -1382,11 +1796,123 @@ function SettingsView({
       <div className="mona-row">
         <Button onClick={onTheme}>Switch to {theme === 'daybreak' ? 'Afterglow' : 'Daybreak'}</Button>
       </div>
+
+      <section className="settings-block" aria-labelledby="settings-appearance">
+        <h3 id="settings-appearance">Appearance</h3>
+        <div className="mona-row" role="group" aria-label="Density">
+          {(['comfortable', 'compact'] as Density[]).map((value) => (
+            <Button
+              key={value}
+              size="sm"
+              aria-pressed={density === value}
+              variant={density === value ? 'primary' : 'secondary'}
+              onClick={() => onAttention({ density: value })}
+              data-testid={`density-${value}`}
+            >
+              {value === 'comfortable' ? 'Comfortable' : 'Compact'}
+            </Button>
+          ))}
+        </div>
+        <div className="mona-row">
+          <Button size="sm" onClick={onToggleFocus} disabled={!canFocus} aria-pressed={focusMode}>
+            {focusMode ? 'Leave Focus Mode' : 'Enter Focus Mode'}
+          </Button>
+          <span className="mona-muted">
+            Focus Mode is saved per project. Execution controls and Interrupt now stay visible.
+          </span>
+        </div>
+      </section>
+
+      <section className="settings-block" aria-labelledby="settings-attention">
+        <h3 id="settings-attention">Notifications and quiet hours</h3>
+        <label className="rail-check">
+          <input
+            type="checkbox"
+            checked={settings?.notificationsEnabled ?? true}
+            onChange={(event) => onAttention({ notificationsEnabled: event.target.checked })}
+          />
+          Deliver completion and blocker notifications
+        </label>
+        <label className="rail-check">
+          <input
+            id="quiet-enabled"
+            type="checkbox"
+            checked={quiet?.enabled ?? false}
+            onChange={(event) => onAttention({ quietHours: { enabled: event.target.checked } })}
+          />
+          Quiet hours
+        </label>
+        <div className="mona-row quiet-row">
+          <label className="mona-field-label" htmlFor="quiet-start">
+            From
+          </label>
+          <input
+            id="quiet-start"
+            className="mona-input"
+            type="time"
+            value={minutesToTime(quiet?.startMinute ?? 22 * 60)}
+            onChange={(event) => onAttention({ quietHours: { startMinute: timeToMinutes(event.target.value) } })}
+          />
+          <label className="mona-field-label" htmlFor="quiet-end">
+            To
+          </label>
+          <input
+            id="quiet-end"
+            className="mona-input"
+            type="time"
+            value={minutesToTime(quiet?.endMinute ?? 7 * 60)}
+            onChange={(event) => onAttention({ quietHours: { endMinute: timeToMinutes(event.target.value) } })}
+          />
+          <label className="mona-field-label" htmlFor="quiet-zone">
+            Timezone
+          </label>
+          <input
+            key={quiet?.timeZone ?? 'local'}
+            id="quiet-zone"
+            className="mona-input mona-mono"
+            defaultValue={quiet?.timeZone ?? 'local'}
+            onBlur={(event) => onAttention({ quietHours: { timeZone: event.target.value.trim() || 'local' } })}
+          />
+        </div>
+        <p className="mona-muted" data-testid="quiet-detail">
+          {attention?.quietDetail ?? 'Quiet hours are off. Notifications can be delivered at any time.'}
+        </p>
+        <p className="mona-muted">
+          Quiet hours silence notification delivery only. They never pause a running turn. Use “local” to follow the
+          system timezone as it changes.
+        </p>
+        <p className="mona-muted" data-testid="tray-detail">
+          Tray: {attention?.tray.tooltip ?? 'Not reported'} — {attention?.tray.detail ?? ''}
+        </p>
+      </section>
+
+      <section className="settings-block" aria-labelledby="settings-quit">
+        <h3 id="settings-quit">Stopping work</h3>
+        <p className="mona-muted">
+          Closing the window keeps owned work alive in the tray. Quit and stop work interrupts the active turn, then
+          stops the runtimes Mona owns. Sent work is not rolled back.
+        </p>
+        <Button variant="danger" onClick={onQuit}>
+          Quit and stop work…
+        </Button>
+      </section>
+
       <Notification tone="success" title="No Mona telemetry">
         Diagnostics are local and redacted. Credentials stay with Codewhale; Mona never reads or echoes them.
       </Notification>
     </section>
   );
+}
+
+function minutesToTime(minutes: number): string {
+  const bounded = Math.max(0, Math.min(1439, Math.round(minutes)));
+  return `${String(Math.floor(bounded / 60)).padStart(2, '0')}:${String(bounded % 60).padStart(2, '0')}`;
+}
+
+function timeToMinutes(value: string): number {
+  const match = /^(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return 0;
+  return Math.min(1439, Number(match[1]) * 60 + Number(match[2]));
 }
 
 function InspectorPanel({

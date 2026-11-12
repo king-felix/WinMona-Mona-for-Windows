@@ -790,6 +790,15 @@ export class TaskService {
     });
   }
 
+  /** Read-only completion gaps for a brief; never changes a task or its evidence. */
+  async gaps(taskId: string): Promise<string[]> {
+    return await this.store.read((db) => {
+      const task = this.loadTask(db, taskId);
+      if (!task) throw stateError('not_found', `task ${taskId} does not exist`);
+      return [...this.completionGaps(task), ...this.stepGaps(task)];
+    });
+  }
+
   /** Completion requires every configured check, every human item and fresh evidence. */
   async completeTask(taskId: string, actor = 'victor'): Promise<CompletionReport> {
     // Re-hash linked artifacts before deciding. If an artifact changed after the

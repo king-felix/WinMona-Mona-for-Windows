@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createBackup, restoreBackup, verifyDatabaseFile } from './backup.js';
+import { openState } from './index.js';
 import { applyMigrations, MIGRATIONS } from './migrations.js';
 import { ProjectStore } from './store.js';
 import { ArtifactStore } from './artifacts.js';
@@ -290,5 +291,27 @@ describe('SQLite submission journal', () => {
     expect(fetched?.operationKey).toBe(operationKey);
     const byKey = await journal.findByOperationKey(threadId, operationKey);
     expect(byKey?.id).toBe(id);
+  });
+});
+
+describe('opening existing state', () => {
+  it('backs up an existing database before migrating without deadlocking the barrier', async () => {
+    const dir = await tempDir('open-existing');
+    const first = await openState({ directory: dir });
+    const folder = await tempDir('open-existing-folder');
+    await first.store.registerProject(folder, { label: 'existing' });
+    first.store.close();
+
+    const second = await openState({ directory: dir });
+    try {
+      expect(second.migrations.alreadyCurrent).toBe(true);
+      expect(second.preMigrationBackup).not.toBeNull();
+      expect(verifyDatabaseFile(second.preMigrationBackup?.file as string)).toBe('ok');
+      expect(second.schemaVersion).toBe(MIGRATIONS[MIGRATIONS.length - 1]?.version);
+      const projects = await second.store.listProjects();
+      expect(projects).toHaveLength(1);
+    } finally {
+      second.store.close();
+    }
   });
 });

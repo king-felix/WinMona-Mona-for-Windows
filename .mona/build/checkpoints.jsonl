@@ -38,3 +38,7 @@
 {"utc":"2026-11-12T07:52:03Z","revision":39,"prompt":"P11","status":"completed","note":"refresh evidence hashes after the final gate, build and checks runs; no work changed","commit":"5e6c3e8d0c7352f02bd3ee32871c864844bdf657"}
 {"utc":"2026-11-12T07:52:31Z","revision":40,"prompt":"P11","status":"completed","note":"correct the sample step count to 13 and refresh evidence hashes","commit":"6411ea1102a0b766ec566d8cc0c25293a29c1403"}
 {"utc":"2026-11-12T07:52:36Z","revision":41,"prompt":"P13","status":"completed","note":"refresh evidence hashes after the step-count correction; no work changed","commit":"6411ea1102a0b766ec566d8cc0c25293a29c1403"}
+{"utc":"2026-11-12T08:23:35Z","revision":42,"prompt":"P14","status":"completed","note":null,"commit":"6decd12f11b31b76adb064935881b69cb157fa75"}
+{"utc":"2026-11-12T08:24:31Z","revision":43,"prompt":"P14","status":"completed","note":"refresh the checks evidence hash after a final r42 validate; no behavior changed","commit":"6decd12f11b31b76adb064935881b69cb157fa75"}
+{"utc":"2026-11-12T08:25:10Z","revision":44,"prompt":"P14","status":"completed","note":"refresh evidence hashes for the final gate record; no behavior changed","commit":"6decd12f11b31b76adb064935881b69cb157fa75"}
+{"utc":"2026-11-12T08:26:53Z","revision":45,"prompt":"P14","status":"completed","note":"final gate rerun after the notification signature cleanup; 349 tests, build and checks pass","commit":"6decd12f11b31b76adb064935881b69cb157fa75"}
