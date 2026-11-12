@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe",
+    "X:\\AI_projects\\Mona\\apps\\desktop",
+    "project",
+    "open",
+    "--path",
+    "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second",
+    "--profile",
+    "ds-full-access"
+  ],
+  "executable": "X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe",
+  "appPath": "X:\\AI_projects\\Mona\\apps\\desktop"
+}

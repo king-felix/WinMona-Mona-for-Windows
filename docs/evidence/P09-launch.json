@@ -1,0 +1,472 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "the startup command opens the folder Explorer selected",
+      "ok": true,
+      "detail": {
+        "status": "ready",
+        "project": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "detail": "mona p09 alpha & (beta) 'quoted' — ünïcode is open from Explorer and the runtime is ready. No task was sent."
+      }
+    },
+    {
+      "name": "the shell opens the studio for that folder",
+      "ok": true,
+      "detail": {
+        "title": "mona p09 alpha & (beta) 'quoted' — ünïcode"
+      }
+    },
+    {
+      "name": "the ready composer takes focus",
+      "ok": true,
+      "detail": {
+        "activeElement": "draft"
+      }
+    },
+    {
+      "name": "the context bar shows the route and the saved profile",
+      "ok": true,
+      "detail": {
+        "model": "deepseek-flash",
+        "permission": "Full Access · DS"
+      }
+    },
+    {
+      "name": "opening from Explorer creates no thread and no message",
+      "ok": true,
+      "detail": {
+        "thread": null,
+        "items": 0
+      }
+    },
+    {
+      "name": "the second instance exits instead of opening a second app",
+      "ok": true,
+      "detail": {
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "the second instance received the documented launcher argv intact",
+      "ok": true,
+      "detail": {
+        "argv": [
+          "X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe",
+          "X:\\AI_projects\\Mona\\apps\\desktop",
+          "project",
+          "open",
+          "--path",
+          "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second",
+          "--profile",
+          "ds-full-access"
+        ]
+      }
+    },
+    {
+      "name": "the running owner receives the second selection",
+      "ok": true,
+      "detail": {
+        "status": "opened",
+        "seq": 2,
+        "detail": "mona p09 second is open from Explorer, but the runtime is serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode. Stop it before starting this project's runtime. No task was sent."
+      }
+    },
+    {
+      "name": "the window switches to the second project",
+      "ok": true,
+      "detail": {
+        "title": "mona p09 second"
+      }
+    },
+    {
+      "name": "the composer is focused after the second launch",
+      "ok": true,
+      "detail": {
+        "activeElement": "draft"
+      }
+    },
+    {
+      "name": "still exactly one application window",
+      "ok": true,
+      "detail": {
+        "windows": 1
+      }
+    },
+    {
+      "name": "a repeat launch exits as a second instance",
+      "ok": true,
+      "detail": {
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "a repeat launch reuses the same project and adds no entry",
+      "ok": true,
+      "detail": {
+        "before": 2,
+        "after": 2,
+        "projectId": "prj_fb34cf1d1ec54e5a85e4eacf09503141"
+      }
+    },
+    {
+      "name": "the hostile folder name arrived as one inert argument",
+      "ok": true,
+      "detail": {
+        "requestedPath": "X:\\AI_PROJECTS\\QWEN3.8-27B\\CACHE\\TEMP\\MONA-P09-LAUNCH-13ROIW\\MONA P09 SECOND"
+      }
+    },
+    {
+      "name": "both fast launches exited as second instances",
+      "ok": true,
+      "detail": {
+        "firstFast": 0,
+        "secondFast": 0
+      }
+    },
+    {
+      "name": "two fast launches produce two ordered receipts",
+      "ok": true,
+      "detail": {
+        "seqs": [
+          4,
+          5
+        ],
+        "paths": [
+          "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+          "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second"
+        ]
+      }
+    },
+    {
+      "name": "the newest completed launch is the project on screen",
+      "ok": true,
+      "detail": {
+        "newest": "mona p09 second",
+        "title": "mona p09 second"
+      }
+    },
+    {
+      "name": "a missing-folder launch exits as a second instance",
+      "ok": true,
+      "detail": {
+        "exitCode": 0
+      }
+    },
+    {
+      "name": "a missing folder is reported and leaves the current project alone",
+      "ok": true,
+      "detail": {
+        "detail": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\not-a-real-folder was not found. It may have been moved, renamed, or disconnected.",
+        "title": "mona p09 second"
+      }
+    },
+    {
+      "name": "no launch recorded a paid turn",
+      "ok": true,
+      "detail": {
+        "spendA": {
+          "turnCount": 0,
+          "knownCostMicros": 0,
+          "unknownCostRecords": 0
+        },
+        "spendB": {
+          "turnCount": 0,
+          "knownCostMicros": 0,
+          "unknownCostRecords": 0
+        }
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p09\\01-launched-from-explorer-command.png",
+      "label": "launched-from-explorer-command"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p09\\02-second-launch-switched-project.png",
+      "label": "second-launch-switched-project"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p09\\03-two-fast-launches.png",
+      "label": "two-fast-launches"
+    }
+  ],
+  "fixtures": {
+    "a": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+    "b": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second"
+  },
+  "receipts": [
+    {
+      "seq": 1,
+      "at": "2026-11-12T06:40:03.111Z",
+      "source": "startup",
+      "requestedPath": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+      "openedPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+      "status": "ready",
+      "detail": "mona p09 alpha & (beta) 'quoted' — ünïcode is open from Explorer and the runtime is ready. No task was sent.",
+      "warnings": [],
+      "project": {
+        "id": "prj_53d65d861e2443f6b24955760e8a0027",
+        "label": "mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "repoKind": "none",
+        "sharedRepoKey": null,
+        "branch": null,
+        "pinned": false,
+        "archived": false,
+        "revision": 1,
+        "createdAt": "2026-11-12T06:40:02.009Z",
+        "updatedAt": "2026-11-12T06:40:02.009Z",
+        "folderExists": true,
+        "markerId": "prj_53d65d861e2443f6b24955760e8a0027",
+        "color": null,
+        "monogram": null,
+        "worktreeSiblingIds": [],
+        "binding": {
+          "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+          "endpoint": "http://127.0.0.1:56161",
+          "pid": 35284,
+          "owned": true,
+          "state": "connected",
+          "engineVersion": null,
+          "engineCommit": null,
+          "lastSeenAt": "2026-11-12T06:40:03.108Z"
+        }
+      },
+      "engine": {
+        "state": "connected",
+        "detail": "Owned runtime rt_2317ff4fe388e68299fa7a78 on http://127.0.0.1:56161",
+        "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "pid": 35284,
+        "endpoint": "http://127.0.0.1:56161",
+        "compatibility": "qualified"
+      },
+      "profile": {
+        "label": "Full Access",
+        "profile": "DS",
+        "posture": "full_access"
+      },
+      "focusComposer": true
+    },
+    {
+      "seq": 2,
+      "at": "2026-11-12T06:40:04.538Z",
+      "source": "second-instance",
+      "requestedPath": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second",
+      "openedPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+      "status": "opened",
+      "detail": "mona p09 second is open from Explorer, but the runtime is serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode. Stop it before starting this project's runtime. No task was sent.",
+      "warnings": [],
+      "project": {
+        "id": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "label": "mona p09 second",
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+        "repoKind": "none",
+        "sharedRepoKey": null,
+        "branch": null,
+        "pinned": false,
+        "archived": false,
+        "revision": 1,
+        "createdAt": "2026-11-12T06:40:04.516Z",
+        "updatedAt": "2026-11-12T06:40:04.516Z",
+        "folderExists": true,
+        "markerId": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "color": null,
+        "monogram": null,
+        "worktreeSiblingIds": [],
+        "binding": null
+      },
+      "engine": {
+        "state": "connected",
+        "detail": "Owned runtime rt_2317ff4fe388e68299fa7a78 on http://127.0.0.1:56161",
+        "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "pid": 35284,
+        "endpoint": "http://127.0.0.1:56161",
+        "compatibility": "qualified"
+      },
+      "profile": {
+        "label": "Full Access",
+        "profile": "DS",
+        "posture": "full_access"
+      },
+      "focusComposer": true
+    },
+    {
+      "seq": 3,
+      "at": "2026-11-12T06:40:05.717Z",
+      "source": "second-instance",
+      "requestedPath": "X:\\AI_PROJECTS\\QWEN3.8-27B\\CACHE\\TEMP\\MONA-P09-LAUNCH-13ROIW\\MONA P09 SECOND",
+      "openedPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+      "status": "opened",
+      "detail": "mona p09 second is open from Explorer, but the runtime is serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode. Stop it before starting this project's runtime. No task was sent.",
+      "warnings": [],
+      "project": {
+        "id": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "label": "mona p09 second",
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+        "repoKind": "none",
+        "sharedRepoKey": null,
+        "branch": null,
+        "pinned": false,
+        "archived": false,
+        "revision": 1,
+        "createdAt": "2026-11-12T06:40:04.516Z",
+        "updatedAt": "2026-11-12T06:40:04.516Z",
+        "folderExists": true,
+        "markerId": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "color": null,
+        "monogram": null,
+        "worktreeSiblingIds": [],
+        "binding": null
+      },
+      "engine": {
+        "state": "connected",
+        "detail": "Owned runtime rt_2317ff4fe388e68299fa7a78 on http://127.0.0.1:56161",
+        "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "pid": 35284,
+        "endpoint": "http://127.0.0.1:56161",
+        "compatibility": "qualified"
+      },
+      "profile": {
+        "label": "Full Access",
+        "profile": "DS",
+        "posture": "full_access"
+      },
+      "focusComposer": true
+    },
+    {
+      "seq": 4,
+      "at": "2026-11-12T06:40:05.925Z",
+      "source": "second-instance",
+      "requestedPath": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+      "openedPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+      "status": "ready",
+      "detail": "mona p09 alpha & (beta) 'quoted' — ünïcode is open from Explorer and the runtime is serving it. No task was sent.",
+      "warnings": [],
+      "project": {
+        "id": "prj_53d65d861e2443f6b24955760e8a0027",
+        "label": "mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "repoKind": "none",
+        "sharedRepoKey": null,
+        "branch": null,
+        "pinned": false,
+        "archived": false,
+        "revision": 1,
+        "createdAt": "2026-11-12T06:40:02.009Z",
+        "updatedAt": "2026-11-12T06:40:02.009Z",
+        "folderExists": true,
+        "markerId": "prj_53d65d861e2443f6b24955760e8a0027",
+        "color": null,
+        "monogram": null,
+        "worktreeSiblingIds": [],
+        "binding": {
+          "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+          "endpoint": "http://127.0.0.1:56161",
+          "pid": 35284,
+          "owned": true,
+          "state": "connected",
+          "engineVersion": null,
+          "engineCommit": null,
+          "lastSeenAt": "2026-11-12T06:40:03.108Z"
+        }
+      },
+      "engine": {
+        "state": "connected",
+        "detail": "Owned runtime rt_2317ff4fe388e68299fa7a78 on http://127.0.0.1:56161",
+        "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "pid": 35284,
+        "endpoint": "http://127.0.0.1:56161",
+        "compatibility": "qualified"
+      },
+      "profile": {
+        "label": "Full Access",
+        "profile": "DS",
+        "posture": "full_access"
+      },
+      "focusComposer": true
+    },
+    {
+      "seq": 5,
+      "at": "2026-11-12T06:40:05.932Z",
+      "source": "second-instance",
+      "requestedPath": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second",
+      "openedPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+      "status": "opened",
+      "detail": "mona p09 second is open from Explorer, but the runtime is serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode. Stop it before starting this project's runtime. No task was sent.",
+      "warnings": [],
+      "project": {
+        "id": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "label": "mona p09 second",
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second",
+        "repoKind": "none",
+        "sharedRepoKey": null,
+        "branch": null,
+        "pinned": false,
+        "archived": false,
+        "revision": 1,
+        "createdAt": "2026-11-12T06:40:04.516Z",
+        "updatedAt": "2026-11-12T06:40:04.516Z",
+        "folderExists": true,
+        "markerId": "prj_fb34cf1d1ec54e5a85e4eacf09503141",
+        "color": null,
+        "monogram": null,
+        "worktreeSiblingIds": [],
+        "binding": null
+      },
+      "engine": {
+        "state": "connected",
+        "detail": "Owned runtime rt_2317ff4fe388e68299fa7a78 on http://127.0.0.1:56161",
+        "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode",
+        "pid": 35284,
+        "endpoint": "http://127.0.0.1:56161",
+        "compatibility": "qualified"
+      },
+      "profile": {
+        "label": "Full Access",
+        "profile": "DS",
+        "posture": "full_access"
+      },
+      "focusComposer": true
+    },
+    {
+      "seq": 6,
+      "at": "2026-11-12T06:40:07.123Z",
+      "source": "second-instance",
+      "requestedPath": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\not-a-real-folder",
+      "openedPath": null,
+      "status": "rejected",
+      "detail": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\not-a-real-folder was not found. It may have been moved, renamed, or disconnected.",
+      "warnings": [],
+      "project": null,
+      "engine": null,
+      "profile": null,
+      "focusComposer": false
+    }
+  ],
+  "windows": 1,
+  "noTaskEvidence": {
+    "studioThread": null,
+    "timelineItems": 0,
+    "spendA": {
+      "turnCount": 0,
+      "knownCostMicros": 0,
+      "unknownCostRecords": 0
+    },
+    "spendB": {
+      "turnCount": 0,
+      "knownCostMicros": 0,
+      "unknownCostRecords": 0
+    }
+  },
+  "engine": {
+    "state": "stopped",
+    "workspace": null
+  },
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "capturedAt": "2026-11-12T06:40:11.229Z"
+}

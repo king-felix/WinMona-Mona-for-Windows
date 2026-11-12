@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 29,
+  "revision": 32,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P09",
+  "current_prompt": "P10",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -613,13 +613,76 @@
       "blocker_ids": []
     },
     "P09": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-004"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "launcher CLI contract parser, argv normalization and validated single-instance additionalData hand-off",
+        "serialized launch dispatch: open or reuse once, select the saved DS Full Access profile, cross-checked studio view, start the owned runtime, never submit a task; broad roots ask for selection; honest rejections",
+        "per-user classic folder and folder-background registration under the exact label Start new DS project with Mona; idempotent register, Mona-only uninstall, reg export read-back",
+        "renderer applies launch receipts, switches to the studio and focuses the ready composer; 27 named preload methods",
+        "live native probe: startup argv, five real second instances, two fast launches, missing path, 3 screenshots; 258 vitest, 12 launch, 13 bootstrap, 8 spike"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P09-launch.json",
+          "sha256": "80d95d5078b206ba7755a463a00c79966a41e356d547894cee633fec776d2d01",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-launch-registration.json",
+          "sha256": "073708eb122c98f3a808fc3c738535779f0d003b16ea1cbc108ab16e6f45201e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-launch.md",
+          "sha256": "823d10e8ed1da82a3169bf956c7f25632e8d3d0781bf7176e57df142b405c66f",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-tests.txt",
+          "sha256": "6b023b94d637a2f03d5e9f62c0be34f2a99d3d159851e78e099d9044949f1e55",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-checks.txt",
+          "sha256": "ba9f3fd17151ee0151493b8d0cd74e18dbbe242abfaa2e91dd289c28da791f80",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-build.txt",
+          "sha256": "8f82f1acec9dc6d396820578164d9cb216039773fdc725d36d5823fae2d62e4d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-shell-smoke.json",
+          "sha256": "2316ea0c53058f36321e23ad8d6e9c8221086afc73baae0e65ef8b0d0b8b0d48",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        },
+        {
+          "path": "docs/evidence/P09-catalog-regression.json",
+          "sha256": "21ccf10a7837995d98439c6b14d81ce265948b9478b696378d67091d74452857",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:46:48Z",
+          "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5"
+        }
+      ],
       "blocker_ids": []
     },
     "P10": {
@@ -810,10 +873,9 @@
     }
   },
   "next_eligible_prompts": [
-    "P09",
     "P10",
     "P12",
     "P13"
   ],
-  "last_checkpoint_utc": "2026-11-12T06:15:17Z"
+  "last_checkpoint_utc": "2026-11-12T06:46:48Z"
 }

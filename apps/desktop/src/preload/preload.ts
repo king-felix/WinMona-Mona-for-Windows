@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 
 /**
@@ -49,6 +50,15 @@ const bridge = Object.freeze({
     ipcRenderer.on(STUDIO_CHANNELS.event, listener);
     return () => {
       ipcRenderer.removeListener(STUDIO_CHANNELS.event, listener);
+    };
+  },
+  /** The latest Explorer launch, and pushes for new ones. Returns no path to execute. */
+  getLaunchState: () => ipcRenderer.invoke(LAUNCH_CHANNELS.state, {}),
+  onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {
+    const listener = (_event: unknown, payload: LaunchReceipt): void => handler(payload);
+    ipcRenderer.on(LAUNCH_CHANNELS.event, listener);
+    return () => {
+      ipcRenderer.removeListener(LAUNCH_CHANNELS.event, listener);
     };
   },
 });

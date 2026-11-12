@@ -1,4 +1,5 @@
 export * from './adapter.js';
+export * from './cli.js';
 export * from './compatibility.js';
 export * from './errors.js';
 export * from './http.js';

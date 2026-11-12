@@ -16,6 +16,7 @@ _None._
 | Native build toolchain | P05+ if a native binary is needed | no MSVC Build Tools; Electron and esbuild prebuilts supply everything used so far | a verified prebuilt for the specific native module, or installing VS Build Tools |
 | Code-signing certificate | P21/P23 release packaging | not present, not requested | Victor's explicit decision at release time; unsigned test packages are labeled until then |
 | Windows 11 modern context-menu qualification | P21 | untested | a clean per-user install and Explorer test on this machine |
+| Human click on the classic menu | P21/P22 acceptance | registered live at P09 and exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
 
 ## Resolved
 

@@ -1,0 +1,27 @@
+
+PASS the startup command opens the folder Explorer selected :: {"status":"ready","project":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode","detail":"mona p09 alpha & (beta) 'quoted' — ünïcode is open from Explorer and the runtime is ready. No task was sent."}
+PASS the shell opens the studio for that folder :: {"title":"mona p09 alpha & (beta) 'quoted' — ünïcode"}
+PASS the ready composer takes focus :: {"activeElement":"draft"}
+PASS the context bar shows the route and the saved profile :: {"model":"deepseek-flash","permission":"Full Access · DS"}
+PASS opening from Explorer creates no thread and no message :: {"thread":null,"items":0}
+PASS the second instance exits instead of opening a second app :: {"exitCode":0}
+PASS the second instance received the documented launcher argv intact :: {"argv":["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","X:\\AI_projects\\Mona\\apps\\desktop","project","open","--path","X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\mona p09 second","--profile","ds-full-access"]}
+PASS the running owner receives the second selection :: {"status":"opened","seq":2,"detail":"mona p09 second is open from Explorer, but the runtime is serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode. Stop it before starting this project's runtime. No task was sent."}
+PASS the window switches to the second project :: {"title":"mona p09 second"}
+PASS the composer is focused after the second launch :: {"activeElement":"draft"}
+PASS still exactly one application window :: {"windows":1}
+PASS a repeat launch exits as a second instance :: {"exitCode":0}
+PASS a repeat launch reuses the same project and adds no entry :: {"before":2,"after":2,"projectId":"prj_fb34cf1d1ec54e5a85e4eacf09503141"}
+PASS the hostile folder name arrived as one inert argument :: {"requestedPath":"X:\\AI_PROJECTS\\QWEN3.8-27B\\CACHE\\TEMP\\MONA-P09-LAUNCH-13ROIW\\MONA P09 SECOND"}
+PASS both fast launches exited as second instances :: {"firstFast":0,"secondFast":0}
+PASS two fast launches produce two ordered receipts :: {"seqs":[4,5],"paths":["x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 alpha & (beta) 'quoted' — ünïcode","x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p09-launch-13roiw\\mona p09 second"]}
+PASS the newest completed launch is the project on screen :: {"newest":"mona p09 second","title":"mona p09 second"}
+PASS a missing-folder launch exits as a second instance :: {"exitCode":0}
+PASS a missing folder is reported and leaves the current project alone :: {"detail":"X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p09-launch-13rOiW\\not-a-real-folder was not found. It may have been moved, renamed, or disconnected.","title":"mona p09 second"}
+PASS no launch recorded a paid turn :: {"spendA":{"turnCount":0,"knownCostMicros":0,"unknownCostRecords":0},"spendB":{"turnCount":0,"knownCostMicros":0,"unknownCostRecords":0}}
+mona: applied 2 state migration(s) to version 2
+mona: second-instance bridged=true argv=["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","--path","--profile","--allow-file-access-from-files","--disable-gpu","X:\\AI_projects\\Mona\\apps\\desktop","project","open"]
+mona: second-instance bridged=true argv=["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","--path","--profile","--allow-file-access-from-files","--disable-gpu","X:\\AI_projects\\Mona\\apps\\desktop","project","open"]
+mona: second-instance bridged=true argv=["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","--path","--profile","--allow-file-access-from-files","--disable-gpu","X:\\AI_projects\\Mona\\apps\\desktop","project","open"]
+mona: second-instance bridged=true argv=["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","--path","--profile","--allow-file-access-from-files","--disable-gpu","X:\\AI_projects\\Mona\\apps\\desktop","project","open"]
+mona: second-instance bridged=true argv=["X:\\AI_projects\\Mona\\node_modules\\electron\\dist\\electron.exe","--path","--profile","--allow-file-access-from-files","--disable-gpu","X:\\AI_projects\\Mona\\apps\\desktop","project","open"]

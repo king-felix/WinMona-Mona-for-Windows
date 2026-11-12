@@ -3,7 +3,7 @@
  * be tested. Each signal has one deliberate consequence; no signal silently
  * becomes "quit" or "restart the task".
  */
-import path from 'node:path';
+import { parseLaunchCommand } from './cli.js';
 
 export type LifecycleSignal =
   | 'renderer-process-gone'
@@ -90,16 +90,12 @@ export function decideLifecycle(signal: LifecycleSignal, context: LifecycleConte
   }
 }
 
-/** Parse a launcher invocation into absolute folder paths, ignoring Electron switches. */
+/**
+ * Parse a launcher invocation into absolute folder paths, ignoring Electron
+ * switches. Kept as the path-only view of the documented launcher contract in
+ * `cli.ts`; new code should use `parseLaunchCommand` for the full command.
+ */
 export function parseLaunchArgs(argv: string[], cwd: string, platform: NodeJS.Platform = process.platform): string[] {
-  const paths: string[] = [];
-  for (const arg of argv.slice(1)) {
-    if (!arg || arg.startsWith('-') || arg.startsWith('--')) continue;
-    if (arg === '.' || arg === '..' || arg.includes('/') || arg.includes('\\') || /^[A-Za-z]:/.test(arg)) {
-      const resolved = path.resolve(cwd, arg);
-      const normalized = platform === 'win32' ? resolved.toLowerCase() : resolved;
-      if (!paths.includes(normalized)) paths.push(normalized);
-    }
-  }
-  return paths;
+  const command = parseLaunchCommand(argv.slice(1), cwd, platform);
+  return command.kind === 'launch' ? command.paths : [];
 }

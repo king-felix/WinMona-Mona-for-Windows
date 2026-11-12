@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 173,
+  "revision": 189,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -630,41 +630,134 @@
         "P21",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "folder-launch",
           "description": "Explorer folder command opens or registers the project once",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P09-launch.json",
+              "sha256": "80d95d5078b206ba7755a463a00c79966a41e356d547894cee633fec776d2d01",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:43:57Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Real startup argv opened the hostile-name folder; runtime ready; composer focused; no task sent"
+            },
+            {
+              "path": "docs/evidence/P09-launch.md",
+              "sha256": "823d10e8ed1da82a3169bf956c7f25632e8d3d0781bf7176e57df142b405c66f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:45:40Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "P09 report: delivered behavior, live receipts and limits (corrected wording)"
+            }
+          ]
         },
         {
           "id": "background-launch",
           "description": "Folder-background command behaves equivalently",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P09-launch-registration.json",
+              "sha256": "073708eb122c98f3a808fc3c738535779f0d003b16ea1cbc108ab16e6f45201e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:44:02Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Folder and folder-background register the same quoted %V command; second-instance launch switched the window"
+            },
+            {
+              "path": "docs/evidence/P09-launch.json",
+              "sha256": "80d95d5078b206ba7755a463a00c79966a41e356d547894cee633fec776d2d01",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:44:02Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Real second-instance launch from the background-compatible command opened the second folder"
+            }
+          ]
         },
         {
           "id": "single-instance",
           "description": "Second launch dispatches the path to the running owner without duplication",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P09-launch.json",
+              "sha256": "80d95d5078b206ba7755a463a00c79966a41e356d547894cee633fec776d2d01",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:44:03Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Five real second instances exited and the owner applied each parsed command; two fast launches produced ordered receipts"
+            },
+            {
+              "path": "docs/evidence/P09-tests.txt",
+              "sha256": "6b023b94d637a2f03d5e9f62c0be34f2a99d3d159851e78e099d9044949f1e55",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:46:41Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Silent launch suite: parser, target, dispatcher and renderer launch tests (UTF-8 evidence, line endings normalized)"
+            }
+          ]
         },
         {
           "id": "safe-paths",
           "description": "Spaces, Unicode, quoting, duplicates, missing/inaccessible paths and drive roots are handled",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P09-launch.json",
+              "sha256": "80d95d5078b206ba7755a463a00c79966a41e356d547894cee633fec776d2d01",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:44:03Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Live hostile-name folder arrived as one argument; missing folder rejected without changing the project"
+            },
+            {
+              "path": "docs/evidence/P09-tests.txt",
+              "sha256": "6b023b94d637a2f03d5e9f62c0be34f2a99d3d159851e78e099d9044949f1e55",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:46:44Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Unit matrix: spaces, apostrophes, ampersands, parentheses, Unicode, trailing separators, duplicates, missing, inaccessible, roots, UNC/WSL, junction"
+            }
+          ]
         },
         {
           "id": "idempotent-registration",
           "description": "Repeated launches never duplicate a project entry",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P09-launch-registration.json",
+              "sha256": "073708eb122c98f3a808fc3c738535779f0d003b16ea1cbc108ab16e6f45201e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:44:03Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Register twice (second changed=false), exact read-back, uninstall removed only Mona keys with a foreign key intact"
+            },
+            {
+              "path": "docs/evidence/P09-launch.md",
+              "sha256": "823d10e8ed1da82a3169bf956c7f25632e8d3d0781bf7176e57df142b405c66f",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:45:43Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Classic milestone complete; modern Windows 11 menu and packaged re-verification remain P21/P23"
+            },
+            {
+              "path": "docs/evidence/P09-tests.txt",
+              "sha256": "6b023b94d637a2f03d5e9f62c0be34f2a99d3d159851e78e099d9044949f1e55",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:46:45Z",
+              "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+              "note": "Registration helper tests: exact label, argument arrays, uninstall isolation, repeat plan; requirement stays partial for P21/P23"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {

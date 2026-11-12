@@ -72,6 +72,8 @@ const expectedChannels = [
   'mona:engine-start',
   'mona:engine-state',
   'mona:engine-stop',
+  'mona:launch-event',
+  'mona:launch-state',
   'mona:project-spend',
   'mona:studio-event',
   'mona:studio-get',

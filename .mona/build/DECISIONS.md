@@ -631,3 +631,65 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   running engine actually applied.
 - **Constrains:** existing saved values are not overwritten; a different observed
   posture is displayed as observed, never rewritten to match the saved intent.
+
+## D-0050 — A launch is one serialized receipt owned by the main process
+
+- **Decision:** every shell selection becomes an intent in one FIFO queue. The
+  main process resolves the path, opens or reuses the project, records the
+  studio view, starts the owned runtime and emits one receipt. The renderer only
+  mirrors the receipt, refreshes the catalog, selects the project and focuses the
+  composer.
+- **Why:** a second instance, a broad root and a busy runtime are main-process
+  facts. Letting the renderer re-open paths would race the queue, duplicate
+  selections and lose the reason a launch did not become ready.
+- **Constrains:** identical pending launches coalesce; later launches wait for
+  earlier ones; a receipt is the only thing the renderer acts on; starting a
+  runtime is still not a task and no submission is made.
+
+## D-0051 — The parsed launcher command crosses the single-instance boundary as data
+
+- **Decision:** each instance parses its own argv before requesting the lock and
+  passes `{ monaLaunch }` as `additionalData`. The owner validates it with
+  `coerceLaunchCommand` and uses it in preference to the `second-instance` argv.
+- **Why:** live Windows evidence showed Chromium re-serializes the forwarded
+  command line and detaches `--path` from its value. Parsing that argv cannot
+  recover the selection; ignoring the problem would have shipped a broken
+  right-click that a simulated `second-instance` event would never reveal.
+- **Constrains:** the forwarded data is untrusted input and is schema-checked;
+  the argv parser stays as the fallback; the documented CLI contract is unchanged.
+
+## D-0052 — Broad roots ask for a project folder; UNC/WSL opens with a caveat
+
+- **Decision:** drive roots, share roots and WSL distribution roots are routed to
+  the existing folder picker and never registered. A folder below a UNC or WSL
+  root opens normally and records that the pinned runtime is not qualified there.
+- **Why:** spec 14 forbids whole-drive indexing, and pretending a network or WSL
+  workspace is a qualified runtime environment would be false.
+- **Constrains:** no recursive enumeration anywhere; no copying or indexing of
+  remote content; the caveat is displayed with the launch receipt.
+
+## D-0053 — The classic context menu is a milestone with named keys and an exact label
+
+- **Decision:** register `Directory\shell\Mona.StartNewProject` and
+  `Directory\Background\shell\Mona.StartNewProject` per user with the label
+  **Start new DS project with Mona**, an owned marker, `NeverDefault`, single
+  selection, and a quoted `"%V"` command. Uninstall deletes only those keys.
+- **Why:** P09 must deliver a working Explorer entry without pretending the
+  modern Windows 11 menu exists. A named, marked pair of keys makes ownership
+  provable and removal safe.
+- **Constrains:** no writes outside those keys; no path interpolation into a
+  command string; Windows 11 may show the entry under "Show more options"; P21
+  replaces the development executable path with the packaged one and delivers
+  `IExplorerCommand`.
+
+## D-0054 — A launch starts a runtime but never a task
+
+- **Decision:** launching opens/selects/records and, when possible, starts the
+  owned runtime. It never creates a thread, submits a prompt, creates a queue
+  item or records usage. If another workspace owns the runtime, the project opens
+  with an explicit caveat and the runtime is left alone.
+- **Why:** "start the headless runtime" is not "invent a task for the user", and
+  silently stopping someone else's runtime would be worse than a truthful
+  refusal.
+- **Constrains:** zero provider requests from a launch; the composer is focused
+  and blocked with the existing reason when the runtime serves elsewhere.

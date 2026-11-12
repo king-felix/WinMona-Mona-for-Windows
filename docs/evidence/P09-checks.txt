@@ -1,0 +1,49 @@
+== npm run lint ==
+
+> mona@0.0.0 lint
+> eslint .
+
+
+== npm run format:check ==
+
+> mona@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+== npm run typecheck ==
+
+> mona@0.0.0 typecheck
+> npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/project-state && npm run typecheck -w @mona/ui && npm run typecheck -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/project-state@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/ui@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/desktop@0.1.0 typecheck
+> tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.preload.json && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit
+
+
+== npm run check:build -w @mona/desktop ==
+
+> @mona/desktop@0.1.0 check:build
+> node scripts/check-build.mjs
+
+build checks passed: 4 renderer files, CSP replaced, no fixtures, no credentials, 27 named preload channels
+
+== node tools/build/cli.mjs validate ==
+OK: state revision 29; 24 tasks; 30 requirements; 0 warning(s)

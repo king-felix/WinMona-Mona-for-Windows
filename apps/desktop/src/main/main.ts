@@ -2,19 +2,23 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } from 'elect
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseLaunchArgs } from '@mona/adapter';
+import { coerceLaunchCommand, parseLaunchCommand, stripLauncherArgs, type LaunchCommand } from '@mona/adapter';
 import { CatalogService } from './catalog-service.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { createAppInfo, registerIpc } from './ipc.js';
 import { EngineHost } from './engine-host.js';
+import { LaunchDispatcher, type LaunchIntent } from './launch-dispatch.js';
+import { registerLaunchIpc } from './launch-ipc.js';
 import { StudioService } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
+import { LAUNCH_CHANNELS, type LaunchReceipt, type LaunchSource } from '../shared/launch.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
 import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
 import { runCatalogProbe } from './catalog-probe.js';
 import { runStudioProbe } from './studio-probe.js';
+import { runLaunchProbe } from './launch-probe.js';
 import { runShots } from './shots.js';
 import { UiStateStore } from './ui-state.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
@@ -43,9 +47,15 @@ const studioShots = process.env.MONA_STUDIO_SHOTS ?? path.join(process.cwd(), 'm
 const studioTask =
   process.env.MONA_STUDIO_TASK ??
   'Create a file named hello.txt in this project containing exactly MONA_STUDIO_OK with no extra text. Then run `node check.mjs` and report the result. Do not change any other file.';
+// The launch probe uses the real launcher command line, so its mode flag lives
+// in the environment rather than in argv (argv is the thing under test).
+const launchTest = process.env.MONA_LAUNCH_TEST === '1';
+const launchOut = process.env.MONA_LAUNCH_OUT ?? path.join(process.cwd(), 'mona-launch.json');
+const launchShots = process.env.MONA_LAUNCH_SHOTS ?? path.join(process.cwd(), 'mona-launch-shots');
+const launchFixturesFile = process.env.MONA_LAUNCH_FIXTURES ?? null;
 // Screenshot capture needs deterministic compositing on a headless or remote
 // desktop; the P08 probe captures five live frames.
-if (shotsTest || studioTest) app.disableHardwareAcceleration();
+if (shotsTest || studioTest || launchTest) app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
 const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
@@ -121,7 +131,53 @@ function readSavedProfile(values: unknown): SavedProfile | null {
   };
 }
 
-const pendingLaunchPaths: string[] = [];
+const earlyLaunchIntents: LaunchIntent[] = [];
+let launchDispatcher: LaunchDispatcher | null = null;
+let latestLaunch: LaunchReceipt | null = null;
+let launchCount = 0;
+
+/** One push per receipt for every live window; the snapshot covers an early event. */
+function broadcastLaunch(receipt: LaunchReceipt): void {
+  latestLaunch = receipt;
+  launchCount += 1;
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.isDestroyed()) window.webContents.send(LAUNCH_CHANNELS.event, receipt);
+  }
+}
+
+function launchIntentFrom(command: LaunchCommand, source: LaunchSource): LaunchIntent | null {
+  if (command.kind === 'app') return null;
+  if (command.kind === 'invalid') {
+    return { source, paths: [], profile: null, problem: { code: command.problem, detail: command.detail } };
+  }
+  return { source, paths: command.paths, profile: command.profile, problem: null };
+}
+
+/**
+ * Explorer may deliver a selection before the app is ready. Early intents wait
+ * here and are drained, in order, once the catalog exists; nothing is dropped
+ * and nothing is executed by the shell.
+ */
+function submitLaunch(intent: LaunchIntent | null): void {
+  if (!intent) return;
+  if (launchDispatcher) {
+    void launchDispatcher.enqueue(intent);
+    return;
+  }
+  earlyLaunchIntents.push(intent);
+}
+
+const startupCommand = parseLaunchCommand(
+  stripLauncherArgs(process.argv, { isPackaged: app.isPackaged, appPath: app.getAppPath() }),
+  process.cwd(),
+);
+submitLaunch(launchIntentFrom(startupCommand, 'startup'));
+
+// Windows re-serializes a second instance's command line through Chromium and
+// loses `--path` values. The second instance therefore parses its own argv and
+// sends the result as structured data through the single-instance lock.
+const singleInstanceData = { monaLaunch: startupCommand };
+
 let quitRequested = false;
 
 function delay(ms: number): Promise<void> {
@@ -130,13 +186,38 @@ function delay(ms: number): Promise<void> {
 
 let mainWindow: BrowserWindow | null = null;
 
-if (!app.requestSingleInstanceLock()) {
+if (!app.requestSingleInstanceLock(singleInstanceData)) {
   // The existing owner receives this argv through its own second-instance event.
+  if (process.env.MONA_LAUNCH_CHILD_OUT) {
+    try {
+      fs.writeFileSync(
+        process.env.MONA_LAUNCH_CHILD_OUT,
+        JSON.stringify({ argv: process.argv, executable: process.execPath, appPath: app.getAppPath() }, null, 2),
+        'utf8',
+      );
+    } catch {
+      /* diagnostics are best effort */
+    }
+  }
   app.quit();
 } else {
-  app.on('second-instance', (_event, argv) => {
-    const paths = parseLaunchArgs(['mona', ...argv.slice(1)], process.cwd());
-    pendingLaunchPaths.push(...paths);
+  app.on('second-instance', (_event, argv, _workingDirectory, additionalData) => {
+    const bridged =
+      typeof additionalData === 'object' && additionalData !== null
+        ? coerceLaunchCommand((additionalData as Record<string, unknown>).monaLaunch)
+        : null;
+    const command =
+      bridged ??
+      parseLaunchCommand(
+        stripLauncherArgs(argv, { isPackaged: app.isPackaged, appPath: app.getAppPath() }),
+        process.cwd(),
+      );
+    if (process.env.MONA_LAUNCH_TEST === '1') {
+      process.stderr.write(
+        `mona: second-instance bridged=${bridged !== null} argv=${JSON.stringify(argv.slice(0, 8))}\n`,
+      );
+    }
+    submitLaunch(launchIntentFrom(command, 'second-instance'));
     engineHost.handleSignal('second-instance');
     if (!mainWindow) {
       mainWindow = createMainWindow();
@@ -277,6 +358,24 @@ if (!app.requestSingleInstanceLock()) {
       });
     }
 
+    // Launches share one serialized queue: the path is resolved and validated,
+    // the project is opened or reused, the studio view is recorded, and the
+    // owned runtime is started. No prompt is submitted on the user's behalf.
+    const launchCatalog = catalogService;
+    if (launchCatalog) {
+      launchDispatcher = new LaunchDispatcher({
+        service: launchCatalog,
+        ui: launchCatalog,
+        engine: enginePort,
+        profile: () => savedProfile,
+        pickFolder: async () => {
+          const picked = await launchCatalog.pickFolder('open');
+          return picked.ok ? picked.data.path : null;
+        },
+        emit: broadcastLaunch,
+      });
+    }
+
     registerIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -323,6 +422,11 @@ if (!app.requestSingleInstanceLock()) {
       isTrustedSender: trustedSender,
       service: () => studioService,
     });
+    registerLaunchIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      state: () => ({ latest: latestLaunch, count: launchCount }),
+    });
 
     const reconciled = await engineHost.reconcile();
     if (reconciled.unverifiable > 0) {
@@ -332,6 +436,74 @@ if (!app.requestSingleInstanceLock()) {
     }
 
     mainWindow = createMainWindow();
+
+    // Drain shell selections in arrival order. A launch that arrived before the
+    // catalog existed is still handled; a missing catalog is reported, never
+    // silently accepted.
+    for (const intent of earlyLaunchIntents.splice(0, earlyLaunchIntents.length)) {
+      if (launchDispatcher) {
+        void launchDispatcher.enqueue(intent);
+        continue;
+      }
+      broadcastLaunch({
+        seq: launchCount + 1,
+        at: new Date().toISOString(),
+        source: intent.source,
+        requestedPath: intent.paths[0] ?? null,
+        openedPath: null,
+        status: 'failed',
+        detail:
+          'Local project state is unavailable, so Mona cannot open a project from Explorer. See Settings → Diagnostics.',
+        warnings: [],
+        project: null,
+        engine: null,
+        profile: null,
+        focusComposer: false,
+      });
+    }
+
+    if (launchTest && launchFixturesFile && launchDispatcher) {
+      const probeWindow = mainWindow;
+      const probeDispatcher = launchDispatcher;
+      let fixtures: { a: string; b: string };
+      try {
+        fixtures = JSON.parse(fs.readFileSync(launchFixturesFile, 'utf8')) as { a: string; b: string };
+      } catch (error) {
+        fs.writeFileSync(
+          launchOut,
+          JSON.stringify({ ok: false, error: `launch fixtures unavailable: ${String(error)}` }, null, 2),
+          'utf8',
+        );
+        app.exit(1);
+        return;
+      }
+      runLaunchProbe({
+        window: probeWindow,
+        dispatcher: probeDispatcher,
+        fixtures,
+        shotsDirectory: launchShots,
+        outputPath: launchOut,
+        electronPath: process.execPath,
+        appPath: app.getAppPath(),
+        stopEngine: async () => {
+          await engineHost.stopOwned('launch_probe');
+        },
+        engineSummary: () => {
+          const summary = engineHost.summary();
+          return { state: summary.state, workspace: summary.workspace };
+        },
+      })
+        .then((result) => {
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(launchOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+      return;
+    }
+
     if (smokeTest) {
       runSmoke(mainWindow, smokeOut).catch((error: unknown) => {
         fs.writeFileSync(smokeOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');

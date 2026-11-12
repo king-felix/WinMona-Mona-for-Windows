@@ -83,6 +83,8 @@ export type StudioPanelProps = {
   sessionId: string | null;
   ui: UiStateView | null;
   busy: string | null;
+  /** Increments when a launch lands; the ready composer takes focus. */
+  focusToken?: number;
   onDraft: (text: string) => void;
   onOpenFolder: () => void;
   onStart: () => void;
@@ -128,6 +130,12 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     },
     [],
   );
+
+  // A launch from Explorer leaves the caret in the composer: the project is
+  // ready for a task, and no task has been invented for the user.
+  useEffect(() => {
+    if ((props.focusToken ?? 0) > 0) composerRef.current?.focus();
+  }, [props.focusToken]);
 
   const applyItem = useCallback((items: TimelineItem[], next: TimelineItem): TimelineItem[] => {
     const index = items.findIndex((item) => item.id === next.id);

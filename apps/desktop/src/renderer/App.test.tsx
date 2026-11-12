@@ -11,6 +11,7 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { LaunchReceipt } from '../shared/launch.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
 import { App } from './App.js';
 
@@ -91,6 +92,8 @@ type Store = {
   studio?: StudioView;
   studioHandlers?: Array<(event: StudioEvent) => void>;
   submitted?: Array<{ text: string; mode: string; references: string[] }>;
+  launchHandlers?: Array<(receipt: LaunchReceipt) => void>;
+  launch?: LaunchReceipt | null;
 };
 
 function emptyStudio(): StudioView {
@@ -114,6 +117,30 @@ function emptyStudio(): StudioView {
 
 function ok<T>(data: T): IpcResult<T> {
   return { ok: true, data };
+}
+
+function launchFor(target: CatalogProject, seq: number): LaunchReceipt {
+  return {
+    seq,
+    at: '2026-11-12T00:00:00.000Z',
+    source: 'second-instance',
+    requestedPath: target.canonicalPath,
+    openedPath: target.canonicalPath,
+    status: 'ready',
+    detail: `${target.label} is open from Explorer and the runtime is ready. No task was sent.`,
+    warnings: [],
+    project: target,
+    engine: engine({
+      state: 'connected',
+      detail: 'Owned runtime started.',
+      workspace: target.canonicalPath,
+      pid: 99,
+      endpoint: 'http://127.0.0.1:7801',
+      compatibility: 'qualified',
+    }),
+    profile: { label: 'Full Access', profile: 'DS', posture: 'full_access' },
+    focusComposer: true,
+  };
 }
 
 function bridgeFor(store: Store): Window['mona'] {
@@ -286,6 +313,15 @@ function bridgeFor(store: Store): Window['mona'] {
       return () => {
         const index = handlers.indexOf(handler);
         if (index >= 0) handlers.splice(index, 1);
+      };
+    },
+    getLaunchState: async () => ok({ latest: store.launch ?? null, count: store.launch?.seq ?? 0 }),
+    onLaunchEvent: (handler: (receipt: LaunchReceipt) => void) => {
+      const list = (store.launchHandlers ??= []);
+      list.push(handler);
+      return () => {
+        const index = list.indexOf(handler);
+        if (index >= 0) list.splice(index, 1);
       };
     },
   } as unknown as Window['mona'];
@@ -609,6 +645,51 @@ describe('Mona shell', () => {
     const rendered = document.querySelectorAll('[data-testid="timeline-assistant"]');
     expect(rendered).toHaveLength(1);
     expect(rendered[0]?.textContent).toContain('MONA_OK');
+    await act(async () => root.unmount());
+  });
+
+  it('opens the studio and focuses the composer for an Explorer launch', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const beta = project('prj_beta', 'beta');
+    const store: Store = {
+      projects: [alpha, beta],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      launch: launchFor(beta, 1),
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 80));
+    });
+    expect(document.querySelector('[data-testid="studio-title"]')?.textContent).toBe('beta');
+    expect(document.activeElement?.id).toBe('draft');
+    expect(document.body.textContent).toContain('Opened from Explorer');
+    expect(document.body.textContent).toContain('No task was sent');
+    await act(async () => root.unmount());
+  });
+
+  it('applies a pushed launch and ignores a stale receipt', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const beta = project('prj_beta', 'beta');
+    const store: Store = { projects: [alpha, beta], ui: emptyUi(), engine: engine(), spends: {} };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    await act(async () => {
+      for (const handler of store.launchHandlers ?? []) handler(launchFor(beta, 2));
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    });
+    expect(document.querySelector('[data-testid="studio-title"]')?.textContent).toBe('beta');
+    expect(document.activeElement?.id).toBe('draft');
+    await act(async () => {
+      for (const handler of store.launchHandlers ?? []) handler(launchFor(alpha, 1));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    expect(document.querySelector('[data-testid="studio-title"]')?.textContent).toBe('beta');
     await act(async () => root.unmount());
   });
 

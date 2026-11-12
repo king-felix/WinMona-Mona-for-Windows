@@ -24,6 +24,7 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { LaunchReceipt } from '../shared/launch.js';
 
 type Theme = 'daybreak' | 'afterglow';
 type Notice = { tone: Tone; title: string; body: string };
@@ -114,6 +115,13 @@ export function App(): React.JSX.Element {
   const [createParent, setCreateParent] = useState<string | null>(null);
   const [createName, setCreateName] = useState('');
   const [loaded, setLoaded] = useState(false);
+  const [focusToken, setFocusToken] = useState(0);
+  const appliedLaunch = useRef(0);
+  const liveSelection = useRef<{ projectId: string | null; sessionId: string | null; draft: string }>({
+    projectId: null,
+    sessionId: null,
+    draft: '',
+  });
   const savingDrafts = useRef<Map<string, string>>(new Map());
   const harness = harnessRequest();
 
@@ -221,6 +229,80 @@ export function App(): React.JSX.Element {
       alive = false;
     };
   }, []);
+
+  // The launch flow reads this snapshot when a shell selection arrives, so a
+  // switch never loses an unsent draft.
+  useEffect(() => {
+    liveSelection.current = { projectId: selected?.id ?? null, sessionId, draft: draftText };
+  }, [draftText, selected, sessionId]);
+
+  /**
+   * One Explorer selection. The main process already opened or reused the
+   * project, recorded the studio view and started the runtime; the shell mirrors
+   * that receipt and puts the caret in the composer. It never submits a task.
+   */
+  const applyLaunch = useCallback(
+    async (receipt: LaunchReceipt) => {
+      if (receipt.seq <= appliedLaunch.current) return;
+      appliedLaunch.current = receipt.seq;
+
+      if (receipt.status === 'ready' || receipt.status === 'opened') {
+        if (receipt.project) {
+          const live = liveSelection.current;
+          await refreshCatalog();
+          await activateProject(
+            receipt.project,
+            live.projectId && live.sessionId
+              ? { projectId: live.projectId, sessionId: live.sessionId, text: live.draft }
+              : null,
+          );
+          setScreen('studio');
+          if (receipt.focusComposer) setFocusToken((value) => value + 1);
+        }
+        setNotice({
+          tone: receipt.status === 'ready' ? 'success' : 'attention',
+          title: receipt.status === 'ready' ? 'Opened from Explorer' : 'Opened, with a caveat',
+          body: [receipt.detail, ...receipt.warnings].join(' '),
+        });
+        return;
+      }
+      if (receipt.status === 'needs-selection') {
+        setNotice({ tone: 'attention', title: 'Choose a project folder', body: receipt.detail });
+        return;
+      }
+      if (receipt.status === 'relocation-required') {
+        setNotice({
+          tone: 'attention',
+          title: 'This folder moved',
+          body: [receipt.detail, ...receipt.warnings].join(' '),
+        });
+        return;
+      }
+      setNotice({
+        tone: 'critical',
+        title: 'Launch did not open a project',
+        body: [receipt.detail, ...receipt.warnings].join(' '),
+      });
+    },
+    [activateProject, refreshCatalog],
+  );
+
+  useEffect(() => {
+    if (!loaded) return;
+    let alive = true;
+    const unsubscribe = window.mona.onLaunchEvent((receipt) => {
+      if (alive) void applyLaunch(receipt);
+    });
+    void (async () => {
+      const state = await window.mona.getLaunchState();
+      if (!alive || !state.ok || !state.data.latest) return;
+      await applyLaunch(state.data.latest);
+    })();
+    return () => {
+      alive = false;
+      unsubscribe();
+    };
+  }, [applyLaunch, loaded]);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -800,6 +882,7 @@ export function App(): React.JSX.Element {
                   sessionId={sessionId}
                   ui={ui}
                   busy={busy}
+                  focusToken={focusToken}
                   onDraft={(text) => setDraftText(text)}
                   onOpenFolder={() => void openFolder()}
                   onStart={() => void startEngine()}

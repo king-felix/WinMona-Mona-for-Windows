@@ -1,0 +1,129 @@
+
+> mona@0.0.0 test
+> vitest run && npm run bootstrap:test && npm run launch:test && npm run spike:test
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mX:/AI_projects/Mona[39m
+
+ [32m✓[39m apps/desktop/src/main/launch-target.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 109[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/journal.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 141[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/adapter.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 45[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/contracts.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ui-state.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 643[2mms[22m[39m
+   [32m✓[39m UI state store [2m(4)[22m
+     [33m[2m✓[22m[39m bounds draft text and session count[33m 436[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/migrations.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 693[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/http.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/studio.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 923[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/engine-host.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-ipc.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m packages/ui/src/palette.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 100[2mms[22m[39m
+ [32m✓[39m packages/ui/src/contrast.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/cli.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/work-control.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/ui/src/ui.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 215[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/security.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-ipc.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m packages/ui/src/markdown.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/catalog.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1786[2mms[22m[39m
+   [32m✓[39m project catalog [2m(9)[22m
+     [33m[2m✓[22m[39m reads a branch from HEAD for a repository and a linked worktree[33m 342[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/store.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1787[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1723[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/state.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1779[2mms[22m[39m
+   [32m✓[39m backup and restore [2m(3)[22m
+     [33m[2m✓[22m[39m backs up, restores, and parks the replaced database without deleting it[33m 387[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/renderer/App.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 874[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-dispatch.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1967[2mms[22m[39m
+   [32m✓[39m launch dispatch [2m(11)[22m
+     [33m[2m✓[22m[39m opens a folder, records the studio view, starts the runtime and sends no task[33m 301[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-service.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 2105[2mms[22m[39m
+   [32m✓[39m live studio service [2m(13)[22m
+     [33m[2m✓[22m[39m streams a real turn into user, assistant and outcome items exactly once[33m 401[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/supervisor.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 24391[2mms[22m[39m
+   [32m✓[39m process tree ownership [2m(1)[22m
+     [33m[2m✓[22m[39m stops a real owned process tree and leaves an unrelated node process alive[33m 2871[2mms[22m[39m
+   [32m✓[39m RuntimeSupervisor [2m(9)[22m
+     [33m[2m✓[22m[39m starts the runtime with an authenticated loopback identity and a token-free ownership record[33m 4037[2mms[22m[39m
+     [33m[2m✓[22m[39m stops a real descendant spawned by the owned runtime[33m 4286[2mms[22m[39m
+     [33m[2m✓[22m[39m clears a stale pid record and starts a fresh runtime[33m 4307[2mms[22m[39m
+     [33m[2m✓[22m[39m does not kill a live pid whose creation identity changed[33m 324[2mms[22m[39m
+     [33m[2m✓[22m[39m restarts a crashed runtime a bounded number of times without submitting work[33m 7962[2mms[22m[39m
+     [33m[2m✓[22m[39m fails the start when the runtime exits before it is usable[33m 434[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m      Tests [22m [1m[32m258 passed[39m[22m[90m (258)[39m
+[2m   Start at [22m 23:41:53
+[2m   Duration [22m 24.78s[2m (tests 85%, environment 8%, import 5%, transform 1%)[22m
+
+
+> mona@0.0.0 bootstrap:test
+> node --test tests/bootstrap
+
+✔ checkpoint advances revision atomically and journals the boundary (1011.213ms)
+✔ stale expected revision is refused and state is untouched (944.5749ms)
+✔ a write interrupted after the temp file is promoted by recover (1025.4758ms)
+✔ a torn temp file is quarantined and the committed state survives (774.3891ms)
+✔ a corrupt state file is restored from the newest verified backup (1064.8084ms)
+✔ validation rejects a dependency cycle (774.5459ms)
+✔ validation rejects an unregistered requirement and an unknown owner (797.4425ms)
+✔ validation rejects a changed specification whose recorded hash is stale (769.0639ms)
+✔ validation rejects a passed criterion with no evidence (778.8977ms)
+✔ evidence command records a hash and derives requirement status (924.7445ms)
+✔ checkpoint refuses evidence paths that do not exist (728.6156ms)
+✔ a recorded remaining step can be explicitly cleared when it is finished (1043.8299ms)
+✔ evidence can prune stale references left on sibling criteria (767.1438ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11467.7111
+
+> mona@0.0.0 launch:test
+> node --test tests/launch
+
+✔ the registered command quotes the executable, the app directory and %V (0.8386ms)
+✔ a hostile folder name cannot appear in the registration at all (0.1283ms)
+✔ relative or quote-bearing executable paths are refused (0.2863ms)
+✔ registration names both keys with the exact label and command (0.5422ms)
+✔ removal names only Mona keys and never their parents (0.1805ms)
+✔ the executor passes argument arrays and stops at the first refusal by default (0.2163ms)
+✔ reg export parsing reads escaped quotes, backslashes and empty values (0.3371ms)
+✔ verification compares every value Mona owns on both keys (41.8865ms)
+✔ uninstall removes Mona keys only and leaves a foreign menu entry alone (0.4421ms)
+✔ uninstalling when nothing is registered is a verified no-op (0.1895ms)
+✔ registration is expressed identically on a repeat run (0.1735ms)
+✔ the module never builds a shell command string (0.8598ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 113.6186
+
+> mona@0.0.0 spike:test
+> node --test tests/spike
+
+✔ parseSseFrame reads event, id, and JSON data (8.2721ms)
+✔ parseSseFrame joins multi-line data and ignores comments (0.1136ms)
+✔ parseSseFrame tolerates malformed payloads without throwing (0.1122ms)
+✔ parseSseFrame returns null for an empty frame (0.0808ms)
+✔ RuntimeClient refuses a non-loopback base URL (0.3162ms)
+✔ RuntimeClient requires a real bearer token (0.0995ms)
+✔ startOwnedRuntime refuses an invalid port before spawning (0.2327ms)
+✔ startOwnedRuntime keeps the token out of argv (0.2993ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 66.2308

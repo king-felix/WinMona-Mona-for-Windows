@@ -170,6 +170,8 @@ describe('launch argument parsing', () => {
       'C:\\Work',
       'win32',
     );
-    expect(paths).toEqual(['c:\\work', 'c:\\work\\alpha']);
+    // Paths keep the spelling the shell passed; duplicates are compared
+    // case-insensitively on Windows and collapse to one entry.
+    expect(paths).toEqual(['C:\\Work', 'C:\\Work\\Alpha']);
   });
 });
