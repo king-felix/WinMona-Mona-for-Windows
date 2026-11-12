@@ -16,11 +16,16 @@ const shotsDir = process.env.MONA_CHANGES_SHOTS ?? path.join(repoRoot, 'docs', '
 await mkdir(path.dirname(out), { recursive: true });
 
 let electronPath;
-try {
-  electronPath = (await import('electron')).default;
-} catch (error) {
-  console.error('Electron runtime is not installed:', String(error));
-  process.exit(3);
+const packagedExe = process.env.MONA_CHANGES_EXE?.trim() || null;
+if (packagedExe) {
+  electronPath = packagedExe;
+} else {
+  try {
+    electronPath = (await import('electron')).default;
+  } catch (error) {
+    console.error('Electron runtime is not installed:', String(error));
+    process.exit(3);
+  }
 }
 if (!electronPath || !existsSync(electronPath)) {
   console.error('Electron runtime binary is missing at', electronPath ?? '(unknown)');
@@ -29,8 +34,8 @@ if (!electronPath || !existsSync(electronPath)) {
 
 const workspace = await mkdtemp(path.join(tmpdir(), 'mona-p23-changes-ws-'));
 const profile = await mkdtemp(path.join(tmpdir(), 'mona-p23-changes-profile-'));
-const child = spawn(electronPath, ['.', '--changes-test'], {
-  cwd: appDir,
+const child = spawn(electronPath, packagedExe ? ['--changes-test'] : ['.', '--changes-test'], {
+  cwd: packagedExe ? repoRoot : appDir,
   env: {
     ...process.env,
     MONA_CHANGES_OUT: out,

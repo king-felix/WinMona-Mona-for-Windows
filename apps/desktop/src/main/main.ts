@@ -58,6 +58,8 @@ import { runPolishProbe } from './polish-probe.js';
 import { runTerminalProbe, writeTerminalProbe } from './terminal-probe.js';
 import { runQaProbe } from './qa-probe.js';
 import { runChangesProbe } from './changes-probe.js';
+import { runMemoryProbe } from './memory-probe.js';
+import { runA11yProbe } from './a11y-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
@@ -117,6 +119,18 @@ const qaEvents = Number.parseInt(process.env.MONA_QA_EVENTS ?? '10000', 10);
 const qaIdleSeconds = Number.parseInt(process.env.MONA_QA_IDLE_SECONDS ?? '60', 10);
 // P23 release-candidate probe: the real Changes surface against a real workspace.
 const changesTest = process.argv.includes('--changes-test');
+// P23 memory investigation: per-process breakdown and the renderer JS heap.
+const memoryTest = process.argv.includes('--memory-probe');
+const memoryOut = process.env.MONA_MEMORY_OUT ?? path.join(process.cwd(), 'mona-memory.json');
+const memoryWorkspace = process.env.MONA_MEMORY_WORKSPACE ?? null;
+const memoryIdleSeconds = Number.parseInt(process.env.MONA_MEMORY_IDLE_SECONDS ?? '60', 10);
+const memoryDiffPath = process.env.MONA_MEMORY_DIFF_PATH ?? 'big.txt';
+const memoryHistoryRows = Number.parseInt(process.env.MONA_MEMORY_HISTORY ?? '0', 10);
+// P23 accessibility probe: names, dialog focus contract, keyboard navigation, 200% zoom.
+const a11yTest = process.argv.includes('--a11y-probe');
+const a11yOut = process.env.MONA_A11Y_OUT ?? path.join(process.cwd(), 'mona-a11y.json');
+const a11yWorkspace = process.env.MONA_A11Y_WORKSPACE ?? null;
+const a11yHistoryRows = Number.parseInt(process.env.MONA_A11Y_HISTORY ?? '300', 10);
 const changesOut = process.env.MONA_CHANGES_OUT ?? path.join(process.cwd(), 'mona-changes.json');
 const changesWorkspace = process.env.MONA_CHANGES_WORKSPACE ?? null;
 const changesShots = process.env.MONA_CHANGES_SHOTS ?? path.join(process.cwd(), 'mona-changes-shots');
@@ -126,6 +140,8 @@ const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
 const terminalShots = process.env.MONA_TERMINAL_SHOTS ?? path.join(process.cwd(), 'mona-terminal-shots');
 // Screenshot capture needs deterministic compositing on a headless or remote
 // desktop; the P08 probe captures five live frames.
+// Memory measurement deliberately keeps hardware acceleration: the GPU process
+// is part of the real process set and must be measured, not designed away.
 if (shotsTest || studioTest || launchTest || polishTest || terminalTest || changesTest)
   app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
@@ -884,6 +900,140 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         profile: null,
         focusComposer: false,
       });
+    }
+
+    if (a11yTest && a11yWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runA11yProbe({
+        window: probeWindow,
+        outputPath: a11yOut,
+        workspace: a11yWorkspace,
+        historyRows: Number.isFinite(a11yHistoryRows) ? a11yHistoryRows : 300,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        showView: (projectId, view) => {
+          catalogService?.select(projectId);
+          catalogService?.setView(projectId, view as 'studio' | 'changes');
+        },
+        seedHistory: async (projectId, rows) => {
+          if (!localState || !uiStateStore) return 0;
+          const state = uiStateStore.view();
+          const sessionId = state.projects[projectId]?.currentSessionId ?? null;
+          const project = await localState.store.getProject(projectId);
+          if (!sessionId || !project) return 0;
+          const database = localState.store.database;
+          const stamp = new Date().toISOString();
+          const id = `thr_a11y_${Date.now().toString(36)}`;
+          database
+            .prepare(
+              'INSERT INTO threads (id, project_id, engine_thread_id, workspace, last_seq, created_at, updated_at, session_id, mode, profile_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)',
+            )
+            .run(id, projectId, `a11y-${id}`, project.canonicalPath, rows, stamp, stamp, sessionId, 'agent');
+          const insert = database.prepare(
+            'INSERT INTO timeline_items (id, project_id, thread_id, turn_id, seq, kind, title, body, status, truncated, created_at, updated_at) VALUES (?, ?, ?, NULL, ?, ?, ?, ?, NULL, 0, ?, ?)',
+          );
+          database.exec('BEGIN');
+          for (let index = 1; index <= rows; index += 1) {
+            insert.run(
+              `a11y_${id}_${index}`,
+              projectId,
+              id,
+              index,
+              index % 7 === 0 ? 'tool' : index % 3 === 0 ? 'status' : 'assistant',
+              `Keyboard event ${index}`,
+              `Accessibility fixture ${index}: a bounded window of history alongside the newest rows.`,
+              stamp,
+              stamp,
+            );
+          }
+          database.exec('COMMIT');
+          return rows;
+        },
+        reload: () => {
+          if (!probeWindow.isDestroyed()) probeWindow.webContents.reload();
+        },
+        prepareDiff: async (projectId) => {
+          if (!changesService) return null;
+          await changesService.capture(projectId, 'a11y probe baseline');
+          const project = await localState?.store.getProject(projectId);
+          if (!project) return null;
+          const target = path.join(project.canonicalPath, 'big.txt');
+          fs.writeFileSync(
+            target,
+            Array.from({ length: 4_000 }, (_, index) => `line ${index} edited for the a11y probe`).join('\n'),
+            'utf8',
+          );
+          const diff = await changesService.diff(projectId, 'big.txt');
+          return diff.ok ? { path: 'big.txt', available: diff.data.available } : null;
+        },
+      })
+        .then((result) => {
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(a11yOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+    }
+
+    if (memoryTest && memoryWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runMemoryProbe({
+        window: probeWindow,
+        outputPath: memoryOut,
+        workspace: memoryWorkspace,
+        idleSeconds: Number.isFinite(memoryIdleSeconds) ? memoryIdleSeconds : 60,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        showView: (projectId, view) => {
+          catalogService?.select(projectId);
+          catalogService?.setView(projectId, view as 'studio' | 'changes');
+        },
+        prepareChanges: async (projectId) => {
+          if (!changesService) return null;
+          // A baseline first, then one large edited file: the diff is real Git
+          // output for a real workspace, and nothing is sent anywhere.
+          await changesService.capture(projectId, 'memory probe baseline');
+          const project = await localState?.store.getProject(projectId);
+          if (!project) return null;
+          const target = path.join(project.canonicalPath, memoryDiffPath);
+          const body = Array.from({ length: 4_000 }, (_, index) => `line ${index} edited for the memory probe`).join(
+            '\n',
+          );
+          fs.writeFileSync(target, body, 'utf8');
+          const diff = await changesService.diff(projectId, memoryDiffPath);
+          return diff.ok ? { path: memoryDiffPath, available: diff.data.available } : null;
+        },
+        historyRows: Number.isFinite(memoryHistoryRows) ? memoryHistoryRows : 0,
+        sessionId: (projectId) => {
+          if (!uiStateStore) return null;
+          const state = uiStateStore.view();
+          const existing = state.projects[projectId]?.currentSessionId ?? null;
+          if (existing) return existing;
+          return uiStateStore.newSession(projectId).projects[projectId]?.currentSessionId ?? null;
+        },
+        database: () => (localState ? (localState.store.database as never) : null),
+        reload: () => {
+          if (!probeWindow.isDestroyed()) probeWindow.webContents.reload();
+        },
+      })
+        .then((result) => {
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(memoryOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
     }
 
     if (changesTest && changesWorkspace && mainWindow) {

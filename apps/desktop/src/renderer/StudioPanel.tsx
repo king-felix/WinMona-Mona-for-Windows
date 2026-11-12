@@ -7,6 +7,13 @@ import type { StudioMode, StudioRun, StudioView as StudioState, TimelineItem, Ti
 
 const PREVIEW_CHARS = 2_000;
 const TOOL_PREVIEW_CHARS = 1_500;
+/**
+ * Rows rendered at once. The shell still loads the newest 500 items into state;
+ * this only bounds what exists in the DOM, because rendered rows — not stored
+ * text — are what costs memory. Measured: removing 400 of 500 rendered rows from
+ * the live DOM released ~23 MB of working set (P23-memory-dev.json).
+ */
+const TIMELINE_RENDER_PAGE = 120;
 
 const KIND_LABEL: Record<TimelineKind, string> = {
   user: 'You',
@@ -115,6 +122,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [references, setReferences] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [renderPage, setRenderPage] = useState(1);
   const [notice, setNotice] = useState<string | null>(null);
   const [favoriteLabel, setFavoriteLabel] = useState('');
   const timelineRef = useRef<HTMLDivElement | null>(null);
@@ -122,6 +130,11 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const lastDelta = useRef<Map<string, number>>(new Map());
   const projectId = project?.id ?? null;
   const session = projectId ? ui?.projects[projectId]?.sessions.find((item) => item.sessionId === sessionId) : null;
+
+  // A new session, project or mode starts at the newest page again.
+  useEffect(() => {
+    setRenderPage(1);
+  }, [projectId, sessionId, mode]);
 
   const unwrap = useCallback(
     async <T,>(promise: Promise<{ ok: true; data: T } | { ok: false; error: { message: string } }>, title: string) => {
@@ -324,6 +337,11 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   }, []);
 
   const items = studio?.items ?? [];
+  // The newest page of rows is rendered; older loaded items stay in state and one
+  // click away, so nothing recorded becomes unreachable.
+  const renderLimit = TIMELINE_RENDER_PAGE * renderPage;
+  const hiddenCount = Math.max(0, items.length - renderLimit);
+  const visibleItems = hiddenCount > 0 ? items.slice(items.length - renderLimit) : items;
   const pending = studio?.pending ?? null;
   const blockedProblem = studio?.control.blockedProblem ?? null;
   const thread = studio?.thread ?? null;
@@ -594,7 +612,18 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             }
           />
         ) : null}
-        {items.map((item) => (
+        {hiddenCount > 0 ? (
+          <div className="timeline-earlier" data-testid="timeline-earlier">
+            <Button size="sm" onClick={() => setRenderPage((value) => value + 1)}>
+              Show {Math.min(hiddenCount, TIMELINE_RENDER_PAGE)} earlier item(s)
+            </Button>
+            <span className="mona-muted">
+              Showing the newest {visibleItems.length} of {items.length} loaded items. Older items are recorded and one
+              click away.
+            </span>
+          </div>
+        ) : null}
+        {visibleItems.map((item) => (
           <TimelineEntry
             key={item.id}
             item={item}

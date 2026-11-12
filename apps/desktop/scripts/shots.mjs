@@ -12,8 +12,10 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(here, '..');
 const repoRoot = path.resolve(appDir, '..', '..');
 const shotsDir = process.env.MONA_SHOTS_DIR ?? path.join(repoRoot, 'docs', 'evidence', 'shots');
-const manifestFile = path.join(repoRoot, 'docs', 'evidence', 'P06-shots.json');
-const logFile = path.join(repoRoot, 'docs', 'evidence', 'P06-shots-log.txt');
+// Evidence paths are overridable so a later prompt can re-capture into its own
+// artifacts instead of overwriting the prompt that first produced them.
+const manifestFile = process.env.MONA_SHOTS_MANIFEST ?? path.join(repoRoot, 'docs', 'evidence', 'P06-shots.json');
+const logFile = process.env.MONA_SHOTS_LOG ?? path.join(repoRoot, 'docs', 'evidence', 'P06-shots-log.txt');
 await mkdir(shotsDir, { recursive: true });
 
 let electronPath;

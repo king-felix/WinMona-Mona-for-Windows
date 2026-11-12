@@ -594,7 +594,7 @@ export function unregisterClassicMenu(layout, run = runExe) {
 /* ------------------------------------------------------------------------- */
 
 export const PACKAGE_PS1 = `param(
-  [Parameter(Mandatory = $true)][ValidateSet('install','remove','status','trust-certificate')][string]$Action,
+  [Parameter(Mandatory = $true)][ValidateSet('install','remove','status')][string]$Action,
   [string]$Msix,
   [string]$ExternalLocation,
   [string]$Certificate
@@ -617,13 +617,11 @@ try {
       $packages = @(Get-AppxPackage -Name '${IDENTITY_NAME}')
       Reply @{ ok = $true; installed = $packages.Count; packages = @($packages | ForEach-Object { @{ fullName = $_.PackageFullName; status = "$($_.Status)"; location = $_.InstallLocation } }) }
     }
-    'trust-certificate' {
-      # Adding this certificate to the current user's Root store is what makes a
-      # test-signed package installable. Windows shows a security warning that a
-      # person must accept; that is the point, and it is never done silently.
-      Import-Certificate -FilePath $Certificate -CertStoreLocation 'Cert:\\CurrentUser\\Root' -ErrorAction Stop | Out-Null
-      Reply @{ ok = $true; store = 'Cert:\\CurrentUser\\Root'; certificate = $Certificate }
-    }
+    # There is deliberately no 'trust-certificate' action here. Trust is
+    # provisioned by tools/install/trust.mjs, which verifies the signer, the
+    # manifest and the build record first and writes only
+    # LocalMachine\TrustedPeople. Importing into the Root store was removed so
+    # no caller can reach it.
   }
 } catch {
   $exception = $_.Exception
@@ -853,7 +851,7 @@ export async function install(layout, options = {}) {
         registered: false,
         reason: 'No identity package has been built. Run: node tools/install/cli.mjs package',
         prerequisite:
-          'Build and sign the sparse package, then either enable Windows developer mode or trust the local test certificate once.',
+          'Build and sign the sparse package, then trust the local test certificate once for this machine (node tools/install/cli.mjs trust-test-certificate).',
       };
     } else {
       const attempt = runPackageAction(layout, 'install', {
@@ -869,7 +867,7 @@ export async function install(layout, options = {}) {
         msix: artifacts.msix,
         prerequisite: attempt.ok
           ? null
-          : 'Windows refused the unsigned/test-signed package. Enable developer mode, import the labelled test certificate into Trusted People, or sign with a trusted certificate.',
+          : 'Windows refused the unsigned/test-signed package. Trust the labelled test certificate for this machine (node tools/install/cli.mjs trust-test-certificate), or sign with a production certificate.',
       };
     }
   }
@@ -1091,10 +1089,25 @@ foreach ($store in @('My','TrustedPeople')) {
   $path = "Cert:\\CurrentUser\\$store\\$thumb"
   if (Test-Path $path) { Remove-Item $path -Force; $removed += $store }
 }
-@{ ok = $true; removed = $removed; thumbprint = $thumb } | ConvertTo-Json -Compress`;
+$machineTrust = $false
+if (Test-Path "Cert:\\LocalMachine\\TrustedPeople\\$thumb") { $machineTrust = $true }
+@{ ok = $true; removed = $removed; thumbprint = $thumb; machineTrust = $machineTrust } | ConvertTo-Json -Compress`;
   const result = runExe('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { timeout: 60000 });
   try {
-    return { ...JSON.parse(result.stdout.split(/\r?\n/).filter(Boolean).at(-1)), status: result.status };
+    const parsed = JSON.parse(result.stdout.split(/\r?\n/).filter(Boolean).at(-1));
+    return {
+      ...parsed,
+      status: result.status,
+      // Machine-level trust needs elevation, so uninstall reports it rather than
+      // pretending to have cleaned it up. The command names the exact thumbprint.
+      machineTrustNote: parsed.machineTrust
+        ? {
+            store: 'Cert:\\LocalMachine\\TrustedPeople',
+            thumbprint,
+            removeCommand: `# elevated PowerShell: Remove-Item -Path 'Cert:\\LocalMachine\\TrustedPeople\\${thumbprint}' -Force`,
+          }
+        : null,
+    };
   } catch {
     return { ok: false, error: result.stderr || result.stdout || 'certificate removal produced no output' };
   }

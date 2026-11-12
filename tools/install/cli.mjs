@@ -3,7 +3,8 @@
 //
 //   node tools/install/cli.mjs stage                 build the install payload
 //   node tools/install/cli.mjs package [--test-sign] build (and optionally sign) the identity package
-//   node tools/install/cli.mjs trust-test-certificate  import the labelled test certificate (explicit)
+//   node tools/install/cli.mjs trust-test-certificate  verify the signer, then trust it for this machine (elevated)
+//   node tools/install/cli.mjs untrust-test-certificate  remove exactly that certificate from TrustedPeople (elevated)
 //   node tools/install/cli.mjs install [--close-running] [--force] [--no-classic]
 //   node tools/install/cli.mjs upgrade [--close-running] [--force]
 //   node tools/install/cli.mjs uninstall [--force]
@@ -148,12 +149,26 @@ async function main() {
       output = { ok: false, error: 'No test certificate exists. Run: node tools/install/cli.mjs package --test-sign' };
       exitCode = 4;
     } else {
-      const { runPackageAction } = await import('./installer.mjs');
-      output = {
-        ...runPackageAction(layout, 'trust-certificate', { certificate: artifacts.certificate }),
-        certificate: artifacts.certificate,
-      };
-      if (!output.ok) exitCode = 1;
+      // Verification happens before any import, inside provisionTrust: the
+      // certificate, the package signer, the manifest publisher and the build
+      // record must all agree, or nothing is trusted.
+      const { provisionTrust, elevationCommand } = await import('./trust.mjs');
+      output = provisionTrust(layout);
+      if (output.elevationRequired) {
+        output.preparedCommand = elevationCommand(layout);
+        exitCode = 4;
+      } else if (!output.ok) {
+        exitCode = 1;
+      }
+    }
+  } else if (options.command === 'untrust-test-certificate') {
+    const { removeTrust, elevationCommand } = await import('./trust.mjs');
+    output = removeTrust(layout);
+    if (output.elevationRequired) {
+      output.preparedCommand = elevationCommand(layout);
+      exitCode = 4;
+    } else if (!output.ok) {
+      exitCode = 1;
     }
   } else if (options.command === 'install' || options.command === 'upgrade') {
     output = await install(layout, {
