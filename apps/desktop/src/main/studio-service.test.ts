@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -215,7 +216,12 @@ type Harness = {
 
 async function harness(
   label: string,
-  options: { maxItemChars?: number; attention?: (event: StudioAttentionEvent) => void } = {},
+  options: {
+    maxItemChars?: number;
+    attention?: (event: StudioAttentionEvent) => void;
+    saveFile?: (input: { title: string; defaultName: string; extensions: string[] }) => Promise<string | null>;
+    appVersion?: () => string;
+  } = {},
 ): Promise<Harness> {
   const store = await openStore(label);
   const project = await makeProject(store, label);
@@ -241,6 +247,8 @@ async function harness(
     maxItemChars: options.maxItemChars ?? 64 * 1024,
     flushIntervalMs: 0,
     ...(options.attention ? { attention: options.attention } : {}),
+    ...(options.saveFile ? { saveFile: options.saveFile } : {}),
+    ...(options.appVersion ? { appVersion: options.appVersion } : {}),
   });
 
   const threadId = (): string => {
@@ -776,5 +784,97 @@ describe('cost and dispatch boundary', () => {
       expect(paused.data.run.detail).toContain('native workflow');
     }
     expect(adapter.submissions).toHaveLength(0);
+  });
+});
+
+describe('conversation export', () => {
+  async function runOneTurn(h: Harness, prompt: string, reply: string): Promise<void> {
+    await h.submit(prompt);
+    const thread = h.threadId();
+    h.adapter.pushEvent(engineEvent('thread.started', 1, thread, null, { thread: { id: thread } }));
+    h.adapter.pushEvent(
+      engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1', input_summary: prompt } }),
+    );
+    h.adapter.pushEvent(
+      engineEvent(
+        'item.started',
+        3,
+        thread,
+        'turn_1',
+        { item: { id: 'item_user', kind: 'user_message', status: 'completed', detail: prompt } },
+        'item_user',
+      ),
+    );
+    h.adapter.pushEvent(
+      engineEvent(
+        'item.completed',
+        4,
+        thread,
+        'turn_1',
+        { item: { id: 'item_agent', kind: 'agent_message', status: 'completed', detail: reply } },
+        'item_agent',
+      ),
+    );
+    h.adapter.pushEvent(
+      engineEvent('turn.completed', 5, thread, 'turn_1', {
+        turn: { id: 'turn_1', thread_id: thread, status: 'completed' },
+      }),
+    );
+    await h.waitFor((current) => current.run.state === 'idle');
+  }
+
+  it('writes the recorded timeline verbatim and reports the file it wrote', async () => {
+    const directory = await tempDir('export');
+    const target = path.join(directory, 'conversation.md');
+    const h = await harness('export', { saveFile: async () => target, appVersion: () => '0.1.0' });
+    await runOneTurn(h, 'Say MONA_OK', 'MONA_OK');
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.data.saved).toBe(true);
+    expect(result.data.path).toBe(target);
+    expect(result.data.items).toBeGreaterThanOrEqual(3);
+    expect(result.data.bytes).toBeGreaterThan(0);
+    expect(result.data.sha256).toMatch(/^[0-9a-f]{64}$/);
+    expect(result.data.note).toContain('No model was called');
+
+    const text = readFileSync(target, 'utf8');
+    expect(text).toContain('# Mona conversation');
+    expect(text).toContain('Say MONA_OK');
+    expect(text).toContain('MONA_OK');
+    expect(text).toContain('Mona 0.1.0');
+    expect(text).toContain('deepseek-flash');
+    expect(text).toContain('full_access');
+    // Nothing was sent by exporting.
+    expect(h.adapter.submissions).toHaveLength(1);
+  });
+
+  it('writes nothing when the save dialog is cancelled', async () => {
+    const directory = await tempDir('export-cancel');
+    const target = path.join(directory, 'never.md');
+    const h = await harness('export-cancel', { saveFile: async () => null });
+    await runOneTurn(h, 'Say MONA_OK', 'MONA_OK');
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.saved).toBe(false);
+      expect(result.data.path).toBeNull();
+      expect(result.data.bytes).toBe(0);
+      expect(result.data.note).toContain('Nothing was written');
+    }
+    expect(existsSync(target)).toBe(false);
+  });
+
+  it('refuses to export a session with no recorded events instead of writing an empty file', async () => {
+    const directory = await tempDir('export-empty');
+    const h = await harness('export-empty', { saveFile: async () => path.join(directory, 'empty.md') });
+    await h.service.view(h.project.id, 'ses_empty');
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_empty' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toContain('nothing to export');
+    expect(existsSync(path.join(directory, 'empty.md'))).toBe(false);
   });
 });

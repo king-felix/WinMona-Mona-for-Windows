@@ -654,9 +654,9 @@ function cmdCheckpoint(root, flags) {
       next.current_prompt = prompt;
     }
     if (flags['verified-commit']) next.last_verified_commit = String(flags['verified-commit']);
-    if (next.next_eligible_prompts.length === 0) {
-      next.next_eligible_prompts = [next.current_prompt];
-    }
+    // An empty eligible list is a real state: every prompt is completed, skipped or
+    // blocked. Back-filling the current prompt here made `validate` disagree with
+    // `computeEligible` on the last prompt of the project.
     next.revision = current.revision + 1;
     next.last_checkpoint_utc = utcNow();
 

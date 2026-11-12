@@ -2,6 +2,7 @@ import type { AttentionBridge } from '../shared/attention.js';
 import type { AgentBridge } from '../shared/agents.js';
 import type { BriefingBridge } from '../shared/briefing.js';
 import type { CatalogBridge } from '../shared/catalog.js';
+import type { ChangesBridge } from '../shared/changes.js';
 import type { CapabilityBridge } from '../shared/capabilities.js';
 import type { ExtensionBridge } from '../shared/extensions.js';
 import type { AppInfo, IpcResult } from '../shared/ipc.js';
@@ -23,7 +24,8 @@ declare global {
       LaunchBridge &
       AttentionBridge &
       BriefingBridge &
-      MemoryBridge & {
+      MemoryBridge &
+      ChangesBridge & {
         getAppInfo(): Promise<IpcResult<AppInfo>>;
       };
   }

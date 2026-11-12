@@ -1,10 +1,16 @@
 import { errorResult } from '@mona/contracts';
 import { z } from 'zod';
-import { CATALOG_CHANNELS, type IpcResult, type ProjectLayout, type ProjectView } from '../shared/catalog.js';
+import {
+  CATALOG_CHANNELS,
+  PROJECT_VIEWS,
+  type IpcResult,
+  type ProjectLayout,
+  type ProjectView,
+} from '../shared/catalog.js';
 import type { CatalogService } from './catalog-service.js';
 import type { IpcHandle } from './ipc.js';
 
-const VIEWS: [ProjectView, ...ProjectView[]] = ['home', 'studio', 'work', 'cost', 'settings'];
+const VIEWS: [ProjectView, ...ProjectView[]] = [...PROJECT_VIEWS];
 
 const Empty = z.object({}).strict();
 const ListRequest = z

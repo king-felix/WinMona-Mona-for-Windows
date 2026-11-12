@@ -1,4 +1,5 @@
-import { existsSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
+import { existsSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { WorkQueue, redact, type AdapterStreamEvent, type EngineAdapter } from '@mona/adapter';
 import {
@@ -11,10 +12,12 @@ import {
 } from '@mona/contracts';
 import type { CostLedger, ProjectStore, StudioThreadRow, TimelineItemRow } from '@mona/project-state';
 import { z } from 'zod';
+import { conversationFileName, renderConversationMarkdown } from './conversation-export.js';
 import type { EngineSummary } from './engine-host.js';
 import type {
   StudioControl,
   StudioEvent,
+  StudioExport,
   StudioMode,
   StudioPending,
   StudioProfile,
@@ -50,6 +53,10 @@ export type StudioServiceDeps = {
   /** Minimum interval between streaming body writes to the database. */
   flushIntervalMs?: number;
   pickReferences?: (project: { id: string; canonicalPath: string }) => Promise<string[] | null>;
+  /** Asks the user where an exported file should go; null means they cancelled. */
+  saveFile?: (input: { title: string; defaultName: string; extensions: string[] }) => Promise<string | null>;
+  /** The running application version, recorded in exported files. */
+  appVersion?: () => string;
   /** True when a native workflow is independently dispatching work for this project. */
   nativeDispatcherActive?: (projectId: string) => boolean;
   /** Optional ledger: budgets gate the next dispatch, never mid-flight work. */
@@ -188,6 +195,8 @@ export class StudioService {
   private readonly maxItemChars: number;
   private readonly flushIntervalMs: number;
   private readonly pickReferences: StudioServiceDeps['pickReferences'];
+  private readonly saveFile: StudioServiceDeps['saveFile'];
+  private readonly appVersion: StudioServiceDeps['appVersion'];
   private readonly nativeDispatcherActive: StudioServiceDeps['nativeDispatcherActive'];
   private readonly costs: StudioServiceDeps['costs'];
   private readonly attention: StudioServiceDeps['attention'];
@@ -201,6 +210,8 @@ export class StudioService {
     this.maxItemChars = deps.maxItemChars ?? DEFAULT_MAX_ITEM_CHARS;
     this.flushIntervalMs = deps.flushIntervalMs ?? DEFAULT_FLUSH_MS;
     this.pickReferences = deps.pickReferences;
+    this.saveFile = deps.saveFile;
+    this.appVersion = deps.appVersion;
     this.nativeDispatcherActive = deps.nativeDispatcherActive;
     this.costs = deps.costs;
     this.attention = deps.attention;
@@ -604,6 +615,99 @@ export class StudioService {
       })
       .filter((value): value is string => typeof value === 'string');
     return { ok: true, data: { paths: [...new Set(paths)].sort() } };
+  }
+
+  /**
+   * Export the recorded conversation as Markdown. This is a copy of what the
+   * runtime already produced, written to a path the user picks: no model call,
+   * no summarization, and no item is silently dropped (a truncated item keeps
+   * its truncation note in the file).
+   */
+  async exportConversation(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+  }): Promise<ServiceResult<StudioExport>> {
+    const project = await this.store.getProject(input.projectId);
+    if (!project) return { ok: false, error: errorResult('not_found', 'That project is not in the catalog.') };
+    if (!this.saveFile) {
+      return {
+        ok: false,
+        error: errorResult('capability_unsupported', 'Saving a file is not available in this window.'),
+      };
+    }
+    const threadRow = await this.store.studioThreadForSession(input.projectId, input.sessionId, input.mode);
+    const items = threadRow ? (await this.store.listTimelineItems(threadRow.id, 500)).map(toTimelineItem) : [];
+    if (items.length === 0) {
+      return {
+        ok: false,
+        error: errorResult('not_found', 'This session has no recorded events, so there is nothing to export.'),
+      };
+    }
+    const profile = threadRow ? parseProfile(threadRow) : null;
+    const thread = profile ? toStudioProfile(profile) : null;
+    const at = this.now();
+    const fileName = conversationFileName(project.label, input.sessionId, at);
+    const target = await this.saveFile({
+      title: 'Export this conversation',
+      defaultName: fileName,
+      extensions: ['md'],
+    });
+    const truncatedItems = items.filter((item) => item.truncated).length;
+    if (!target) {
+      return {
+        ok: true,
+        data: {
+          saved: false,
+          path: null,
+          fileName,
+          bytes: 0,
+          sha256: null,
+          items: items.length,
+          truncatedItems,
+          note: 'Export cancelled. Nothing was written.',
+        },
+      };
+    }
+    if (!path.isAbsolute(target)) {
+      return { ok: false, error: errorResult('invalid_request', 'The export path must be absolute.') };
+    }
+    const text = renderConversationMarkdown({
+      projectLabel: project.label,
+      workspace: project.canonicalPath,
+      sessionId: input.sessionId,
+      thread,
+      items,
+      exportedAt: at.toISOString(),
+      appVersion: this.appVersion?.() ?? 'version unknown',
+      itemBound: 500,
+    });
+    // Write through a temporary name so an interrupted export never leaves a
+    // half file where a complete one used to be.
+    const temp = `${target}.${randomUUID()}.tmp`;
+    try {
+      writeFileSync(temp, text, 'utf8');
+      renameSync(temp, target);
+    } catch {
+      rmSync(temp, { recursive: false, force: true });
+      return {
+        ok: false,
+        error: errorResult('internal', 'The conversation could not be written to that location.'),
+      };
+    }
+    return {
+      ok: true,
+      data: {
+        saved: true,
+        path: target,
+        fileName,
+        bytes: Buffer.byteLength(text, 'utf8'),
+        sha256: createHash('sha256').update(text).digest('hex'),
+        items: items.length,
+        truncatedItems,
+        note: 'Exported the recorded timeline exactly as stored. No model was called.',
+      },
+    };
   }
 
   /** Called when the owned runtime stops: live turns become honestly uncertain. */

@@ -12,6 +12,7 @@ export const STUDIO_CHANNELS = {
   pause: 'mona:studio-pause',
   resume: 'mona:studio-resume',
   references: 'mona:studio-pick-references',
+  export: 'mona:studio-export',
   event: 'mona:studio-event',
 } as const;
 
@@ -131,6 +132,21 @@ export type StudioEvent =
 
 export type StudioReferencePick = { paths: string[] };
 
+/**
+ * The outcome of exporting a conversation. `saved: false` means the user
+ * cancelled the save dialog; nothing was written and no path is claimed.
+ */
+export type StudioExport = {
+  saved: boolean;
+  path: string | null;
+  fileName: string;
+  bytes: number;
+  sha256: string | null;
+  items: number;
+  truncatedItems: number;
+  note: string;
+};
+
 export type StudioBridge = {
   studioGet(input: { projectId: string; sessionId: string; mode?: StudioMode }): Promise<IpcResult<StudioView>>;
   studioSubmit(input: {
@@ -144,6 +160,7 @@ export type StudioBridge = {
   studioPause(input: { projectId: string }): Promise<IpcResult<{ run: StudioRun; control: StudioControl }>>;
   studioResume(input: { projectId: string }): Promise<IpcResult<{ run: StudioRun; control: StudioControl }>>;
   studioPickReferences(input: { projectId: string }): Promise<IpcResult<StudioReferencePick>>;
+  studioExport(input: { projectId: string; sessionId: string; mode?: StudioMode }): Promise<IpcResult<StudioExport>>;
   /** Subscribes to main-process studio pushes; returns an unsubscribe function. */
   onStudioEvent(handler: (event: StudioEvent) => void): () => void;
 };

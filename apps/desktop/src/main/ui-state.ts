@@ -38,6 +38,7 @@ const VIEWS: readonly ProjectView[] = [
   'extensions',
   'memory',
   'cost',
+  'changes',
   'capabilities',
   'settings',
 ];

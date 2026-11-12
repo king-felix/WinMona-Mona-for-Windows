@@ -4,6 +4,7 @@ import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js'
 import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { CHANGES_CHANNELS } from '../shared/changes.js';
 import { CAPABILITY_CHANNELS } from '../shared/capabilities.js';
 import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
@@ -82,6 +83,11 @@ const bridge = Object.freeze({
   studioPause: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.pause, input),
   studioResume: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.resume, input),
   studioPickReferences: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.references, input),
+  studioExport: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
+    ipcRenderer.invoke(STUDIO_CHANNELS.export, input),
+  changesView: (input: { projectId: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.view, input),
+  changesDiff: (input: { projectId: string; path: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.diff, input),
+  changesCapture: (input: { projectId: string; label?: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.capture, input),
   /** Main-process pushes for the live studio; the only channel the renderer listens on. */
   onStudioEvent: (handler: (event: StudioEvent) => void) => {
     const listener = (_event: unknown, payload: StudioEvent): void => handler(payload);

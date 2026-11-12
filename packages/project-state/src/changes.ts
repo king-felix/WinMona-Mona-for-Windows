@@ -210,6 +210,15 @@ export class ChangeService {
     this.previewBytes = options.previewBytes ?? OVERSIZE_PREVIEW;
   }
 
+  /**
+   * The bounds this instance actually scans with. A surface that reports a
+   * change list has to state these, because "no changes" means something
+   * different when the scan stopped at a file cap or skipped a tree.
+   */
+  get scanBounds(): { excluded: readonly string[]; maxFiles: number; previewBytes: number } {
+    return { excluded: this.excluded, maxFiles: this.maxFiles, previewBytes: this.previewBytes };
+  }
+
   /** Capture the current workspace as a baseline. Excluded trees are recorded. */
   async captureBaseline(input: CaptureInput): Promise<Baseline> {
     const label = input.label.trim();

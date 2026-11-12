@@ -87,6 +87,10 @@ export function registerStudioIpc(deps: {
   register(STUDIO_CHANNELS.references, ProjectOnly, (payload, service) =>
     service.references((payload as { projectId: string }).projectId),
   );
+  register(STUDIO_CHANNELS.export, StudioRequest, (payload, service) => {
+    const input = payload as { projectId: string; sessionId: string; mode?: 'agent' | 'plan' };
+    return service.exportConversation(input);
+  });
 
   return channels;
 }

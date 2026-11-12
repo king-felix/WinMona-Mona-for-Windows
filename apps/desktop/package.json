@@ -22,7 +22,8 @@
     "check:build": "node scripts/check-build.mjs",
     "verify": "npm run build && npm run check:build",
     "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
-    "qa": "node scripts/qa.mjs"
+    "qa": "node scripts/qa.mjs",
+    "changes": "node scripts/changes.mjs"
   },
   "dependencies": {
     "@mona/adapter": "0.1.0",

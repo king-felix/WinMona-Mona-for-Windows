@@ -31,3 +31,7 @@ export type { HarnessScreenId } from './harness/screens.js';
 export { HARNESS_LABEL, fixtures } from './harness/fixtures.js';
 export { contrastRatio, readTokens, requirementsFor, parseHex, relativeLuminance } from './contrast.js';
 export type { ContrastRequirement, TokenMap } from './contrast.js';
+export { VirtualList } from './virtual-list.js';
+export type { VirtualListProps } from './virtual-list.js';
+export { scrollTopForRow, virtualWindow } from './virtual.js';
+export type { VirtualWindow, VirtualWindowInput } from './virtual.js';

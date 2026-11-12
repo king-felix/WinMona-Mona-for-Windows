@@ -1,4 +1,4 @@
-﻿// P00 bootstrap tests: atomicity, revision conflicts, recovery, graph and hash validation.
+// P00 bootstrap tests: atomicity, revision conflicts, recovery, graph and hash validation.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -98,6 +98,25 @@ test('checkpoint advances revision atomically and journals the boundary', () => 
   assert.equal(cli(root, ['validate']).code, 0);
 });
 
+test('completing the last open prompt leaves an empty eligible list that validates', () => {
+  const root = sandbox();
+  // Mark every prompt completed except the last one, so the final checkpoint has
+  // nothing left to be eligible. Before the fix the CLI back-filled the current
+  // prompt and alidate then disagreed with its own eligibility computation.
+  const statePath = path.join(root, '.mona', 'build', 'state.json');
+  const state = readState(root);
+  const ids = Object.keys(state.tasks).sort();
+  const last = ids[ids.length - 1];
+  for (const id of ids) state.tasks[id].status = id === last ? 'pending' : 'completed';
+  writeJson(statePath, state);
+
+  const r = cli(root, ['checkpoint', '--prompt', last, '--status', 'completed', '--expected-revision', '1']);
+  assert.equal(r.code, 0, r.err);
+  const after = readState(root);
+  assert.deepEqual(after.next_eligible_prompts, []);
+  assert.equal(after.tasks[last].status, 'completed');
+  assert.equal(cli(root, ['validate']).code, 0);
+});
 test('stale expected revision is refused and state is untouched', () => {
   const root = sandbox();
   assert.equal(

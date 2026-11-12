@@ -25,6 +25,7 @@ const TerminalDrawer = lazy(() => import('./TerminalDrawer.js').then((module) =>
 import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { MemoryPanel } from './MemoryPanel.js';
+import { ChangesPanel } from './ChangesPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
 import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
 import type { BriefingView } from '../shared/briefing.js';
@@ -52,6 +53,7 @@ const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'agents', label: 'Agents', hint: 'Native goals, fleets, runs and child agents' },
   { id: 'extensions', label: 'Extensions', hint: 'MCP servers, skills, plugins, hooks and project rules' },
   { id: 'memory', label: 'Memory', hint: 'Local search, prompt shelf, portable handoff and diagnostics' },
+  { id: 'changes', label: 'Changes', hint: 'Changed paths, real diffs and recorded test receipts' },
   { id: 'cost', label: 'Cost', hint: 'Recorded usage and spend' },
   { id: 'capabilities', label: 'Capabilities', hint: 'Pinned-engine capability map, live flags, terminal and logs' },
   { id: 'settings', label: 'Settings', hint: 'Route, permission, appearance, diagnostics' },
@@ -655,7 +657,7 @@ export function App(): React.JSX.Element {
     }
   }, []);
 
-  // Keyboard flow: Alt+1…8 for sections, Ctrl+Shift+F for Focus Mode,
+  // Keyboard flow: Alt+1…9 and Alt+0 for sections, Ctrl+Shift+F for Focus Mode,
   // Ctrl+Shift+N for a new session, Ctrl+/ for the shortcut list. Interrupting
   // work stays a deliberate click on the execution controls.
   useEffect(() => {
@@ -672,6 +674,7 @@ export function App(): React.JSX.Element {
           '7': 'capabilities',
           '8': 'settings',
           '9': 'memory',
+          '0': 'changes',
         };
         const target = targets[event.key];
         if (target) {
@@ -721,6 +724,7 @@ export function App(): React.JSX.Element {
       { id: 'action:agents', label: 'Go to Agents observatory', group: 'Navigate' },
       { id: 'action:extensions', label: 'Go to Extensions', group: 'Navigate' },
       { id: 'action:memory', label: 'Go to Memory', group: 'Navigate' },
+      { id: 'action:changes', label: 'Go to Changes', group: 'Navigate' },
       { id: 'action:cost', label: 'Go to Cost lens', group: 'Navigate' },
       { id: 'action:capabilities', label: 'Go to Capabilities', group: 'Navigate' },
       { id: 'action:settings', label: 'Go to Settings', group: 'Navigate' },
@@ -813,6 +817,8 @@ export function App(): React.JSX.Element {
         case 'action:work':
         case 'action:agents':
         case 'action:extensions':
+        case 'action:memory':
+        case 'action:changes':
         case 'action:cost':
         case 'action:capabilities':
         case 'action:settings': {
@@ -1208,6 +1214,14 @@ export function App(): React.JSX.Element {
                   onStart={() => void startEngine()}
                   onStop={() => void stopEngine()}
                   onNewSession={() => void newSession()}
+                  onExport={async () => {
+                    if (!selected || !sessionId) return 'No session to export yet.';
+                    const result = await window.mona.studioExport({ projectId: selected.id, sessionId });
+                    if (!result.ok) return result.error.message;
+                    return result.data.saved
+                      ? `Exported ${result.data.items} item(s) to ${result.data.path} (${result.data.bytes} bytes).`
+                      : result.data.note;
+                  }}
                   onDraftSent={() => {
                     setDraftText('');
                     if (selected && sessionId)
@@ -1250,6 +1264,8 @@ export function App(): React.JSX.Element {
                     await refreshCatalog();
                   }}
                 />
+              ) : screen === 'changes' ? (
+                <ChangesPanel project={selected} />
               ) : screen === 'cost' ? (
                 <CostView info={info} project={selected} spend={spend} />
               ) : screen === 'capabilities' ? (
@@ -1569,7 +1585,7 @@ export function App(): React.JSX.Element {
           </li>
           <li>
             <kbd>Alt</kbd>+<kbd>1…8</kbd> Home, Studio, Work, Agents, Extensions, Cost, Capabilities, Settings;{' '}
-            <kbd>Alt</kbd>+<kbd>9</kbd> Memory
+            <kbd>Alt</kbd>+<kbd>9</kbd> Memory; <kbd>Alt</kbd>+<kbd>0</kbd> Changes
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> toggle Focus Mode

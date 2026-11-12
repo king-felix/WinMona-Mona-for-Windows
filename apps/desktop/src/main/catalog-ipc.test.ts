@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { CatalogService } from './catalog-service.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import type { IpcHandle } from './ipc.js';
-import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { CATALOG_CHANNELS, PROJECT_VIEWS } from '../shared/catalog.js';
 
 function harness(options: { trusted?: boolean; service?: boolean } = {}) {
   const listeners = new Map<string, (event: unknown, payload: unknown) => unknown>();
@@ -25,6 +25,10 @@ function harness(options: { trusted?: boolean; service?: boolean } = {}) {
     },
     saveDraft: async () => {
       calls.push('saveDraft');
+      return { ok: true as const, data: { currentProjectId: null, projects: {}, warning: null } };
+    },
+    setView: async (id: string, view: string) => {
+      calls.push(`setView:${id}:${view}`);
       return { ok: true as const, data: { currentProjectId: null, projects: {}, warning: null } };
     },
   } as unknown as CatalogService;
@@ -76,6 +80,15 @@ describe('catalog IPC surface', () => {
       expect(result).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
     }
     expect(h.calls).toEqual([]);
+  });
+
+  it('accepts every section the shell can show, so a view is never renderable but unsaved', async () => {
+    const h = harness();
+    for (const view of PROJECT_VIEWS) {
+      const result = await h.invoke(CATALOG_CHANNELS.uiSetView, { projectId: 'prj_1', view });
+      expect(result, `view ${view}`).toMatchObject({ ok: true });
+    }
+    expect(h.calls).toHaveLength(PROJECT_VIEWS.length);
   });
 
   it('delegates a valid call and keeps arguments typed', async () => {

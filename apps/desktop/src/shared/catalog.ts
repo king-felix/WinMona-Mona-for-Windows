@@ -32,8 +32,25 @@ export const CATALOG_CHANNELS = {
 
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: ErrorResult };
 
-export type ProjectView =
-  'home' | 'studio' | 'work' | 'agents' | 'extensions' | 'memory' | 'cost' | 'capabilities' | 'settings';
+/**
+ * Every section the shell can show and persist. One list, so a new view cannot
+ * be renderable but unsavable: the IPC allowlist, the persisted UI state and the
+ * rail all read this.
+ */
+export const PROJECT_VIEWS = [
+  'home',
+  'studio',
+  'work',
+  'agents',
+  'extensions',
+  'memory',
+  'cost',
+  'changes',
+  'capabilities',
+  'settings',
+] as const;
+
+export type ProjectView = (typeof PROJECT_VIEWS)[number];
 
 export type RepoKind = 'none' | 'git' | 'worktree';
 

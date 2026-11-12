@@ -99,6 +99,8 @@ export type StudioPanelProps = {
   onDraftSent: () => void;
   /** Ask the shell to re-read recorded spend after a turn settles. */
   onSpendRefresh: () => void;
+  /** Export the recorded conversation; returns a message for the notice line. */
+  onExport?: () => Promise<string>;
 };
 
 export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
@@ -633,6 +635,23 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             <Button size="sm" onClick={props.onNewSession}>
               New session
             </Button>
+            {props.onExport ? (
+              <Button
+                size="sm"
+                onClick={() => {
+                  setNotice(null);
+                  void props.onExport?.().then((message) => setNotice(message));
+                }}
+                disabled={!sessionId || items.length === 0}
+                title={
+                  items.length === 0
+                    ? 'This session has no recorded events to export.'
+                    : 'Write the recorded conversation to a Markdown file. No model is called.'
+                }
+              >
+                Export
+              </Button>
+            ) : null}
             <Button
               variant="primary"
               size="sm"

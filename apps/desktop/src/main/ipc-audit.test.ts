@@ -7,6 +7,7 @@ import { registerAttentionIpc } from './attention-ipc.js';
 import { registerBriefingIpc } from './briefing-ipc.js';
 import { registerCapabilityIpc } from './capability-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
+import { registerChangesIpc } from './changes-ipc.js';
 import { registerExtensionIpc } from './extensions-ipc.js';
 import { registerIpc, type IpcHandle } from './ipc.js';
 import { registerLaunchIpc } from './launch-ipc.js';
@@ -31,6 +32,7 @@ function wireEverything(): Map<string, (event: unknown, payload: unknown) => unk
   registerIpc({ handle, isTrustedSender: untrusted, getAppInfo: () => ({}) as AppInfo });
   registerCatalogIpc({ handle, isTrustedSender: untrusted, service: null });
   registerStudioIpc({ handle, isTrustedSender: untrusted, service: () => null });
+  registerChangesIpc({ handle, isTrustedSender: untrusted, service: () => null });
   registerAgentIpc({ handle, isTrustedSender: untrusted, service: () => null });
   registerProviderIpc({ handle, isTrustedSender: untrusted, service: () => null });
   registerExtensionIpc({ handle, isTrustedSender: untrusted, service: () => null });

@@ -24,6 +24,8 @@ import { LaunchDispatcher, type LaunchIntent } from './launch-dispatch.js';
 import { registerLaunchIpc } from './launch-ipc.js';
 import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
+import { ChangesService } from './changes-service.js';
+import { registerChangesIpc } from './changes-ipc.js';
 import { AgentObservatoryService } from './agent-observatory.js';
 import { registerAgentIpc } from './agents-ipc.js';
 import { EngineConfigCli } from './engine-config.js';
@@ -55,6 +57,7 @@ import { runShots } from './shots.js';
 import { runPolishProbe } from './polish-probe.js';
 import { runTerminalProbe, writeTerminalProbe } from './terminal-probe.js';
 import { runQaProbe } from './qa-probe.js';
+import { runChangesProbe } from './changes-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
@@ -112,13 +115,19 @@ const qaOut = process.env.MONA_QA_OUT ?? path.join(process.cwd(), 'mona-qa.json'
 const qaWorkspace = process.env.MONA_QA_WORKSPACE ?? null;
 const qaEvents = Number.parseInt(process.env.MONA_QA_EVENTS ?? '10000', 10);
 const qaIdleSeconds = Number.parseInt(process.env.MONA_QA_IDLE_SECONDS ?? '60', 10);
+// P23 release-candidate probe: the real Changes surface against a real workspace.
+const changesTest = process.argv.includes('--changes-test');
+const changesOut = process.env.MONA_CHANGES_OUT ?? path.join(process.cwd(), 'mona-changes.json');
+const changesWorkspace = process.env.MONA_CHANGES_WORKSPACE ?? null;
+const changesShots = process.env.MONA_CHANGES_SHOTS ?? path.join(process.cwd(), 'mona-changes-shots');
 const terminalTest = process.argv.includes('--terminal-test');
 const terminalOut = process.env.MONA_TERMINAL_OUT ?? path.join(process.cwd(), 'mona-terminal.json');
 const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
 const terminalShots = process.env.MONA_TERMINAL_SHOTS ?? path.join(process.cwd(), 'mona-terminal-shots');
 // Screenshot capture needs deterministic compositing on a headless or remote
 // desktop; the P08 probe captures five live frames.
-if (shotsTest || studioTest || launchTest || polishTest || terminalTest) app.disableHardwareAcceleration();
+if (shotsTest || studioTest || launchTest || polishTest || terminalTest || changesTest)
+  app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
 const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
@@ -151,6 +160,9 @@ const engineHost = new EngineHost({
 
 let localState: LocalState | null = null;
 let studioService: StudioService | null = null;
+let changesService: ChangesService | null = null;
+/** The same ChangeService the briefing and Changes surfaces read; kept for the release probe. */
+let ownedChangeService: ChangeService | null = null;
 let observatoryService: AgentObservatoryService | null = null;
 let providerService: ProviderWorkbenchService | null = null;
 let extensionsService: ExtensionsService | null = null;
@@ -533,6 +545,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       const attemptService = new AttemptService(localState.store, { tasks: taskService });
       const costLedger = new CostLedger(localState.store);
       const changeService = new ChangeService(localState.store);
+      ownedChangeService = changeService;
       briefingService = new BriefingService(localState.store, {
         tasks: taskService,
         attempts: attemptService,
@@ -593,7 +606,22 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
           const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
           return picked.canceled ? null : picked.filePaths;
         },
+        saveFile: async ({ title, defaultName, extensions }) => {
+          const options = {
+            title,
+            defaultPath: path.join(app.getPath('documents'), defaultName),
+            filters: [{ name: 'Markdown', extensions }],
+          };
+          const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+          const picked = owner ? await dialog.showSaveDialog(owner, options) : await dialog.showSaveDialog(options);
+          return picked.canceled || !picked.filePath ? null : picked.filePath;
+        },
+        appVersion: () => app.getVersion(),
       });
+
+      // The Changes surface reads real workspace state: Git status, a diff
+      // against a captured baseline, Git text diffs and recorded test receipts.
+      changesService = new ChangesService(localState.store, changeService);
 
       // The observatory reads engine-owned goals, fleets, runs and agent
       // children, and is the only component that may hand a start to the
@@ -749,6 +777,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       isTrustedSender: trustedSender,
       service: () => studioService,
     });
+    registerChangesIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => changesService,
+    });
     registerAgentIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -851,6 +884,48 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         profile: null,
         focusComposer: false,
       });
+    }
+
+    if (changesTest && changesWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runChangesProbe({
+        window: probeWindow,
+        outputPath: changesOut,
+        shotsDirectory: changesShots,
+        workspace: changesWorkspace,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        prepare: (projectId) => {
+          catalogService?.select(projectId);
+          catalogService?.setView(projectId, 'changes');
+        },
+        reload: () => {
+          if (!probeWindow.isDestroyed()) probeWindow.webContents.reload();
+        },
+        recordReceipt: async (projectId) => {
+          if (!ownedChangeService) return null;
+          const receipt = await ownedChangeService.recordTestReceipt({
+            projectId,
+            command: 'npm test',
+            exitCode: 0,
+            outcome: 'passed',
+            output: 'P23 probe: the project test command exited 0.\n',
+          });
+          return { id: receipt.id, outcome: receipt.outcome };
+        },
+      })
+        .then((result) => {
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(changesOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
     }
 
     if (qaTest && qaWorkspace && mainWindow) {
