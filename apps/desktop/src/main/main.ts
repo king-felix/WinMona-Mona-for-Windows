@@ -1,14 +1,18 @@
-import { app, BrowserWindow, ipcMain, Menu, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } from 'electron';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseLaunchArgs } from '@mona/adapter';
+import { CatalogService } from './catalog-service.js';
+import { registerCatalogIpc } from './catalog-ipc.js';
 import { createAppInfo, registerIpc } from './ipc.js';
 import { EngineHost } from './engine-host.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
 import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
+import { runCatalogProbe } from './catalog-probe.js';
 import { runShots } from './shots.js';
+import { UiStateStore } from './ui-state.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -24,6 +28,13 @@ const shotsTest = process.argv.includes('--shots');
 const shotsDir = process.env.MONA_SHOTS_DIR ?? path.join(process.cwd(), 'mona-shots');
 const shotsManifest = process.env.MONA_SHOTS_MANIFEST ?? path.join(shotsDir, 'manifest.json');
 const lifecycleWorkspace = process.env.MONA_LIFECYCLE_WORKSPACE ?? null;
+const catalogTest = process.argv.includes('--catalog-test');
+const catalogOut = process.env.MONA_CATALOG_OUT ?? path.join(process.cwd(), 'mona-catalog.json');
+const catalogWorkspace = process.env.MONA_CATALOG_WORKSPACE ?? null;
+const catalogShots = process.env.MONA_CATALOG_SHOTS ?? path.join(process.cwd(), 'mona-catalog-shots');
+// The P06 fixture harness is development-only. A production window must never
+// render fixture projects, fake spend, or fake engine badges.
+const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
 const trustOptions = { indexPath: rendererIndex, ...(devServerUrl ? { devServerUrl } : {}) };
 
 // Evidence runs and tests must never write into the real user profile.
@@ -96,10 +107,58 @@ if (!app.requestSingleInstanceLock()) {
       });
     });
 
+    const trustedSender = (event: unknown): boolean =>
+      isTrustedSenderFrame(event as { senderFrame?: { url: string; parent: unknown } | null }, trustOptions);
+
+    // Reconciliation never starts inference or a runtime: it inspects ownership
+    // records and terminates only processes this install can still identify.
+    // Local state opens before any project work: migrations run under the
+    // maintenance barrier and a pre-migration backup is kept. A state failure is
+    // reported, never hidden, and it never starts inference.
+    let stateDetail = 'Local state is not open yet.';
+    try {
+      localState = await openLocalState(path.join(app.getPath('userData'), 'state'));
+      engineHost.bindJournal(localState.journal);
+      stateDetail = `Local state open at schema v${localState.schemaVersion}.`;
+      if (localState.migrations.applied.length > 0) {
+        process.stderr.write(
+          `mona: applied ${localState.migrations.applied.length} state migration(s) to version ${localState.schemaVersion}\n`,
+        );
+      }
+    } catch (error) {
+      stateDetail = `Local state unavailable: ${String(error).slice(0, 200)}`;
+      process.stderr.write(`mona: local state unavailable: ${String(error)}\n`);
+    }
+
+    let catalogService: CatalogService | null = null;
+    if (localState) {
+      const uiState = new UiStateStore({ file: path.join(app.getPath('userData'), 'state', 'ui-state.json') });
+      catalogService = new CatalogService({
+        store: localState.store,
+        ui: uiState,
+        engine: engineHost,
+        pickFolder: async (purpose) => {
+          const options = {
+            title: purpose === 'open' ? 'Open a project folder' : 'Choose where to create the project',
+            properties: ['openDirectory', 'createDirectory'] as Array<'openDirectory' | 'createDirectory'>,
+          };
+          const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+          const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
+          return picked.canceled ? null : (picked.filePaths[0] ?? null);
+        },
+        reveal: async (target) => {
+          const failure = await shell.openPath(target);
+          return {
+            ok: failure === '',
+            detail: failure === '' ? 'Opened the folder in File Explorer.' : failure,
+          };
+        },
+      });
+    }
+
     registerIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
-      isTrustedSender: (event) =>
-        isTrustedSenderFrame(event as { senderFrame?: { url: string; parent: unknown } | null }, trustOptions),
+      isTrustedSender: trustedSender,
       getAppInfo: () => {
         const engine = engineHost.summary();
         return createAppInfo({
@@ -109,27 +168,29 @@ if (!app.requestSingleInstanceLock()) {
           node: process.versions.node ?? 'unknown',
           platform: process.platform,
           arch: process.arch,
-          engine: { status: engine.state, detail: engine.detail, descriptors: engine.descriptors },
+          engine: {
+            status: engine.state,
+            detail: engine.detail,
+            descriptors: engine.descriptors,
+            workspace: engine.workspace,
+            pid: engine.pid,
+            endpoint: engine.endpoint,
+            compatibility: engine.compatibility,
+          },
+          localState: {
+            available: localState !== null,
+            schemaVersion: localState?.schemaVersion ?? null,
+            detail: stateDetail,
+          },
+          harnessEnabled,
         });
       },
     });
-
-    // Reconciliation never starts inference or a runtime: it inspects ownership
-    // records and terminates only processes this install can still identify.
-    // Local state opens before any project work: migrations run under the
-    // maintenance barrier and a pre-migration backup is kept. A state failure is
-    // reported, never hidden, and it never starts inference.
-    try {
-      localState = await openLocalState(path.join(app.getPath('userData'), 'state'));
-      engineHost.bindJournal(localState.journal);
-      if (localState.migrations.applied.length > 0) {
-        process.stderr.write(
-          `mona: applied ${localState.migrations.applied.length} state migration(s) to version ${localState.schemaVersion}\n`,
-        );
-      }
-    } catch (error) {
-      process.stderr.write(`mona: local state unavailable: ${String(error)}\n`);
-    }
+    registerCatalogIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: catalogService,
+    });
 
     const reconciled = await engineHost.reconcile();
     if (reconciled.unverifiable > 0) {
@@ -175,6 +236,25 @@ if (!app.requestSingleInstanceLock()) {
         })
         .catch((error: unknown) => {
           fs.writeFileSync(lifecycleOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+    }
+    if (catalogTest && catalogWorkspace) {
+      runCatalogProbe({
+        window: mainWindow,
+        rendererIndex,
+        workspace: catalogWorkspace,
+        shotsDirectory: catalogShots,
+        outputPath: catalogOut,
+        engine: engineHost,
+      })
+        .then((result) => {
+          const window = mainWindow as BrowserWindow | null;
+          if (window && !window.isDestroyed()) window.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(catalogOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
     }
@@ -296,12 +376,17 @@ async function runSmoke(window: BrowserWindow, outputPath: string): Promise<void
       nav: Array.from(document.querySelectorAll('[data-testid^="nav-"]')).map((node) => node.textContent),
       engine: document.querySelector('[data-testid="engine-state"]')?.textContent ?? null,
       theme: document.documentElement.getAttribute('data-theme'),
-      hasFixtureMarker: document.documentElement.innerHTML.includes('mona.fixture.test-only')
+      hasFixtureMarker: document.documentElement.innerHTML.includes('mona.fixture.test-only'),
+      hasHarness: Boolean(document.querySelector('[data-testid="harness"]')),
+      emptyCatalog: (document.body.textContent ?? '').includes('Choose a folder to begin'),
+      palette: Boolean(document.querySelector('[data-testid="palette-trigger"]')),
+      contextModel: document.querySelector('[data-testid="context-model"]')?.textContent ?? null,
+      contextPermission: document.querySelector('[data-testid="context-permission"]')?.textContent ?? null
     })`,
     true,
   );
 
-  // The renderer-facing bridge must be a frozen single method.
+  // The renderer-facing bridge must be a frozen set of named methods.
   const bridge = await window.webContents.executeJavaScript(
     `({
       keys: Object.keys(window.mona ?? {}),

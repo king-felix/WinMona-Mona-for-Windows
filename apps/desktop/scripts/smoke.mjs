@@ -53,6 +53,11 @@ const failures = [];
 if (!report.ok) failures.push('main process did not report ok');
 if (report.dom?.version !== `v${report.appVersion}`) failures.push('renderer did not report the real app version');
 if (report.dom?.hasFixtureMarker) failures.push('test fixtures leaked into the production renderer');
+if (report.dom?.hasHarness) failures.push('the fixture harness rendered in a production window');
+if (!report.dom?.emptyCatalog) failures.push('a fresh window did not show the empty catalog state');
+if (!report.dom?.palette) failures.push('the command palette entry point is missing');
+if (!report.dom?.contextModel || !report.dom?.contextPermission)
+  failures.push('the context bar is missing route facts');
 if (report.rendererProcessCount < 1) failures.push('no renderer process metric');
 
 const security = report.security ?? {};
@@ -62,9 +67,34 @@ if (security.windowCount !== 1) failures.push(`unexpected window count ${String(
 if (security.devToolsAllowed) failures.push('devtools are open in a production window');
 
 const bridge = report.bridge ?? {};
-const keys = bridge.keys ?? [];
-if (keys.length !== 1 || keys[0] !== 'getAppInfo') failures.push(`preload exposes unexpected keys: ${keys.join(',')}`);
+const keys = [...(bridge.keys ?? [])].sort();
+const expectedKeys = [
+  'createProject',
+  'engineState',
+  'getAppInfo',
+  'getUiState',
+  'listProjects',
+  'newSession',
+  'openProject',
+  'pickFolder',
+  'projectSpend',
+  'relocateProject',
+  'removeProject',
+  'revealProject',
+  'saveDraft',
+  'selectProject',
+  'setProjectView',
+  'startEngine',
+  'stopEngine',
+  'updateProject',
+].sort();
+if (JSON.stringify(keys) !== JSON.stringify(expectedKeys)) {
+  failures.push(`preload exposes unexpected keys: ${keys.join(',')}`);
+}
 if (!bridge.frozen) failures.push('preload bridge is not frozen');
+if (keys.includes('invoke') || keys.includes('send') || keys.includes('require')) {
+  failures.push('preload exposes a generic IPC primitive');
+}
 if (bridge.hasNodeRequire || bridge.hasProcess || bridge.hasIpcRenderer) {
   failures.push('Node or ipcRenderer leaked into the renderer global scope');
 }
@@ -74,7 +104,7 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `smoke security checks passed: navigation refused, popup refused, one frozen bridge key, footprint ${String(
+  `smoke security checks passed: navigation refused, popup refused, ${keys.length} named bridge methods, footprint ${String(
     report.totalWorkingSetMb,
   )} MB`,
 );

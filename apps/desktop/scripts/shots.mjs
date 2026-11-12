@@ -36,6 +36,7 @@ const child = spawn(electronPath, ['.', '--shots'], {
     MONA_SHOTS_DIR: shotsDir,
     MONA_SHOTS_MANIFEST: manifestFile,
     MONA_USER_DATA: profile,
+    MONA_ALLOW_HARNESS: '1',
   },
   stdio: ['ignore', 'pipe', 'pipe'],
   windowsHide: true,

@@ -327,7 +327,8 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   the `héllo` test fixture, and the `package.json` description). The corrupted
   regex silently stopped matching every prompt heading, so `validate` reported
   all 24 prompt sections missing even though the document was untouched.
-- **Detection:** a repo-wide mojibake scan (`â€`, `Ã¢`, `ï¿½`) plus the fact that
+- **Detection:** a repo-wide scan for double-encoded UTF-8 (the byte sequences
+  `C3 82`, `C3 A2` and the replacement character `EF BF BD`) plus the fact that
   `.gitattributes` stores bytes exactly, so an encoding change shows up as a
   real diff.
 - **Evidence:** this session's diff; `node tools/build/cli.mjs validate` returns
@@ -474,3 +475,82 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   manual screenshot ritual would not survive the next prompt.
 - **Constrains:** the harness is fixture data reachable only with `?harness=1`,
   and P07 must move it behind a development-only flag once the real shell exists.
+## D-0038 — Catalog actions live in one service, the store keeps the single write path
+
+- **Decision:** every shell action (open, create, rename, pin, archive, remove,
+  relocate, reveal, select, engine start/stop, spend) goes through
+  `CatalogService` in the main process. It validates input, maps store failures
+  to renderer-safe `ErrorResult` codes, and delegates mutations to
+  `ProjectStore`, which keeps its maintenance barrier, revision checks and
+  one-transaction write path.
+- **Why:** the acceptance criteria are behavioural ("aliases deduplicate",
+  "removal never deletes", "switching stays isolated"), and those are testable
+  against a service far more cheaply than against a window. The live probe then
+  proves the same service through the real bridge.
+- **Constrains:** the renderer never touches SQLite, filesystem paths or the
+  engine directly; new catalog features must grow the service and the channel
+  list together, and `check-build.mjs` fails on an unexpected channel.
+
+## D-0039 — Drafts are machine-local UI state, not project content
+
+- **Decision:** selected project, last view per project and unsent drafts per
+  project/session live in an atomically written `ui-state.json` beside the
+  SQLite database. Sessions are bounded (20) and draft text is bounded (200k
+  characters). An unreadable file is set aside as `ui-state.json.corrupt-<ts>`
+  with a visible warning instead of being overwritten.
+- **Why:** a project export must not carry half-written text, and a reload must
+  not lose a draft. Keeping it out of the project database also keeps
+  `MONA-005`'s "catalog entry removal never touches project files" trivially
+  true for drafts.
+- **Constrains:** drafts are per machine and per install; they are not portable,
+  and the UI must not promise otherwise.
+
+## D-0040 — A moved folder is a relocation, an alias is the same project
+
+- **Decision:** the same filesystem identity at a new path is a
+  `relocation_required` when the previously recorded path no longer exists, and
+  an `alias` (same project) when it still does. A project marker at a new path
+  is always `relocation_required`. Only an explicit `relocateProject` with the
+  expected revision rebinds.
+- **Why:** P07's acceptance names both cases, and they need opposite answers:
+  opening a junction must not create a duplicate, opening a moved folder must not
+  silently rewrite identity. The observable difference is whether the old path
+  still exists.
+- **Constrains:** moving a project while the old path still exists (a copy, not a
+  move) requires the explicit `Locate…` action; Mona will not guess.
+
+## D-0041 — The fixture harness is development-only, enforced in the main process
+
+- **Decision:** the renderer renders `?harness=1` only when `AppInfo`
+  reports `harnessEnabled`, which the main process sets for a dev-server session
+  or `MONA_ALLOW_HARNESS=1`. The screenshot runner sets the flag; production
+  smoke asserts the harness never renders, and `check-build.mjs` still rejects
+  the fixture marker in the bundle.
+- **Why:** P06 shipped the harness behind a query parameter, which is reachable in
+  production. A query parameter is not a development flag; the main process has
+  to be the one that decides.
+- **Constrains:** any new development-only surface needs the same treatment:
+  decided in the main process, asserted by the smoke run.
+
+## D-0042 — The composer comes before the connection explanation
+
+- **Decision:** in the studio, the draft composer renders above the engine
+  connection block and the execution-disabled explanation.
+- **Why:** at 1280×800 the composer was below the fold in the first live capture.
+  The specification asks that the main task and composer stay usable at that
+  size; a screenshot, not a review, is what caught it.
+- **Constrains:** status or diagnostic copy must never push the primary input out
+  of the first viewport. Live screenshots are part of the check, not decoration.
+
+## D-0043 — Mojibake is a build failure, not a review finding
+
+- **Decision:** `apps/desktop/scripts/check-build.mjs` fails when the renderer
+  bundle contains double-encoded UTF-8 sequences (`C3 82`, `C3 A2` + `E2 82 AC`,
+  `C2 B7`). Source files are edited with byte-safe tools; PowerShell text
+  round-trips are not used for source.
+- **Why:** P07 hit the P02 failure mode again through `Get-Content`/`Set-Content`
+  and it reached a rendered screenshot as `Â·` and `â€™`. A rule in a document did
+  not prevent it; a failing check will.
+- **Constrains:** the check is a bundle check, so it cannot catch corruption in a
+  file that never reaches the bundle — those remain covered by
+  `npm run format:check` and by reading what the build produced.

@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-11-12T03:14:18.342Z",
+  "capturedAt": "2026-11-12T04:28:17.035Z",
   "electron": "45.3.0",
   "chrome": "156.0.8078.96",
   "platform": "win32-x64",
@@ -492,76 +492,76 @@
         {
           "tag": "BUTTON",
           "name": "Open project",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Choose a folder…",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Timeline",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "DIV",
           "name": "09:41:02intent persisted before send (opa_…7f21)○submission0",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Interrupt now",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Pause after task",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Interrupt now",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Cancel queued",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Quit and stop work…",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Queue actions menu",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Open evidence",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Open evidence",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Copy blocker summary",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "INPUT",
           "name": "",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         }
       ],
       "focusRingVisible": true,
-      "ringsPainted": 14,
+      "ringsPainted": 0,
       "stylesheetHasFocusRing": true
     },
     {
@@ -576,76 +576,76 @@
         {
           "tag": "BUTTON",
           "name": "Open project",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Choose a folder…",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Timeline",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "DIV",
           "name": "09:41:02intent persisted before send (opa_…7f21)○submission0",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Interrupt now",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Pause after task",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Interrupt now",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Cancel queued",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Quit and stop work…",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Queue actions menu",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Open evidence",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Open evidence",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "BUTTON",
           "name": "Copy blocker summary",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         },
         {
           "tag": "INPUT",
           "name": "",
-          "outline": "solid 2px"
+          "outline": "none 3px"
         }
       ],
       "focusRingVisible": true,
-      "ringsPainted": 14,
+      "ringsPainted": 0,
       "stylesheetHasFocusRing": true
     }
   ]

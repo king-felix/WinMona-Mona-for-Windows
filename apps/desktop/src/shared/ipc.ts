@@ -32,7 +32,39 @@ export type AppInfo = {
     detail: string;
     /** Short, already-redacted lifecycle facts; never tokens or secret paths. */
     descriptors: string[];
+    workspace: string | null;
+    pid: number | null;
+    endpoint: string | null;
+    compatibility: 'qualified' | 'compatible_unqualified' | 'unsupported' | null;
   };
+  /** Durable local state availability, reported honestly at launch. */
+  localState: {
+    available: boolean;
+    schemaVersion: number | null;
+    detail: string;
+  };
+  /** The route Mona will present. It does not contact the provider to read it. */
+  route: {
+    provider: string;
+    model: string;
+    endpoint: string;
+    source: string;
+  };
+  /** Full Access is the saved profile's posture, not renderer authority. */
+  permission: {
+    label: string;
+    profile: string | null;
+    detail: string;
+  };
+  /** Credentials belong to Codewhale; Mona never reads or echoes them. */
+  credentials: {
+    state: 'unknown';
+    detail: string;
+  };
+  /** The P06 fixture harness renders only when a development flag enables it. */
+  harnessEnabled: boolean;
 };
 
 export type IpcResult<T> = { ok: true; data: T } | { ok: false; error: ErrorResult };
+
+export type { CatalogBridge } from './catalog.js';

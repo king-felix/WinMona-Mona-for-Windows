@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
 import type { SubmissionRecord } from '@mona/contracts';
@@ -87,6 +87,41 @@ export type UsageInput = {
   costMicros?: number | null;
   costKnown: boolean;
   source: string;
+};
+
+export type RuntimeBindingRow = {
+  id: string;
+  projectId: string;
+  workspace: string;
+  endpoint: string | null;
+  pid: number | null;
+  processCreationTime: string | null;
+  engineVersion: string | null;
+  engineCommit: string | null;
+  owned: boolean;
+  tokenSha256: string | null;
+  state: string;
+  createdAt: string;
+  lastSeenAt: string;
+};
+
+export type RuntimeBindingInput = {
+  projectId: string;
+  workspace: string;
+  endpoint?: string | null;
+  pid?: number | null;
+  processCreationTime?: string | null;
+  engineVersion?: string | null;
+  engineCommit?: string | null;
+  owned: boolean;
+  tokenSha256?: string | null;
+  state: string;
+};
+
+export type ProjectUsageRow = {
+  turnCount: number;
+  knownCostMicros: number;
+  unknownCostRecords: number;
 };
 
 export type StoreOptions = {
@@ -203,6 +238,17 @@ export class ProjectStore {
       const identityHash = hashIdentity(identity.fsIdentity);
       const byIdentity = findByFsIdentity(tx.db, identityHash);
       if (byIdentity && byIdentity.canonical_path !== identity.canonicalPath) {
+        // The same filesystem object seen at a new path is a move, not a second
+        // project. The old path disappearing is the observable difference
+        // between a moved folder and a junction/alias to a live one.
+        if (!existsSync(byIdentity.canonical_path)) {
+          return {
+            status: 'relocation_required' as const,
+            project: toProject(byIdentity),
+            observedPath: identity.canonicalPath,
+            reason: `this folder is project ${byIdentity.id}, last seen at ${byIdentity.canonical_path}; rebind it explicitly instead of creating a second project`,
+          };
+        }
         return { status: 'alias' as const, project: toProject(byIdentity) };
       }
 
@@ -306,6 +352,155 @@ export class ProjectStore {
       const result = tx.db.prepare('DELETE FROM projects WHERE id = ?').run(id);
       if (Number(result.changes) > 0) tx.bumpRevision();
       return { removed: Number(result.changes) > 0 };
+    });
+  }
+
+  /**
+   * Deliberately move a catalog entry to a new path (a moved folder). This is
+   * the only way a known project changes location; opening a moved folder by
+   * itself reports `relocation_required` first.
+   */
+  async relocateProject(id: string, expectedRevision: number, target: string): Promise<ProjectRow> {
+    const identity = identifyPath(target);
+    return await this.write(
+      (tx) => {
+        const row = tx.db.prepare('SELECT * FROM projects WHERE id = ?').get(id) as ProjectRecord | undefined;
+        if (!row) throw stateError('not_found', `project ${id} does not exist`);
+        if (row.revision !== expectedRevision) {
+          throw stateError(
+            'stale_revision',
+            `project ${id} is at revision ${row.revision}, caller expected ${expectedRevision}`,
+          );
+        }
+        rebindProject(tx, id, identity);
+        return toProject(tx.db.prepare('SELECT * FROM projects WHERE id = ?').get(id) as ProjectRecord);
+      },
+      { expectedRevision, projectId: id },
+    );
+  }
+
+  /** Store the latest observed connection for a project; one row per project. */
+  async putRuntimeBinding(input: RuntimeBindingInput): Promise<RuntimeBindingRow> {
+    return await this.write((tx) => {
+      const existing = tx.db
+        .prepare('SELECT * FROM runtime_bindings WHERE project_id = ? ORDER BY last_seen_at DESC LIMIT 1')
+        .get(input.projectId) as RuntimeBindingRecord | undefined;
+      const now = tx.now();
+      if (existing) {
+        tx.db
+          .prepare(
+            `UPDATE runtime_bindings
+               SET workspace = ?, endpoint = ?, pid = ?, process_creation_time = ?, engine_version = ?, engine_commit = ?, owned = ?, token_sha256 = ?, state = ?, last_seen_at = ?
+             WHERE id = ?`,
+          )
+          .run(
+            input.workspace,
+            input.endpoint ?? null,
+            input.pid ?? null,
+            input.processCreationTime ?? null,
+            input.engineVersion ?? null,
+            input.engineCommit ?? null,
+            input.owned ? 1 : 0,
+            input.tokenSha256 ?? null,
+            input.state,
+            now,
+            existing.id,
+          );
+        tx.bumpRevision();
+        return toRuntimeBinding(
+          tx.db.prepare('SELECT * FROM runtime_bindings WHERE id = ?').get(existing.id) as RuntimeBindingRecord,
+        );
+      }
+      const id = `rtb_${randomUUID().replaceAll('-', '')}`;
+      tx.db
+        .prepare(
+          `INSERT INTO runtime_bindings(id, project_id, workspace, endpoint, pid, process_creation_time, engine_version, engine_commit, owned, token_sha256, state, created_at, last_seen_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          id,
+          input.projectId,
+          input.workspace,
+          input.endpoint ?? null,
+          input.pid ?? null,
+          input.processCreationTime ?? null,
+          input.engineVersion ?? null,
+          input.engineCommit ?? null,
+          input.owned ? 1 : 0,
+          input.tokenSha256 ?? null,
+          input.state,
+          now,
+          now,
+        );
+      tx.bumpRevision();
+      return toRuntimeBinding(
+        tx.db.prepare('SELECT * FROM runtime_bindings WHERE id = ?').get(id) as RuntimeBindingRecord,
+      );
+    });
+  }
+
+  async getRuntimeBinding(projectId: string): Promise<RuntimeBindingRow | null> {
+    return await this.read((db) => {
+      const row = db
+        .prepare('SELECT * FROM runtime_bindings WHERE project_id = ? ORDER BY last_seen_at DESC LIMIT 1')
+        .get(projectId) as RuntimeBindingRecord | undefined;
+      return row ? toRuntimeBinding(row) : null;
+    });
+  }
+
+  async listRuntimeBindings(): Promise<RuntimeBindingRow[]> {
+    return await this.read((db) => {
+      const rows = db
+        .prepare('SELECT * FROM runtime_bindings ORDER BY last_seen_at DESC')
+        .all() as RuntimeBindingRecord[];
+      const seen = new Set<string>();
+      const latest: RuntimeBindingRow[] = [];
+      for (const row of rows) {
+        if (seen.has(row.project_id)) continue;
+        seen.add(row.project_id);
+        latest.push(toRuntimeBinding(row));
+      }
+      return latest;
+    });
+  }
+
+  /** Mark a project's observed runtime as no longer running. */
+  async clearRuntimeBinding(projectId: string, state = 'stopped'): Promise<void> {
+    await this.write((tx) => {
+      const changed = tx.db
+        .prepare(
+          'UPDATE runtime_bindings SET state = ?, pid = NULL, endpoint = NULL, last_seen_at = ? WHERE project_id = ?',
+        )
+        .run(state, tx.now(), projectId);
+      if (Number(changed.changes) > 0) tx.bumpRevision();
+    });
+  }
+
+  /** Cost and usage already recorded for one project. Unknown is not zero. */
+  async projectUsage(projectId: string): Promise<ProjectUsageRow> {
+    return await this.read((db) => {
+      const row = db
+        .prepare(
+          `SELECT COUNT(*) AS turn_count,
+                  COALESCE(SUM(CASE WHEN cost_known = 1 THEN cost_micros ELSE 0 END), 0) AS known_micros,
+                  COALESCE(SUM(CASE WHEN cost_known = 0 THEN 1 ELSE 0 END), 0) AS unknown_records
+             FROM usage_records WHERE project_id = ?`,
+        )
+        .get(projectId) as { turn_count: number; known_micros: number; unknown_records: number };
+      return {
+        turnCount: Number(row.turn_count ?? 0),
+        knownCostMicros: Number(row.known_micros ?? 0),
+        unknownCostRecords: Number(row.unknown_records ?? 0),
+      };
+    });
+  }
+
+  async countThreads(projectId: string): Promise<number> {
+    return await this.read((db) => {
+      const row = db.prepare('SELECT COUNT(*) AS count FROM threads WHERE project_id = ?').get(projectId) as {
+        count: number;
+      };
+      return Number(row.count ?? 0);
     });
   }
 
@@ -569,6 +764,22 @@ export class WriteTransaction {
   }
 }
 
+type RuntimeBindingRecord = {
+  id: string;
+  project_id: string;
+  workspace: string;
+  endpoint: string | null;
+  pid: number | null;
+  process_creation_time: string | null;
+  engine_version: string | null;
+  engine_commit: string | null;
+  owned: number;
+  token_sha256: string | null;
+  state: string;
+  created_at: string;
+  last_seen_at: string;
+};
+
 type ProjectRecord = {
   id: string;
   label: string;
@@ -602,6 +813,24 @@ function toProject(row: ProjectRecord): ProjectRow {
     revision: row.revision,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+function toRuntimeBinding(row: RuntimeBindingRecord): RuntimeBindingRow {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    workspace: row.workspace,
+    endpoint: row.endpoint,
+    pid: row.pid,
+    processCreationTime: row.process_creation_time,
+    engineVersion: row.engine_version,
+    engineCommit: row.engine_commit,
+    owned: row.owned === 1,
+    tokenSha256: row.token_sha256,
+    state: row.state,
+    createdAt: row.created_at,
+    lastSeenAt: row.last_seen_at,
   };
 }
 

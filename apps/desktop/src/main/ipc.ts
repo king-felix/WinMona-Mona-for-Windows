@@ -14,7 +14,17 @@ export function createAppInfo(input: {
   node: string;
   platform: string;
   arch: string;
-  engine?: { status: EngineStatus; detail: string; descriptors?: string[] };
+  engine?: {
+    status: EngineStatus;
+    detail: string;
+    descriptors?: string[];
+    workspace?: string | null;
+    pid?: number | null;
+    endpoint?: string | null;
+    compatibility?: 'qualified' | 'compatible_unqualified' | 'unsupported' | null;
+  };
+  localState?: { available: boolean; schemaVersion: number | null; detail: string };
+  harnessEnabled?: boolean;
 }): AppInfo {
   const engine = input.engine ?? {
     status: 'not_started' as const,
@@ -33,7 +43,32 @@ export function createAppInfo(input: {
       status: engine.status,
       detail: engine.detail,
       descriptors: engine.descriptors ?? [],
+      workspace: engine.workspace ?? null,
+      pid: engine.pid ?? null,
+      endpoint: engine.endpoint ?? null,
+      compatibility: engine.compatibility ?? null,
     },
+    localState: input.localState ?? {
+      available: false,
+      schemaVersion: null,
+      detail: 'Local state is not open yet.',
+    },
+    route: {
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      endpoint: 'https://api.deepseek.com',
+      source: 'pinned build route; not contacted to display this',
+    },
+    permission: {
+      label: 'Full Access',
+      profile: 'DS',
+      detail: 'Saved Codewhale profile; the engine applies it when a runtime starts.',
+    },
+    credentials: {
+      state: 'unknown',
+      detail: 'Codewhale manages credentials. Mona never reads them; the runtime reports authentication at start.',
+    },
+    harnessEnabled: input.harnessEnabled ?? false,
   };
 }
 

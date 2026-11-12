@@ -65,6 +65,41 @@ function normalizeKey(value: string): string {
   return process.platform === 'win32' ? value.toLowerCase() : value;
 }
 
+/**
+ * The git directory behind a working tree, or null when the folder is not a
+ * repository. A linked worktree stores its git directory in a `.git` file, so a
+ * plain `existsSync(join(root, '.git'))` is not enough.
+ */
+export function resolveGitDir(canonicalPath: string): string | null {
+  const dotGit = path.join(canonicalPath, '.git');
+  if (!existsSync(dotGit)) return null;
+  try {
+    if (statSync(dotGit).isDirectory()) return dotGit;
+    const contents = readFileSync(dotGit, 'utf8');
+    const match = /^gitdir:\s*(.+)$/m.exec(contents);
+    return match?.[1] ? path.resolve(canonicalPath, match[1].trim()) : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The checked-out branch, read from HEAD without running git. A detached HEAD
+ * returns its short commit id; a non-repository folder returns null.
+ */
+export function readGitBranch(canonicalPath: string): string | null {
+  const gitDir = resolveGitDir(canonicalPath);
+  if (!gitDir) return null;
+  try {
+    const head = readFileSync(path.join(gitDir, 'HEAD'), 'utf8').trim();
+    const ref = /^ref:\s*refs\/heads\/(.+)$/.exec(head);
+    if (ref?.[1]) return ref[1];
+    return /^[0-9a-f]{7,64}$/i.test(head) ? head.slice(0, 12) : null;
+  } catch {
+    return null;
+  }
+}
+
 /** Mona's own marker, written when a folder is registered as a project. */
 export function markerPath(canonicalPath: string): string {
   return path.join(canonicalPath, '.mona', 'project', 'project.json');

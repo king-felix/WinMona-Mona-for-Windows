@@ -4,6 +4,7 @@ export * from './db.js';
 export * from './migrations.js';
 export * from './identity.js';
 export * from './store.js';
+export * from './catalog.js';
 export * from './artifacts.js';
 export * from './backup.js';
 export * from './export.js';

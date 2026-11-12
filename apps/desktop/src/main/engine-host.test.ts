@@ -16,13 +16,17 @@ const receipt: ShutdownReceipt = {
   rollback_claimed: false,
 };
 
-function fakeSupervisor(): { supervisor: RuntimeSupervisor; events: SupervisorEvent[]; stopped: string[] } {
+function fakeSupervisor(workspace = 'x:\\work\\alpha'): {
+  supervisor: RuntimeSupervisor;
+  events: SupervisorEvent[];
+  stopped: string[];
+} {
   const events: SupervisorEvent[] = [];
   const stopped: string[] = [];
   const runtime = {
     runtimeId: 'rt_0123456789abcdef01234567',
     pid: 4242,
-    workspace: 'x:\\work\\alpha',
+    workspace,
     endpoint: 'http://127.0.0.1:7903',
     identity: {} as never,
     report: { status: 'qualified' as const, reasons: [], capabilityGaps: [] } as never,
@@ -153,15 +157,18 @@ describe('EngineHost', () => {
     expect(host.summary().detail).toContain('Outcome unknown');
   });
 
-  it('refuses a second owned runtime and an external attach in the same session', async () => {
+  it('refuses a second workspace while one runtime is owned, and is idempotent for the same one', async () => {
     const host = new EngineHost({
       ownershipDir: 'C:\\data\\runtime',
       executable: 'codewhale.exe',
-      supervisorFactory: () => fakeSupervisor().supervisor,
+      supervisorFactory: () => fakeSupervisor('C:\\work\\alpha').supervisor,
     });
     await host.startProjectRuntime({ workspace: 'C:\\work\\alpha' });
+    const same = await host.startProjectRuntime({ workspace: 'C:\\work\\alpha' });
+    expect(same.ok).toBe(true);
     const second = await host.startProjectRuntime({ workspace: 'C:\\work\\beta' });
-    expect(second.ok).toBe(true);
+    expect(second.ok).toBe(false);
+    if (!second.ok) expect(second.error.message).toContain('already owns a runtime');
     const attached = await host.attachUserRuntime({ baseUrl: 'http://127.0.0.1:7904', token: '[redacted]' });
     expect(attached.ok).toBe(false);
     if (!attached.ok) expect(attached.error.code).toBe('invalid_request');

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 23,
+  "revision": 24,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P07",
+  "current_prompt": "P08",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -302,14 +302,14 @@
         },
         {
           "path": "docs/evidence/P04-lifecycle.json",
-          "sha256": "7a65083c437c6d9d1ef12a5132a0033f981815553b907cefc3611b8d8102dfcd",
+          "sha256": "242acac78ce625c52dd785f429390dc23e7e3fc3e4bc75ad6f32dc973fc05fcd",
           "kind": "document",
           "recorded_utc": "2026-11-12T03:14:57Z",
           "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-lifecycle-log.txt",
-          "sha256": "4b4703b31d37c3f64aad06a5c6a612ca6bdf2fd89e83d291efadab562f8e39d4",
+          "sha256": "a487c7f7f228e9405abec2e36ffdd8d57320568609cfec4c8651dcea33d4def8",
           "kind": "document",
           "recorded_utc": "2026-11-12T03:14:57Z",
           "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
@@ -367,7 +367,7 @@
         },
         {
           "path": "docs/evidence/P05-state-open.json",
-          "sha256": "73ef1152ba195798f8fbc051ab8c38ad997470acf59888a3ecf72af893bb89ac",
+          "sha256": "3808bd3711683828d07121fdb09713206662a6d6ebcf82a6107c0b19cc9c44ff",
           "kind": "document",
           "recorded_utc": "2026-11-12T03:14:57Z",
           "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
@@ -421,7 +421,7 @@
         },
         {
           "path": "docs/evidence/P06-shots.json",
-          "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+          "sha256": "7cf0047244be7e2ecc6ef7db8c5cfbe5ff64a9fda6caa81654e14c845168dbc7",
           "kind": "document",
           "recorded_utc": "2026-11-12T03:15:23Z",
           "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
@@ -465,15 +465,72 @@
       "blocker_ids": []
     },
     "P07": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-005",
         "MONA-006",
         "MONA-029"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "project catalog extended with branch reading, runtime bindings, deliberate relocation and usage rollup behind one ProjectCatalog facade",
+        "CatalogService + 18 named IPC channels replace the single app-info bridge with validated, sender-checked catalog actions",
+        "renderer rebuilt as a real shell: rail search/recents, context bar, home, studio, work, cost, settings, one inspector, closed drawer, command palette",
+        "drafts, selected project and per-project view persist per project and survive a reload; switching never mixes drafts, spend or engine state",
+        "P06 fixture harness moved behind a main-process development flag; smoke and bundle checks fail if it reaches production",
+        "21-step live Electron catalog probe plus six live shell screenshots; two defects found and fixed (byte-double-encoded UTF-8, composer below the fold)"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P07-projects.md",
+          "sha256": "1b198a010450a908c91e9e56d384e2c17936f8847fe5fa0278fb48b3e4f6aa1e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-catalog.json",
+          "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-catalog-log.txt",
+          "sha256": "aa93908e0b0dc488e6378250d296289aa01e224476451e9bddbfa13d01fd48e5",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-shell.json",
+          "sha256": "6f370518d04425f5fa2cb13a19ae8b831c40a18af4a463aef1313593649d9e53",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-tests.txt",
+          "sha256": "aa65c4e12924058909de2893f8c220e8f66fff12da0032e327eaf0d04f0ae26c",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-checks.txt",
+          "sha256": "aacfaaa4340eb03f666f0790c30ff2a2e8e2440fb2a6dcd12ddc9c0c46db2198",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        },
+        {
+          "path": "docs/evidence/P07-build.txt",
+          "sha256": "a9739a29f4f163f4d86cde696c7e4e7717ca69af52cb745adc5bcbeee144e0bd",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T04:35:58Z",
+          "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f"
+        }
+      ],
       "blocker_ids": []
     },
     "P08": {
@@ -687,7 +744,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P07"
+    "P08"
   ],
-  "last_checkpoint_utc": "2026-11-12T03:15:23Z"
+  "last_checkpoint_utc": "2026-11-12T04:35:58Z"
 }

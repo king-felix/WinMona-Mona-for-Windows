@@ -1,0 +1,92 @@
+﻿P07 verification - final artifact
+recorded_utc: 2026-11-12T04:33:30Z
+node: v26.13.1  platform: Microsoft Windows NT 10.0.26200.0
+
+ RUN  v5.1.0 X:/AI_projects/Mona
+
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts (5 tests) 12ms
+ ✓ packages/adapter/src/http.test.ts (7 tests) 32ms
+ ✓ packages/contracts/src/contracts.test.ts (24 tests) 30ms
+ ✓ packages/adapter/src/adapter.test.ts (24 tests) 56ms
+ ✓ packages/adapter/src/journal.test.ts (4 tests) 113ms
+ ✓ packages/ui/src/contrast.test.ts (6 tests) 6ms
+ ✓ apps/desktop/src/main/security.test.ts (6 tests) 5ms
+ ✓ apps/desktop/src/main/ui-state.test.ts (4 tests) 458ms
+ ✓ packages/adapter/src/work-control.test.ts (14 tests) 9ms
+ ✓ packages/project-state/src/migrations.test.ts (5 tests) 517ms
+ ✓ apps/desktop/src/main/ipc.test.ts (5 tests) 8ms
+ ✓ apps/desktop/src/main/engine-host.test.ts (11 tests) 7ms
+ ✓ packages/ui/src/palette.test.tsx (3 tests) 66ms
+ ✓ packages/ui/src/ui.test.tsx (10 tests) 111ms
+ ✓ apps/desktop/src/renderer/App.test.tsx (6 tests) 305ms
+ ✓ packages/project-state/src/store.test.ts (9 tests) 1327ms
+ ✓ packages/project-state/src/catalog.test.ts (9 tests) 1350ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts (8 tests) 1229ms
+ ✓ packages/project-state/src/state.test.ts (9 tests) 1275ms
+ ✓ packages/adapter/src/supervisor.test.ts (11 tests) 24384ms
+   ✓ process tree ownership (1)
+     ✓ stops a real owned process tree and leaves an unrelated node process alive 2722ms
+   ✓ RuntimeSupervisor (9)
+     ✓ starts the runtime with an authenticated loopback identity and a token-free ownership record 4078ms
+     ✓ stops a real descendant spawned by the owned runtime 4324ms
+     ✓ clears a stale pid record and starts a fresh runtime 4332ms
+     ✓ does not kill a live pid whose creation identity changed 321ms
+     ✓ restarts a crashed runtime a bounded number of times without submitting work 7928ms
+     ✓ fails the start when the runtime exits before it is usable 431ms
+
+ Test Files  20 passed (20)
+      Tests  180 passed (180)
+   Start at  21:33:31
+   Duration  24.77s (tests 88%, environment 6%, import 5%, transform 1%)
+
+
+
+--- bootstrap ---
+
+> mona@0.0.0 bootstrap:test
+> node --test tests/bootstrap
+
+✔ checkpoint advances revision atomically and journals the boundary (912.1929ms)
+✔ stale expected revision is refused and state is untouched (822.4439ms)
+✔ a write interrupted after the temp file is promoted by recover (964.3778ms)
+✔ a torn temp file is quarantined and the committed state survives (653.892ms)
+✔ a corrupt state file is restored from the newest verified backup (1001.5669ms)
+✔ validation rejects a dependency cycle (691.9821ms)
+✔ validation rejects an unregistered requirement and an unknown owner (689.3195ms)
+✔ validation rejects a changed specification whose recorded hash is stale (688.3529ms)
+✔ validation rejects a passed criterion with no evidence (695.2725ms)
+✔ evidence command records a hash and derives requirement status (843.0922ms)
+✔ checkpoint refuses evidence paths that do not exist (647.5184ms)
+✔ a recorded remaining step can be explicitly cleared when it is finished (872.8742ms)
+✔ evidence can prune stale references left on sibling criteria (686.8219ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10236.7684
+
+
+--- spike ---
+
+> mona@0.0.0 spike:test
+> node --test tests/spike
+
+✔ parseSseFrame reads event, id, and JSON data (3.3497ms)
+✔ parseSseFrame joins multi-line data and ignores comments (0.1157ms)
+✔ parseSseFrame tolerates malformed payloads without throwing (0.1146ms)
+✔ parseSseFrame returns null for an empty frame (0.0824ms)
+✔ RuntimeClient refuses a non-loopback base URL (0.3321ms)
+✔ RuntimeClient requires a real bearer token (0.102ms)
+✔ startOwnedRuntime refuses an invalid port before spawning (0.2311ms)
+✔ startOwnedRuntime keeps the token out of argv (0.3002ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 63.1309

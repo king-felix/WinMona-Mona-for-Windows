@@ -118,7 +118,18 @@ export class EngineHost {
       };
     }
     if (this.supervisor?.existing()) {
-      return { ok: true, endpoint: this.supervisor.existing()?.endpoint ?? '' };
+      const existing = this.supervisor.existing();
+      if (existing && existing.workspace !== input.workspace) {
+        return {
+          ok: false,
+          error: {
+            code: 'invalid_request',
+            message: `Mona already owns a runtime for ${existing.workspace}. Stop it before starting another project.`,
+            retryable: false,
+          },
+        };
+      }
+      return { ok: true, endpoint: existing?.endpoint ?? '' };
     }
     const options: RuntimeSupervisorOptions = {
       executable: this.deps.executable,

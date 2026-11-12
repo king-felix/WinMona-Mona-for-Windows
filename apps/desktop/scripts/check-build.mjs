@@ -26,8 +26,13 @@ for (const file of files) {
   if (!/\.(html|js|css|json)$/.test(file)) continue;
   const text = await readFile(file, 'utf8');
   const rel = path.relative(repoRoot, file);
-  if (text.includes('__MONA_CSP__')) failures.push(`${rel}: CSP placeholder was not replaced`);
-  if (text.includes('mona.fixture.test-only')) failures.push(`${rel}: test fixture marker leaked into the build`);
+  if (/__MONA_CSP__/.test(text)) failures.push(`${rel}: CSP placeholder was not replaced`);
+  if (/mona\.fixture\.test-only/.test(text)) failures.push(`${rel}: test fixture marker leaked into the build`);
+  // A PowerShell round-trip can silently double-encode UTF-8. Make that
+  // corruption impossible to ship rather than something a reviewer must spot.
+  if (/\u00C3[\u0080-\u00BF]|\u00E2\u20AC|\u00C2\u00B7/.test(text)) {
+    failures.push(`${rel}: mojibake (double-encoded UTF-8) in the renderer bundle`);
+  }
   if (
     /CODEWHALE_RUNTIME_TOKEN|DEEPSEEK_API_KEY|ANTHROPIC_API_KEY|BEGIN (RSA |EC )?PRIVATE KEY|sk-[A-Za-z0-9]{16,}/.test(
       text,
@@ -52,9 +57,32 @@ if (!/Content-Security-Policy/.test(html)) failures.push('index.html: missing CS
 if (!/connect-src 'none'/.test(html)) failures.push('index.html: production CSP does not deny network');
 
 const preload = await readFile(path.join(repoRoot, 'apps', 'desktop', 'dist', 'preload', 'preload.cjs'), 'utf8');
-const channels = [...preload.matchAll(/mona:[a-z-]+/g)].map((match) => match[0]);
-if (channels.length !== 1 || channels[0] !== 'mona:app-info')
+const channels = [...new Set([...preload.matchAll(/mona:[a-z-]+/g)].map((match) => match[0]))].sort();
+const expectedChannels = [
+  'mona:app-info',
+  'mona:catalog-create',
+  'mona:catalog-list',
+  'mona:catalog-open',
+  'mona:catalog-pick-folder',
+  'mona:catalog-relocate',
+  'mona:catalog-remove',
+  'mona:catalog-reveal',
+  'mona:catalog-select',
+  'mona:catalog-update',
+  'mona:engine-start',
+  'mona:engine-state',
+  'mona:engine-stop',
+  'mona:project-spend',
+  'mona:ui-get',
+  'mona:ui-new-session',
+  'mona:ui-save-draft',
+  'mona:ui-set-view',
+].sort();
+if (JSON.stringify(channels) !== JSON.stringify(expectedChannels)) {
   failures.push(`preload exposes unexpected channels: ${channels.join(', ')}`);
+}
+if (/ipcRenderer\.invoke\([^,]+,\s*payload\)/.test(preload))
+  failures.push('preload forwards an arbitrary payload channel');
 if (/\brequire\(["'](?:node:)?(?:fs|child_process|net|http|https)["']\)/.test(preload))
   failures.push('preload requires a privileged Node module');
 
@@ -63,5 +91,5 @@ if (failures.length) {
   process.exit(1);
 }
 console.log(
-  `build checks passed: ${files.length} renderer files, CSP replaced, no fixtures, no credentials, one preload channel`,
+  `build checks passed: ${files.length} renderer files, CSP replaced, no fixtures, no credentials, ${channels.length} named preload channels`,
 );

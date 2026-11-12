@@ -5,14 +5,14 @@
       "name": "owned runtime started for the lifecycle probe",
       "ok": true,
       "detail": {
-        "endpoint": "http://127.0.0.1:52393"
+        "endpoint": "http://127.0.0.1:52036"
       }
     },
     {
       "name": "runtime is owned with a real process id",
       "ok": true,
       "detail": {
-        "pid": 23952,
+        "pid": 36484,
         "state": "connected"
       }
     },
@@ -21,7 +21,7 @@
       "ok": true,
       "detail": {
         "windowDestroyed": false,
-        "runtimePid": 23952,
+        "runtimePid": 36484,
         "runtimeAlive": true,
         "hostState": "connected"
       }
@@ -47,7 +47,7 @@
       "name": "the runtime survived the renderer crash",
       "ok": true,
       "detail": {
-        "runtimePid": 23952,
+        "runtimePid": 36484,
         "hostState": "connected"
       }
     },
@@ -63,7 +63,7 @@
       "ok": true,
       "detail": {
         "windowCount": 1,
-        "runtimePid": 23952,
+        "runtimePid": 36484,
         "sameRuntime": true
       }
     },
@@ -76,14 +76,14 @@
         "rollbackClaimed": false,
         "quit": {
           "receipt": {
-            "runtime_id": "rt_8e14e6b4802c0bb5c075918f",
-            "requested_at": "2026-11-12T03:13:12.519Z",
-            "completed_at": "2026-11-12T03:13:15.748Z",
+            "runtime_id": "rt_a9044e12cb5905fa381b727f",
+            "requested_at": "2026-11-12T04:28:23.084Z",
+            "completed_at": "2026-11-12T04:28:26.331Z",
             "reason": "app_quit",
             "outcome": "stopped_forced",
             "root_exited": true,
             "observed_descendants": [
-              19952
+              38016
             ],
             "remaining_pids": [],
             "endpoint_closed": true,
@@ -96,9 +96,9 @@
       "name": "the runtime process is gone after quit",
       "ok": true,
       "detail": {
-        "runtimePid": 23952
+        "runtimePid": 36484
       }
     }
   ],
-  "capturedAt": "2026-11-12T03:13:15.755Z"
+  "capturedAt": "2026-11-12T04:28:26.342Z"
 }

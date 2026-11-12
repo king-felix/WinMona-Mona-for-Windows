@@ -10,6 +10,7 @@ export type ButtonProps = {
   disabled?: boolean;
   type?: 'button' | 'submit';
   'aria-label'?: string;
+  title?: string;
   ref?: Ref<HTMLButtonElement>;
 };
 

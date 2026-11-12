@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 136,
+  "revision": 152,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -676,12 +676,12 @@
         "P07",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "catalog-actions",
           "description": "Create, open, rename label, archive, pin, search, relocate and reveal work",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P05-state.md",
@@ -690,6 +690,14 @@
               "recorded_utc": "2026-11-12T02:23:00Z",
               "commit": "ad74116",
               "note": "P05 evidence recorded at commit ad74116"
+            },
+            {
+              "path": "docs/evidence/P07-catalog.json",
+              "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:43Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "21 live Electron steps through renderer/preload/IPC/SQLite: dirty non-Git folder, Git branch, junction alias dedupe, create, rename+pin, branch search, archive/restore, relocation rebind, removal"
             }
           ]
         },
@@ -705,6 +713,14 @@
               "recorded_utc": "2026-11-12T02:23:00Z",
               "commit": "ad74116",
               "note": "P05 evidence recorded at commit ad74116"
+            },
+            {
+              "path": "docs/evidence/P07-catalog.json",
+              "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:43Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "live probe removes a catalog entry and re-checks the folder and its file on disk; unit test asserts marker survival"
             }
           ]
         },
@@ -720,12 +736,20 @@
               "recorded_utc": "2026-11-12T02:23:01Z",
               "commit": "ad74116",
               "note": "P05 evidence recorded at commit ad74116"
+            },
+            {
+              "path": "docs/evidence/P07-catalog.json",
+              "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:43Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "live probe registers a folder, renames it on disk, observes relocation_required, then rebinds deliberately; a junction returns the same project"
             }
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -755,12 +779,20 @@
               "note": "Daybreak shell rendered in the live window with the design system loaded; palette contrast measured separately in P06-shots"
             },
             {
-              "path": "docs/evidence/P06-shots.json",
-              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "path": "docs/evidence/P07-projects.md",
+              "sha256": "1b198a010450a908c91e9e56d384e2c17936f8847fe5fa0278fb48b3e4f6aa1e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:15:23Z",
-              "commit": "b026819",
-              "note": "P06 evidence recorded at commit b026819"
+              "recorded_utc": "2026-11-12T04:31:04Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "real shell (catalog, context bar, studio, palette) captured in Daybreak at 1280x800: docs/evidence/shots-p07"
+            },
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "7cf0047244be7e2ecc6ef7db8c5cfbe5ff64a9fda6caa81654e14c845168dbc7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:48Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "harness shots regenerated after the harness was made development-only (MONA_ALLOW_HARNESS=1); 34 screenshots, 4 audits clean"
             }
           ]
         },
@@ -784,6 +816,14 @@
               "recorded_utc": "2026-11-12T03:15:23Z",
               "commit": "b026819",
               "note": "P06 evidence recorded at commit b026819"
+            },
+            {
+              "path": "docs/evidence/P07-projects.md",
+              "sha256": "1b198a010450a908c91e9e56d384e2c17936f8847fe5fa0278fb48b3e4f6aa1e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:31:04Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "real shell captured in Afterglow at 1280x800 after the harness was made development-only"
             }
           ]
         },
@@ -801,12 +841,20 @@
               "note": "semantic nav, aria-current, aria-live, focus-visible, system typography verified live and in DOM tests; screen-reader and 200% QA are P06/P22"
             },
             {
-              "path": "docs/evidence/P06-shots.json",
-              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "path": "docs/evidence/P07-catalog.json",
+              "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:15:23Z",
-              "commit": "b026819",
-              "note": "P06 evidence recorded at commit b026819"
+              "recorded_utc": "2026-11-12T04:35:48Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "live shell: Ctrl+K palette reached all five screens with Enter only; 18 real Tab stops; both themes captured at 1280x800; screen-reader QA still P22"
+            },
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "7cf0047244be7e2ecc6ef7db8c5cfbe5ff64a9fda6caa81654e14c845168dbc7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:49Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "harness keyboard audit re-run after the development-only gate: 14 focus stops per theme/density, focus ring present, no unnamed controls"
             }
           ]
         },
@@ -834,7 +882,7 @@
           ]
         }
       ],
-      "verified_commit": "b026819",
+      "verified_commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1379,11 +1427,11 @@
             },
             {
               "path": "docs/evidence/P04-lifecycle.json",
-              "sha256": "7a65083c437c6d9d1ef12a5132a0033f981815553b907cefc3611b8d8102dfcd",
+              "sha256": "242acac78ce625c52dd785f429390dc23e7e3fc3e4bc75ad6f32dc973fc05fcd",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:14:57Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "re-verified at P06: lifecycle probe still passes with local state and the design system loaded"
+              "recorded_utc": "2026-11-12T04:35:49Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "P04 lifecycle probe re-run during P07 regression: renderer crash recreates the window, runtime survives, quit-and-stop receipts intact"
             }
           ]
         },
@@ -1426,7 +1474,7 @@
           ]
         }
       ],
-      "verified_commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+      "verified_commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1971,12 +2019,20 @@
           "status": "passed",
           "evidence": [
             {
-              "path": "docs/evidence/P06-shots.json",
-              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "path": "docs/evidence/P07-catalog.json",
+              "sha256": "2dc7a98d20c725e8d8d6cbd808fe879edee9143e0ca8e8ea6d41764eaeaedf79",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:15:23Z",
-              "commit": "b026819",
-              "note": "P06 evidence recorded at commit b026819"
+              "recorded_utc": "2026-11-12T04:35:48Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "keyboard-only navigation of the real shell, recorded per screen in the probe steps"
+            },
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "7cf0047244be7e2ecc6ef7db8c5cfbe5ff64a9fda6caa81654e14c845168dbc7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T04:35:49Z",
+              "commit": "b5eafb6457de65f02b5ee2489f292b8a0e968e3f",
+              "note": "harness Tab traversal re-run in P07 after the gate change: 14 focus stops, ring visible in all four theme/density combinations"
             }
           ]
         }
