@@ -6,7 +6,28 @@ Acknowledging a blocker never resets its counter or clears the row.
 
 ## Open
 
-_None._
+### ISSUE-0023 — modern Explorer menu cannot be registered without a trust decision
+
+- **Problem:** the identity package is built and correctly signed with a labelled
+  test certificate, but Windows refuses to install it on this machine, so the
+  Windows 11 menu entry cannot appear and cannot be seen.
+- **Observed:** unsigned registration → `0x80073CFF`; test-signed package →
+  `0x800B0109` (untrusted root); Root-store import → interactive consent required
+  (non-interactive run reports "UI is not allowed in this operation").
+- **Not a code defect:** a machine-policy gate. Three independent attempts were
+  made and recorded; no further local attempt can succeed without one of the
+  options below.
+- **What clears it (Victor's choice):**
+  - **A.** Enable Windows developer mode (administrator, one time), then re-run
+    `node tools/install/cli.mjs install`.
+  - **B.** Run `node tools/install/cli.mjs trust-test-certificate` in an
+    interactive terminal and accept the Windows security warning for
+    `CN=Mona Development`; uninstall removes that certificate again.
+  - **C.** Supply a production certificate matching the manifest publisher and
+    sign with `MONA_SIGN_PFX` / `MONA_SIGN_PASSWORD`.
+- **Afterwards:** right-click a folder and a folder background; the entry must
+  appear in the Windows 11 menu, not under **Show more options**.
+- **Requirement:** MONA-027 stays **blocked** until then.
 
 ## Prerequisites that are not blockers yet
 

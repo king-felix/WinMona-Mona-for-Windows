@@ -62,3 +62,4 @@
 {"utc":"2026-11-12T16:41:19Z","revision":63,"prompt":"P18","status":"completed","note":"P19 reconciliation: refresh the P18 terminal evidence hash after the final edit; no status or claim changed.","commit":"7cd82e908de6eb21accc58e29dd59a2c491f94a9"}
 {"utc":"2026-11-12T16:41:19Z","revision":64,"prompt":"P19","status":"completed","note":"P19 completed with MONA-024 and MONA-025 verified; P20 next.","commit":"7cd82e908de6eb21accc58e29dd59a2c491f94a9"}
 {"utc":"2026-11-12T16:48:43Z","revision":65,"prompt":"P20","status":"completed","note":"P20 completed. Residual: main hard kill, DB-level disk full, OS sleep not directly simulated.","commit":"43e99daa8fa232f01d33ecd21e29c161a3e419f7"}
+{"utc":"2026-11-12T17:38:34Z","revision":66,"prompt":"P21","status":"completed","note":"P21 complete; MONA-027 blocked on package trust; P22 queued by Victor","commit":"f1f0f473852d806400e268adbd7ac9b37aa18135"}

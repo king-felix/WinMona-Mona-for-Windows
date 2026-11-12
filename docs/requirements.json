@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 300,
+  "revision": 309,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -638,7 +638,7 @@
         "P21",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "folder-launch",
@@ -660,6 +660,14 @@
               "recorded_utc": "2026-11-12T06:45:40Z",
               "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
               "note": "P09 report: delivered behavior, live receipts and limits (corrected wording)"
+            },
+            {
+              "path": "docs/evidence/P21-launch-installed.json",
+              "sha256": "2e4924a6a6308f27f361894bab237775b8fe14f9f7e3d2cac559b4293b1e582d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:09Z",
+              "commit": "f1f0f47",
+              "note": "The installed Mona.exe launched from the exact registered command with a hostile Unicode folder; one window, composer focused, no task sent"
             }
           ]
         },
@@ -683,6 +691,14 @@
               "recorded_utc": "2026-11-12T06:44:02Z",
               "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
               "note": "Real second-instance launch from the background-compatible command opened the second folder"
+            },
+            {
+              "path": "docs/evidence/P21-launch-installed-registration.json",
+              "sha256": "c0e282f93eb2b0d0973194d970a047304aeae56035cee7656d32f97fcb123804",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:09Z",
+              "commit": "f1f0f47",
+              "note": "The installer re-registered folder and folder-background against the installed executable with the same quoted %V command; read-back verified"
             }
           ]
         },
@@ -706,6 +722,14 @@
               "recorded_utc": "2026-11-12T06:46:41Z",
               "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
               "note": "Silent launch suite: parser, target, dispatcher and renderer launch tests (UTF-8 evidence, line endings normalized)"
+            },
+            {
+              "path": "docs/evidence/P21-launch-installed.json",
+              "sha256": "2e4924a6a6308f27f361894bab237775b8fe14f9f7e3d2cac559b4293b1e582d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:09Z",
+              "commit": "f1f0f47",
+              "note": "Five second instances exited 0 against the installed build; the owner applied each path, one window, two fast launches produced ordered receipts"
             }
           ]
         },
@@ -729,6 +753,14 @@
               "recorded_utc": "2026-11-12T06:46:44Z",
               "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
               "note": "Unit matrix: spaces, apostrophes, ampersands, parentheses, Unicode, trailing separators, duplicates, missing, inaccessible, roots, UNC/WSL, junction"
+            },
+            {
+              "path": "docs/evidence/P21-launch-installed.json",
+              "sha256": "2e4924a6a6308f27f361894bab237775b8fe14f9f7e3d2cac559b4293b1e582d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "Installed build: ampersand, parentheses, apostrophes, em dash and CJK folder arrived as one inert argument; missing folder rejected without changing the project"
             }
           ]
         },
@@ -760,11 +792,19 @@
               "recorded_utc": "2026-11-12T06:46:45Z",
               "commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
               "note": "Registration helper tests: exact label, argument arrays, uninstall isolation, repeat plan; requirement stays partial for P21/P23"
+            },
+            {
+              "path": "docs/evidence/P21-install.json",
+              "sha256": "841ecd50dc9edd18832f6f2da6ed3bb63a61772538a2932d273133f3c9794b5b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "Packaged install registered the classic menu twice-verifiable and wrote only Mona keys; uninstall removed only those keys"
             }
           ]
         }
       ],
-      "verified_commit": "380d7bba61db2d8b4a105badf282c74475dfe8f5",
+      "verified_commit": "f1f0f47",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2721,31 +2761,67 @@
         "P21",
         "P23"
       ],
-      "status": "pending",
+      "status": "blocked",
       "criteria": [
         {
           "id": "installer",
           "description": "Per-user install and uninstall with Mona-owned components only",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P21-install.json",
+              "sha256": "841ecd50dc9edd18832f6f2da6ed3bb63a61772538a2932d273133f3c9794b5b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "Per-user install of 1656 checksummed files into %LOCALAPPDATA%\\Programs\\Mona; atomic replacement; uninstall entry; installed app smoke-launched"
+            }
+          ]
         },
         {
           "id": "modern-menu",
           "description": "Windows 11 modern context menu works on the target system",
-          "status": "pending",
-          "evidence": []
+          "status": "blocked",
+          "evidence": [
+            {
+              "path": "docs/evidence/P21-windows.md",
+              "sha256": "4534af0def478606aa71903fb653ec7ec1dcec05d9c51fdd4eecf83627dff6c3",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "Helper implements IExplorerCommand and package is built, but Windows refuses registration without developer mode or a trusted certificate; exact prerequisite recorded"
+            }
+          ]
         },
         {
           "id": "uninstall",
           "description": "Uninstall removes Mona registration and preserves projects and engine history",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P21-uninstall.json",
+              "sha256": "c881ef65b0f98b8657742a395a2972e33a6b88e3ff173125108f8cfae1bf51fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "Installed uninstaller removed program files, keys, classic menu and its test certificate; user data and ~/.codewhale unchanged"
+            }
+          ]
         },
         {
           "id": "signing",
           "description": "Signing/distribution prerequisites are recorded; unsigned test packages are labeled",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P21-package.json",
+              "sha256": "06f88b81fccedb6b50a493b92af265e5baf05aa32a4797de7d046c4cb3fc341e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T17:38:10Z",
+              "commit": "f1f0f47",
+              "note": "MSIX produced and test-signed with a labelled self-created certificate; no production signature exists and none is claimed; checksums written"
+            }
+          ]
         }
       ],
       "verified_commit": null,

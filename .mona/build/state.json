@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 65,
+  "revision": 66,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P21",
+  "current_prompt": "P22",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -1344,15 +1344,40 @@
       "blocker_ids": []
     },
     "P21": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-004",
         "MONA-027"
       ],
-      "completed_steps": [],
-      "remaining_steps": [],
-      "evidence": [],
-      "blocker_ids": []
+      "completed_steps": [
+        "native IExplorerCommand helper built with pinned Zig and verified through real COM activation",
+        "sparse identity package with folder and folder-background verbs, packed and test-signed with a labelled certificate",
+        "per-user installer, atomic upgrade, active-run deferral, uninstall with user-data preservation",
+        "packaged-argv fix in stripLauncherArgs found by the installed launch probe"
+      ],
+      "remaining_steps": [
+        "modern-menu package registration requires developer mode or a trusted certificate (MONA-027 blocked, ISSUE-0023)",
+        "human right-click confirmation of the classic and modern menu entries"
+      ],
+      "evidence": [
+        {
+          "path": "docs/evidence/P21-windows.md",
+          "sha256": "4534af0def478606aa71903fb653ec7ec1dcec05d9c51fdd4eecf83627dff6c3",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T17:38:34Z",
+          "commit": "f1f0f473852d806400e268adbd7ac9b37aa18135"
+        },
+        {
+          "path": "docs/evidence/P21-launch-installed.json",
+          "sha256": "2e4924a6a6308f27f361894bab237775b8fe14f9f7e3d2cac559b4293b1e582d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T17:38:34Z",
+          "commit": "f1f0f473852d806400e268adbd7ac9b37aa18135"
+        }
+      ],
+      "blocker_ids": [
+        "ISSUE-0023"
+      ]
     },
     "P22": {
       "status": "pending",
@@ -1408,7 +1433,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P21"
+    "P22"
   ],
-  "last_checkpoint_utc": "2026-11-12T16:48:43Z"
+  "last_checkpoint_utc": "2026-11-12T17:38:34Z"
 }
