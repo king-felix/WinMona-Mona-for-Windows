@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 26,
+  "revision": 27,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P08",
+  "current_prompt": "P09",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -534,16 +534,82 @@
       "blocker_ids": []
     },
     "P08": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-007",
         "MONA-008",
         "MONA-012",
         "MONA-014"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "StudioService owns one engine thread per session and mode; P03 adapter submission, P04 work queue and a durable event projection",
+        "migration v2 adds studio thread bindings and timeline_items with a unique (thread_id, seq) index; replay is a no-op and items cap at 64 KB",
+        "seven validated studio IPC channels plus a main-process event push; preload stays a frozen set of named methods (25 total)",
+        "renderer studio: persistent control strip, timeline, composer with file references, pending approval/input card, diagnostics drawer",
+        "safe escaped Markdown renderer with no raw HTML and no anchors",
+        "saved DS Full Access profile seeded once; observed thread posture displayed separately",
+        "live Electron probe: real turn created hello.txt, ran the project test, showed matching outcome and tool evidence; 6 screenshots",
+        "P07 shell/catalog regression passes with prompt-scoped evidence paths"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P08-studio.md",
+          "sha256": "52489ce13231b5071325abf47146d1bf373f002bba0c278e9b7aabb069c75184",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-studio.json",
+          "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-studio-log.txt",
+          "sha256": "d37a9bc81fec13410a381ad01222b5976e5bd5dafed9e8796e9c42a37bf1d47d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-shell-smoke.json",
+          "sha256": "1a678e70a629b8b82d6a49f861dcc489b0793bc54455b5abdd1f9c398af110ce",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-catalog-regression.json",
+          "sha256": "b95b5cc8a33f96e9d50cf468cd2099b61e4d6db4c60b3d89d371d4257f0ab984",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-tests.txt",
+          "sha256": "f69d06e18500bb6d69b635ed169421a1ffe9e23e1ffa35d88fce93a24a128d8b",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-checks.txt",
+          "sha256": "4c586c9cbf717f1a2428490dd520a7d47d9ef77f29bd4c023bdff617084b1cf4",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        },
+        {
+          "path": "docs/evidence/P08-build.txt",
+          "sha256": "1f71b335876d82971903a6d976af0a32e36ac127782df8da188b7e4e1dd61372",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T06:12:19Z",
+          "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5"
+        }
+      ],
       "blocker_ids": []
     },
     "P09": {
@@ -744,7 +810,10 @@
     }
   },
   "next_eligible_prompts": [
-    "P08"
+    "P09",
+    "P10",
+    "P12",
+    "P13"
   ],
-  "last_checkpoint_utc": "2026-11-12T04:36:50Z"
+  "last_checkpoint_utc": "2026-11-12T06:12:19Z"
 }

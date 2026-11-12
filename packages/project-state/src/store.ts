@@ -136,6 +136,60 @@ export type StoreOptions = {
   };
 };
 
+export type StudioMode = 'agent' | 'plan';
+
+export type StudioThreadRow = {
+  id: string;
+  projectId: string;
+  engineThreadId: string;
+  workspace: string;
+  sessionId: string | null;
+  mode: StudioMode | null;
+  profileJson: string | null;
+  lastSeq: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StudioThreadInput = {
+  id: string;
+  projectId: string;
+  engineThreadId: string;
+  workspace: string;
+  sessionId: string;
+  mode: StudioMode;
+  /** The effective profile observed from the engine, stored verbatim. */
+  profileJson: string;
+};
+
+export type TimelineItemInput = {
+  id: string;
+  projectId: string;
+  threadId: string;
+  turnId: string | null;
+  seq: number;
+  kind: string;
+  title: string;
+  body: string;
+  status: string | null;
+  truncated: boolean;
+};
+
+export type TimelineItemRow = {
+  id: string;
+  projectId: string;
+  threadId: string;
+  turnId: string | null;
+  seq: number;
+  kind: string;
+  title: string;
+  body: string;
+  status: string | null;
+  truncated: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /**
  * The one write path for local project state. Every mutation enters the
  * maintenance barrier and a single IMMEDIATE transaction; project-scoped writes
@@ -495,6 +549,40 @@ export class ProjectStore {
     });
   }
 
+  /** Usage already recorded for one engine thread. Used to attribute cost deltas. */
+  async threadUsageTotals(threadId: string): Promise<{
+    cacheHitTokens: number;
+    cacheMissTokens: number;
+    outputTokens: number;
+    knownCostMicros: number;
+    records: number;
+  }> {
+    return await this.read((db) => {
+      const row = db
+        .prepare(
+          `SELECT COALESCE(SUM(cache_hit_tokens), 0) AS hit,
+                  COALESCE(SUM(cache_miss_tokens), 0) AS miss,
+                  COALESCE(SUM(output_tokens), 0) AS out,
+                  COALESCE(SUM(CASE WHEN cost_known = 1 THEN cost_micros ELSE 0 END), 0) AS known,
+                  COUNT(*) AS records
+             FROM usage_records WHERE thread_id = ?`,
+        )
+        .get(threadId) as { hit: number; miss: number; out: number; known: number; records: number };
+      return {
+        cacheHitTokens: Number(row.hit ?? 0),
+        cacheMissTokens: Number(row.miss ?? 0),
+        outputTokens: Number(row.out ?? 0),
+        knownCostMicros: Number(row.known ?? 0),
+        records: Number(row.records ?? 0),
+      };
+    });
+  }
+
+  /** Records one usage row for a turn; costKnown=false never carries a price. */
+  async recordUsage(input: UsageInput): Promise<string> {
+    return await this.write((tx) => tx.recordUsage(input));
+  }
+
   async countThreads(projectId: string): Promise<number> {
     return await this.read((db) => {
       const row = db.prepare('SELECT COUNT(*) AS count FROM threads WHERE project_id = ?').get(projectId) as {
@@ -512,6 +600,227 @@ export class ProjectStore {
       return rows.map(toProject);
     });
   }
+
+  // --- studio: engine thread bindings and the projected timeline ----------
+
+  /**
+   * Bind an engine thread to one Mona session. Re-binding the same session
+   * updates the observed profile instead of creating a second thread.
+   */
+  async putStudioThread(input: StudioThreadInput): Promise<StudioThreadRow> {
+    return await this.write((tx) => {
+      const now = tx.now();
+      tx.db
+        .prepare(
+          `INSERT INTO threads(id, project_id, engine_thread_id, workspace, last_seq, created_at, updated_at, session_id, mode, profile_json)
+           VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?)
+           ON CONFLICT(id) DO UPDATE SET profile_json = excluded.profile_json, mode = excluded.mode, updated_at = excluded.updated_at`,
+        )
+        .run(
+          input.id,
+          input.projectId,
+          input.engineThreadId,
+          input.workspace,
+          now,
+          now,
+          input.sessionId,
+          input.mode,
+          input.profileJson,
+        );
+      tx.bumpRevision();
+      const row = tx.db.prepare('SELECT * FROM threads WHERE id = ?').get(input.id) as ThreadRecord;
+      return toStudioThread(row);
+    });
+  }
+
+  async getStudioThread(threadId: string): Promise<StudioThreadRow | null> {
+    return await this.read((db) => {
+      const row = db.prepare('SELECT * FROM threads WHERE id = ?').get(threadId) as ThreadRecord | undefined;
+      return row ? toStudioThread(row) : null;
+    });
+  }
+
+  async studioThreadForSession(
+    projectId: string,
+    sessionId: string,
+    mode?: StudioMode,
+  ): Promise<StudioThreadRow | null> {
+    return await this.read((db) => {
+      const row = (
+        mode
+          ? db
+              .prepare(
+                'SELECT * FROM threads WHERE project_id = ? AND session_id = ? AND mode = ? ORDER BY updated_at DESC, rowid DESC LIMIT 1',
+              )
+              .get(projectId, sessionId, mode)
+          : db
+              .prepare(
+                'SELECT * FROM threads WHERE project_id = ? AND session_id = ? ORDER BY updated_at DESC, rowid DESC LIMIT 1',
+              )
+              .get(projectId, sessionId)
+      ) as ThreadRecord | undefined;
+      return row ? toStudioThread(row) : null;
+    });
+  }
+
+  /** Advances the replay cursor. This is bookkeeping, not user state. */
+  async touchThread(threadId: string, lastSeq: number): Promise<void> {
+    await this.write((tx) => {
+      tx.db.prepare('UPDATE threads SET last_seq = ?, updated_at = ? WHERE id = ?').run(lastSeq, tx.now(), threadId);
+    });
+  }
+
+  /**
+   * Inserts a projected event. The (thread_id, seq) index makes a replayed
+   * engine event a no-op instead of a duplicate timeline row.
+   */
+  async putTimelineItem(input: TimelineItemInput): Promise<'inserted' | 'updated' | 'duplicate'> {
+    return await this.write((tx) => {
+      const now = tx.now();
+      const existing = tx.db
+        .prepare('SELECT id FROM timeline_items WHERE thread_id = ? AND seq = ?')
+        .get(input.threadId, input.seq) as { id?: string } | undefined;
+      if (existing?.id) {
+        if (existing.id !== input.id) return 'duplicate';
+        tx.db
+          .prepare(
+            'UPDATE timeline_items SET body = ?, title = ?, status = ?, truncated = ?, updated_at = ? WHERE id = ?',
+          )
+          .run(input.body, input.title, input.status, input.truncated ? 1 : 0, now, input.id);
+        return 'updated';
+      }
+      tx.db
+        .prepare(
+          `INSERT INTO timeline_items(id, project_id, thread_id, turn_id, seq, kind, title, body, status, truncated, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        )
+        .run(
+          input.id,
+          input.projectId,
+          input.threadId,
+          input.turnId,
+          input.seq,
+          input.kind,
+          input.title,
+          input.body,
+          input.status,
+          input.truncated ? 1 : 0,
+          now,
+          now,
+        );
+      return 'inserted';
+    });
+  }
+
+  async listTimelineItems(threadId: string, limit = 500): Promise<TimelineItemRow[]> {
+    const bounded = Math.max(1, Math.min(2000, Math.trunc(limit)));
+    return await this.read((db) => {
+      const rows = db
+        .prepare('SELECT * FROM timeline_items WHERE thread_id = ? ORDER BY seq ASC LIMIT ?')
+        .all(threadId, bounded) as TimelineRecord[];
+      return rows.map(toTimelineItem);
+    });
+  }
+
+  async recordTurn(input: { threadId: string; engineTurnId: string; status: string }): Promise<void> {
+    await this.write((tx) => {
+      const existing = tx.db.prepare('SELECT id FROM turns WHERE engine_turn_id = ?').get(input.engineTurnId) as
+        { id?: string } | undefined;
+      if (existing?.id) {
+        tx.db.prepare('UPDATE turns SET status = ? WHERE id = ?').run(input.status, existing.id);
+        return;
+      }
+      tx.db
+        .prepare('INSERT INTO turns(id, thread_id, engine_turn_id, status, created_at) VALUES (?, ?, ?, ?, ?)')
+        .run(
+          `trn_${input.engineTurnId.replace(/^turn_/, '')}`,
+          input.threadId,
+          input.engineTurnId,
+          input.status,
+          tx.now(),
+        );
+    });
+  }
+
+  /** Records a settings version; the newest version for a scope wins. */
+  async saveSettingVersion(scope: string, version: number, values: unknown): Promise<void> {
+    await this.write((tx) => tx.putSettingVersion(scope, version, values));
+  }
+
+  /** The newest saved settings blob for a scope, or null when never saved. */
+  async latestSettingVersion(scope: string): Promise<{ version: number; values: unknown } | null> {
+    return await this.read((db) => {
+      const row = db
+        .prepare('SELECT version, values_json FROM settings_versions WHERE scope = ? ORDER BY version DESC LIMIT 1')
+        .get(scope) as { version?: number; values_json?: string } | undefined;
+      if (!row || typeof row.version !== 'number') return null;
+      try {
+        return { version: row.version, values: JSON.parse(row.values_json ?? 'null') as unknown };
+      } catch {
+        return null;
+      }
+    });
+  }
+}
+
+type ThreadRecord = {
+  id: string;
+  project_id: string;
+  engine_thread_id: string;
+  workspace: string;
+  last_seq: number;
+  created_at: string;
+  updated_at: string;
+  session_id: string | null;
+  mode: string | null;
+  profile_json: string | null;
+};
+
+function toStudioThread(row: ThreadRecord): StudioThreadRow {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    engineThreadId: row.engine_thread_id,
+    workspace: row.workspace,
+    sessionId: row.session_id,
+    mode: row.mode === 'plan' ? 'plan' : row.mode === 'agent' ? 'agent' : null,
+    profileJson: row.profile_json,
+    lastSeq: Number(row.last_seq ?? 0),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+type TimelineRecord = {
+  id: string;
+  project_id: string;
+  thread_id: string;
+  turn_id: string | null;
+  seq: number;
+  kind: string;
+  title: string;
+  body: string;
+  status: string | null;
+  truncated: number;
+  created_at: string;
+  updated_at: string;
+};
+
+function toTimelineItem(row: TimelineRecord): TimelineItemRow {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    threadId: row.thread_id,
+    turnId: row.turn_id,
+    seq: Number(row.seq),
+    kind: row.kind,
+    title: row.title,
+    body: row.body,
+    status: row.status,
+    truncated: row.truncated === 1,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 function writeMarkerFile(identity: PathIdentity, id: string, label: string, createdAt: string): void {

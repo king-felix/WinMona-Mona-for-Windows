@@ -1,0 +1,29 @@
+
+PASS a dirty non-Git folder opens as a project with no invented branch :: {"repoKind":"none","branch":null}
+PASS a Git folder opens and reports its real branch from HEAD :: {"branch":"probe/main","kind":"git"}
+PASS a junction path resolves to the existing project instead of a duplicate :: {"status":"existing","sameProject":true}
+PASS creating a project makes the folder on disk and records it :: {"label":"created by probe"}
+PASS a project label can be renamed and pinned without touching the folder :: {"label":"Probe repo renamed","pinned":true}
+PASS local search matches a branch and returns only that project :: ["Probe repo renamed"]
+PASS archiving hides a project and restoring brings it back :: {"hiddenCount":2,"visibleCount":3}
+PASS a moved folder requires a deliberate rebind and keeps one catalog entry :: {"registered":true,"relocationStatus":"relocation_required","rebound":true}
+PASS removing a catalog entry never deletes source files :: {"removed":true,"folderStillExists":true}
+PASS the persisted view for the open project is restored after a reload :: {"landedOn":"Recorded spend"}
+PASS the catalog and its labels survive a window reload :: ["Probe repo renamed","movable-project","plain-dirty-folder"]
+PASS the shell shows real route and permission facts, and no fixture harness :: {"model":"deepseek-flash","permission":"Full Access · DS","palette":true,"harness":false}
+PASS unsent drafts are stored per project and survive a reload :: {"plain":["draft for the plain folder"],"repo":["draft for the git repo"]}
+PASS every major screen is reachable with the keyboard alone :: {"paletteOpen":true,"reached":["Projects","Probe repo renamed","Work board","Recorded spend","Route and permission"]}
+PASS the command palette routes to a specific screen, not to a guess :: ["Projects","Probe repo renamed","Work board"]
+PASS Tab traversal reaches real controls in the live shell :: {"stops":18,"first":["BUTTON:Open the command palette","INPUT:","INPUT:","BUTTON:Home","BUTTON:Studio","BUTTON:Work"]}
+PASS connecting the selected project reports a real engine endpoint and pid :: {"state":"connected","endpoint":"http://127.0.0.1:61210","pid":3268}
+PASS the shell reflects the live engine state instead of a static badge :: {"badge":"Engine connected","detail":"Engine: Owned runtime rt_b1fca6c6a664a85c51e7bc26 on http://127.0.0.1:61210","stop":true}
+PASS switching projects mid-runtime keeps drafts, engine state and spend isolated :: {"badge":"Engine connected","draft":"draft for the plain folder","spend":"No recorded spend","warned":true,"secondStartRefused":true,"reason":"A runtime is already serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p07-catalog-ng4sao\\mona-probe-repo. Stop it before starting this one."}
+PASS stopping the engine through the shell reports the real state and leaves the catalog usable :: {"badge":"Engine stopped","detail":"Engine: Runtime stopped (stopped_forced). Work already sent is not rolled back.","settled":true,"state":"stopped"}
+PASS offline history still lists every project after the runtime stops :: {"count":3}
+shot p07-daybreak-home
+shot p07-daybreak-studio
+shot p07-daybreak-cost
+shot p07-daybreak-palette
+shot p07-afterglow-home
+shot p07-afterglow-studio
+mona: applied 2 state migration(s) to version 2

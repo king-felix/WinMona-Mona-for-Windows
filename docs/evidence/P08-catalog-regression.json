@@ -1,0 +1,236 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a dirty non-Git folder opens as a project with no invented branch",
+      "ok": true,
+      "detail": {
+        "repoKind": "none",
+        "branch": null
+      }
+    },
+    {
+      "name": "a Git folder opens and reports its real branch from HEAD",
+      "ok": true,
+      "detail": {
+        "branch": "probe/main",
+        "kind": "git"
+      }
+    },
+    {
+      "name": "a junction path resolves to the existing project instead of a duplicate",
+      "ok": true,
+      "detail": {
+        "status": "existing",
+        "sameProject": true
+      }
+    },
+    {
+      "name": "creating a project makes the folder on disk and records it",
+      "ok": true,
+      "detail": {
+        "label": "created by probe"
+      }
+    },
+    {
+      "name": "a project label can be renamed and pinned without touching the folder",
+      "ok": true,
+      "detail": {
+        "label": "Probe repo renamed",
+        "pinned": true
+      }
+    },
+    {
+      "name": "local search matches a branch and returns only that project",
+      "ok": true,
+      "detail": [
+        "Probe repo renamed"
+      ]
+    },
+    {
+      "name": "archiving hides a project and restoring brings it back",
+      "ok": true,
+      "detail": {
+        "hiddenCount": 2,
+        "visibleCount": 3
+      }
+    },
+    {
+      "name": "a moved folder requires a deliberate rebind and keeps one catalog entry",
+      "ok": true,
+      "detail": {
+        "registered": true,
+        "relocationStatus": "relocation_required",
+        "rebound": true
+      }
+    },
+    {
+      "name": "removing a catalog entry never deletes source files",
+      "ok": true,
+      "detail": {
+        "removed": true,
+        "folderStillExists": true
+      }
+    },
+    {
+      "name": "the persisted view for the open project is restored after a reload",
+      "ok": true,
+      "detail": {
+        "landedOn": "Recorded spend"
+      }
+    },
+    {
+      "name": "the catalog and its labels survive a window reload",
+      "ok": true,
+      "detail": [
+        "Probe repo renamed",
+        "movable-project",
+        "plain-dirty-folder"
+      ]
+    },
+    {
+      "name": "the shell shows real route and permission facts, and no fixture harness",
+      "ok": true,
+      "detail": {
+        "model": "deepseek-flash",
+        "permission": "Full Access · DS",
+        "palette": true,
+        "harness": false
+      }
+    },
+    {
+      "name": "unsent drafts are stored per project and survive a reload",
+      "ok": true,
+      "detail": {
+        "plain": [
+          "draft for the plain folder"
+        ],
+        "repo": [
+          "draft for the git repo"
+        ]
+      }
+    },
+    {
+      "name": "every major screen is reachable with the keyboard alone",
+      "ok": true,
+      "detail": {
+        "paletteOpen": true,
+        "reached": [
+          "Projects",
+          "Probe repo renamed",
+          "Work board",
+          "Recorded spend",
+          "Route and permission"
+        ]
+      }
+    },
+    {
+      "name": "the command palette routes to a specific screen, not to a guess",
+      "ok": true,
+      "detail": [
+        "Projects",
+        "Probe repo renamed",
+        "Work board"
+      ]
+    },
+    {
+      "name": "Tab traversal reaches real controls in the live shell",
+      "ok": true,
+      "detail": {
+        "stops": 18,
+        "first": [
+          "BUTTON:Open the command palette",
+          "INPUT:",
+          "INPUT:",
+          "BUTTON:Home",
+          "BUTTON:Studio",
+          "BUTTON:Work"
+        ]
+      }
+    },
+    {
+      "name": "connecting the selected project reports a real engine endpoint and pid",
+      "ok": true,
+      "detail": {
+        "state": "connected",
+        "endpoint": "http://127.0.0.1:61210",
+        "pid": 3268
+      }
+    },
+    {
+      "name": "the shell reflects the live engine state instead of a static badge",
+      "ok": true,
+      "detail": {
+        "badge": "Engine connected",
+        "detail": "Engine: Owned runtime rt_b1fca6c6a664a85c51e7bc26 on http://127.0.0.1:61210",
+        "stop": true
+      }
+    },
+    {
+      "name": "switching projects mid-runtime keeps drafts, engine state and spend isolated",
+      "ok": true,
+      "detail": {
+        "badge": "Engine connected",
+        "draft": "draft for the plain folder",
+        "spend": "No recorded spend",
+        "warned": true,
+        "secondStartRefused": true,
+        "reason": "A runtime is already serving x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p07-catalog-ng4sao\\mona-probe-repo. Stop it before starting this one."
+      }
+    },
+    {
+      "name": "stopping the engine through the shell reports the real state and leaves the catalog usable",
+      "ok": true,
+      "detail": {
+        "badge": "Engine stopped",
+        "detail": "Engine: Runtime stopped (stopped_forced). Work already sent is not rolled back.",
+        "settled": true,
+        "state": "stopped"
+      }
+    },
+    {
+      "name": "offline history still lists every project after the runtime stops",
+      "ok": true,
+      "detail": {
+        "count": 3
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-daybreak-home.png",
+      "theme": "daybreak",
+      "view": "home"
+    },
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-daybreak-studio.png",
+      "theme": "daybreak",
+      "view": "studio"
+    },
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-daybreak-cost.png",
+      "theme": "daybreak",
+      "view": "cost"
+    },
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-daybreak-palette.png",
+      "theme": "daybreak",
+      "view": "palette"
+    },
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-afterglow-home.png",
+      "theme": "afterglow",
+      "view": "home"
+    },
+    {
+      "file": "..\\..\\docs\\evidence\\shots-p08-catalog-regression\\p07-afterglow-studio.png",
+      "theme": "afterglow",
+      "view": "studio"
+    }
+  ],
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32-x64",
+  "capturedAt": "2026-11-12T06:07:28.226Z"
+}

@@ -529,3 +529,384 @@ body {
   overflow: auto;
   background: var(--canvas);
 }
+
+/* --- P08 live studio ------------------------------------------------- */
+
+.control-strip {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.control-strip > .control-run {
+  flex: 1 1 230px;
+  min-width: 0;
+}
+
+.control-run {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.control-run .dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  flex: none;
+}
+
+.control-run .dot[data-state='running'],
+.control-run .dot[data-state='preparing'],
+.control-run .dot[data-state='interrupting'] {
+  background: var(--info);
+}
+
+.control-run .dot[data-state='reconnecting'],
+.control-run .dot[data-state='awaiting_approval'] {
+  background: var(--attention);
+}
+
+.control-run .dot[data-state='failed'] {
+  background: var(--critical);
+}
+
+.control-run strong {
+  display: block;
+  font-size: var(--text-sm);
+}
+
+.control-run p {
+  margin: 0;
+  font-size: var(--text-sm);
+  max-width: 52ch;
+}
+
+.control-mode {
+  display: inline-flex;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.mode-button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+}
+
+.mode-button.active {
+  background: var(--primary-soft);
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+}
+
+.mode-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.control-facts {
+  display: grid;
+  flex: 1 1 150px;
+  gap: 1px;
+  font-size: var(--text-sm);
+  min-width: 0;
+}
+
+.control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  background: var(--surface-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+}
+
+.chip-remove {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chip-remove:hover {
+  color: var(--critical);
+}
+
+.pending-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--attention);
+  border-radius: var(--radius-md);
+  background: var(--attention-soft);
+}
+
+.pending-card p {
+  margin: 0;
+}
+
+.timeline {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+  min-height: 160px;
+  max-height: 42vh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-2) 0 0;
+  border-top: 1px solid var(--border);
+}
+
+.timeline:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.timeline-item {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.timeline-item.kind-user {
+  background: var(--info-soft);
+  border-color: var(--info);
+}
+
+.timeline-item.kind-outcome {
+  background: var(--success-soft);
+  border-color: var(--success);
+}
+
+.timeline-item.kind-approval {
+  background: var(--attention-soft);
+  border-color: var(--attention);
+}
+
+.timeline-item.kind-error {
+  background: var(--critical-soft);
+  border-color: var(--critical);
+}
+
+.timeline-item.pending {
+  border-style: dashed;
+}
+
+.timeline-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.timeline-title {
+  font-weight: var(--weight-medium);
+}
+
+.timeline-meta {
+  margin-left: auto;
+  font-size: var(--text-xs);
+}
+
+.timeline-plain {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.timeline-code,
+.diagnostics-log {
+  margin: 0;
+  padding: var(--space-2);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  line-height: var(--leading-base);
+  max-height: 22rem;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.timeline-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.mona-markdown {
+  display: grid;
+  gap: var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.mona-markdown p,
+.mona-markdown ul,
+.mona-markdown ol,
+.mona-markdown blockquote,
+.mona-markdown figure {
+  margin: 0;
+}
+
+.mona-markdown h3,
+.mona-markdown h4 {
+  margin: 0;
+  font-size: var(--text-md);
+}
+
+.mona-markdown ul,
+.mona-markdown ol {
+  padding-left: var(--space-5);
+}
+
+.mona-md-codeblock {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.mona-md-codeblock figcaption {
+  padding: 2px var(--space-2);
+  background: var(--surface-sunken);
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.mona-md-codeblock pre {
+  margin: 0;
+  padding: var(--space-2);
+  overflow: auto;
+  max-height: 20rem;
+}
+
+.mona-md-code {
+  font-family: var(--font-mono);
+  background: var(--surface-sunken);
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+}
+
+.mona-md-link {
+  text-decoration: underline dotted;
+}
+
+.mona-md-url {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.studio-diagnostics {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2);
+}
+
+/* Compact enough that the control strip, composer and timeline all fit at
+   1280x800 without horizontal scrolling or a hidden execution control. */
+.studio-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: calc(100vh - 220px);
+  overflow: auto;
+}
+
+.studio-panel > .timeline {
+  flex: 1 1 auto;
+  min-height: 120px;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.composer {
+  padding: var(--space-3);
+}
+
+.composer-input {
+  min-height: 56px;
+  height: 56px;
+}
+
+.composer-foot > .mona-row {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.control-run p {
+  max-width: 44ch;
+}
+
+.studio-head h2 {
+  font-size: var(--text-lg);
+}
+
+.studio-head .mona-mono {
+  font-size: var(--text-xs);
+}
+
+.studio-diagnostics summary {
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+}
+
+@media (max-width: 1180px) {
+  .control-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 780px) {
+  .control-actions {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control-run .dot {
+    transition: none;
+  }
+}

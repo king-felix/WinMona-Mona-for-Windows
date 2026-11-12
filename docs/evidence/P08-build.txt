@@ -1,0 +1,54 @@
+
+> mona@0.0.0 build
+> npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/project-state@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/ui@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/desktop@0.1.0 build
+> npm run clean && npm run build:main && npm run build:preload && npm run build:renderer
+
+
+> @mona/desktop@0.1.0 clean
+> node -e "require('node:fs').rmSync('dist',{recursive:true,force:true})"
+
+
+> @mona/desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+
+> @mona/desktop@0.1.0 build:preload
+> esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs
+
+
+  dist\preload\preload.cjs  3.8kb
+
+Done in 6ms
+
+> @mona/desktop@0.1.0 build:renderer
+> vite build
+
+vite v8.3.8 building client environment for production...
+transforming...
+✓ 27 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/renderer/index.html                   0.73 kB │ gzip:  0.41 kB
+dist/renderer/assets/index-CQRV0ZnR.css   23.65 kB │ gzip:  4.76 kB
+dist/renderer/assets/index-DgD8xRGY.js   289.03 kB │ gzip: 87.00 kB │ map: 1,245.10 kB
+
+✓ built in 127ms

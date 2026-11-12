@@ -7,10 +7,14 @@ import { CatalogService } from './catalog-service.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { createAppInfo, registerIpc } from './ipc.js';
 import { EngineHost } from './engine-host.js';
+import { StudioService } from './studio-service.js';
+import { registerStudioIpc } from './studio-ipc.js';
+import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
 import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
 import { runCatalogProbe } from './catalog-probe.js';
+import { runStudioProbe } from './studio-probe.js';
 import { runShots } from './shots.js';
 import { UiStateStore } from './ui-state.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
@@ -32,6 +36,16 @@ const catalogTest = process.argv.includes('--catalog-test');
 const catalogOut = process.env.MONA_CATALOG_OUT ?? path.join(process.cwd(), 'mona-catalog.json');
 const catalogWorkspace = process.env.MONA_CATALOG_WORKSPACE ?? null;
 const catalogShots = process.env.MONA_CATALOG_SHOTS ?? path.join(process.cwd(), 'mona-catalog-shots');
+const studioTest = process.argv.includes('--studio-test');
+const studioOut = process.env.MONA_STUDIO_OUT ?? path.join(process.cwd(), 'mona-studio.json');
+const studioWorkspace = process.env.MONA_STUDIO_WORKSPACE ?? null;
+const studioShots = process.env.MONA_STUDIO_SHOTS ?? path.join(process.cwd(), 'mona-studio-shots');
+const studioTask =
+  process.env.MONA_STUDIO_TASK ??
+  'Create a file named hello.txt in this project containing exactly MONA_STUDIO_OK with no extra text. Then run `node check.mjs` and report the result. Do not change any other file.';
+// Screenshot capture needs deterministic compositing on a headless or remote
+// desktop; the P08 probe captures five live frames.
+if (shotsTest || studioTest) app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
 const harnessEnabled = isDev || process.env.MONA_ALLOW_HARNESS === '1';
@@ -51,10 +65,63 @@ const engineHost = new EngineHost({
   ownershipDir: path.join(app.getPath('userData'), 'runtime'),
   executable: resolveEngineExecutable(),
   parentPid: process.pid,
+  onEvent: (event) => {
+    if (
+      (event.type === 'exited' && !event.expected) ||
+      event.type === 'restart_exhausted' ||
+      event.type === 'startup_failed'
+    ) {
+      studioService?.engineStopped('the owned runtime is no longer running');
+    }
+  },
 });
 
-const pendingLaunchPaths: string[] = [];
 let localState: LocalState | null = null;
+let studioService: StudioService | null = null;
+
+/**
+ * Victor's DS Full Access profile, recorded once in local state. It states the
+ * posture Mona will request; the effective posture is always read back from the
+ * engine's thread record and displayed separately.
+ */
+type SavedProfile = {
+  label: string;
+  profile: string;
+  provider: string;
+  model: string;
+  endpoint: string;
+  permissionPosture: 'full_access';
+  allowShell: boolean;
+  trustMode: boolean;
+  autoApprove: boolean;
+};
+
+const DEFAULT_PROFILE: SavedProfile = {
+  label: 'Full Access',
+  profile: 'DS',
+  provider: 'deepseek',
+  model: 'deepseek-flash',
+  endpoint: 'https://api.deepseek.com',
+  permissionPosture: 'full_access',
+  allowShell: true,
+  trustMode: true,
+  autoApprove: true,
+};
+
+let savedProfile: SavedProfile = DEFAULT_PROFILE;
+
+function readSavedProfile(values: unknown): SavedProfile | null {
+  if (typeof values !== 'object' || values === null || Array.isArray(values)) return null;
+  const record = values as Record<string, unknown>;
+  if (typeof record.label !== 'string' || typeof record.profile !== 'string') return null;
+  return {
+    ...DEFAULT_PROFILE,
+    label: record.label.slice(0, 80),
+    profile: record.profile.slice(0, 40),
+  };
+}
+
+const pendingLaunchPaths: string[] = [];
 let quitRequested = false;
 
 function delay(ms: number): Promise<void> {
@@ -130,13 +197,45 @@ if (!app.requestSingleInstanceLock()) {
       process.stderr.write(`mona: local state unavailable: ${String(error)}\n`);
     }
 
+    // Victor's DS Full Access profile is recorded once in local state and then
+    // read back on every launch. It states the posture Mona requests; the
+    // effective posture is always displayed from the engine's own thread record.
+    if (localState) {
+      try {
+        const existing = await localState.store.latestSettingVersion('profile');
+        const stored = existing ? readSavedProfile(existing.values) : null;
+        if (stored) {
+          savedProfile = stored;
+        } else {
+          await localState.store.saveSettingVersion('profile', 1, DEFAULT_PROFILE);
+          savedProfile = DEFAULT_PROFILE;
+        }
+      } catch (error) {
+        process.stderr.write(`mona: saved profile unavailable: ${String(error).slice(0, 200)}\n`);
+      }
+    }
+
+    // One engine port for every surface. Stopping the runtime also tells the
+    // studio, so a live turn becomes an honest "outcome uncertain" instead of a
+    // spinner that never resolves.
+    const enginePort = {
+      summary: () => engineHost.summary(),
+      startProjectRuntime: (input: { workspace: string }) => engineHost.startProjectRuntime(input),
+      stopOwned: async (reason: string) => {
+        const stopped = await engineHost.stopOwned(reason);
+        studioService?.engineStopped(`runtime stopped (${reason})`);
+        return stopped;
+      },
+      adapter: () => engineHost.adapter(),
+    };
+
     let catalogService: CatalogService | null = null;
     if (localState) {
       const uiState = new UiStateStore({ file: path.join(app.getPath('userData'), 'state', 'ui-state.json') });
       catalogService = new CatalogService({
         store: localState.store,
         ui: uiState,
-        engine: engineHost,
+        engine: enginePort,
         pickFolder: async (purpose) => {
           const options = {
             title: purpose === 'open' ? 'Open a project folder' : 'Choose where to create the project',
@@ -152,6 +251,28 @@ if (!app.requestSingleInstanceLock()) {
             ok: failure === '',
             detail: failure === '' ? 'Opened the folder in File Explorer.' : failure,
           };
+        },
+      });
+
+      // The live studio: one engine thread per Mona session, streamed into a
+      // durable timeline. It sends nothing until a prompt is submitted.
+      studioService = new StudioService({
+        store: localState.store,
+        engine: enginePort,
+        emit: (event: StudioEvent) => {
+          for (const window of BrowserWindow.getAllWindows()) {
+            if (!window.isDestroyed()) window.webContents.send(STUDIO_CHANNELS.event, event);
+          }
+        },
+        pickReferences: async (project) => {
+          const options = {
+            title: 'Reference files from this project',
+            properties: ['openFile', 'multiSelections'] as Array<'openFile' | 'multiSelections'>,
+            defaultPath: project.canonicalPath,
+          };
+          const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+          const picked = owner ? await dialog.showOpenDialog(owner, options) : await dialog.showOpenDialog(options);
+          return picked.canceled ? null : picked.filePaths;
         },
       });
     }
@@ -182,6 +303,12 @@ if (!app.requestSingleInstanceLock()) {
             schemaVersion: localState?.schemaVersion ?? null,
             detail: stateDetail,
           },
+          permission: {
+            label: savedProfile.label,
+            profile: savedProfile.profile,
+            detail:
+              'Saved once in Mona’s local state. The engine applies it when a thread is created; the studio shows the observed posture from the runtime.',
+          },
           harnessEnabled,
         });
       },
@@ -190,6 +317,11 @@ if (!app.requestSingleInstanceLock()) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: catalogService,
+    });
+    registerStudioIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => studioService,
     });
 
     const reconciled = await engineHost.reconcile();
@@ -257,6 +389,27 @@ if (!app.requestSingleInstanceLock()) {
           fs.writeFileSync(catalogOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
+      return;
+    }
+    if (studioTest && studioWorkspace) {
+      runStudioProbe({
+        window: mainWindow,
+        rendererIndex,
+        workspace: studioWorkspace,
+        shotsDirectory: studioShots,
+        outputPath: studioOut,
+        engine: engineHost,
+        taskText: studioTask,
+      })
+        .then((result) => {
+          const window = mainWindow as BrowserWindow | null;
+          if (window && !window.isDestroyed()) window.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(studioOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
     }
   });
 
@@ -277,6 +430,8 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('will-quit', () => {
+    studioService?.close();
+    studioService = null;
     localState?.close();
     localState = null;
   });

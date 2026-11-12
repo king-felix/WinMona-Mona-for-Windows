@@ -11,6 +11,7 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { StudioEvent, StudioView } from '../shared/studio.js';
 import { App } from './App.js';
 
 const info: AppInfo = {
@@ -87,13 +88,38 @@ type Store = {
   ui: UiStateView;
   engine: EngineView;
   spends: Record<string, ProjectSpend>;
+  studio?: StudioView;
+  studioHandlers?: Array<(event: StudioEvent) => void>;
+  submitted?: Array<{ text: string; mode: string; references: string[] }>;
 };
+
+function emptyStudio(): StudioView {
+  return {
+    projectId: null,
+    sessionId: null,
+    thread: null,
+    items: [],
+    run: { state: 'idle', detail: 'Ready. Nothing has been sent.', turnId: null, submission: null, startedAt: null },
+    control: { pauseRequested: false, queueState: 'idle', lastOutcome: null, interrupt: null },
+    pending: null,
+    diagnostics: [],
+    capabilities: {
+      planMode: { status: 'supported', reason: null },
+      approvalResponse: { status: 'unsupported', reason: 'Mona does not send approval decisions in this build.' },
+      attachments: { status: 'unsupported', reason: 'The turn contract sends text and file references only.' },
+    },
+    warning: null,
+  };
+}
 
 function ok<T>(data: T): IpcResult<T> {
   return { ok: true, data };
 }
 
 function bridgeFor(store: Store): Window['mona'] {
+  const studio = (): StudioView => (store.studio ??= emptyStudio());
+  const handlers = (store.studioHandlers ??= []);
+  const submitted = (store.submitted ??= []);
   const ensure = (id: string) => {
     if (!store.ui.projects[id]) {
       store.ui = {
@@ -206,6 +232,61 @@ function bridgeFor(store: Store): Window['mona'] {
         };
       }
       return ok(store.ui);
+    },
+    studioGet: async (input: { projectId: string; sessionId: string }) =>
+      ok({ ...studio(), projectId: input.projectId, sessionId: input.sessionId }),
+    studioSubmit: async (input: { text: string; mode: string; references: string[] }) => {
+      submitted.push({ text: input.text, mode: input.mode, references: input.references });
+      store.studio = {
+        ...studio(),
+        run: {
+          state: 'running',
+          detail: 'Turn accepted by the runtime.',
+          turnId: 'turn_1',
+          submission: { submissionId: 'sub_1', state: 'accepted', replayed: false },
+          startedAt: '2026-11-12T00:00:00.000Z',
+        },
+      };
+      return ok({
+        submissionId: 'sub_1',
+        threadId: 'thr_1',
+        turnId: 'turn_1',
+        state: 'accepted',
+        replayed: false,
+        reconciliation: { required: false },
+        prompt: input.text,
+        thread: studio().thread,
+        run: studio().run,
+      });
+    },
+    studioInterrupt: async () => {
+      store.studio = {
+        ...studio(),
+        run: { ...studio().run, state: 'interrupting', detail: 'Interrupt acknowledged.' },
+      };
+      return ok({ run: studio().run, control: studio().control });
+    },
+    studioPause: async () => {
+      store.studio = {
+        ...studio(),
+        control: { ...studio().control, pauseRequested: true, queueState: 'running' },
+      };
+      return ok({ run: studio().run, control: studio().control });
+    },
+    studioResume: async () => {
+      store.studio = {
+        ...studio(),
+        control: { ...studio().control, pauseRequested: false, queueState: 'idle' },
+      };
+      return ok({ run: studio().run, control: studio().control });
+    },
+    studioPickReferences: async () => ok({ paths: ['src/app.test.ts'] }),
+    onStudioEvent: (handler: (event: StudioEvent) => void) => {
+      handlers.push(handler);
+      return () => {
+        const index = handlers.indexOf(handler);
+        if (index >= 0) handlers.splice(index, 1);
+      };
     },
   } as unknown as Window['mona'];
 }
@@ -379,6 +460,156 @@ describe('Mona shell', () => {
     expect(document.querySelector('[data-testid="harness"]')).not.toBeNull();
     info.harnessEnabled = false;
     await act(async () => second.root.unmount());
+  });
+
+  it('drives the live studio: observed permission, submit receipt, and pending approval', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: {
+        ...emptyStudio(),
+        thread: {
+          threadId: 'thr_00000000000000000000000000000001',
+          workspace: alpha.canonicalPath,
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          mode: 'agent',
+          permissionPosture: 'full_access',
+          allowShell: true,
+          trustMode: true,
+          autoApprove: true,
+          observedAt: '2026-11-12T00:00:00.000Z',
+        },
+      },
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+
+    expect(document.querySelector('[data-testid="studio-permission"]')?.textContent).toContain('Full Access');
+    expect(document.querySelector('[data-testid="mode-plan"]')?.textContent).toBe('Plan');
+    expect(document.querySelector('[data-testid="mode-agent"]')?.textContent).toBe('Work');
+    const attach = Array.from(document.querySelectorAll('button')).find((node) =>
+      (node.textContent ?? '').includes('Attach file'),
+    );
+    expect(attach?.disabled).toBe(true);
+
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'Say MONA_OK');
+    const submit = exactButton('Submit');
+    expect(submit.disabled).toBe(false);
+    await act(async () => {
+      submit.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(store.submitted).toEqual([{ text: 'Say MONA_OK', mode: 'agent', references: [] }]);
+    expect(document.body.textContent).toContain('Sending…');
+
+    await act(async () => {
+      for (const handler of store.studioHandlers ?? []) {
+        handler({
+          type: 'item',
+          projectId: alpha.id,
+          item: {
+            id: 'tl_1',
+            seq: 1,
+            turnId: 'turn_1',
+            kind: 'user',
+            title: 'You',
+            body: 'Say MONA_OK',
+            status: 'completed',
+            truncated: false,
+            at: '2026-11-12T00:00:00.000Z',
+          },
+        });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(document.body.textContent).not.toContain('Sending…');
+    expect(document.querySelectorAll('[data-testid="timeline-user"]')).toHaveLength(1);
+
+    await act(async () => {
+      for (const handler of store.studioHandlers ?? []) {
+        handler({
+          type: 'state',
+          projectId: alpha.id,
+          thread: store.studio?.thread ?? null,
+          run: {
+            state: 'awaiting_approval',
+            detail: 'The runtime paused for an approval.',
+            turnId: 'turn_1',
+            submission: null,
+            startedAt: null,
+          },
+          control: { pauseRequested: false, queueState: 'running', lastOutcome: null, interrupt: null },
+          pending: {
+            kind: 'approval',
+            approvalId: 'appr_1',
+            toolName: 'bash',
+            description: 'rm -rf dist needs approval',
+            at: '2026-11-12T00:00:00.000Z',
+          },
+        });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(document.querySelector('[data-testid="studio-pending"]')?.textContent).toContain('rm -rf dist');
+    expect(document.querySelector('[data-testid="studio-run-state"]')?.textContent).toBe('Awaiting approval');
+    await act(async () => root.unmount());
+  });
+
+  it('keeps a duplicate streamed item from appearing twice', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const item = {
+      id: 'tl_dup',
+      seq: 4,
+      turnId: 'turn_1',
+      kind: 'assistant' as const,
+      title: 'Assistant',
+      body: 'MONA',
+      status: 'streaming',
+      truncated: false,
+      at: '2026-11-12T00:00:00.000Z',
+    };
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({ state: 'connected', workspace: alpha.canonicalPath }),
+      spends: {},
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    await act(async () => {
+      for (const handler of store.studioHandlers ?? []) {
+        handler({ type: 'item', projectId: alpha.id, item });
+        handler({ type: 'item', projectId: alpha.id, item });
+        handler({ type: 'delta', projectId: alpha.id, itemId: 'tl_dup', text: '_OK', seq: 5 });
+        handler({ type: 'delta', projectId: alpha.id, itemId: 'tl_dup', text: '_OK', seq: 5 });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    const rendered = document.querySelectorAll('[data-testid="timeline-assistant"]');
+    expect(rendered).toHaveLength(1);
+    expect(rendered[0]?.textContent).toContain('MONA_OK');
+    await act(async () => root.unmount());
   });
 
   it('reports a bridge failure instead of pretending the engine is ready', async () => {

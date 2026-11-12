@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
+import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 
 /**
  * The entire renderer-facing surface. Named methods only: no generic invoke, no
@@ -29,6 +30,27 @@ const bridge = Object.freeze({
   saveDraft: (input: { projectId: string; sessionId: string; text: string }) =>
     ipcRenderer.invoke(CATALOG_CHANNELS.uiSaveDraft, input),
   newSession: (projectId: string) => ipcRenderer.invoke(CATALOG_CHANNELS.uiNewSession, { projectId }),
+  studioGet: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
+    ipcRenderer.invoke(STUDIO_CHANNELS.get, input),
+  studioSubmit: (input: {
+    projectId: string;
+    sessionId: string;
+    text: string;
+    mode: 'agent' | 'plan';
+    references: string[];
+  }) => ipcRenderer.invoke(STUDIO_CHANNELS.submit, input),
+  studioInterrupt: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.interrupt, input),
+  studioPause: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.pause, input),
+  studioResume: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.resume, input),
+  studioPickReferences: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.references, input),
+  /** Main-process pushes for the live studio; the only channel the renderer listens on. */
+  onStudioEvent: (handler: (event: StudioEvent) => void) => {
+    const listener = (_event: unknown, payload: StudioEvent): void => handler(payload);
+    ipcRenderer.on(STUDIO_CHANNELS.event, listener);
+    return () => {
+      ipcRenderer.removeListener(STUDIO_CHANNELS.event, listener);
+    };
+  },
 });
 
 contextBridge.exposeInMainWorld('mona', bridge);

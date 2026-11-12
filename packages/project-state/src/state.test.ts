@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createBackup, restoreBackup, verifyDatabaseFile } from './backup.js';
-import { applyMigrations } from './migrations.js';
+import { applyMigrations, MIGRATIONS } from './migrations.js';
 import { ProjectStore } from './store.js';
 import { ArtifactStore } from './artifacts.js';
 import { exportProject, importProject } from './export.js';
@@ -71,7 +71,7 @@ describe('backup and restore', () => {
       recoveryDirectory: path.join(dir, 'recovery'),
     });
     expect(receipt.integrity).toBe('ok');
-    expect(receipt.schemaVersion).toBe(1);
+    expect(receipt.schemaVersion).toBe(MIGRATIONS.length);
     expect((await stat(receipt.parkedCurrentFile)).size).toBeGreaterThan(0);
     expect((await stat(backup.file)).size).toBeGreaterThan(0);
 

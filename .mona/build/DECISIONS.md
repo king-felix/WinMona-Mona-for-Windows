@@ -554,3 +554,80 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** the check is a bundle check, so it cannot catch corruption in a
   file that never reaches the bundle — those remain covered by
   `npm run format:check` and by reading what the build produced.
+
+## D-0044 — A studio thread belongs to one Mona session and one mode
+
+- **Decision:** the studio binds one engine thread per (project, session) and
+  engine mode. Bindings live in the project database (`threads.session_id`,
+  `threads.mode`, `threads.profile_json`); Plan and Work reuse their own thread
+  when the user returns to that mode.
+- **Why:** Mode is a property of an engine thread, not a per-turn flag. Reusing a
+  thread per mode keeps the transcript and the runtime's history aligned, and
+  keeps switching modes from silently mixing plan text into an executing thread.
+- **Constrains:** changing mode opens a thread; it never rewrites an existing one.
+  A thread bound to another workspace is left stored and untouched.
+
+## D-0045 — The timeline is a projection, not a transcript of raw payloads
+
+- **Decision:** `StudioService` projects each engine event into a typed timeline
+  item with a bounded body. Known item kinds become user/assistant/tool/status/
+  outcome rows; internal status items, provider requests and tool-schema
+  snapshots go to Diagnostics; unknown events become one redacted diagnostic
+  line. Deltas are appended in memory and flushed at most every 250 ms.
+- **Why:** the pinned runtime emits many event families that Mona's contracts
+  package does not model. Rendering them as content would invent structure;
+  dropping them would hide state. A projection with an explicit mapping is testable
+  and honest.
+- **Constrains:** an item body never exceeds 64 KB in storage; larger output is
+  labeled truncated, and the renderer expands on demand. A replayed `seq` is a
+  no-op (unique index plus renderer sequence check).
+
+## D-0046 — An approval wait is surfaced and interruptible, never answered by guesswork
+
+- **Decision:** `approval.required`, an unrecognized `approval.*` event, and a
+  `request_user_input` tool call in progress all produce a pending card, a run
+  state of `awaiting_approval`, and an Interrupt-now action. Mona does not POST an
+  approval decision in P08.
+- **Why:** Full Access is Victor's engine posture, not permission for Mona to
+  invent an answer to a question the runtime asked. The runtime exposes approval
+  events; Mona has no qualified approval-response contract. Leaving the wait
+  invisible would be the failure the spec forbids.
+- **Constrains:** the capability is reported as unsupported in the studio view,
+  with the reason, until an approval route is contract-tested.
+
+## D-0047 — Model output is rendered by an escaped, anchor-free Markdown renderer
+
+- **Decision:** `packages/ui/src/markdown.tsx` parses a small Markdown subset into
+  React text nodes. Raw HTML is never interpreted; links become inert label +
+  address text with no `href`.
+- **Why:** the renderer is privileged. A summary of the security model is not
+  enough; the renderer itself must have no path to navigation, no anchor, and no
+  HTML injection. Tests assert the HTML is text and no anchor exists.
+- **Constrains:** no external link opening from model output in v1; help links
+  are a separate, validated shell action.
+
+## D-0048 — Turn cost is attributed by the engine-priced thread delta
+
+- **Decision:** on completion the studio reads `/v1/threads/{id}/usage`, compares
+  it with the usage rows already recorded for that thread, and records only the
+  difference, with source `engine_priced:thread_delta:<revision>`. When the engine
+  reports no complete price, the turn's token counts are recorded with
+  `costKnown = false` and the cost is shown as unknown.
+- **Why:** `/usage` reports thread totals, not per-turn cost. Recording the total
+  on every turn would overcount; showing $0.00 for a priced turn would lie.
+  A delta against recorded rows is durable across restarts and idempotent.
+- **Constrains:** a first completion after a manual database edit can attribute a
+  larger delta; the source label exposes that. Unknown price is never zero.
+
+## D-0049 — The saved DS profile is seeded once and displayed separately from the observed one
+
+- **Decision:** the first launch writes `{ label, profile, provider, model,
+  endpoint, permissionPosture: full_access, allowShell, trustMode, autoApprove }`
+  to `settings_versions(scope = profile, version 1)` and reads it back on later
+  launches. The context bar shows the saved label; the studio shows the posture
+  the engine reported for the bound thread, or labels the saved value as saved.
+- **Why:** "configure once and show it persistently" must not turn into a
+  hard-coded badge. The observed thread record is the only authority for what the
+  running engine actually applied.
+- **Constrains:** existing saved values are not overwritten; a different observed
+  posture is displayed as observed, never rewritten to match the saved intent.

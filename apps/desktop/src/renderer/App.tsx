@@ -5,7 +5,6 @@ import {
   CommandPalette,
   Dialog,
   EmptyState,
-  ErrorState,
   Harness,
   HarnessScreen,
   Notification,
@@ -15,6 +14,7 @@ import {
   type Tone,
 } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
+import { StudioPanel } from './StudioPanel.js';
 import type {
   CatalogProject,
   EngineView,
@@ -75,17 +75,6 @@ function repoLabel(project: CatalogProject): string {
   if (project.repoKind === 'worktree') return 'Git worktree';
   if (project.repoKind === 'git') return 'Git repository';
   return 'No Git repository';
-}
-
-function connectionTone(engine: EngineView | null, project: CatalogProject | null): Tone {
-  if (!engine) return 'neutral';
-  if (engine.state === 'connected') {
-    if (project && engine.workspace && engine.workspace !== project.canonicalPath) return 'attention';
-    return 'success';
-  }
-  if (engine.state === 'failed' || engine.state === 'crashed') return 'critical';
-  if (engine.state === 'starting' || engine.state === 'stopping') return 'info';
-  return 'neutral';
 }
 
 function draftFor(ui: UiStateView | null, projectId: string | null): { sessionId: string | null; text: string } {
@@ -242,6 +231,14 @@ export function App(): React.JSX.Element {
     }
   }, [theme]);
 
+  // Success notices are transient confirmations, not state the user must clear.
+  // Warnings and failures stay until dismissed.
+  useEffect(() => {
+    if (!notice || notice.tone !== 'success') return;
+    const timer = setTimeout(() => setNotice(null), 4_000);
+    return () => clearTimeout(timer);
+  }, [notice]);
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent): void => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -386,7 +383,7 @@ export function App(): React.JSX.Element {
     setNotice({
       tone: 'success',
       title: 'Engine connected',
-      body: 'Starting the runtime sent no task. The composer remains a draft until the live studio arrives.',
+      body: 'Starting the runtime sent no task and no prompt. Choose Plan or Work and submit when you are ready.',
     });
   }, [refreshCatalog, selected, unwrap]);
 
@@ -596,12 +593,6 @@ export function App(): React.JSX.Element {
     });
 
   const engineWorkspaceMatches = Boolean(selected && engine?.workspace && selected.canonicalPath === engine.workspace);
-  const executionBlocked =
-    !selected ||
-    !selected.folderExists ||
-    !info?.localState.available ||
-    engine?.state !== 'connected' ||
-    !engineWorkspaceMatches;
 
   return (
     <div className="app-shell mona-root">
@@ -800,7 +791,7 @@ export function App(): React.JSX.Element {
                   showArchived={showArchived}
                 />
               ) : screen === 'studio' ? (
-                <StudioView
+                <StudioPanel
                   info={info}
                   project={selected}
                   engine={engine}
@@ -808,14 +799,20 @@ export function App(): React.JSX.Element {
                   draft={draftText}
                   sessionId={sessionId}
                   ui={ui}
-                  executionBlocked={executionBlocked}
-                  engineWorkspaceMatches={engineWorkspaceMatches}
                   busy={busy}
                   onDraft={(text) => setDraftText(text)}
                   onOpenFolder={() => void openFolder()}
                   onStart={() => void startEngine()}
                   onStop={() => void stopEngine()}
                   onNewSession={() => void newSession()}
+                  onDraftSent={() => {
+                    setDraftText('');
+                    if (selected && sessionId)
+                      void window.mona.saveDraft({ projectId: selected.id, sessionId, text: '' });
+                  }}
+                  onSpendRefresh={() => {
+                    if (selected) void loadSpend(selected.id);
+                  }}
                   onLocate={() => {
                     if (selected) {
                       setRelocation({
@@ -1166,209 +1163,6 @@ function HomeView({
           Selected: {selected.label}
         </p>
       ) : null}
-    </section>
-  );
-}
-
-function StudioView({
-  info,
-  project,
-  engine,
-  spend,
-  draft,
-  sessionId,
-  ui,
-  executionBlocked,
-  engineWorkspaceMatches,
-  busy,
-  onDraft,
-  onOpenFolder,
-  onStart,
-  onStop,
-  onNewSession,
-  onLocate,
-}: {
-  info: AppInfo | null;
-  project: CatalogProject | null;
-  engine: EngineView | null;
-  spend: ProjectSpend | null;
-  draft: string;
-  sessionId: string | null;
-  ui: UiStateView | null;
-  executionBlocked: boolean;
-  engineWorkspaceMatches: boolean;
-  busy: string | null;
-  onDraft: (text: string) => void;
-  onOpenFolder: () => void;
-  onStart: () => void;
-  onStop: () => void;
-  onNewSession: () => void;
-  onLocate: () => void;
-}): React.JSX.Element {
-  if (!project) {
-    return (
-      <section className="panel" aria-labelledby="studio-empty">
-        <p className="eyebrow">Studio</p>
-        <h2 id="studio-empty">Choose a folder to begin</h2>
-        <p className="lede">
-          The studio shows a project’s conversation, connection, and drafts. Mona does not start a runtime or invent a
-          task just to fill this screen.
-        </p>
-        <EmptyState
-          title="No project open"
-          body="Open an existing folder or create a new one from Home."
-          action={
-            <Button variant="primary" onClick={onOpenFolder}>
-              Open folder…
-            </Button>
-          }
-        />
-      </section>
-    );
-  }
-
-  const spendView = formatSpend(spend);
-  const session = sessionId ? ui?.projects[project.id]?.sessions.find((item) => item.sessionId === sessionId) : null;
-  const sessionCount = ui?.projects[project.id]?.sessions.length ?? 0;
-  const connectedHere = engine?.state === 'connected' && engineWorkspaceMatches;
-  const connectedElsewhere = engine?.state === 'connected' && !engineWorkspaceMatches;
-  const tone = connectionTone(engine, project);
-
-  return (
-    <section className="panel studio-panel" aria-labelledby="studio-title">
-      <div className="studio-head">
-        <div>
-          <p className="eyebrow">Studio</p>
-          <h2 id="studio-title" data-testid="studio-title">
-            {project.label}
-          </h2>
-          <p className="mona-mono mona-truncate" title={project.canonicalPath}>
-            {project.canonicalPath}
-          </p>
-        </div>
-        <div className="badge-row">
-          <Badge tone={project.branch ? 'success' : 'neutral'}>{project.branch ?? 'No branch'}</Badge>
-          <Badge>{repoLabel(project)}</Badge>
-          <Badge tone={tone}>{engine ? ENGINE_STATUS_LABEL[engine.state] : 'Engine unknown'}</Badge>
-        </div>
-      </div>
-
-      {!project.folderExists ? (
-        <ErrorState
-          title="Project folder is missing"
-          detail="The catalog entry is intact, but the folder is not at the recorded path. Locate it to rebind deliberately; nothing is deleted."
-          action={<Button onClick={onLocate}>Locate folder…</Button>}
-        />
-      ) : null}
-
-      {info && !info.localState.available ? (
-        <ErrorState
-          title="Local state unavailable"
-          detail={`${info.localState.detail} The catalog and drafts cannot be trusted until this opens. See Diagnostics.`}
-        />
-      ) : null}
-
-      <div className="composer">
-        <div className="composer-head">
-          <label className="mona-field-label" htmlFor="draft">
-            Draft for {project.label}
-          </label>
-          <div className="mona-row">
-            <span className="mona-muted" data-testid="session-id">
-              Session {sessionId ? sessionId.slice(0, 12) : 'pending'}
-            </span>
-            <Button size="sm" onClick={onNewSession}>
-              New session
-            </Button>
-          </div>
-        </div>
-        <textarea
-          id="draft"
-          className="mona-input composer-input"
-          value={draft}
-          placeholder="Write a draft. It is saved locally per project and session; nothing is submitted in this build."
-          onChange={(event) => onDraft(event.target.value)}
-          rows={5}
-        />
-        <div className="composer-foot">
-          <span className="mona-muted">
-            {session?.text ? 'Draft saved locally' : 'No draft text yet'} · {sessionCount} session
-            {sessionCount === 1 ? '' : 's'} for this project
-          </span>
-          <Button
-            variant="primary"
-            disabled={executionBlocked}
-            title={
-              executionBlocked
-                ? 'Execution needs a connected engine for this exact workspace, an available local state, and a present folder.'
-                : 'Submission arrives with the live work studio (P08).'
-            }
-          >
-            Submit (arrives in P08)
-          </Button>
-        </div>
-        <p className="mona-muted">
-          {executionBlocked
-            ? 'Execution is disabled: the engine must be connected to this project’s workspace.'
-            : 'Drafts and catalog stay usable offline. Conversation history and submission arrive with the live studio.'}
-        </p>
-      </div>
-
-      <div className="connection">
-        <div>
-          <h3>Engine connection</h3>
-          <p className="mona-muted" data-testid="connection-detail">
-            {engine?.detail ?? 'No engine state has been reported.'}
-          </p>
-          {connectedElsewhere ? (
-            <Notification tone="attention" title="Runtime serves another project">
-              {engine?.workspace ?? 'Another workspace'} is live. Stop it before starting this project; Mona owns one
-              runtime at a time.
-            </Notification>
-          ) : null}
-          {!connectedHere ? (
-            <p className="mona-muted">
-              Starting the runtime submits no task and sends no prompt. Missing credentials or a missing executable are
-              reported when the runtime starts.
-            </p>
-          ) : null}
-          <p className="mona-muted">Credentials: {info?.credentials.detail ?? 'Status unknown.'}</p>
-        </div>
-        <div className="connection-actions">
-          {engine?.state === 'connected' ? (
-            <Button variant="danger" onClick={onStop} disabled={busy !== null}>
-              Stop engine
-            </Button>
-          ) : (
-            <Button variant="primary" onClick={onStart} disabled={busy !== null || !project.folderExists}>
-              Connect engine
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div className="studio-facts">
-        <div>
-          <span className="fact-label">Permission</span>
-          <span className="fact-value">
-            {info ? `${info.permission.label} · ${info.permission.profile ?? 'no profile'}` : 'Unknown'}
-          </span>
-        </div>
-        <div>
-          <span className="fact-label">Model</span>
-          <span className="fact-value">{info?.route.model ?? 'Unknown'}</span>
-        </div>
-        <div>
-          <span className="fact-label">Provider</span>
-          <span className="fact-value">{info?.route.provider ?? 'Unknown'}</span>
-        </div>
-        <div>
-          <span className="fact-label">Spend</span>
-          <span className="fact-value" data-testid="studio-spend">
-            {spendView.label}
-          </span>
-        </div>
-      </div>
     </section>
   );
 }

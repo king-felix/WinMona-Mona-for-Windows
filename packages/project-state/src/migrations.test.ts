@@ -85,13 +85,17 @@ describe('migrations', () => {
 
   it('keeps the database at the previous version when a migration fails', async () => {
     const { store } = await open('fail');
-    const good = MIGRATIONS[0];
-    if (!good) throw new Error('missing migration');
-    const failing = { version: 2, name: 'broken', sql: 'CREATE TABLE ok(id INTEGER); CREATE TABLE ok(id INTEGER);' };
-    const report = await applyMigrations(store.db, { migrations: [good, failing] }).catch((error: unknown) => error);
+    const failing = {
+      version: MIGRATIONS.length,
+      name: 'broken',
+      sql: 'CREATE TABLE ok(id INTEGER); CREATE TABLE ok(id INTEGER);',
+    };
+    const report = await applyMigrations(store.db, {
+      migrations: [...MIGRATIONS.slice(0, -1), failing],
+    }).catch((error: unknown) => error);
     expect(report).toBeInstanceOf(StateError);
     expect((report as StateError).code).toBe('migration_failed');
-    expect(schemaVersion(store.db)).toBe(1);
+    expect(schemaVersion(store.db)).toBe(MIGRATIONS.length - 1);
     const tables = store.db.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all() as Array<{
       name: string;
     }>;
@@ -103,15 +107,19 @@ describe('migrations', () => {
     const { store } = await open('snapshot');
     await applyMigrations(store.db);
     const calls: number[] = [];
-    const next = { version: 2, name: 'second', sql: 'CREATE TABLE extra(id INTEGER PRIMARY KEY);' };
+    const next = {
+      version: MIGRATIONS.length + 1,
+      name: 'second',
+      sql: 'CREATE TABLE extra(id INTEGER PRIMARY KEY);',
+    };
     await applyMigrations(store.db, {
       migrations: [...MIGRATIONS, next],
       beforeApply: (context) => {
         calls.push(context.from, context.to);
       },
     });
-    expect(calls).toEqual([1, 2]);
-    expect(schemaVersion(store.db)).toBe(2);
+    expect(calls).toEqual([MIGRATIONS.length, MIGRATIONS.length + 1]);
+    expect(schemaVersion(store.db)).toBe(MIGRATIONS.length + 1);
   });
 
   it('refuses a database migration this build does not know', async () => {

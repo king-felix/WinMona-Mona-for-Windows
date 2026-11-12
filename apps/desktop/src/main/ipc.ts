@@ -24,6 +24,8 @@ export function createAppInfo(input: {
     compatibility?: 'qualified' | 'compatible_unqualified' | 'unsupported' | null;
   };
   localState?: { available: boolean; schemaVersion: number | null; detail: string };
+  /** The saved profile read from local state; never a hard-coded badge. */
+  permission?: { label: string; profile: string | null; detail: string };
   harnessEnabled?: boolean;
 }): AppInfo {
   const engine = input.engine ?? {
@@ -59,7 +61,7 @@ export function createAppInfo(input: {
       endpoint: 'https://api.deepseek.com',
       source: 'pinned build route; not contacted to display this',
     },
-    permission: {
+    permission: input.permission ?? {
       label: 'Full Access',
       profile: 'DS',
       detail: 'Saved Codewhale profile; the engine applies it when a runtime starts.',

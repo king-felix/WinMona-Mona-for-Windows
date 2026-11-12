@@ -15,6 +15,7 @@
     "lifecycle": "node scripts/lifecycle.mjs",
     "shots": "node scripts/shots.mjs",
     "catalog": "node scripts/catalog.mjs",
+    "studio": "node scripts/studio.mjs",
     "check:build": "node scripts/check-build.mjs",
     "verify": "npm run build \u0026\u0026 npm run check:build",
     "clean": "node -e \"require(\u0027node:fs\u0027).rmSync(\u0027dist\u0027,{recursive:true,force:true})\""

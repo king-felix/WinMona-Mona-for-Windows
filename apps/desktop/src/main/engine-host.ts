@@ -3,6 +3,7 @@ import {
   RuntimeSupervisor,
   attachExternalRuntime,
   decideLifecycle,
+  type EngineAdapter,
   type ExternalRuntime,
   type InterruptReceipt,
   type LifecycleAction,
@@ -216,6 +217,18 @@ export class EngineHost {
 
   bindJournal(journal: SubmissionJournal): void {
     this.journal = journal;
+  }
+
+  /**
+   * The live adapter for whichever runtime is attached, or null. The studio uses
+   * this one path; there is no second engine route in the renderer.
+   */
+  adapter(): EngineAdapter | null {
+    if (!this.journal) return null;
+    const runtime = this.supervisor?.existing() ?? null;
+    if (runtime) return runtime.createAdapter(this.journal);
+    if (this.external) return this.external.createAdapter(this.journal);
+    return null;
   }
 
   async stopOwned(reason: string): Promise<Awaited<ReturnType<RuntimeSupervisor['stop']>>> {

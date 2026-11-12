@@ -197,6 +197,39 @@ export const MIGRATIONS: readonly Migration[] = [
       INSERT INTO store_meta(key, value) VALUES ('revision', '0');
     `,
   },
+  {
+    version: 2,
+    name: 'studio-timeline',
+    sql: `
+      -- A studio thread is an engine thread bound to one Mona session. The
+      -- session id is Mona's; the engine thread id is an opaque engine id.
+      ALTER TABLE threads ADD COLUMN session_id TEXT;
+      ALTER TABLE threads ADD COLUMN mode TEXT;
+      ALTER TABLE threads ADD COLUMN profile_json TEXT;
+      -- A session may hold one thread per mode (Plan and Work), so this is a
+      -- lookup index rather than a uniqueness constraint.
+      CREATE INDEX threads_session ON threads(project_id, session_id);
+
+      -- Projected engine events. seq is the engine's sequence number, so a
+      -- replayed event can never become a second row.
+      CREATE TABLE timeline_items (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        thread_id TEXT NOT NULL,
+        turn_id TEXT,
+        seq INTEGER NOT NULL,
+        kind TEXT NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        status TEXT,
+        truncated INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+      CREATE UNIQUE INDEX timeline_items_thread_seq ON timeline_items(thread_id, seq);
+      CREATE INDEX timeline_items_project ON timeline_items(project_id, created_at);
+    `,
+  },
 ];
 
 export type MigrationReport = {

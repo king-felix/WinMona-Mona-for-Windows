@@ -1,0 +1,99 @@
+{
+  "ok": true,
+  "appVersion": "0.1.0",
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "arch": "x64",
+  "dom": {
+    "title": "Mona",
+    "version": "v0.1.0",
+    "nav": [
+      "Home",
+      "Studio",
+      "Work",
+      "Cost",
+      "Settings"
+    ],
+    "engine": "Engine not connected",
+    "theme": "daybreak",
+    "hasFixtureMarker": false,
+    "hasHarness": false,
+    "emptyCatalog": true,
+    "palette": true,
+    "contextModel": "deepseek-flash",
+    "contextPermission": "Full Access · DS"
+  },
+  "bridge": {
+    "keys": [
+      "getAppInfo",
+      "listProjects",
+      "openProject",
+      "pickFolder",
+      "createProject",
+      "updateProject",
+      "removeProject",
+      "relocateProject",
+      "revealProject",
+      "selectProject",
+      "engineState",
+      "startEngine",
+      "stopEngine",
+      "projectSpend",
+      "getUiState",
+      "setProjectView",
+      "saveDraft",
+      "newSession",
+      "studioGet",
+      "studioSubmit",
+      "studioInterrupt",
+      "studioPause",
+      "studioResume",
+      "studioPickReferences",
+      "onStudioEvent"
+    ],
+    "frozen": true,
+    "hasNodeRequire": false,
+    "hasProcess": false,
+    "hasIpcRenderer": false
+  },
+  "security": {
+    "remoteNavigationAttempted": "https://example.com/",
+    "urlAfterNavigation": "file:///X:/AI_projects/Mona/apps/desktop/dist/renderer/index.html",
+    "navigationRefused": true,
+    "popupAttempted": "https://example.com/",
+    "popupRefused": true,
+    "windowCount": 1,
+    "devToolsAllowed": false
+  },
+  "metrics": [
+    {
+      "type": "Browser",
+      "pid": 40904,
+      "workingSetSizeKb": 109100,
+      "peakWorkingSetSizeKb": 109124
+    },
+    {
+      "type": "GPU",
+      "pid": 28536,
+      "workingSetSizeKb": 97476,
+      "peakWorkingSetSizeKb": 100036
+    },
+    {
+      "type": "Utility",
+      "pid": 33736,
+      "workingSetSizeKb": 52356,
+      "peakWorkingSetSizeKb": 52356
+    },
+    {
+      "type": "Tab",
+      "pid": 2504,
+      "workingSetSizeKb": 83616,
+      "peakWorkingSetSizeKb": 84008
+    }
+  ],
+  "rendererProcessCount": 1,
+  "totalWorkingSetMb": 335,
+  "capturedAt": "2026-11-12T06:07:52.819Z"
+}

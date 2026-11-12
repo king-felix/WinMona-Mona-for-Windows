@@ -1,0 +1,24 @@
+
+PASS the fixture project opens in the real catalog :: {"status":"created"}
+PASS the studio has a session to bind a thread to :: {"sessionId":"ses_9925c502c080406b8afd412ae510951a"}
+PASS the shell is on the project studio :: {"studioTitle":"p08-fixture-project"}
+PASS nothing is sent just by opening and rendering the studio :: {"thread":null,"items":0,"run":"idle"}
+PASS the control strip reports a ready state before any work :: {"runBefore":"Ready"}
+PASS the Connect engine control starts the owned runtime :: {"connected":true}
+PASS the runtime connects and the shell reports it :: {"engine":"Engine connected"}
+PASS connecting the engine creates no thread and no message :: {"thread":null,"items":0}
+PASS the typed prompt is in the composer before sending :: {"filled":true,"length":201}
+PASS the Submit control sends the prompt :: {"submitted":true}
+PASS the control strip shows the turn running :: {"state":"Preparing"}
+PASS the turn reaches a terminal state reported by the runtime :: {"finalState":"Ready"}
+PASS the timeline shows the prompt, tool work and an outcome :: {"kinds":["status","user","assistant","status","tool","status","tool","status","tool","status","tool","assistant","outcome"]}
+PASS the outcome item reports completion, not an invention :: {"outcome":"Status: completed\nDuration: 14.8 s\nUsage: in 1,174 (65,792 cached) · out 631 · reasoning 135\nCost: $0.0015 (engine-priced thread delta; provider_docs)\nChanged paths: hello.txt"}
+PASS the observed permission is Full Access from the runtime thread :: {"thread":{"threadId":"thr_c88acbcd0f0d4adea59232e0921073d8","workspace":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p08-studio-m29gqn\\p08-fixture-project","provider":"deepseek","model":"deepseek-flash","mode":"agent","permissionPosture":"full_access","allowShell":true,"trustMode":true,"autoApprove":true,"observedAt":"2026-11-12T06:00:44.354Z"},"permission":"Full Access · auto-approve"}
+PASS the task changed a real file in the fixture project :: {"hello":"MONA_STUDIO_OK"}
+PASS the project’s own test passes against that file :: {"status":0,"output":"MONA_STUDIO_CHECK_PASS\n"}
+PASS a tool card records the runtime’s own tool input :: {"toolCards":4,"first":"{\n  \"path\": \"check.mjs\"\n}"}
+PASS the turn recorded usage for the project :: {"turnCount":1,"knownCostMicros":1504,"unknownCostRecords":0}
+PASS re-rendering the studio replays stored events without sending anything :: {"before":13,"after":13}
+PASS Stop engine reaches the owned runtime :: {"stopped":true}
+PASS the shell reports the runtime stopped :: {"engine":"Engine stopped"}
+mona: applied 2 state migration(s) to version 2

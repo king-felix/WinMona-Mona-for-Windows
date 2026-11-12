@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 161,
+  "revision": 173,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -900,7 +900,7 @@
         {
           "id": "streaming",
           "description": "Turn output streams into the conversation without fabricated content",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P03-adapter.md",
@@ -909,26 +909,61 @@
               "recorded_utc": "2026-11-12T01:30:55Z",
               "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
               "note": "adapter event projection and streaming parser complete; React transcript is P08"
+            },
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:11:04Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "live Electron probe streamed user/assistant/tool/outcome items from the runtime's own events"
             }
           ]
         },
         {
           "id": "drafts",
           "description": "Composer drafts survive navigation and restart",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-catalog-regression.json",
+              "sha256": "b95b5cc8a33f96e9d50cf468cd2099b61e4d6db4c60b3d89d371d4257f0ab984",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:11:09Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "drafts survive reload and project switching in the live shell; the studio clears a draft only after a successful submit"
+            }
+          ]
         },
         {
           "id": "file-references",
           "description": "File references work and are shown exactly as sent",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-tests.txt",
+              "sha256": "f69d06e18500bb6d69b635ed169421a1ffe9e23e1ffa35d88fce93a24a128d8b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:11:59Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "composes explicit project-relative references into the prompt verbatim; refuses absolute, traversing and control-character references (studio service tests)"
+            }
+          ]
         },
         {
           "id": "copy-export",
           "description": "Copy and export preserve real content",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-tests.txt",
+              "sha256": "f69d06e18500bb6d69b635ed169421a1ffe9e23e1ffa35d88fce93a24a128d8b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:11:59Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "copy buttons ship for timeline items; conversation export is not implemented yet (P14/P23)"
+            }
+          ]
         }
       ],
       "verified_commit": null,
@@ -945,18 +980,27 @@
         "P16",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "plan-work",
           "description": "Plan and Work modes are explicit and switchable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:11:59Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "Plan and Work are separate engine threads; switching modes opens a new thread and keeps the other thread's items (live: full_access agent thread)"
+            }
+          ]
         },
         {
           "id": "permission-display",
           "description": "Effective permission posture and Full Access badge reflect the running runtime",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P03-adapter.md",
@@ -965,6 +1009,14 @@
               "recorded_utc": "2026-11-12T01:30:55Z",
               "commit": "811aee1ff4bcc18d562c98385c11304f2cdeab88",
               "note": "effective permission/model profile exposed by the adapter; full UI display is P08/P16"
+            },
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:00Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "studio shows the observed thread posture (full_access, allowShell/trustMode/autoApprove true); the saved DS profile is labeled saved until observed"
             }
           ]
         },
@@ -984,8 +1036,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1193,12 +1245,12 @@
         "P11",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "pause-after-task",
           "description": "Pause-after-task stops at the next queue boundary",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P04-supervisor.md",
@@ -1207,6 +1259,14 @@
               "recorded_utc": "2026-11-12T02:12:57Z",
               "commit": "3dfb511",
               "note": "P04 evidence recorded at commit 3dfb511"
+            },
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:06Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "the studio control strip pauses the queue after the running turn; the next submit is refused until Resume (unit + live control strip)"
             }
           ]
         },
@@ -1222,6 +1282,14 @@
               "recorded_utc": "2026-11-12T02:12:58Z",
               "commit": "3dfb511",
               "note": "P04 evidence recorded at commit 3dfb511"
+            },
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:07Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "Interrupt now calls the engine interrupt route from the studio and reports the engine receipt; external effects are not rolled back"
             }
           ]
         },
@@ -1267,12 +1335,20 @@
               "recorded_utc": "2026-11-12T02:12:58Z",
               "commit": "3dfb511",
               "note": "P04 evidence recorded at commit 3dfb511"
+            },
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:07Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "an engine stop during a turn becomes failed/outcome-uncertain; an approval wait is labeled and interruptible, never a silent spinner"
             }
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1329,7 +1405,7 @@
         "P13",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "diffs",
@@ -1340,20 +1416,47 @@
         {
           "id": "tests-evidence",
           "description": "Test runs link to their real output and exit status",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:07Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "live run changed hello.txt, ran node check.mjs (exit 0, MONA_STUDIO_CHECK_PASS), and the outcome card names the changed path"
+            }
+          ]
         },
         {
           "id": "provenance",
           "description": "Every change and receipt attributes its source",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-studio.json",
+              "sha256": "5152fcc954519fac2d45a23713143383906fe1ab9bd32e087a8860335cab7c2a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:07Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "tool cards carry the runtime's own tool input; the outcome names cost source and changed paths; usage rows name their engine pricing source"
+            }
+          ]
         },
         {
           "id": "large-output",
           "description": "Large outputs are bounded or streamed without freezing the UI",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P08-tests.txt",
+              "sha256": "f69d06e18500bb6d69b635ed169421a1ffe9e23e1ffa35d88fce93a24a128d8b",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T06:12:07Z",
+              "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+              "note": "timeline items cap at 64 KB and are labeled truncated; the renderer expands on demand; oversize SSE frames become a diagnostic, not a crash"
+            }
+          ]
         }
       ],
       "verified_commit": null,

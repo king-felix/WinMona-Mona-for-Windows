@@ -75,6 +75,7 @@ const expectedKeys = [
   'getUiState',
   'listProjects',
   'newSession',
+  'onStudioEvent',
   'openProject',
   'pickFolder',
   'projectSpend',
@@ -86,6 +87,12 @@ const expectedKeys = [
   'setProjectView',
   'startEngine',
   'stopEngine',
+  'studioGet',
+  'studioInterrupt',
+  'studioPause',
+  'studioPickReferences',
+  'studioResume',
+  'studioSubmit',
   'updateProject',
 ].sort();
 if (JSON.stringify(keys) !== JSON.stringify(expectedKeys)) {

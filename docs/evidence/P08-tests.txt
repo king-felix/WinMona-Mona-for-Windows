@@ -1,0 +1,270 @@
+
+ RUN  v5.1.0 X:/AI_projects/Mona
+
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > ships a second migration without editing the first 3ms
+ ✓ apps/desktop/src/main/ui-state.test.ts > UI state store > keeps drafts per project and never mixes sessions 53ms
+ ✓ packages/contracts/src/contracts.test.ts > opaque identities > accepts correctly prefixed ids 2ms
+ ✓ packages/contracts/src/contracts.test.ts > opaque identities > rejects a thread id used as a project id and vice versa 2ms
+ ✓ packages/contracts/src/contracts.test.ts > opaque identities > generates valid ids and operation keys 5ms
+ ✓ packages/contracts/src/contracts.test.ts > unknown-field policy > rejects unknown fields on internal contracts 2ms
+ ✓ packages/contracts/src/contracts.test.ts > unknown-field policy > rejects unknown fields on the event envelope 1ms
+ ✓ packages/contracts/src/contracts.test.ts > unknown-field policy > rejects a capability record with a missing flag instead of defaulting it 2ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > parses a known event with a valid payload 1ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > preserves an unknown event for diagnostics 0ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > rejects a known event with a malformed payload 1ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > rejects the deliberately malformed fixture 0ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > validates every non-malformed event fixture 1ms
+ ✓ packages/contracts/src/contracts.test.ts > engine events > maps upstream snake_case frames into the Mona envelope 1ms
+ ✓ packages/contracts/src/contracts.test.ts > usage and cost > keeps unknown cost explicitly unknown, never zero 2ms
+ ✓ packages/contracts/src/contracts.test.ts > usage and cost > requires a source and rate revision for known cost 1ms
+ ✓ packages/contracts/src/contracts.test.ts > submission safety > allows the forward path and blocks illegal transitions 0ms
+ ✓ packages/contracts/src/contracts.test.ts > submission safety > rejects an illegal persisted transition 1ms
+ ✓ packages/contracts/src/contracts.test.ts > submission safety > records outcome_unknown with reconciliation guidance 1ms
+ ✓ packages/contracts/src/contracts.test.ts > submission safety > has exactly the documented states 1ms
+ ✓ packages/contracts/src/contracts.test.ts > effective profile > maps an observed upstream thread and preserves route identity 2ms
+ ✓ packages/contracts/src/contracts.test.ts > effective profile > refuses a thread whose id is not a thread id 1ms
+ ✓ packages/contracts/src/contracts.test.ts > effective profile > does not invent a permission posture it did not observe 0ms
+ ✓ packages/contracts/src/contracts.test.ts > approval and error contracts > validates approval payloads 0ms
+ ✓ packages/contracts/src/contracts.test.ts > approval and error contracts > builds a typed error result without extra fields 0ms
+ ✓ packages/contracts/src/contracts.test.ts > approval and error contracts > labels fixtures as test-only 0ms
+ ✓ packages/adapter/src/journal.test.ts > file submission journal > writes, reads, and updates a submission atomically 44ms
+ ✓ packages/adapter/src/journal.test.ts > file submission journal > finds a submission by thread and operation key 41ms
+ ✓ packages/adapter/src/adapter.test.ts > discovery and compatibility > qualifies the pinned runtime and maps capabilities 7ms
+ ✓ packages/adapter/src/adapter.test.ts > discovery and compatibility > marks a different patch version as compatible but unqualified 1ms
+ ✓ packages/adapter/src/adapter.test.ts > discovery and compatibility > refuses an unsupported engine version 0ms
+ ✓ packages/adapter/src/adapter.test.ts > discovery and compatibility > reports schema drift instead of guessing 1ms
+ ✓ packages/adapter/src/adapter.test.ts > threads and profiles > creates a thread and maps effective Full Access settings 4ms
+ ✓ packages/adapter/src/adapter.test.ts > threads and profiles > rejects a thread bound to a different workspace 1ms
+ ✓ packages/adapter/src/adapter.test.ts > threads and profiles > rejects a profile answer for another thread 0ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > persists intent before sending and records acceptance 9ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > recognises an idempotent replay instead of creating a second turn 1ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > reconciles a lost response without a second POST 2ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > returns outcome-unknown when lookup has no record and never retries 1ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > does not lookup or retry when the runtime lacks operation lookup 1ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > refuses to mutate when the runtime answers for another thread 1ms
+ ✓ packages/adapter/src/adapter.test.ts > submission safety > surfaces a capability failure when turns are not advertised 0ms
+ ✓ packages/adapter/src/adapter.test.ts > event streaming > deduplicates replay across a reconnect and converges on the same state 6ms
+ ✓ packages/adapter/src/adapter.test.ts > event streaming > keeps unknown events and reports malformed known payloads without dying 2ms
+ ✓ packages/adapter/src/adapter.test.ts > event streaming > stops reconnecting on an authentication failure 1ms
+ ✓ packages/adapter/src/adapter.test.ts > event streaming > drops an oversized frame and continues with the next one 1ms
+ ✓ packages/adapter/src/adapter.test.ts > history, usage, interrupt, capabilities > rejects history for another thread 1ms
+ ✓ packages/adapter/src/adapter.test.ts > history, usage, interrupt, capabilities > maps known cost and preserves unknown cost 4ms
+ ✓ packages/adapter/src/adapter.test.ts > history, usage, interrupt, capabilities > interrupts only the requested turn on the requested thread 1ms
+ ✓ packages/adapter/src/adapter.test.ts > history, usage, interrupt, capabilities > uses the current provider for models.list instead of hard-coding one 1ms
+ ✓ packages/adapter/src/adapter.test.ts > SSE decoder > handles UTF-8 split across chunks and CRLF frames 0ms
+ ✓ packages/adapter/src/adapter.test.ts > SSE decoder > ignores comments and joins multi-line data 0ms
+ ✓ packages/project-state/src/migrations.test.ts > migrations > applies the schema from empty and reports it as already current on reopen 114ms
+ ✓ packages/adapter/src/journal.test.ts > file submission journal > skips a corrupt journal file without losing a good record 37ms
+ ✓ packages/adapter/src/journal.test.ts > file submission journal > returns null for a missing record 4ms
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > binds one engine thread per project session and updates the observed profile 161ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > opens a plain folder and reports a missing branch without inventing one 164ms
+ ✓ packages/project-state/src/store.test.ts > single write path and revision checks > refuses a stale revision instead of overwriting newer state 174ms
+ ✓ packages/project-state/src/migrations.test.ts > migrations > refuses to run when a shipped migration was edited after being applied 141ms
+ ✓ packages/project-state/src/store.test.ts > single write path and revision checks > rolls back the whole transaction when a write fails part way 206ms
+ ✓ packages/project-state/src/migrations.test.ts > migrations > keeps the database at the previous version when a migration fails 133ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > refuses a non-loopback base URL or short token 2ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > maps authentication failures and does not leak the token 23ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > maps not-found and server errors distinctly 1ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > rejects a non-JSON success body as schema drift 0ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > caps an oversized response body 0ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > requires an event-stream content type 1ms
+ ✓ packages/adapter/src/http.test.ts > HTTP transport > returns a bounded async iterable for a real stream response 0ms
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > keeps a replayed engine sequence out of the timeline 221ms
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts > catalog IPC surface > registers exactly the declared channels 3ms
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts > catalog IPC surface > rejects an untrusted sender before running any action 3ms
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts > catalog IPC surface > rejects unknown fields, wrong shapes and oversize payloads 4ms
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts > catalog IPC surface > delegates a valid call and keeps arguments typed 1ms
+ ✓ apps/desktop/src/main/catalog-ipc.test.ts > catalog IPC surface > reports missing local state instead of throwing 0ms
+ ✓ apps/desktop/src/main/ui-state.test.ts > UI state store > persists across instances and forgets only the removed project 80ms
+ ✓ apps/desktop/src/main/ui-state.test.ts > UI state store > sets aside an unreadable file instead of overwriting it silently 40ms
+ ✓ apps/desktop/src/main/ui-state.test.ts > UI state store > bounds draft text and session count 390ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > opens a folder, lists it, and does not start the engine or create a thread 219ms
+ ✓ packages/project-state/src/state.test.ts > backup and restore > backs up, restores, and parks the replaced database without deleting it 334ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > reads a branch from HEAD for a repository and a linked worktree 297ms
+ ✓ packages/project-state/src/migrations.test.ts > migrations > takes a snapshot before pending migrations run, and never deletes it 138ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > streams a real turn into user, assistant and outcome items exactly once 344ms
+ ✓ packages/project-state/src/store.test.ts > single write path and revision checks > a hook failure before commit leaves no partial rows 160ms
+ ✓ packages/project-state/src/migrations.test.ts > migrations > refuses a database migration this build does not know 128ms
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > advances the thread cursor and records a turn exactly once 203ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > renames, pins, archives, restores, searches and removes without deleting files 242ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > deduplicates a path alias instead of creating a second project 187ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > registers exactly the declared channels 2ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > rejects an untrusted sender before running any action 3ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > rejects a malformed submission before it reaches the service 1ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > rejects an unknown mode rather than defaulting silently 0ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > refuses every action when local state is unavailable 1ms
+ ✓ apps/desktop/src/main/studio-ipc.test.ts > studio IPC surface > passes a validated request through with its mode 1ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > renders tool calls as cards with the real tool input 190ms
+ ✓ packages/project-state/src/state.test.ts > backup and restore > refuses a backup whose digest does not match, leaving the live database untouched 260ms
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > reads the newest saved settings version for a scope 125ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > pauses after the current task without interrupting it 3ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > cancels queued work only, never the running task 1ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > reports an interrupt with no channel as outcome unknown 0ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > labels a failed interrupt as uncertain and keeps active work 0ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > quit-and-stop interrupts then stops and reports a partial receipt truthfully 0ms
+ ✓ packages/adapter/src/work-control.test.ts > WorkQueue transitions > quit-and-stop is partial when the stop is uncertain 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > keeps the runtime and recreates the window after a renderer crash 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > keeps owned work alive when the window closes 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > interrupts and stops owned work on quit 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > does not claim ownership of an external runtime on quit 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > marks a crashed runtime and bounds process restart without resubmitting 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > reconciles stale ownership after a machine restart 0ms
+ ✓ packages/adapter/src/work-control.test.ts > desktop lifecycle matrix > routes a second launcher invocation to the existing owner 0ms
+ ✓ packages/adapter/src/work-control.test.ts > launch argument parsing > extracts only real absolute paths and ignores Electron switches 0ms
+ ✓ packages/project-state/src/studio.test.ts > studio persistence > cascades timeline rows when a project is removed from the catalog 169ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > starts nothing until a project asks for a runtime 2ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > reports a started runtime with its compatibility status 1ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > quit and stop reports the real receipt and never claims rollback 1ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > a renderer crash keeps the runtime and asks for a new window 0ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > a runtime crash is labeled and marked outcome unknown without resubmission 0ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > a runtime crash during active work declares the outcome unknown 1ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > refuses a second workspace while one runtime is owned, and is idempotent for the same one 0ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > reports an external runtime as read-only and never stops it 0ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > EngineHost > quit while the queue has active work interrupts first, then stops 1ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > app info engine state > defaults to an honest not-started label with no descriptors 0ms
+ ✓ apps/desktop/src/main/engine-host.test.ts > app info engine state > carries the observed engine state and redacted descriptors 0ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > deduplicates aliases and requires a deliberate rebind after a move 203ms
+ ✓ packages/ui/src/palette.test.tsx > CommandPalette > focuses the filter, lists actions, and runs the highlighted one with Enter 41ms
+ ✓ packages/ui/src/palette.test.tsx > CommandPalette > filters by label and group, and closes on Escape 19ms
+ ✓ packages/ui/src/palette.test.tsx > CommandPalette > reports no match instead of pretending an action exists 16ms
+ ✓ packages/project-state/src/store.test.ts > single write path and revision checks > survives a real process crash during an open transaction 288ms
+ ✓ packages/project-state/src/state.test.ts > backup and restore > quiesces writers: a write during maintenance is refused, then accepted again 201ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > renames, pins, archives, restores and searches without touching the folder 201ms
+ ✓ packages/ui/src/ui.test.tsx > primitives > labels a field, describes its error and marks it invalid 23ms
+ ✓ packages/ui/src/ui.test.tsx > primitives > carries status meaning in text and glyph, not colour alone 6ms
+ ✓ packages/ui/src/ui.test.tsx > primitives > announces errors assertively and loading state politely 7ms
+ ✓ packages/ui/src/ui.test.tsx > primitives > renders the empty state and notifications with usable text 4ms
+ ✓ packages/ui/src/ui.test.tsx > keyboard behaviour > tabs respond to arrow keys and Home/End 7ms
+ ✓ packages/ui/src/ui.test.tsx > keyboard behaviour > dialog traps focus, closes on Escape and restores the opener 6ms
+ ✓ packages/ui/src/ui.test.tsx > keyboard behaviour > menu opens, moves with arrows, and Escape returns focus to its button 7ms
+ ✓ packages/ui/src/ui.test.tsx > visual harness > is clearly labelled as fixture data and renders every required screen 33ms
+ ✓ apps/desktop/src/main/ipc.test.ts > app-info IPC > registers exactly the app-info channel 2ms
+ ✓ apps/desktop/src/main/ipc.test.ts > app-info IPC > returns typed app info for an empty object from a trusted frame 2ms
+ ✓ apps/desktop/src/main/ipc.test.ts > app-info IPC > rejects an untrusted sender 1ms
+ ✓ apps/desktop/src/main/ipc.test.ts > app-info IPC > rejects unknown or unexpected payload fields 1ms
+ ✓ apps/desktop/src/main/ipc.test.ts > app-info IPC > returns a typed internal error instead of throwing 0ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > parses the shipped token file rather than a copied table 2ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > daybreak meets WCAG AA for every declared pair 1ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > afterglow meets WCAG AA for every declared pair 0ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > keeps body text at AAA on the primary surface in both themes 0ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > never uses the decorative accents as status text colours 0ms
+ ✓ packages/ui/src/contrast.test.ts > measured contrast > distinguishes both themes by more than hue alone 0ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > suppresses a replayed engine sequence instead of duplicating the row 186ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > shows a real empty catalog state without demanding an API key 46ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > renders the catalog and opens a project without a model request 46ms
+ ✓ packages/ui/src/ui.test.tsx > visual harness > makes no external requests and renders no remote URL as a link 26ms
+ ✓ packages/ui/src/ui.test.tsx > visual harness > keeps every interactive control reachable and named 29ms
+ ✓ apps/desktop/src/main/security.test.ts > app origin > accepts the bundled index file only 1ms
+ ✓ apps/desktop/src/main/security.test.ts > app origin > accepts only a loopback dev server when configured 0ms
+ ✓ apps/desktop/src/main/security.test.ts > app origin > rejects subframes and missing frames as IPC senders 0ms
+ ✓ apps/desktop/src/main/security.test.ts > content policy > denies all renderer network access in production 0ms
+ ✓ apps/desktop/src/main/security.test.ts > content policy > allows only the loopback dev server in development 0ms
+ ✓ apps/desktop/src/main/security.test.ts > window isolation > enables sandbox and context isolation and disables Node 0ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > creates a new folder and rejects unsafe names 153ms
+ ✓ packages/project-state/src/state.test.ts > artifacts > stores bounded files by digest and refuses oversize or full-disk writes 41ms
+ ✓ packages/project-state/src/state.test.ts > artifacts > never prunes artifacts that protected evidence depends on 37ms
+ ✓ packages/project-state/src/store.test.ts > project identity > registering the same folder twice yields one project 136ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > removes only the catalog entry and never deletes the folder or its files 164ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > keeps drafts isolated per project while switching 88ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > renders fenced code with its language label and exact content 15ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > never interprets raw HTML from model output 2ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > renders links as inert text instead of anchors 1ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > cannot produce a javascript: link 1ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > supports inline code, bold and italic without HTML 1ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > renders ordered and unordered lists as real lists 2ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > reports an empty body instead of inventing content 1ms
+ ✓ packages/ui/src/markdown.test.tsx > safe Markdown > parses a large body without dropping or reordering it 1ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > surfaces an approval wait and offers a real interrupt receipt 191ms
+ ✓ packages/project-state/src/store.test.ts > project identity > a second path alias of one folder does not create a duplicate project 190ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > requires a deliberate rebind after a folder moves 166ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > opens the command palette with Ctrl+K and closes with Escape 78ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > ignores the fixture harness unless the development flag is enabled 45ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > keeps drafts, views, costs and runtime bindings separate when switching projects 256ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > truncates oversized output and labels it 152ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > drives the live studio: observed permission, submit receipt, and pending approval 107ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > keeps a duplicate streamed item from appearing twice 53ms
+ ✓ apps/desktop/src/renderer/App.test.tsx > Mona shell > reports a bridge failure instead of pretending the engine is ready 14ms
+ ✓ packages/project-state/src/store.test.ts > project identity > a moved folder requires an explicit rebind instead of a second project 163ms
+ ✓ packages/project-state/src/state.test.ts > project export and import > exports portable status without machine-local bindings and re-imports it atomically 274ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > records runtime bindings and project usage without turning unknown into zero 145ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > composes explicit file references into the prompt exactly as sent 137ms
+ ✓ packages/project-state/src/store.test.ts > project identity > nested worktrees stay distinct roots sharing one repository key 153ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > reports engine start failure and leaves the project usable offline 145ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > keeps nested repositories as distinct catalog entries 164ms
+ ✓ packages/project-state/src/store.test.ts > project identity > removing a catalog entry never deletes the folder 140ms
+ ✓ packages/project-state/src/catalog.test.ts > project catalog > reports a folder that disappeared without dropping its history 130ms
+ ✓ packages/project-state/src/state.test.ts > project export and import > rejects a tampered export by digest before writing anything 250ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > rejects an absolute or traversing file reference instead of sending it 140ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > survives a restart: catalog and UI state reload from disk 184ms
+ ✓ apps/desktop/src/main/catalog-service.test.ts > catalog service > reveals only a registered, existing project folder 113ms
+ ✓ packages/project-state/src/state.test.ts > project export and import > refuses an import older than the local revision unless explicitly accepted 139ms
+ ✓ packages/project-state/src/state.test.ts > SQLite submission journal > persists intent and finds it by operation key through one write path 66ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > turns a dropped stream into reconnecting, then running after a replay 153ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > starts Plan work in its own engine thread and keeps Work history 91ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > pauses after the current task and refuses new work until resumed 66ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > refuses to send anything when the engine is not connected 49ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > marks a live turn uncertain when the engine stops 51ms
+ ✓ apps/desktop/src/main/studio-service.test.ts > live studio service > keeps the observed permission rather than a hard-coded badge 50ms
+ ✓ packages/adapter/src/supervisor.test.ts > process tree ownership > stops a real owned process tree and leaves an unrelated node process alive 2861ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > starts the runtime with an authenticated loopback identity and a token-free ownership record 4069ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > stops a real descendant spawned by the owned runtime 4299ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > never kills a stranger that already holds the requested port 121ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > reports a missing executable as an actionable engine failure 2ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > classifies permission failures without inventing a runtime 0ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > clears a stale pid record and starts a fresh runtime 4295ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > does not kill a live pid whose creation identity changed 325ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > restarts a crashed runtime a bounded number of times without submitting work 7924ms
+ ✓ packages/adapter/src/supervisor.test.ts > RuntimeSupervisor > fails the start when the runtime exits before it is usable 438ms
+ ✓ packages/adapter/src/supervisor.test.ts > external runtime attachment > attaches read-only and refuses to stop a runtime Mona did not start 120ms
+
+ Test Files  24 passed (24)
+      Tests  215 passed (215)
+   Start at  23:11:16
+   Duration  24.85s (tests 86%, environment 7%, import 5%, transform 1%)
+
+ 
+
+> mona@0.0.0 bootstrap:test
+> node --test tests/bootstrap
+
+✔ checkpoint advances revision atomically and journals the boundary (945.0503ms)
+✔ stale expected revision is refused and state is untouched (872.8617ms)
+✔ a write interrupted after the temp file is promoted by recover (970.8914ms)
+✔ a torn temp file is quarantined and the committed state survives (696.625ms)
+✔ a corrupt state file is restored from the newest verified backup (1017.8888ms)
+✔ validation rejects a dependency cycle (733.632ms)
+✔ validation rejects an unregistered requirement and an unknown owner (739.3003ms)
+✔ validation rejects a changed specification whose recorded hash is stale (727.3999ms)
+✔ validation rejects a passed criterion with no evidence (732.9845ms)
+✔ evidence command records a hash and derives requirement status (914.5782ms)
+✔ checkpoint refuses evidence paths that do not exist (708.2698ms)
+✔ a recorded remaining step can be explicitly cleared when it is finished (913.8834ms)
+✔ evidence can prune stale references left on sibling criteria (743.3206ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10786.8314
+
+> mona@0.0.0 spike:test
+> node --test tests/spike
+
+✔ parseSseFrame reads event, id, and JSON data (3.6675ms)
+✔ parseSseFrame joins multi-line data and ignores comments (0.127ms)
+✔ parseSseFrame tolerates malformed payloads without throwing (0.1124ms)
+✔ parseSseFrame returns null for an empty frame (0.0812ms)
+✔ RuntimeClient refuses a non-loopback base URL (0.3241ms)
+✔ RuntimeClient requires a real bearer token (0.0994ms)
+✔ startOwnedRuntime refuses an invalid port before spawning (0.2346ms)
+✔ startOwnedRuntime keeps the token out of argv (0.3091ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65.0443

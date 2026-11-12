@@ -13,6 +13,8 @@ export {
 export type { ButtonProps, FieldProps, SelectProps, Tone } from './primitives.js';
 export { Dialog, Menu, Tabs } from './overlay.js';
 export type { MenuItem, TabItem } from './overlay.js';
+export { Markdown, parseMarkdown } from './markdown.js';
+export type { MarkdownProps } from './markdown.js';
 export { CommandPalette } from './palette.js';
 export type { PaletteItem } from './palette.js';
 export {

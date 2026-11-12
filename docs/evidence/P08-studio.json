@@ -1,0 +1,267 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "the fixture project opens in the real catalog",
+      "ok": true,
+      "detail": {
+        "status": "created"
+      }
+    },
+    {
+      "name": "the studio has a session to bind a thread to",
+      "ok": true,
+      "detail": {
+        "sessionId": "ses_9925c502c080406b8afd412ae510951a"
+      }
+    },
+    {
+      "name": "the shell is on the project studio",
+      "ok": true,
+      "detail": {
+        "studioTitle": "p08-fixture-project"
+      }
+    },
+    {
+      "name": "nothing is sent just by opening and rendering the studio",
+      "ok": true,
+      "detail": {
+        "thread": null,
+        "items": 0,
+        "run": "idle"
+      }
+    },
+    {
+      "name": "the control strip reports a ready state before any work",
+      "ok": true,
+      "detail": {
+        "runBefore": "Ready"
+      }
+    },
+    {
+      "name": "the Connect engine control starts the owned runtime",
+      "ok": true,
+      "detail": {
+        "connected": true
+      }
+    },
+    {
+      "name": "the runtime connects and the shell reports it",
+      "ok": true,
+      "detail": {
+        "engine": "Engine connected"
+      }
+    },
+    {
+      "name": "connecting the engine creates no thread and no message",
+      "ok": true,
+      "detail": {
+        "thread": null,
+        "items": 0
+      }
+    },
+    {
+      "name": "the typed prompt is in the composer before sending",
+      "ok": true,
+      "detail": {
+        "filled": true,
+        "length": 201
+      }
+    },
+    {
+      "name": "the Submit control sends the prompt",
+      "ok": true,
+      "detail": {
+        "submitted": true
+      }
+    },
+    {
+      "name": "the control strip shows the turn running",
+      "ok": true,
+      "detail": {
+        "state": "Preparing"
+      }
+    },
+    {
+      "name": "the turn reaches a terminal state reported by the runtime",
+      "ok": true,
+      "detail": {
+        "finalState": "Ready"
+      }
+    },
+    {
+      "name": "the timeline shows the prompt, tool work and an outcome",
+      "ok": true,
+      "detail": {
+        "kinds": [
+          "status",
+          "user",
+          "assistant",
+          "status",
+          "tool",
+          "status",
+          "tool",
+          "status",
+          "tool",
+          "status",
+          "tool",
+          "assistant",
+          "outcome"
+        ]
+      }
+    },
+    {
+      "name": "the outcome item reports completion, not an invention",
+      "ok": true,
+      "detail": {
+        "outcome": "Status: completed\nDuration: 14.8 s\nUsage: in 1,174 (65,792 cached) · out 631 · reasoning 135\nCost: $0.0015 (engine-priced thread delta; provider_docs)\nChanged paths: hello.txt"
+      }
+    },
+    {
+      "name": "the observed permission is Full Access from the runtime thread",
+      "ok": true,
+      "detail": {
+        "thread": {
+          "threadId": "thr_c88acbcd0f0d4adea59232e0921073d8",
+          "workspace": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p08-studio-m29gqn\\p08-fixture-project",
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "mode": "agent",
+          "permissionPosture": "full_access",
+          "allowShell": true,
+          "trustMode": true,
+          "autoApprove": true,
+          "observedAt": "2026-11-12T06:00:44.354Z"
+        },
+        "permission": "Full Access · auto-approve"
+      }
+    },
+    {
+      "name": "the task changed a real file in the fixture project",
+      "ok": true,
+      "detail": {
+        "hello": "MONA_STUDIO_OK"
+      }
+    },
+    {
+      "name": "the project’s own test passes against that file",
+      "ok": true,
+      "detail": {
+        "status": 0,
+        "output": "MONA_STUDIO_CHECK_PASS\n"
+      }
+    },
+    {
+      "name": "a tool card records the runtime’s own tool input",
+      "ok": true,
+      "detail": {
+        "toolCards": 4,
+        "first": "{\n  \"path\": \"check.mjs\"\n}"
+      }
+    },
+    {
+      "name": "the turn recorded usage for the project",
+      "ok": true,
+      "detail": {
+        "turnCount": 1,
+        "knownCostMicros": 1504,
+        "unknownCostRecords": 0
+      }
+    },
+    {
+      "name": "re-rendering the studio replays stored events without sending anything",
+      "ok": true,
+      "detail": {
+        "before": 13,
+        "after": 13
+      }
+    },
+    {
+      "name": "Stop engine reaches the owned runtime",
+      "ok": true,
+      "detail": {
+        "stopped": true
+      }
+    },
+    {
+      "name": "the shell reports the runtime stopped",
+      "ok": true,
+      "detail": {
+        "engine": "Engine stopped"
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\01-studio-ready.png",
+      "label": "studio-ready"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\02-composer-filled.png",
+      "label": "composer-filled"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\03-turn-running.png",
+      "label": "turn-running"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\04-turn-complete.png",
+      "label": "turn-complete"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\05-outcome-card.png",
+      "label": "outcome-card"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p08\\06-studio-reloaded.png",
+      "label": "studio-reloaded"
+    }
+  ],
+  "timeline": {
+    "kinds": [
+      "status",
+      "user",
+      "assistant",
+      "status",
+      "tool",
+      "status",
+      "tool",
+      "status",
+      "tool",
+      "status",
+      "tool",
+      "assistant",
+      "outcome"
+    ],
+    "outcome": "Status: completed\nDuration: 14.8 s\nUsage: in 1,174 (65,792 cached) · out 631 · reasoning 135\nCost: $0.0015 (engine-priced thread delta; provider_docs)\nChanged paths: hello.txt",
+    "permission": "full_access",
+    "sessionId": "ses_9925c502c080406b8afd412ae510951a"
+  },
+  "evidence": {
+    "helloFile": "MONA_STUDIO_OK",
+    "checkExitCode": 0,
+    "changedFilesOnDisk": [
+      "check.mjs",
+      "hello.txt",
+      "README.md",
+      ".codewhale/state/.gitignore",
+      ".codewhale/state/subagents.v1.lock",
+      ".mona/project/project.json"
+    ]
+  },
+  "spend": {
+    "turnCount": 1,
+    "knownCostMicros": 1504,
+    "unknownCostRecords": 0
+  },
+  "engine": {
+    "state": "stopped",
+    "workspace": null,
+    "version": null
+  },
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "capturedAt": "2026-11-12T06:01:27.226Z"
+}
