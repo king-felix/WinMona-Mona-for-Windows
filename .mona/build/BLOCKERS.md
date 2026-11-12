@@ -28,6 +28,22 @@ Acknowledging a blocker never resets its counter or clears the row.
 - **Afterwards:** right-click a folder and a folder background; the entry must
   appear in the Windows 11 menu, not under **Show more options**.
 - **Requirement:** MONA-027 stays **blocked** until then.
+- **Re-confirmed at P23:** a clean-root install of the release candidate reports
+  the same `0x800B0109` refusal (`docs/evidence/P23-clean-install.json`). This is
+  still a machine-policy gate, not a code defect, and P23 did not attempt a
+  fourth local workaround.
+
+### MONA-028 — two human-only checks and one measured memory miss
+
+This is not a three-attempt blocker; it is recorded here because it needs Victor.
+
+- **Memory:** idle 406.4 MB across four processes on the release candidate
+  against the 350 MB target. The target is unchanged (D-0104). Victor either
+  accepts the recorded deviation for 0.1.0 or asks for the heap profile first;
+  either way MONA-028 stays partial until it is resolved.
+- **Screen reader:** a Narrator walkthrough is human-only (P22-ISSUE-004).
+- **Physical 200% scaling:** the harness captures 200% zoom, which is not the
+  same test as a real display at 200%.
 
 ## Prerequisites that are not blockers yet
 
@@ -39,6 +55,9 @@ Acknowledging a blocker never resets its counter or clears the row.
 | Windows 11 modern context-menu qualification | P21 | **Built and verified, not registered.** `MonaMenu.dll` passes 7 native checks including real COM activation; the sparse package is packed and test-signed. Windows refuses it: `0x80073CFF` unsigned, `0x800B0109` test-signed, Root-store import needs interactive consent, developer mode needs administrator | Victor picks one: (A) enable developer mode, (B) accept the test certificate into the current-user Root store once, or (C) supply a trusted signing certificate. Then re-run `node tools/install/cli.mjs install` |
 | Human click on the classic menu | P21/P22 acceptance | registered live at P09 and re-registered by the P21 installer against the installed `Mona.exe`; exercised through the exact registered argv, not by a hand click | a right-click on a folder and on a folder background, choosing **Start new DS project with Mona** (possibly under **Show more options**) |
 | Human click on the modern menu | P21/P22 acceptance | cannot be offered until the identity package registers (see above) | after A, B or C: right-click a folder and a folder background and confirm the entry in the Windows 11 menu |
+| Narrator walkthrough | P22/P23 acceptance | not performed; no automated claim is made | with Narrator on, open Mona, tab Home -> Studio -> composer, send nothing, confirm every control announces a name and state |
+| 200% scaling on a physical display | P22/P23 acceptance | automated 200% zoom captured; physical display not tested | set Windows scaling to 200% and confirm the composer and control strip stay reachable without horizontal scrolling |
+| Release candidate decision | 0.1.0 handoff | candidate built, installed, verified and documented; not published | accept the candidate as 0.1.0, or schedule the memory profile and the human checks first |
 
 ## Resolved
 

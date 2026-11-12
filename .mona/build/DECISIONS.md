@@ -1278,3 +1278,56 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** the on-disk profile directory remains `%APPDATA%\@mona\desktop`;
   renaming it is a future migration with its own evidence, not a side effect of
   packaging.
+## D-0101 - The Changes surface reports facts and keeps "unavailable" distinct from "empty"
+
+- **Decision:** a new Changes section (`ChangesPanel`, `ChangesService`,
+  three IPC channels) reads Git status, a change list against a captured
+  baseline, Git text diffs and recorded test receipts. Four states are
+  separate and never collapse into one: no baseline ("Changes unavailable"),
+  a real empty change list ("No changes since the baseline"), a non-Git
+  workspace (a diff reports "no textual baseline"), and a missing folder
+  ("Changes unavailable: the project folder is missing").
+- **Why:** the specification requires "Changes unavailable" to differ from
+  "No changes", and the engine's terminal or an empty diff would both be lies.
+  The change list already existed in `ChangeService` but had no renderer
+  surface (P13-ISSUE-001); this closes the Core criterion MONA-014/diffs.
+- **Constrains:** the surface states its scan bounds (5,000 files, the excluded
+  trees, the 1 MiB preview cap) because "no changes" means less when a scan
+  stopped early. Attribution comes only from recorded tool paths; every other
+  change is labelled unattributed, never "agent work".
+
+## D-0102 - Virtualized lists are arithmetic on a fixed row height
+
+- **Decision:** `packages/ui` exposes `virtualWindow` and `VirtualList`, which
+  render only the visible rows plus overscan inside a full-height spacer. Diff
+  rows are 18 px and change rows 30 px, declared in both the component and the
+  stylesheet.
+- **Why:** a 4,000-line change must not build 8,000 DOM nodes. Measured in real
+  Electron, an 8,007-line diff renders **29** rows and its tail is reachable by
+  scrolling. Measuring every row would reintroduce the freeze this replaces.
+- **Constrains:** rows must be a uniform height. A future variable-height list
+  needs its own measured implementation, not a tweak to this one.
+
+## D-0103 - One list of sections governs rendering, persistence and validation
+
+- **Decision:** `PROJECT_VIEWS` in `shared/catalog.ts` is the single list of
+  sections. The catalog IPC schema, the persisted UI state and the rail all read
+  it, and a test iterates every entry through `uiSetView`.
+- **Why:** before P23 the IPC allowlist accepted five sections while the shell
+  rendered nine, so a restart silently dropped Agents, Extensions, Memory and
+  Capabilities. Renderable-but-unsavable was a bug waiting to be reported as a
+  data loss.
+- **Constrains:** adding a section means adding it in one place and adding its
+  render branch; nothing else may hard-code a view list.
+
+## D-0104 - The 350 MB memory target stays; the deviation is recorded, not absorbed
+
+- **Decision:** the release candidate ships with idle memory measured at
+  406.4 MB across four processes. The 350 MB budget is unchanged, MONA-028 stays
+  partial, and the first post-0.1.0 performance task is a heap profile of the
+  main and renderer processes (P23-ISSUE-001).
+- **Why:** moving the target to the measurement would delete the only thing the
+  target does. The number is real and reproducible on this machine; the *cause*
+  is not yet known, so a fix now would be guesswork.
+- **Constrains:** no release text may claim the budget is met. A stated target
+  change requires Victor's recorded decision, not a builder's convenience.

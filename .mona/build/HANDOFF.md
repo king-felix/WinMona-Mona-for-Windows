@@ -1,100 +1,90 @@
 # Mona build handoff
 
-**Current prompt:** P23 — Package the release candidate and finish the handoff
-**Current status:** P00–P22 completed. State revision 67; ledger revision 314.
-MONA-027 is **blocked** (modern-menu package trust) and MONA-028 is **partial**
-(idle memory over budget, human screen-reader check). A 1.0-complete claim is
-therefore not available.
+**Current prompt:** P23 — release candidate and final handoff. **Status: completed.**
+State revision 70; ledger revision 323. All 24 prompts are delivered.
 
-`last_verified_commit` stays null because a state file cannot contain the hash of
-the commit that contains it. Verify with `node tools/build/cli.mjs validate`
-(expect OK, 0 warnings) before trusting this file.
+**The claim Mona can support today is "Core usable release candidate 0.1.0".** A 1.0-complete
+claim is not available: MONA-027 is blocked on a machine trust decision and MONA-028 is partial
+on a measured memory miss plus two human-only checks. Nothing was relabelled to hide that.
 
-## P22 result — whole-product QA
+The artifact is built, installed cleanly from an empty root, verified, and documented. Nothing
+was published: no remote, no package, no certificate, no public repository. Local commits only.
 
-- **Measured on this machine** (Ryzen 7 5800X, 32 GB, Windows 11 26200): cold
-  startup 418 ms, warm 722 ms, idle CPU 0.04% over 60 s, idle memory **404 MB**
-  across 4 processes, engine 270.8 MB separately, history query 1 ms for the newest
-  500 of 20,000 rows, 500 items rendered.
-- **Real engine turn through the installed app**: 22/22 steps, `hello.txt` written,
-  project test passed, one turn at **596 µUSD**, replay sent nothing.
-- **Accessibility**: focus trail has a solid outline on every stop, no duplicate
-  ids, no unnamed controls, no colour-only statuses; both themes, both densities,
-  1280×800, 1920×1080 and 200% zoom captured; Alt+2, Focus Mode and notification
-  focus are keyboard-only.
-- **Findings recorded, not smoothed over**: memory misses its 350 MB budget by
-  54 MB (P22-ISSUE-001); paint frame timing is invalid because the harness window
-  was not presented (P22-ISSUE-002); the packaged QA harness stalled and needs the
-  watchdog (P22-ISSUE-003); screen-reader and engine-under-load memory remain
-  unmeasured (P22-ISSUE-004/005).
-- **Requirement effect**: MONA-030 verified; MONA-028 partial; MONA-027 still
-  blocked.
+`last_verified_commit` stays null because a state file cannot contain the hash of the commit that
+contains it. Verify with `node tools/build/cli.mjs validate` (expect OK, 0 warnings).
 
-## Next exact action (P23)
+## P23 result
 
-P23 packages the release candidate and closes the project. Work from what exists:
+- **Closed the last two Foundation/Core criteria**, both of which the ledger had assigned to P23:
+  - MONA-014 `diffs` — new Changes section: `ChangesService`, `ChangesPanel`, three validated
+    IPC channels, and `packages/ui` `virtualWindow`/`VirtualList`. Real-Electron probe: 20/20
+    steps, 5 screenshots, 0 provider requests; an 8,007-line diff renders 29 DOM rows and its
+    tail is reachable by scrolling.
+  - MONA-007 `copy-export` — conversation export writes the recorded timeline to a Markdown file
+    through a temp file plus rename; real store, real file write, cancelled-save and empty-
+    session cases tested.
+- **Fixed a silent persistence gap found while adding the section:** the IPC view allowlist
+  accepted five sections while the shell rendered nine, so restarts dropped Agents, Extensions,
+  Memory and Capabilities. One `PROJECT_VIEWS` list now drives rendering, persistence and
+  validation, with a test over every entry (D-0103).
+- **Gate:** `npm run ci` exit 0 — 546 Vitest (66 files), 14 bootstrap, 12 launch, 14 install,
+  8 spike, typecheck/lint/format/build all pass; `npm run native:test` 7/7; `validate` OK.
+- **Candidate:** stage 1,668 files / 452,401,443 bytes; MSIX `Mona-0.1.0-x64.msix` sha256
+  `0c7446e7...f91a6a`, test-signed, untrusted root reported honestly; clean-root install, smoke,
+  verify and uninstall all documented in `docs/evidence/P23-clean-*.json`.
+- **Measured on this build:** cold 1,093 ms, warm 741 ms, idle CPU 0.04%, idle memory 406.4 MB,
+  engine 256.4 MB separately, 500 of 20,000 history rows in 1 ms.
+- **Documentation:** README, user guide, developer guide, compatibility policy, release notes
+  with hashes and rollback, changelog, third-party notices, contributing and security policy.
+  License deliberately unchosen.
+- **Bootstrap CLI defect found and fixed at the last checkpoint:** `checkpoint` back-filled
+  `next_eligible_prompts` with the current prompt whenever the computed list was empty, so
+  completing the final prompt left a stale entry and `validate` then failed against its own
+  computation. The list is now purely derived, with a regression test (bootstrap 13 -> 14).
 
-1. Re-run the gate: `npm run ci`, `npm run native:test`, `node tools/build/cli.mjs
-   validate`.
-2. Build the candidate: `node tools/install/cli.mjs stage`,
-   `node tools/install/cli.mjs package --test-sign`, `install --smoke`, and record
-   checksums in the release notes.
-3. Write the release documentation the spec asks for: README, third-party notices,
-   contribution and security-report instructions, compatibility policy,
-   reproducible-build steps, and screenshots of actual builds (reuse
-   `docs/evidence/shots-p22/`).
-4. Publish nothing. No public repository, package, release, certificate, or
-   purchase. Local commits only.
-5. Produce the final report with the honest matrix: MONA-027 blocked on
-   ISSUE-0023, MONA-028 partial on the measured memory miss and the human checks,
-   and the remaining human checklist from `docs/evidence/P22-product-QA.md`.
-6. Decide the memory question explicitly: accept 404 MB with a recorded reason, or
-   schedule profiling. Do not move the 350 MB target to match the number.
+## Next exact action (for Victor, or for the next session)
 
-## The one blocking prerequisite (Victor's decision)
+1. **Decide the modern-menu trust question** (developer mode / one-time test-certificate trust /
+   production certificate), then `node tools/install/cli.mjs install` and right-click a folder
+   and a folder background. This is the only thing that can clear MONA-027.
+2. **Decide the memory question.** Accept 406.4 MB for 0.1.0 or authorise a heap profile of the
+   main and renderer processes. The 350 MB target stays either way (D-0104).
+3. **Run the two human checks**: Narrator walkthrough and a physical 200% scaling pass.
+4. Only then consider a 0.2.0 scope. Later-scope features (mobile, cloud sync, multi-provider
+   routing, background summarisation) are not started and must not be started automatically.
 
-The modern-menu identity package cannot register until one of these happens: enable
-developer mode (administrator), accept the labelled test certificate into the
-current-user Root store once
-(`node tools/install/cli.mjs trust-test-certificate`, interactive), or supply a
-production certificate for `MONA_SIGN_PFX`. Details: `.mona/build/BLOCKERS.md`
-ISSUE-0023 and `docs/evidence/P21-windows.md`.
+## Where the pieces are
 
-## Relevant files and spec sections
+- Release notes with artifact hashes, provenance, rollback: `docs/release-notes-0.1.0.md`.
+- P23 evidence: `docs/evidence/P23-release-candidate.md`, `P23-changes.json`,
+  `P23-changes-log.txt`, `shots-p23/`, `P23-performance.json`, `P23-package.json`,
+  `P23-clean-install.json`, `P23-clean-verify.json`, `P23-clean-uninstall.json`,
+  `P23-install-restored.json`, `P23-gate-ci.txt`.
+- Decisions added: D-0101 (Changes states), D-0102 (fixed-height virtualization),
+  D-0103 (one section list), D-0104 (memory target unchanged).
+- Probes: `npm run changes -w @mona/desktop` (new), plus the P22 set unchanged.
 
-- `tools/install/` (lifecycle), `native/windows-shell/` (menu helper)
-- `apps/desktop/scripts/qa.mjs`, `apps/desktop/src/main/qa-probe.ts`
-- `docs/evidence/P21-windows.md`, `P22-product-QA.md`, `P22-performance.json`
-- Spec 14–17; prompt P23.
+## Requirement matrix
 
-## Open problem IDs and no-progress counts
-
-No open three-attempt blocker. `attempts.jsonl` holds only the closed P02 rows.
-
-P22-ISSUE-001..005 (memory miss, paint timing, packaged harness stall,
-screen-reader, engine-under-load memory). P21-ISSUE-001..006. Carried from P20 and
-earlier: P20-ISSUE-001..003, P19-ISSUE-001..004, P18-ISSUE-002/003,
-P17-ISSUE-001..005, P16-ISSUE-001..004, P15-ISSUE-001..003, P14-ISSUE-001..004,
-P13-ISSUE-001..003, P12-ISSUE-001..003, P11-ISSUE-001, P10-ISSUE-001..003,
-P09-ISSUE-001..002, P08-ISSUE-001..003, P07-ISSUE-001, P06-ISSUE-002,
-P05-ISSUE-001, P01-ISSUE-001..004, terminal ISSUE-0019..0022.
+- Foundation + Core: **28 verified**. Blocked: MONA-027. Partial: MONA-028.
+- Open issues carried: P23-ISSUE-001 (memory), P23-ISSUE-002 (= ISSUE-0023), P23-ISSUE-003
+  (export dialog not automated); P22-ISSUE-002..005; all earlier Pxx rows stay as recorded.
+- No open three-attempt blocker. `attempts.jsonl` holds only the closed P02 rows.
 
 ## Last relevant validation
 
-- `npm test` → 513 Vitest (61 files) + 13 bootstrap + 12 launch + 14 install + 8 spike.
-- `npm run native:test` → 7/7. `npm run typecheck`, `lint`, `format:check`, `build` pass.
-- `node tools/build/cli.mjs validate` → OK, 0 warnings.
-- Spend this prompt: 596 µUSD (one real turn). P15's delegated run (5,731.872 µUSD)
-  remains the largest single paid run; the $2 pilot ceiling is not approached.
+- `npm run ci` exit 0 (546 Vitest / 66 files + 14 + 12 + 14 + 8).
+- `npm run native:test` 7/7. `node tools/build/cli.mjs validate` OK.
+- `npm run changes` 20/20 steps, 5 screenshots, 0 provider requests.
+- Spend this prompt: **0 µUSD**. No paid turn was run: the probe that submits a turn is
+  `npm run studio`, and P23 changed no adapter, context or orchestration path. The P22 figure
+  (596 µUSD) remains the last recorded real turn; P15's 5,731.872 µUSD remains the largest.
 
-## Human input needed
+## Cautions
 
-- Modern-menu choice A/B/C, then a right-click in Explorer for both the modern and
-  classic entries.
-- Screen-reader walkthrough; 200% scaling on a physical display.
-- A decision on the 404 MB idle footprint.
-
-Standing caution unchanged: edit source with byte-safe tools. A PowerShell
-`Get-Content`/`Set-Content` round-trip double-encoded `App.tsx` and one test string
-in P14; Prettier does not repair that. `check-build.mjs` fails on mojibake in the
-renderer bundle.
+- Edit source with byte-safe tools. A PowerShell `Get-Content`/`Set-Content` round trip
+  double-encoded `App.tsx` once; `check-build.mjs` fails on mojibake, and that check is the
+  reason it is hard to ship now.
+- Adding an IPC method means updating the allowlist in `apps/desktop/scripts/check-build.mjs`;
+  the build fails on an unexpected channel on purpose.
+- Do not "fix" the memory row by editing the target, and do not publish anything.

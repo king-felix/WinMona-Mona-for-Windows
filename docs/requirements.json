@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 314,
+  "revision": 323,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1036,7 +1036,7 @@
         "P08",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "streaming",
@@ -1094,7 +1094,7 @@
         {
           "id": "copy-export",
           "description": "Copy and export preserve real content",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P08-tests.txt",
@@ -1103,12 +1103,20 @@
               "recorded_utc": "2026-11-12T06:11:59Z",
               "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
               "note": "copy buttons ship for timeline items; conversation export is not implemented yet (P14/P23)"
+            },
+            {
+              "path": "docs/evidence/P23-release-candidate.md",
+              "sha256": "d6572249fbbae3f0e6bebdd8c47c02b5337b636997bb4e4ad6be571dd1bb68e7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:56:30Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "conversation export writes the recorded timeline to a chosen Markdown file through a temp file plus rename; unit-tested with a real SQLite store and real file write, including cancelled and empty sessions; the OS save dialog itself is not automated"
             }
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1774,13 +1782,22 @@
         "P13",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "diffs",
           "description": "Diffs render from real workspace state with virtualization",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P23-changes.json",
+              "sha256": "20337cf2524f4411e09bc8cd6f60c00d54efb5bcaf727124d5eb1e2530a5aa5e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:52:21Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "real Electron probe: change list against a captured baseline, Git's own diff text rendered, an 8007-line diff rendered as 29 DOM rows with its tail reachable, traversal path refused (20/20 steps, 5 screenshots, 0 provider requests)"
+            }
+          ]
         },
         {
           "id": "tests-evidence",
@@ -1844,8 +1861,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -2790,6 +2807,14 @@
               "recorded_utc": "2026-11-12T17:38:10Z",
               "commit": "f1f0f47",
               "note": "Helper implements IExplorerCommand and package is built, but Windows refuses registration without developer mode or a trusted certificate; exact prerequisite recorded"
+            },
+            {
+              "path": "docs/evidence/P23-clean-install.json",
+              "sha256": "90d4bb330ae674bb7618c49ae3f6d6425e045635b50beceecfb6b011ccbd60e9",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:52:31Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "clean-root install of the release candidate re-confirms Windows refusing the test-signed identity package with 0x800B0109 (untrusted root); the classic menu is registered and verified"
             }
           ]
         },
@@ -2850,6 +2875,14 @@
               "recorded_utc": "2026-11-12T18:21:52Z",
               "commit": "7cf416d",
               "note": "Full suite and live probes re-run on the reference machine: 513 Vitest, 13 bootstrap, 12 launch, 14 install, 8 spike, 7 native; typecheck, lint, format and build pass"
+            },
+            {
+              "path": "docs/evidence/P23-gate-ci.txt",
+              "sha256": "1bfca907f24a42415edab42205ee1d0f31bcb92fe12e5e65cf7f3d8436e8226a",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:56:34Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "release-candidate gate re-run after the bootstrap CLI fix: npm run ci exit 0 with 546 Vitest (66 files), 14 bootstrap, 12 launch, 14 install, 8 spike, plus typecheck, lint, format and build; native:test 7/7"
             }
           ]
         },
@@ -2880,6 +2913,14 @@
               "recorded_utc": "2026-11-12T18:21:52Z",
               "commit": "7cf416d",
               "note": "Cold 418 ms and warm 722 ms startup pass; idle CPU 0.04% over 60 s passes; idle memory 404 MB misses the 350 MB budget by 54 MB; paint frame timing not measured because the window was not presented"
+            },
+            {
+              "path": "docs/evidence/P23-performance.json",
+              "sha256": "c048832b744f83fb4e372e27536ea8acfcc84b6f24568584b7ad4a51299bb359",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:52:28Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "release-candidate rerun: cold 1093 ms, warm 741 ms, idle CPU 0.04%, idle memory 406.4 MB across 4 processes vs the 350 MB target, engine 256.4 MB separate; frame timing landed on the vsync grid this run"
             }
           ]
         },
@@ -2895,6 +2936,14 @@
               "recorded_utc": "2026-11-12T18:21:52Z",
               "commit": "7cf416d",
               "note": "Requirement audit across all 30 rows with the P22 changes listed; capability coverage unchanged from the pinned-engine ledger"
+            },
+            {
+              "path": "docs/evidence/P23-release-candidate.md",
+              "sha256": "d6572249fbbae3f0e6bebdd8c47c02b5337b636997bb4e4ad6be571dd1bb68e7",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T18:56:34Z",
+              "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5",
+              "note": "release candidate matrix: all Foundation and Core requirements verified, MONA-027 blocked on the trust decision, MONA-028 partial on memory and human checks; documented in README, release notes and this evidence"
             }
           ]
         }

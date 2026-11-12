@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 67,
+  "revision": 70,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1418,7 +1418,7 @@
       "blocker_ids": []
     },
     "P23": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-001",
         "MONA-002",
@@ -1451,14 +1451,55 @@
         "MONA-029",
         "MONA-030"
       ],
-      "completed_steps": [],
-      "remaining_steps": [],
-      "evidence": [],
-      "blocker_ids": []
+      "completed_steps": [
+        "Changes section: baseline change list, Git diffs in a virtualized viewer, test receipts, three validated IPC channels (MONA-014 diffs closed)",
+        "Conversation export to Markdown from the recorded timeline, temp-file write plus rename, cancelled and empty cases tested (MONA-007 copy-export closed)",
+        "one PROJECT_VIEWS list governs rendering, persistence and IPC validation; restart no longer drops sections",
+        "release candidate staged (1668 files), MSIX packed and test-signed, checksums recorded",
+        "clean-root install, installed-app smoke, verify and uninstall documented",
+        "release documentation: README, user guide, developer guide, compatibility, release notes, changelog, notices, contributing, security",
+        "requirement matrix reconciled: 28 verified, MONA-027 blocked, MONA-028 partial; no 1.0-complete claim"
+      ],
+      "remaining_steps": [
+        "modern menu needs Victor's trust decision (developer mode, test-certificate trust, or production certificate) before MONA-027 can move",
+        "memory decision: accept 406.4 MB for 0.1.0 or authorise a heap profile; the 350 MB target is unchanged",
+        "human checks: Narrator walkthrough and physical 200% scaling"
+      ],
+      "evidence": [
+        {
+          "path": "docs/evidence/P23-changes.json",
+          "sha256": "20337cf2524f4411e09bc8cd6f60c00d54efb5bcaf727124d5eb1e2530a5aa5e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:53:00Z",
+          "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5"
+        },
+        {
+          "path": "docs/evidence/P23-performance.json",
+          "sha256": "c048832b744f83fb4e372e27536ea8acfcc84b6f24568584b7ad4a51299bb359",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:53:00Z",
+          "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5"
+        },
+        {
+          "path": "docs/evidence/P23-clean-install.json",
+          "sha256": "90d4bb330ae674bb7618c49ae3f6d6425e045635b50beceecfb6b011ccbd60e9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:53:00Z",
+          "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5"
+        },
+        {
+          "path": "docs/evidence/P23-release-candidate.md",
+          "sha256": "d6572249fbbae3f0e6bebdd8c47c02b5337b636997bb4e4ad6be571dd1bb68e7",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T18:56:37Z",
+          "commit": "0fc121e96617efae4acd5c1b1510417dcd7cc8b5"
+        }
+      ],
+      "blocker_ids": [
+        "ISSUE-0023"
+      ]
     }
   },
-  "next_eligible_prompts": [
-    "P23"
-  ],
-  "last_checkpoint_utc": "2026-11-12T18:21:57Z"
+  "next_eligible_prompts": [],
+  "last_checkpoint_utc": "2026-11-12T18:56:37Z"
 }

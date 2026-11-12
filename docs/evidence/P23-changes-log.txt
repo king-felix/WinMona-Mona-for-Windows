@@ -1,0 +1,11 @@
+
+{
+  "ok": true,
+  "steps": 20
+}
+mona: applied 7 state migration(s) to version 7
+warning: in the working copy of 'one.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'one.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'big.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'big.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'big.txt', LF will be replaced by CRLF the next time Git touches it
