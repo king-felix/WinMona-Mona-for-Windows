@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 18,
+  "revision": 22,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P06",
+  "current_prompt": "P07",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -197,10 +197,10 @@
         },
         {
           "path": "docs/evidence/P02-smoke.json",
-          "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
+          "sha256": "6c46c04f387d2bc41bc65b4338b6bbab68577df061efd6ab937ca0469e6fd33e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:36Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:56Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         }
       ],
       "blocker_ids": []
@@ -283,57 +283,57 @@
           "path": "docs/evidence/P04-supervisor.md",
           "sha256": "e1e47eb3b504122f61749a17d1dea44f12bc13c5b2a0d136c2b54b1492256faf",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-live.json",
           "sha256": "abd55ee2cf999e721d9292d62f6e36b25a4326766b07776aa3b965c5f0212dee",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-live-log.txt",
           "sha256": "48eafebf4d8052afc0ad7ea71293ca87ef3db93b68ef6c9acce6d407f801d84c",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-lifecycle.json",
-          "sha256": "973ccd85c03d2e17cfad785ca94667ab23759a994faaeada4ec2240460779d1a",
+          "sha256": "7a65083c437c6d9d1ef12a5132a0033f981815553b907cefc3611b8d8102dfcd",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-lifecycle-log.txt",
-          "sha256": "9817e9c03291141b99df64640a7f989bb1d8e999027cd9b31dd575c3d3a8791e",
+          "sha256": "4b4703b31d37c3f64aad06a5c6a612ca6bdf2fd89e83d291efadab562f8e39d4",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-tests.txt",
           "sha256": "ca9e48e32c92371f52ac8042edae2cfcd625374db01b26a7bd8f6d203406088e",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-checks.txt",
           "sha256": "a0678bf2afa20c9a0bd591572fba7086db8b3670fde7be461541e886adb430b3",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P04-build.txt",
           "sha256": "fc410464552be8868c69e82f35d12e5742f01805437114ae812d7d28854519e0",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:22:37Z",
-          "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         }
       ],
       "blocker_ids": []
@@ -362,49 +362,106 @@
           "path": "docs/evidence/P05-state.md",
           "sha256": "7b56ac4503a0c4c0efa8a4f8bc670d36ec1e21a964166fb2c36bb624db4f0839",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:23:00Z",
-          "commit": "ad74116fd42f093567b7dbc61b5671b75375dbab"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P05-state-open.json",
-          "sha256": "966f1a97864d44135bf21fc6f9168e5b047afa14b77851659c83fd4e3287a428",
+          "sha256": "73ef1152ba195798f8fbc051ab8c38ad997470acf59888a3ecf72af893bb89ac",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:23:00Z",
-          "commit": "ad74116fd42f093567b7dbc61b5671b75375dbab"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P05-tests.txt",
           "sha256": "c0797c8bd7b0afdc03012bb84d6fedcc02050c402d7ecf4d96190773eec0fb4b",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:23:00Z",
-          "commit": "ad74116fd42f093567b7dbc61b5671b75375dbab"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P05-checks.txt",
           "sha256": "89ed052dd661290997ef8e885a68443c429d829eb568578b551c63ffc16abfae",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:23:00Z",
-          "commit": "ad74116fd42f093567b7dbc61b5671b75375dbab"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         },
         {
           "path": "docs/evidence/P05-build.txt",
           "sha256": "e7a9a1298511605c0b6c9eee38a0891bde5640492e9269001e357c2b60c4f849",
           "kind": "document",
-          "recorded_utc": "2026-11-12T02:23:00Z",
-          "commit": "ad74116fd42f093567b7dbc61b5671b75375dbab"
+          "recorded_utc": "2026-11-12T03:14:57Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
         }
       ],
       "blocker_ids": []
     },
     "P06": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-006",
         "MONA-029"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "packages/ui: Daybreak/Afterglow tokens, density modes, motion and reduced-motion, typography and surfaces",
+        "Primitives and overlays: button, field, select, badge, card, inspector, empty, skeleton, error, notification, dialog, menu, tabs",
+        "Contrast measured from the shipped stylesheet; two palette failures found and fixed (border-strong below 3:1, coral as status text)",
+        "Labelled fixture harness for home, studio, work board, cost lens, blocker card, settings and non-happy states",
+        "Real-Electron capture and keyboard audit: 34 screenshots across both themes and densities, 1280x800, 1920x1080 and 200% scaling",
+        "Fixed a theme-overwrite bug found by inspecting captures; renderer consumes @mona/ui tokens"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P06-design.md",
+          "sha256": "9c672ce73bddfa913e4e3e93251093cb7b9b525bc0a0452b5987557eef97b794",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/evidence/P06-shots.json",
+          "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/evidence/P06-shots-log.txt",
+          "sha256": "0a61a901a73829bb6d8f3eca422b7ef760cfb82894f688575e60ece89881204a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/evidence/P06-tests.txt",
+          "sha256": "b55551418cb2f2e8fe29414c2d6fca544380ba145a131003521e17bd5cdbbf36",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/evidence/P06-checks.txt",
+          "sha256": "4b98e3bb93de19669f4899948f40647a1ef8a296a6a14a537225a9346b827075",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/evidence/P06-build.txt",
+          "sha256": "06fca662a1914cc93db78cb0f6aba0bd3a7b57465c3092d36d9c2ac48c7c3c28",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        },
+        {
+          "path": "docs/design-system.md",
+          "sha256": "1a9dd51bc773dadb1313d7e7c0b2c3894510992a5d1fc5b0ace13c30d35f5bc0",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T03:15:03Z",
+          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+        }
+      ],
       "blocker_ids": []
     },
     "P07": {
@@ -630,7 +687,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P06"
+    "P07"
   ],
-  "last_checkpoint_utc": "2026-11-12T02:23:00Z"
+  "last_checkpoint_utc": "2026-11-12T03:15:03Z"
 }

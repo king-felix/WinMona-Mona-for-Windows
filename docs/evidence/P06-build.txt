@@ -1,0 +1,239 @@
+﻿P06 build and shell verification - 2026-11-11T20:12:59.0772668-07:00
+
+=== npm run build ===
+
+> mona@0.0.0 build
+> npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/project-state@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/ui@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/desktop@0.1.0 build
+> npm run clean && npm run build:main && npm run build:preload && npm run build:renderer
+
+
+> @mona/desktop@0.1.0 clean
+> node -e "require('node:fs').rmSync('dist',{recursive:true,force:true})"
+
+
+> @mona/desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+
+> @mona/desktop@0.1.0 build:preload
+> esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  dist\preload\preload.cjs  327b 
+
+Done in 9ms
+
+> @mona/desktop@0.1.0 build:renderer
+> vite build
+
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 24 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/renderer/index.html                   0.73 kB │ gzip:  0.41 kB
+dist/renderer/assets/index-ONr5y3uH.css   13.88 kB │ gzip:  3.24 kB
+dist/renderer/assets/index-DWuG0Wl3.js   243.01 kB │ gzip: 75.44 kB │ map: 1,107.86 kB
+
+[32m✓ built in 116ms[39m
+
+=== npm run check:build -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 check:build
+> node scripts/check-build.mjs
+
+build checks passed: 4 renderer files, CSP replaced, no fixtures, no credentials, one preload channel
+
+=== npm run smoke -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 smoke
+> node scripts/smoke.mjs
+
+node.exe : mona: applied 1 state migration(s) to version 1
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mona: applied 1...s) to version 1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+{
+  "ok": true,
+  "appVersion": "0.1.0",
+  "electron": "45.3.0",
+  "chrome": "156.0.8078.96",
+  "node": "24.22.2",
+  "platform": "win32",
+  "arch": "x64",
+  "dom": {
+    "title": "Mona",
+    "version": "v0.1.0",
+    "nav": [
+      "Projects",
+      "Work",
+      "Cost",
+      "Settings"
+    ],
+    "engine": "Engine not connected",
+    "theme": "daybreak",
+    "hasFixtureMarker": false
+  },
+  "bridge": {
+    "keys": [
+      "getAppInfo"
+    ],
+    "frozen": true,
+    "hasNodeRequire": false,
+    "hasProcess": false,
+    "hasIpcRenderer": false
+  },
+  "security": {
+    "remoteNavigationAttempted": "https://example.com/",
+    "urlAfterNavigation": "file:///X:/AI_projects/Mona/apps/desktop/dist/renderer/index.html",
+    "navigationRefused": true,
+    "popupAttempted": "https://example.com/",
+    "popupRefused": true,
+    "windowCount": 1,
+    "devToolsAllowed": false
+  },
+  "metrics": [
+    {
+      "type": "Browser",
+      "pid": 37276,
+      "workingSetSizeKb": 110396,
+      "peakWorkingSetSizeKb": 110412
+    },
+    {
+      "type": "GPU",
+      "pid": 17104,
+      "workingSetSizeKb": 95304,
+      "peakWorkingSetSizeKb": 98228
+    },
+    {
+      "type": "Utility",
+      "pid": 2504,
+      "workingSetSizeKb": 52516,
+      "peakWorkingSetSizeKb": 52516
+    },
+    {
+      "type": "Tab",
+      "pid": 35724,
+      "workingSetSizeKb": 81244,
+      "peakWorkingSetSizeKb": 81560
+    }
+  ],
+  "rendererProcessCount": 1,
+  "totalWorkingSetMb": 332,
+  "capturedAt": "2026-11-12T03:13:10.309Z"
+}
+smoke security checks passed: navigation refused, popup refused, one frozen bridge key, footprint 332 MB
+
+=== npm run lifecycle -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 lifecycle
+> node scripts/lifecycle.mjs
+
+
+PASS owned runtime started for the lifecycle probe :: {"endpoint":"http://127.0.0.1:52393"}
+PASS runtime is owned with a real process id :: {"pid":23952,"state":"connected"}
+PASS closing the window hides it instead of ending owned work :: {"windowDestroyed":false,"runtimePid":23952,"runtimeAlive":true,"hostState":"connected"}
+PASS a renderer crash recreates the window :: {"crashedWebContentsId":1,"newWebContentsId":2,"windowCount":1}
+PASS the recreated window renders the real application :: {"title":"Mona","version":"v0.1.0"}
+PASS the runtime survived the renderer crash :: {"runtimePid":23952,"hostState":"connected"}
+PASS the renderer crash did not start a quit :: {"hostState":"connected"}
+PASS a second launch restores the existing window and keeps the same runtime :: {"windowCount":1,"runtimePid":23952,"sameRuntime":true}
+PASS quit and stop ends the owned runtime with a receipt :: {"outcome":"stopped_forced","rootExited":true,"rollbackClaimed":false,"quit":{"receipt":{"runtime_id":"rt_8e14e6b4802c0bb5c075918f","requested_at":"2026-11-12T03:13:12.519Z","completed_at":"2026-11-12T03:13:15.748Z","reason":"app_quit","outcome":"stopped_forced","root_exited":true,"observed_descendants":[19952],"remaining_pids":[],"endpoint_closed":true,"rollback_claimed":false}}}
+PASS the runtime process is gone after quit :: {"runtimePid":23952}
+node.exe : mona: applied 1 state migration(s) to version 1
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mona: applied 1...s) to version 1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+mona: renderer gone (crashed); recreating window
+local state opened: schema v1, 17 tables, integrity ok
+lifecycle probe passed 10 checks in real Electron
+
+=== npm run shots -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 shots
+> node scripts/shots.mjs
+
+
+load daybreak/comfortable
+shot daybreak-comfortable-viewport 1280x800@1
+shot daybreak-comfortable-home 1280x800@1
+shot daybreak-comfortable-studio 1280x800@1
+shot daybreak-comfortable-work 1280x800@1
+shot daybreak-comfortable-cost 1280x800@1
+shot daybreak-comfortable-blocker 1280x800@1
+shot daybreak-comfortable-settings 1280x800@1
+shot daybreak-comfortable-states 1280x800@1
+load daybreak/compact
+shot daybreak-compact-viewport 1280x800@1
+shot daybreak-compact-home 1280x800@1
+shot daybreak-compact-studio 1280x800@1
+shot daybreak-compact-work 1280x800@1
+shot daybreak-compact-cost 1280x800@1
+shot daybreak-compact-blocker 1280x800@1
+shot daybreak-compact-settings 1280x800@1
+shot daybreak-compact-states 1280x800@1
+load afterglow/comfortable
+shot afterglow-comfortable-viewport 1280x800@1
+shot afterglow-comfortable-home 1280x800@1
+shot afterglow-comfortable-studio 1280x800@1
+shot afterglow-comfortable-work 1280x800@1
+shot afterglow-comfortable-cost 1280x800@1
+shot afterglow-comfortable-blocker 1280x800@1
+shot afterglow-comfortable-settings 1280x800@1
+shot afterglow-comfortable-states 1280x800@1
+load afterglow/compact
+shot afterglow-compact-viewport 1280x800@1
+shot afterglow-compact-home 1280x800@1
+shot afterglow-compact-studio 1280x800@1
+shot afterglow-compact-work 1280x800@1
+shot afterglow-compact-cost 1280x800@1
+shot afterglow-compact-blocker 1280x800@1
+shot afterglow-compact-settings 1280x800@1
+shot afterglow-compact-states 1280x800@1
+shot daybreak-comfortable-1920x1080 1920x1080@1
+shot afterglow-compact-200pct 1280x800@2
+daybreak/comfortable: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+daybreak/compact: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+afterglow/comfortable: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+afterglow/compact: focus 14 stops, ring visible, unnamed 0, dup ids 0, external 0
+captured 34 screenshots; audit failures 0
+node.exe : mona: applied 1 state migration(s) to version 1
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (mona: applied 1...s) to version 1:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+design system captured: 34 screenshots, 4 audits clean
+

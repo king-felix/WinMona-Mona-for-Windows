@@ -17,7 +17,12 @@ export function isTrustedAppUrl(
   try {
     const url = new URL(candidate);
     if (url.protocol !== 'file:') return false;
-    return path.resolve(fileURLToPath(url)) === path.resolve(options.indexPath);
+    // A query string is how the renderer selects a view (and the design harness);
+    // only the file itself has to match, never another path that carries a query.
+    const fileUrl = new URL(url.toString());
+    fileUrl.search = '';
+    fileUrl.hash = '';
+    return path.resolve(fileURLToPath(fileUrl)) === path.resolve(options.indexPath);
   } catch {
     return false;
   }

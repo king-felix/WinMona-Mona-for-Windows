@@ -1,6 +1,20 @@
 import { useEffect, useState } from 'react';
+import { Harness, HarnessScreen, type HarnessScreenId } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import type { AppInfo } from '../shared/ipc.js';
+
+/** Query-driven visual harness route: fixtures only, never live state. */
+function harnessRequest(): { screen: HarnessScreenId | 'all' } | null {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('harness') === null) return null;
+    const requested = params.get('screen') ?? 'all';
+    const allowed: HarnessScreenId[] = ['home', 'studio', 'work', 'cost', 'blocker', 'settings', 'states'];
+    return { screen: allowed.includes(requested as HarnessScreenId) ? (requested as HarnessScreenId) : 'all' };
+  } catch {
+    return null;
+  }
+}
 
 type Theme = 'daybreak' | 'afterglow';
 type View = 'projects' | 'work' | 'cost' | 'settings';
@@ -33,6 +47,10 @@ const VIEW_COPY: Record<View, { title: string; body: string }> = {
 
 function initialTheme(): Theme {
   try {
+    // An explicit request (the screenshot harness) wins over the stored choice,
+    // and must be read before the theme effect writes the attribute.
+    const requested = new URLSearchParams(window.location.search).get('theme');
+    if (requested === 'daybreak' || requested === 'afterglow') return requested;
     return localStorage.getItem('mona.theme') === 'afterglow' ? 'afterglow' : 'daybreak';
   } catch {
     return 'daybreak';
@@ -44,6 +62,19 @@ export function App(): React.JSX.Element {
   const [view, setView] = useState<View>('projects');
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const harness = harnessRequest();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const density = params.get('density');
+    if (density === 'compact' || density === 'comfortable') {
+      document.documentElement.dataset.density = density;
+    }
+    const requestedTheme = params.get('theme');
+    if (requestedTheme === 'afterglow' || requestedTheme === 'daybreak') {
+      document.documentElement.dataset.theme = requestedTheme;
+    }
+  }, []);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -72,6 +103,14 @@ export function App(): React.JSX.Element {
   }, []);
 
   const copy = VIEW_COPY[view];
+
+  if (harness) {
+    return (
+      <div className="harness-route mona-root">
+        {harness.screen === 'all' ? <Harness /> : <HarnessScreen id={harness.screen} />}
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">

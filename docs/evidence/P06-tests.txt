@@ -1,0 +1,78 @@
+﻿P06 tests - 2026-11-11T20:12:23.2910319-07:00
+
+=== npx vitest run ===
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mX:/AI_projects/Mona[39m
+
+ [32m✓[39m apps/desktop/src/main/security.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m packages/ui/src/contrast.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/work-control.test.ts [2m([22m[2m14 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/http.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 29[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/contracts.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/adapter.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/journal.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 97[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/engine-host.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/migrations.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 344[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/renderer/App.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m packages/ui/src/ui.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[32m 113[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/store.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 842[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/state.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 789[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/supervisor.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 24234[2mms[22m[39m
+   [32m✓[39m process tree ownership [2m(1)[22m
+     [33m[2m✓[22m[39m stops a real owned process tree and leaves an unrelated node process alive[33m 2513[2mms[22m[39m
+   [32m✓[39m RuntimeSupervisor [2m(9)[22m
+     [33m[2m✓[22m[39m starts the runtime with an authenticated loopback identity and a token-free ownership record[33m 4107[2mms[22m[39m
+     [33m[2m✓[22m[39m stops a real descendant spawned by the owned runtime[33m 4364[2mms[22m[39m
+     [33m[2m✓[22m[39m clears a stale pid record and starts a fresh runtime[33m 4316[2mms[22m[39m
+     [33m[2m✓[22m[39m does not kill a live pid whose creation identity changed[33m 332[2mms[22m[39m
+     [33m[2m✓[22m[39m restarts a crashed runtime a bounded number of times without submitting work[33m 7918[2mms[22m[39m
+     [33m[2m✓[22m[39m fails the start when the runtime exits before it is usable[33m 437[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m15 passed[39m[22m[90m (15)[39m
+[2m      Tests [22m [1m[32m148 passed[39m[22m[90m (148)[39m
+[2m   Start at [22m 20:12:24
+[2m   Duration [22m 24.62s[2m (tests 90%, import 5%, environment 4%, transform 1%)[22m
+
+
+=== node --test tests/bootstrap ===
+✔ checkpoint advances revision atomically and journals the boundary (867.9915ms)
+✔ stale expected revision is refused and state is untouched (791.9808ms)
+✔ a write interrupted after the temp file is promoted by recover (955.3288ms)
+✔ a torn temp file is quarantined and the committed state survives (646.2847ms)
+✔ a corrupt state file is restored from the newest verified backup (944.8344ms)
+✔ validation rejects a dependency cycle (657.2658ms)
+✔ validation rejects an unregistered requirement and an unknown owner (652.5841ms)
+✔ validation rejects a changed specification whose recorded hash is stale (668.7655ms)
+✔ validation rejects a passed criterion with no evidence (673.9029ms)
+✔ evidence command records a hash and derives requirement status (838.6277ms)
+✔ checkpoint refuses evidence paths that do not exist (612.0093ms)
+✔ a recorded remaining step can be explicitly cleared when it is finished (832.1046ms)
+✔ evidence can prune stale references left on sibling criteria (660.4516ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9865.4247
+
+=== node --test tests/spike ===
+✔ parseSseFrame reads event, id, and JSON data (3.1033ms)
+✔ parseSseFrame joins multi-line data and ignores comments (0.1341ms)
+✔ parseSseFrame tolerates malformed payloads without throwing (0.1428ms)
+✔ parseSseFrame returns null for an empty frame (0.0999ms)
+✔ RuntimeClient refuses a non-loopback base URL (0.3312ms)
+✔ RuntimeClient requires a real bearer token (0.0982ms)
+✔ startOwnedRuntime refuses an invalid port before spawning (0.2326ms)
+✔ startOwnedRuntime keeps the token out of argv (0.2366ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 60.9083
+

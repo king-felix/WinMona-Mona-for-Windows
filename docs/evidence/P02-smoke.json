@@ -40,30 +40,30 @@
   "metrics": [
     {
       "type": "Browser",
-      "pid": 19888,
-      "workingSetSizeKb": 108552,
-      "peakWorkingSetSizeKb": 108552
+      "pid": 37276,
+      "workingSetSizeKb": 110396,
+      "peakWorkingSetSizeKb": 110412
     },
     {
       "type": "GPU",
-      "pid": 29404,
-      "workingSetSizeKb": 98212,
-      "peakWorkingSetSizeKb": 100416
+      "pid": 17104,
+      "workingSetSizeKb": 95304,
+      "peakWorkingSetSizeKb": 98228
     },
     {
       "type": "Utility",
-      "pid": 32692,
-      "workingSetSizeKb": 52332,
-      "peakWorkingSetSizeKb": 52332
+      "pid": 2504,
+      "workingSetSizeKb": 52516,
+      "peakWorkingSetSizeKb": 52516
     },
     {
       "type": "Tab",
-      "pid": 40940,
-      "workingSetSizeKb": 82612,
-      "peakWorkingSetSizeKb": 82960
+      "pid": 35724,
+      "workingSetSizeKb": 81244,
+      "peakWorkingSetSizeKb": 81560
     }
   ],
   "rendererProcessCount": 1,
-  "totalWorkingSetMb": 334,
-  "capturedAt": "2026-11-12T02:21:56.045Z"
+  "totalWorkingSetMb": 332,
+  "capturedAt": "2026-11-12T03:13:10.309Z"
 }

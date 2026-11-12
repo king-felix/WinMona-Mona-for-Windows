@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 120,
+  "revision": 131,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -739,27 +739,35 @@
         "P22",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "daybreak",
           "description": "Daybreak theme meets measured contrast and hierarchy requirements",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
+              "sha256": "6c46c04f387d2bc41bc65b4338b6bbab68577df061efd6ab937ca0469e6fd33e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:37Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "re-verified at P05 with local state wired in; Daybreak tokens and security assertions unchanged"
+              "recorded_utc": "2026-11-12T03:15:02Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "Daybreak shell rendered in the live window with the design system loaded; palette contrast measured separately in P06-shots"
+            },
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T03:15:03Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "Daybreak tokens measured from the shipped stylesheet: 14 pairs pass AA, body ink 15.9:1"
             }
           ]
         },
         {
           "id": "afterglow",
           "description": "Afterglow theme meets the same accessibility bar",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
@@ -768,13 +776,21 @@
               "recorded_utc": "2026-11-12T01:41:48Z",
               "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "Afterglow tokens implemented and unit-tested; live equal-accessibility testing is P06"
+            },
+            {
+              "path": "docs/evidence/P06-design.md",
+              "sha256": "9c672ce73bddfa913e4e3e93251093cb7b9b525bc0a0452b5987557eef97b794",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T03:14:50Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "Afterglow measured at the same bar (body 14.4:1, all pairs AA); a Daybreak-overwrite bug was found by inspecting the captures and fixed"
             }
           ]
         },
         {
           "id": "accessibility",
           "description": "Keyboard access, visible focus, 200% scaling and screen-reader checks recorded",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
@@ -783,13 +799,21 @@
               "recorded_utc": "2026-11-12T01:41:48Z",
               "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "semantic nav, aria-current, aria-live, focus-visible, system typography verified live and in DOM tests; screen-reader and 200% QA are P06/P22"
+            },
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T03:14:50Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "real keyboard traversal: 14 focus stops per theme/density, focus rule ships and paints, zero unnamed controls, zero duplicate ids"
             }
           ]
         },
         {
           "id": "density-motion",
           "description": "Density modes share one information architecture; reduced motion respected",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
@@ -798,12 +822,20 @@
               "recorded_utc": "2026-11-12T01:41:49Z",
               "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "reduced-motion media query and compact density foundation; full density modes are P06"
+            },
+            {
+              "path": "docs/design-system.md",
+              "sha256": "1a9dd51bc773dadb1313d7e7c0b2c3894510992a5d1fc5b0ace13c30d35f5bc0",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T03:14:50Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "compact and comfortable share one information architecture; reduced-motion zeroes all durations and the skeleton animation"
             }
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1347,11 +1379,11 @@
             },
             {
               "path": "docs/evidence/P04-lifecycle.json",
-              "sha256": "973ccd85c03d2e17cfad785ca94667ab23759a994faaeada4ec2240460779d1a",
+              "sha256": "7a65083c437c6d9d1ef12a5132a0033f981815553b907cefc3611b8d8102dfcd",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:38Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "re-verified at P05 with local state open: close keeps work, crash recreates one window, relaunch reuses the runtime"
+              "recorded_utc": "2026-11-12T03:14:57Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "re-verified at P06: lifecycle probe still passes with local state and the design system loaded"
             }
           ]
         },
@@ -1394,7 +1426,7 @@
           ]
         }
       ],
-      "verified_commit": "ad74116",
+      "verified_commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1752,11 +1784,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
+              "sha256": "6c46c04f387d2bc41bc65b4338b6bbab68577df061efd6ab937ca0469e6fd33e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:37Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "re-verified at P05: sandboxed renderer, one frozen preload key, no Node globals, devtools closed"
+              "recorded_utc": "2026-11-12T03:14:56Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "re-verified at P06 with the design system in the renderer: sandboxed, one frozen key, no Node globals, devtools closed"
             }
           ]
         },
@@ -1767,11 +1799,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
+              "sha256": "6c46c04f387d2bc41bc65b4338b6bbab68577df061efd6ab937ca0469e6fd33e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:37Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "still a single app-info channel; local state is main-process only"
+              "recorded_utc": "2026-11-12T03:14:56Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "still one app-info channel; the design system added no IPC"
             }
           ]
         },
@@ -1812,11 +1844,11 @@
           "evidence": [
             {
               "path": "docs/evidence/P02-smoke.json",
-              "sha256": "c85f5f623ddfdec2ec7ce9f1c7880cfbca9b1b8fbddee56be6435263c11fe151",
+              "sha256": "6c46c04f387d2bc41bc65b4338b6bbab68577df061efd6ab937ca0469e6fd33e",
               "kind": "document",
-              "recorded_utc": "2026-11-12T02:22:38Z",
-              "commit": "08a9c61ab1be4205632db5ae7a67fe31aacacbdc",
-              "note": "remote navigation and popups still refused after the P05 wiring"
+              "recorded_utc": "2026-11-12T03:14:57Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "remote navigation and popups still refused with @mona/ui in the bundle"
             }
           ]
         }
@@ -1913,7 +1945,7 @@
         "P14",
         "P23"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "resume-brief",
@@ -1936,8 +1968,17 @@
         {
           "id": "keyboard-flow",
           "description": "Core flows are reachable without a mouse",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P06-shots.json",
+              "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T03:14:50Z",
+              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+              "note": "core harness flows reachable by Tab alone; dialogs/menus/tabs have explicit arrow, Escape and focus-restoration tests"
+            }
+          ]
         }
       ],
       "verified_commit": null,

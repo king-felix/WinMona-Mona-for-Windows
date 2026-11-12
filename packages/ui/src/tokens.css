@@ -1,0 +1,579 @@
+/*
+ * Mona design tokens.
+ *
+ * Two themes, one information architecture. Colour is never the only carrier of
+ * meaning: every status also has text and an icon glyph. Contrast is measured by
+ * `packages/ui/src/contrast.test.ts` against these literal values, so editing a
+ * hex without re-measuring fails a test.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --canvas: #f7f8fc;
+  --surface: #ffffff;
+  --surface-sunken: #eff2f9;
+  --surface-raised: #ffffff;
+  --scrim: rgba(16, 22, 43, 0.42);
+
+  /* Text */
+  --ink: #18213b;
+  --muted: #4e5b73;
+  --ink-inverse: #ffffff;
+
+  /* Actions */
+  --primary: #5a3ed0;
+  --primary-hover: #4b2fb8;
+  --primary-ink: #ffffff;
+  --primary-soft: #eee9ff;
+
+  /* Status (text-safe values; -soft for backgrounds) */
+  --success: #00695f;
+  --success-soft: #e3f4f1;
+  --attention: #7a4c00;
+  --attention-soft: #fff2d1;
+  --critical: #a81e3c;
+  --critical-soft: #fdeaee;
+  --info: #1f4f9c;
+  --info-soft: #e7effb;
+
+  /* Structure */
+  --border: #d7dded;
+  --border-strong: #7a8bab;
+  --focus: #3f2ba8;
+  --focus-offset: 2px;
+  --selection: #e4dcff;
+
+  /* Decorative only: never text, never a status carrier. */
+  --accent-coral: #d94a66;
+  --accent-sea: #007b70;
+
+  /* Typography */
+  --font-ui:
+    system-ui, -apple-system, 'Segoe UI Variable Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-ui);
+  --font-mono: ui-monospace, 'Cascadia Mono', 'Consolas', 'SF Mono', monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.75rem;
+  --leading-tight: 1.25;
+  --leading-base: 1.55;
+  --leading-loose: 1.7;
+  --weight-regular: 400;
+  --weight-medium: 550;
+  --weight-strong: 650;
+
+  /* Spacing: 8 px rhythm with half steps for dense controls */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Shape */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+  --shadow-sm: 0 1px 2px rgba(16, 22, 43, 0.06);
+  --shadow-md: 0 12px 28px -22px rgba(16, 22, 43, 0.5);
+  --shadow-lg: 0 28px 64px -40px rgba(16, 22, 43, 0.55);
+
+  /* Motion */
+  --motion-fast: 120ms;
+  --motion-base: 160ms;
+  --motion-slow: 180ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0.1, 1);
+
+  /* Density */
+  --density-row: 40px;
+  --density-pad: var(--space-4);
+  --density-gap: var(--space-3);
+}
+
+:root[data-theme='afterglow'] {
+  color-scheme: dark;
+
+  --canvas: #121426;
+  --surface: #1b1e36;
+  --surface-sunken: #171a2e;
+  --surface-raised: #232746;
+  --scrim: rgba(4, 6, 16, 0.6);
+
+  --ink: #eef0fb;
+  --muted: #b3bad9;
+  --ink-inverse: #161022;
+
+  --primary: #b9a4ff;
+  --primary-hover: #cbbcff;
+  --primary-ink: #1a1233;
+  --primary-soft: #2b2350;
+
+  --success: #6ff0d9;
+  --success-soft: #123b38;
+  --attention: #ffd166;
+  --attention-soft: #3a2c10;
+  --critical: #ffadba;
+  --critical-soft: #3d1b25;
+  --info: #9dc4ff;
+  --info-soft: #17243c;
+
+  --border: #2f3457;
+  --border-strong: #6b77b8;
+  --focus: #d3c6ff;
+  --selection: #34295e;
+
+  --accent-coral: #ff97ab;
+  --accent-sea: #6ff0d9;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 16px 34px -26px rgba(0, 0, 0, 0.85);
+  --shadow-lg: 0 32px 72px -44px rgba(0, 0, 0, 0.9);
+}
+
+:root[data-density='compact'] {
+  --density-row: 32px;
+  --density-pad: var(--space-3);
+  --density-gap: var(--space-2);
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.1875rem;
+}
+
+:root[data-density='comfortable'] {
+  --density-row: 44px;
+  --density-pad: var(--space-5);
+  --density-gap: var(--space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+    --motion-slow: 0ms;
+  }
+}
+
+/* Global element styling kept minimal; components own their own rules. */
+
+.mona-root {
+  color: var(--ink);
+  background: var(--canvas);
+  font-family: var(--font-ui);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.mona-root ::selection {
+  background: var(--selection);
+  color: var(--ink);
+}
+
+.mona-focus-ring:focus-visible,
+.mona-root :focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* Components */
+
+.mona-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--density-row);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  font: inherit;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.mona-button[data-variant='primary'] {
+  background: var(--primary);
+  color: var(--primary-ink);
+}
+.mona-button[data-variant='primary']:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+.mona-button[data-variant='secondary'] {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+.mona-button[data-variant='secondary']:hover:not(:disabled) {
+  background: var(--surface-sunken);
+}
+.mona-button[data-variant='ghost'] {
+  background: transparent;
+  color: var(--ink);
+}
+.mona-button[data-variant='ghost']:hover:not(:disabled) {
+  background: var(--surface-sunken);
+}
+.mona-button[data-variant='danger'] {
+  background: var(--surface);
+  color: var(--critical);
+  border-color: var(--critical);
+}
+.mona-button[data-variant='danger']:hover:not(:disabled) {
+  background: var(--critical-soft);
+}
+.mona-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.mona-button[data-size='sm'] {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.mona-field {
+  display: grid;
+  gap: var(--space-2);
+}
+.mona-field-label {
+  font-weight: var(--weight-medium);
+  color: var(--ink);
+}
+.mona-field-hint {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+.mona-field-error {
+  color: var(--critical);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.mona-input,
+.mona-select {
+  min-height: var(--density-row);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  width: 100%;
+}
+.mona-input[aria-invalid='true'],
+.mona-select[aria-invalid='true'] {
+  border-color: var(--critical);
+  background: var(--critical-soft);
+}
+
+.mona-tabs {
+  display: flex;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--border);
+}
+.mona-tab {
+  min-height: var(--density-row);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+.mona-tab[aria-selected='true'] {
+  color: var(--ink);
+  border-bottom-color: var(--primary);
+}
+
+.mona-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--density-pad);
+  display: grid;
+  gap: var(--density-gap);
+}
+
+.mona-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-strong);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.mona-badge[data-tone='success'] {
+  background: var(--success-soft);
+  color: var(--success);
+  border-color: var(--success);
+}
+.mona-badge[data-tone='attention'] {
+  background: var(--attention-soft);
+  color: var(--attention);
+  border-color: var(--attention);
+}
+.mona-badge[data-tone='critical'] {
+  background: var(--critical-soft);
+  color: var(--critical);
+  border-color: var(--critical);
+}
+.mona-badge[data-tone='info'] {
+  background: var(--info-soft);
+  color: var(--info);
+  border-color: var(--info);
+}
+.mona-badge-glyph {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.mona-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  z-index: 40;
+}
+.mona-dialog {
+  background: var(--surface-raised);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-5);
+  width: min(560px, 100%);
+  display: grid;
+  gap: var(--space-4);
+}
+.mona-dialog h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+
+.mona-menu {
+  position: relative;
+  display: inline-block;
+}
+.mona-menu-list {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  min-width: 220px;
+  margin: 0;
+  padding: var(--space-1);
+  list-style: none;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 30;
+}
+.mona-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: var(--density-row);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.mona-menu-item:hover:not(:disabled),
+.mona-menu-item[data-active='true'] {
+  background: var(--surface-sunken);
+}
+.mona-menu-item:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.mona-notification {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+}
+.mona-notification[data-tone='success'] {
+  border-color: var(--success);
+  background: var(--success-soft);
+}
+.mona-notification[data-tone='attention'] {
+  border-color: var(--attention);
+  background: var(--attention-soft);
+}
+.mona-notification[data-tone='critical'] {
+  border-color: var(--critical);
+  background: var(--critical-soft);
+}
+
+.mona-inspector {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--density-pad);
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.mona-inspector-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-strong);
+}
+
+.mona-empty {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.mona-empty h3 {
+  margin: 0;
+  font-size: var(--text-md);
+}
+.mona-empty p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.mona-skeleton {
+  display: block;
+  height: 12px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--surface-sunken), var(--border), var(--surface-sunken));
+  background-size: 200% 100%;
+  animation: mona-skeleton 900ms var(--ease-standard) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mona-skeleton {
+    animation: none;
+  }
+}
+@keyframes mona-skeleton {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -20% 0;
+  }
+}
+
+.mona-error {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--critical);
+  border-radius: var(--radius-md);
+  background: var(--critical-soft);
+  color: var(--ink);
+}
+.mona-error h3 {
+  margin: 0;
+  color: var(--critical);
+  font-size: var(--text-md);
+}
+
+/* Harness layout (development only, labelled in the UI) */
+
+.mona-harness {
+  display: grid;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+.mona-harness-banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex-wrap: wrap;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--attention);
+  background: var(--attention-soft);
+  color: var(--attention);
+  font-weight: var(--weight-medium);
+}
+.mona-screen {
+  display: grid;
+  gap: var(--density-gap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--canvas);
+  padding: var(--density-pad);
+}
+.mona-screen-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+.mona-screen-head h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  line-height: var(--leading-tight);
+}
+.mona-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--density-gap);
+}
+.mona-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.mona-stack {
+  display: grid;
+  gap: var(--space-2);
+}
+.mona-muted {
+  color: var(--muted);
+}
+.mona-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.mona-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}

@@ -8,6 +8,7 @@ import { EngineHost } from './engine-host.js';
 import { resolveEngineExecutable } from './engine-host-config.js';
 import { openLocalState, type LocalState } from './local-state.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
+import { runShots } from './shots.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -19,6 +20,9 @@ const smokeTest = process.argv.includes('--smoke-test');
 const lifecycleTest = process.argv.includes('--lifecycle-test');
 const smokeOut = process.env.MONA_SMOKE_OUT ?? path.join(process.cwd(), 'mona-smoke.json');
 const lifecycleOut = process.env.MONA_LIFECYCLE_OUT ?? path.join(process.cwd(), 'mona-lifecycle.json');
+const shotsTest = process.argv.includes('--shots');
+const shotsDir = process.env.MONA_SHOTS_DIR ?? path.join(process.cwd(), 'mona-shots');
+const shotsManifest = process.env.MONA_SHOTS_MANIFEST ?? path.join(shotsDir, 'manifest.json');
 const lifecycleWorkspace = process.env.MONA_LIFECYCLE_WORKSPACE ?? null;
 const trustOptions = { indexPath: rendererIndex, ...(devServerUrl ? { devServerUrl } : {}) };
 
@@ -27,6 +31,10 @@ const userDataOverride = process.env.MONA_USER_DATA;
 if (userDataOverride && userDataOverride.trim()) {
   app.setPath('userData', path.resolve(userDataOverride));
 }
+
+// Screenshot capture is unreliable on a headless or remote desktop with GPU
+// compositing; software rendering makes capturePage deterministic.
+if (shotsTest) app.disableHardwareAcceleration();
 
 const engineHost = new EngineHost({
   ownershipDir: path.join(app.getPath('userData'), 'runtime'),
@@ -136,6 +144,19 @@ if (!app.requestSingleInstanceLock()) {
         fs.writeFileSync(smokeOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
         app.exit(1);
       });
+    }
+    if (shotsTest) {
+      const window = mainWindow;
+      runShots({
+        rendererIndex,
+        outputDirectory: shotsDir,
+        manifestFile: shotsManifest,
+        window,
+      }).catch((error: unknown) => {
+        fs.writeFileSync(shotsManifest, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+        app.exit(1);
+      });
+      return;
     }
     if (lifecycleTest && lifecycleWorkspace) {
       runLifecycleProbe({

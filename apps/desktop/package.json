@@ -13,6 +13,7 @@
     "start": "electron .",
     "smoke": "node scripts/smoke.mjs",
     "lifecycle": "node scripts/lifecycle.mjs",
+    "shots": "node scripts/shots.mjs",
     "check:build": "node scripts/check-build.mjs",
     "verify": "npm run build \u0026\u0026 npm run check:build",
     "clean": "node -e \"require(\u0027node:fs\u0027).rmSync(\u0027dist\u0027,{recursive:true,force:true})\""
@@ -21,6 +22,7 @@
     "@mona/adapter": "0.1.0",
     "@mona/contracts": "0.1.0",
     "@mona/project-state": "0.1.0",
+    "@mona/ui": "0.1.0",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },

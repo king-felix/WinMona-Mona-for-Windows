@@ -438,3 +438,39 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** the marker is additive and small; losing it degrades relocation
   detection to path/inode matching. Removing a catalog entry never deletes user
   files, and the tests assert the folder and marker survive removal.
+## D-0035 — The design system lives in `packages/ui`, measured by its own tests
+
+- **Decision:** tokens, primitives, overlays and the visual harness live in
+  `packages/ui`. Contrast requirements are computed from the shipped
+  `tokens.css` by `contrast.test.ts`, so a palette edit that fails WCAG breaks a
+  test.
+- **Why:** the specification's palette is a starting point, not a validated
+  claim. Two real failures were found this way (`--border-strong` below 3:1, and
+  coral used as a status colour at 4.10:1) and fixed by changing the tokens.
+- **Constrains:** decorative accents (`--accent-coral`, `--accent-sea`) may never
+  become status text; status text uses the measured `--success/--attention/
+  --critical/--info` tokens, and every badge carries a glyph and a word.
+
+## D-0036 — Status meaning is never colour alone
+
+- **Decision:** every badge renders a glyph (`✓ ! ✕ i ○`) and a word; every
+  notification carries a badge and a heading; toasts/notifications use
+  `role="status"` for polite updates and `role="alert"` for critical failures.
+  The audit counts colour-only status elements and fails if any exist.
+- **Why:** WCAG 1.4.1 and the product's own "no colour-only meaning" rule; a
+  red dot alone is unusable for a colour-blind reader and unclear in a
+  screenshot.
+- **Constrains:** new status surfaces must extend the Tone union rather than
+  inventing a colour.
+
+## D-0037 — Screenshots and the accessibility sweep are one reproducible command
+
+- **Decision:** `npm run shots -w @mona/desktop` loads the labelled harness in a
+  real Electron window, captures both themes and both densities at 1280×800 plus
+  1920×1080 and 200% scaling, drives a real Tab traversal, and writes
+  `docs/evidence/P06-shots.json` plus the PNGs. Capture uses the DevTools
+  protocol because `capturePage()` fails with `UnknownVizError` on this host.
+- **Why:** screenshots and keyboard access must be observed, not asserted, and a
+  manual screenshot ritual would not survive the next prompt.
+- **Constrains:** the harness is fixture data reachable only with `?harness=1`,
+  and P07 must move it behind a development-only flag once the real shell exists.
