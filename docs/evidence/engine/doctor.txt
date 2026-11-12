@@ -1,0 +1,207 @@
+﻿codewhale Doctor
+==================
+Not ready: the deepseek route has no verified key → save one with /provider in Codewhale or `codewhale auth set --provider deepseek`; `codewhale doctor --probe-api` checks a key already saved.
+
+Version Information:
+  codewhale: 0.10.2 (ff466b2ed0bf)
+  host rustc: not installed (only needed to build from source)
+
+Updates:
+  · current: v0.10.2
+  · latest: unknown (not checked; offline default)
+    Run `codewhale doctor --check-updates` to opt in.
+
+Configuration:
+  ✓ config.toml found at ~\.codewhale\config.toml
+  workspace: X:\AI_projects\Mona
+  search_provider: firecrawl (source: default; set [search] provider = "baidu" | "metaso" | "volcengine" for China); works without an API key (limited quota; set FIRECRAWL_API_KEY or [search] api_key to raise it)
+
+Resolved User Paths (read-only):
+  · home: ~\.codewhale
+  · config: ~\.codewhale\config.toml
+  · settings: ~\.codewhale\settings.toml
+  · sessions: ~\.codewhale\sessions
+  · logs: ~\.codewhale\logs
+  · automations: ~\.codewhale\automations
+  · task_manager_root: ~\.codewhale\tasks
+  · task_manager_tasks: ~\.codewhale\tasks\tasks
+  · task_manager_artifacts: ~\.codewhale\tasks\artifacts
+  · runtime_store: ~\.codewhale\tasks\runtime
+  · runtime_events: ~\.codewhale\tasks\runtime\events
+  · personal_fleet_definitions: ~\.codewhale\fleets
+  · personal_fleet_agents: ~\.codewhale\agents
+  · secrets: ~\.codewhale\secrets\secrets.json
+
+Secret Backend (structural only):
+  · backend: file
+  · presence: present (metadata_only)
+  · path: C:\Users\victo\.codewhale\secrets\secrets.json
+  · legacy_path: C:\Users\victo\.deepseek\secrets\secrets.json (absent, metadata_only)
+  · No credential-store values were read or printed by this check.
+
+Sessions:
+  · last repair 2026-11-11T23:38:29.282379500+00:00: 0 recovered, 0 threads unbound, 0 stores + 0 artifact dirs + 0 unreadable documents set aside, 0 newer-schema documents left in place, 1 unbound stores in use by another process, 0 kept with work
+
+State Root:
+  active: ~\.codewhale
+  ✓ legacy state: no known .deepseek entries need migration
+  ✓ legacy sessions: no top-level session JSON files found
+    Doctor inspected filenames and filesystem metadata only; it did not read chat contents, traverse checkpoints, or modify session files.
+
+Stored Sessions:
+  ✓ no credentials found in stored tool output (19 files)
+
+Setup State:
+  · source: persisted
+  · credential: source=secret_store_unprobed, availability=not_probed
+  ! first-run: needs action
+  ! operate/fleet: needs action
+  · constitution autonomy: unspecified (choice: unset; guidance only; account profile: not probed)
+  · runtime posture: default_mode=agent (settings), permission_posture=full-access (settings), approval_policy=on-request (default), allow_shell=true (interactive default), sandbox=mode-derived (default), network.default=prompt (default), telemetry=on (env), trust=workspace not elevated
+  · control socket: control_socket=off (default)
+  · next actions: /constitution (standing law), /setup report (readiness), /setup provider or /provider setup <name> (provider credentials), /model (route), /config (runtime posture), /setup fleet (Operate/Fleet readiness), /fleet setup (explicit profile authoring), /setup hotbar (optional shortcuts), /setup tools (Tools/MCP readiness), /setup remote (remote runtime on-ramp), /setup persistence (path review)
+    · language: not_started (optional, unversioned, no result)
+    · provider_model: needs_action (required, 0.9.4, provider=deepseek, model=deepseek-flash, context_window=1000000 (fallback (unverified)) auth=endpoint reachable · model not checked, health=needs action)
+    · trust_sandbox: not_started (optional, unversioned, no result)
+    · constitution: not_started (optional, unversioned, no result)
+    · operate_fleet: not_started (optional, unversioned, no result)
+    · hotbar: not_started (optional, unversioned, no result)
+    · tools_mcp: not_started (optional, unversioned, no result)
+    · remote_runtime: not_started (optional, unversioned, no result)
+    · persistence: not_started (optional, unversioned, no result)
+    · verification: not_started (optional, unversioned, no result)
+
+Fleet roster layers:
+  · no profile id is defined in more than one layer
+
+API Keys:
+  · deepseek: env_source=not inspected, config_source=not declared
+  · nvidia-nim: env_source=not inspected, config_source=not declared
+  · openai: env_source=not inspected, config_source=not declared
+  · atlascloud: env_source=not inspected, config_source=not declared
+  · wanjie-ark: env_source=not inspected, config_source=not declared
+  · volcengine: env_source=not inspected, config_source=not declared
+  · openrouter: env_source=not inspected, config_source=not declared
+  · orcarouter: env_source=not inspected, config_source=not declared
+  · xiaomi-mimo: env_source=not inspected, config_source=not declared
+  · novita: env_source=not inspected, config_source=not declared
+  · fireworks: env_source=not inspected, config_source=not declared
+  · siliconflow: env_source=not inspected, config_source=not declared
+  · arcee: env_source=not inspected, config_source=not declared
+  · siliconflow-CN: env_source=not inspected, config_source=not declared
+  · moonshot: env_source=not inspected, config_source=not declared
+  · sglang: env_source=not inspected, config_source=not declared
+  · vllm: env_source=not inspected, config_source=not declared
+  · ollama: env_source=not inspected, config_source=not declared
+  · ollama-cloud: env_source=not inspected, config_source=not declared
+  · huggingface: env_source=not inspected, config_source=not declared
+  · together: env_source=not inspected, config_source=not declared
+  · qianfan: env_source=not inspected, config_source=not declared
+  · openai-codex: env_source=not inspected, config_source=not declared
+  · anthropic: env_source=not inspected, config_source=not declared
+  · openmodel: env_source=not inspected, config_source=not declared
+  · zai: env_source=not inspected, config_source=not declared
+  · stepfun: env_source=not inspected, config_source=not declared
+  · minimax: env_source=not inspected, config_source=not declared
+  · deepinfra: env_source=not inspected, config_source=not declared
+  · sakana: env_source=not inspected, config_source=not declared
+  · longcat: env_source=not inspected, config_source=not declared
+  · opencode-go: env_source=not inspected, config_source=not declared
+  · opencode-zen: env_source=not inspected, config_source=not declared
+  · meta: env_source=not inspected, config_source=not declared
+  · xai: env_source=not inspected, config_source=not declared
+  · mistral: env_source=not inspected, config_source=not declared
+  · telecomjs: env_source=not inspected, config_source=not declared
+  · modelstudio-token-plan: env_source=not inspected, config_source=not declared
+  · modelscope: env_source=not inspected, config_source=not declared
+  · google: env_source=not inspected, config_source=not declared
+  · edenai: env_source=not inspected, config_source=not declared
+  · zenmux: env_source=not inspected, config_source=not declared
+  · csdn: env_source=not inspected, config_source=not declared
+  · concentrate: env_source=not inspected, config_source=not declared
+  · codewhale: env_source=not inspected, config_source=not declared
+  · custom: env_source=not inspected, config_source=not declared
+  · credential precedence is unchanged; doctor does not inspect credential values
+
+External credential consent (configuration only):
+  openai-codex: access=disabled, provider=openai-codex, source=codex_cli, owner=Codex CLI, path="C:\\Users\\victo\\.codex\\auth.json", version=1, state=dormant, ambient_path_changed=false
+    semantics: disabled; no external-credential probing, reading, refresh, discovery, identity-provider or network acquisition, writes, or rewrites; normal requests to the explicitly selected provider may use Codewhale-owned credentials
+    revoke: codewhale auth external-revoke --provider openai-codex
+  xai: access=disabled, provider=xai, source=grok_cli, owner=Grok CLI, path="C:\\Users\\victo\\.grok\\auth.json", version=1, state=dormant, ambient_path_changed=false
+    semantics: disabled; no external-credential probing, reading, refresh, discovery, identity-provider or network acquisition, writes, or rewrites; normal requests to the explicitly selected provider may use Codewhale-owned credentials
+    revoke: codewhale auth external-revoke --provider xai
+  deepseek: access=disabled, provider=deepseek, source=dsh_cli, owner=DeepSeek Harness, path="C:\\Users\\victo\\.dsh\\.credentials.yaml", version=1, state=dormant, ambient_path_changed=false
+    semantics: disabled; no external-credential probing, reading, refresh, discovery, identity-provider or network acquisition, writes, or rewrites; normal requests to the explicitly selected provider may use Codewhale-owned credentials
+    revoke: codewhale auth external-revoke --provider deepseek
+
+DeepSeek Harness integration (read-only detection):
+  state: not-installed
+  not installed — `dsh` not on PATH; connect later with `codewhale integrations dsh connect`
+  owned files: ~\.codewhale\integrations\dsh (overlay absent)
+  · active provider credential source: secret store eligible; store not probed
+  · active provider credential availability: not_probed
+
+API Connectivity:
+  · scope: configured route — what a session launched now would use; a running session keeps the route it resolved at launch (its TUI header shows the live route)
+  · provider: deepseek
+  · base_url: https://api.deepseek.com
+  · model: deepseek-flash (resolved)
+  · strict_tool_mode: disabled
+  · Live hosted connectivity not checked (offline default)
+    Run `codewhale doctor --probe-api` to opt in.
+
+Search Provider Reachability:
+  · not checked (offline default)
+  Run `codewhale doctor --probe-search` to test the selected provider authority.
+
+MCP Servers (configuration only):
+  · Static check only; no server process was started.
+  ✓ MCP feature flag enabled
+  · MCP config not found at ~\.codewhale\mcp.json
+  · Project MCP config not found at \\?\X:\AI_projects\Mona\.codewhale\mcp.json
+  · 0 merged server(s) configured
+    Run `codewhale mcp init` or add `.codewhale/mcp.json`.
+
+Skills:
+  · local skills dir not found at X:\AI_projects\Mona\skills
+  · .agents skills dir not found at X:\AI_projects\Mona\.agents\skills
+  · global .agents skills dir not found at ~\.agents\skills
+  ✓ global skills dir found at ~\.codewhale\skills (48 items)
+  · selected skills dir: ~\.codewhale\skills
+
+Tools:
+  · tools dir not found at ~\.codewhale\tools
+    Run `codewhale setup --tools` to scaffold a starter dir.
+
+Plugins:
+  · plugins dir not found at ~\.codewhale\plugins
+    Run `codewhale setup --plugins` to scaffold a starter dir.
+
+Storage:
+  · tool-output spillover dir not yet created at ~\.codewhale\tool_outputs
+  · composer stash empty (Ctrl+G or Ctrl+S in the composer to park a draft)
+
+Tool Dependencies:
+  ✓ Python: python → code_execution tool registered
+  ✓ Node.js: present → js_execution tool registered
+  ✓ Extension host runtime: node 26.13.1 at C:\Program Files\nodejs\node.exe (runtime = "node") (unused: Native extensions and Host MCP are off)
+    Node remains the default; Bun default eligibility awaits measured runtime and platform isolation gates.
+    memory cap 1024 MiB (Job Object per-process limit; plugin child processes included)
+  · pandoc: not found (optional)
+    pandoc_convert tool is NOT advertised to the model. Install pandoc 2.15+ to enable:
+      winget install JohnMacFarlane.Pandoc
+  · tesseract: not found (optional)
+    image_ocr tool is NOT advertised to the model. Install tesseract to enable:
+      winget install UB-Mannheim.TesseractOCR
+  · pdftotext: not found (optional; PDF text reads fail as `binary_unavailable`)
+    Install Poppler for Windows from https://blog.alivate.com.au/poppler-windows/
+
+Terminal Quirks:
+  • legacy Windows console host → low_motion + fancy_animations=false + bracketed_paste=false + synchronized_output=off (auto)
+
+Platform:
+  OS: windows
+  Arch: x86_64
+  ! sandbox not available (commands run best-effort)
+
+Not ready: the deepseek route has no verified key → save one with /provider in Codewhale or `codewhale auth set --provider deepseek`; `codewhale doctor --probe-api` checks a key already saved.

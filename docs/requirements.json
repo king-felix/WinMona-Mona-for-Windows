@@ -1,0 +1,1621 @@
+{
+  "schema_version": 1,
+  "revision": 12,
+  "spec": {
+    "file": "Mona_Project.md",
+    "companion_file": "Mona_PROMPTS.md",
+    "version": "1.0",
+    "sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
+    "companion_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
+    "indexed_utc": "2026-11-12T00:19:48.098Z"
+  },
+  "prompts": [
+    {
+      "id": "P00",
+      "title": "Bootstrap the project and establish ground truth",
+      "deliverable": "Bootstrap, inventory, durable build ledger",
+      "prerequisites": [],
+      "requirements": [
+        "MONA-001",
+        "MONA-010"
+      ]
+    },
+    {
+      "id": "P01",
+      "title": "Prove headless integration and preserve the economics",
+      "deliverable": "Integration, cost, and coverage gates",
+      "prerequisites": [
+        "P00"
+      ],
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-003",
+        "MONA-030"
+      ]
+    },
+    {
+      "id": "P02",
+      "title": "Create the desktop foundation and strict contracts",
+      "deliverable": "Desktop repository and contracts",
+      "prerequisites": [
+        "P01"
+      ],
+      "requirements": [
+        "MONA-006",
+        "MONA-026"
+      ]
+    },
+    {
+      "id": "P03",
+      "title": "Implement the real versioned engine adapter",
+      "deliverable": "Real engine adapter",
+      "prerequisites": [
+        "P02"
+      ],
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-007",
+        "MONA-008",
+        "MONA-016"
+      ]
+    },
+    {
+      "id": "P04",
+      "title": "Own runtime processes and stopping behavior correctly",
+      "deliverable": "Runtime/process supervisor",
+      "prerequisites": [
+        "P03"
+      ],
+      "requirements": [
+        "MONA-002",
+        "MONA-012",
+        "MONA-016"
+      ]
+    },
+    {
+      "id": "P05",
+      "title": "Build transactional project state and safe migrations",
+      "deliverable": "Transactional state and migration",
+      "prerequisites": [
+        "P02"
+      ],
+      "requirements": [
+        "MONA-005",
+        "MONA-010",
+        "MONA-016",
+        "MONA-025"
+      ]
+    },
+    {
+      "id": "P06",
+      "title": "Build Mona's distinctive design system",
+      "deliverable": "Design system and accessible screens",
+      "prerequisites": [
+        "P02"
+      ],
+      "requirements": [
+        "MONA-006",
+        "MONA-029"
+      ]
+    },
+    {
+      "id": "P07",
+      "title": "Assemble the project catalog and desktop shell",
+      "deliverable": "Project catalog and shell",
+      "prerequisites": [
+        "P04",
+        "P05",
+        "P06"
+      ],
+      "requirements": [
+        "MONA-005",
+        "MONA-006",
+        "MONA-029"
+      ]
+    },
+    {
+      "id": "P08",
+      "title": "Deliver the live work studio",
+      "deliverable": "Live work studio",
+      "prerequisites": [
+        "P03",
+        "P07"
+      ],
+      "requirements": [
+        "MONA-007",
+        "MONA-008",
+        "MONA-012",
+        "MONA-014"
+      ]
+    },
+    {
+      "id": "P09",
+      "title": "Make the first right-click launch work",
+      "deliverable": "Early folder launch",
+      "prerequisites": [
+        "P07",
+        "P08"
+      ],
+      "requirements": [
+        "MONA-004"
+      ]
+    },
+    {
+      "id": "P10",
+      "title": "Implement prompt execution and durable continuation",
+      "deliverable": "Prompt work board and continuity",
+      "prerequisites": [
+        "P05",
+        "P08"
+      ],
+      "requirements": [
+        "MONA-009",
+        "MONA-010",
+        "MONA-024"
+      ]
+    },
+    {
+      "id": "P11",
+      "title": "Enforce the three-attempt rule and clear stop controls",
+      "deliverable": "Attempt ledger and execution boundaries",
+      "prerequisites": [
+        "P04",
+        "P10"
+      ],
+      "requirements": [
+        "MONA-011",
+        "MONA-012"
+      ]
+    },
+    {
+      "id": "P12",
+      "title": "Build the cost ledger and optional budget controls",
+      "deliverable": "Cost ledger and budgets",
+      "prerequisites": [
+        "P03",
+        "P05",
+        "P08"
+      ],
+      "requirements": [
+        "MONA-003",
+        "MONA-013"
+      ]
+    },
+    {
+      "id": "P13",
+      "title": "Make changes, evidence, Git, and restore trustworthy",
+      "deliverable": "Changes, Git, tests and restore",
+      "prerequisites": [
+        "P08",
+        "P05"
+      ],
+      "requirements": [
+        "MONA-014",
+        "MONA-015"
+      ]
+    },
+    {
+      "id": "P14",
+      "title": "Deliver the daily-use polish without inference overhead",
+      "deliverable": "Resume Brief, tray and focus",
+      "prerequisites": [
+        "P10",
+        "P11",
+        "P12",
+        "P13"
+      ],
+      "requirements": [
+        "MONA-017",
+        "MONA-029"
+      ]
+    },
+    {
+      "id": "P15",
+      "title": "Surface native agents, goals, fleets, and workflows",
+      "deliverable": "Agent observatory and native workflows",
+      "prerequisites": [
+        "P11",
+        "P12",
+        "P13"
+      ],
+      "requirements": [
+        "MONA-018",
+        "MONA-019"
+      ]
+    },
+    {
+      "id": "P16",
+      "title": "Expose providers, models, permissions, and effective settings",
+      "deliverable": "Provider/model/configuration workbench",
+      "prerequisites": [
+        "P08",
+        "P12"
+      ],
+      "requirements": [
+        "MONA-008",
+        "MONA-020"
+      ]
+    },
+    {
+      "id": "P17",
+      "title": "Make tools and extensions manageable",
+      "deliverable": "MCP, skills, plugins and hooks",
+      "prerequisites": [
+        "P16"
+      ],
+      "requirements": [
+        "MONA-021"
+      ]
+    },
+    {
+      "id": "P18",
+      "title": "Complete advanced access and the capability explorer",
+      "deliverable": "Terminal and complete capability explorer",
+      "prerequisites": [
+        "P15",
+        "P17"
+      ],
+      "requirements": [
+        "MONA-022",
+        "MONA-023",
+        "MONA-030"
+      ]
+    },
+    {
+      "id": "P19",
+      "title": "Finish project memory, portable handoff, and diagnostics",
+      "deliverable": "Memory, import/export and diagnostics",
+      "prerequisites": [
+        "P10",
+        "P13",
+        "P18"
+      ],
+      "requirements": [
+        "MONA-024",
+        "MONA-025"
+      ]
+    },
+    {
+      "id": "P20",
+      "title": "Harden recovery and test hostile or failing inputs",
+      "deliverable": "Recovery, security and failure testing",
+      "prerequisites": [
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19"
+      ],
+      "requirements": [
+        "MONA-016",
+        "MONA-025",
+        "MONA-026"
+      ]
+    },
+    {
+      "id": "P21",
+      "title": "Deliver the modern Windows menu and installation lifecycle",
+      "deliverable": "Modern Windows menu and installer",
+      "prerequisites": [
+        "P09",
+        "P20"
+      ],
+      "requirements": [
+        "MONA-004",
+        "MONA-027"
+      ]
+    },
+    {
+      "id": "P22",
+      "title": "Run whole-product QA and prove the remaining claims",
+      "deliverable": "Whole-product QA and economics recheck",
+      "prerequisites": [
+        "P21"
+      ],
+      "requirements": [
+        "MONA-003",
+        "MONA-006",
+        "MONA-028",
+        "MONA-030"
+      ]
+    },
+    {
+      "id": "P23",
+      "title": "Package the release candidate and finish the handoff",
+      "deliverable": "Release candidate and final handoff",
+      "prerequisites": [
+        "P22"
+      ],
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-003",
+        "MONA-004",
+        "MONA-005",
+        "MONA-006",
+        "MONA-007",
+        "MONA-008",
+        "MONA-009",
+        "MONA-010",
+        "MONA-011",
+        "MONA-012",
+        "MONA-013",
+        "MONA-014",
+        "MONA-015",
+        "MONA-016",
+        "MONA-017",
+        "MONA-018",
+        "MONA-019",
+        "MONA-020",
+        "MONA-021",
+        "MONA-022",
+        "MONA-023",
+        "MONA-024",
+        "MONA-025",
+        "MONA-026",
+        "MONA-027",
+        "MONA-028",
+        "MONA-029",
+        "MONA-030"
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "MONA-001",
+      "track": "Foundation",
+      "title": "Installed Codewhale identity, provenance, and capability discovery",
+      "owning_prompts": [
+        "P00",
+        "P01",
+        "P03",
+        "P23"
+      ],
+      "status": "partial",
+      "criteria": [
+        {
+          "id": "identity",
+          "description": "Installed executable path, version, commit/tag and matching source are recorded with commands",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-bootstrap.md",
+              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:41Z",
+              "commit": null,
+              "note": "engine identity recorded: 0.10.2 (ff466b2ed0bf), WinGet install, single PATH entry"
+            }
+          ]
+        },
+        {
+          "id": "capabilities",
+          "description": "Version-pinned CLI, API, configuration and extension inventory exists with evidence",
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/codewhale-capabilities.json",
+              "sha256": "4faaa310a1051b6f9e38cd0087f111249f9ca61a314dd819624bb8acc750b004",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:41Z",
+              "commit": null,
+              "note": "seed inventory only: 43 top-level commands + 4 transports, all unqualified"
+            }
+          ]
+        },
+        {
+          "id": "reproducible",
+          "description": "Discovery is re-runnable on this machine and records non-secret facts only",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/discovery-report.md",
+              "sha256": "19096ab1be2133936180121d8ff55ddccfda2ab6e846d8086e615dd37cd03acc",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:41Z",
+              "commit": null,
+              "note": "discovery commands and redacted facts recorded; re-runnable"
+            },
+            {
+              "path": "docs/evidence/P00-final-audit.txt",
+              "sha256": "334af28e6a78d21c7d557b7d02fa1c126f00a8e870d05ad1b659d86252bf0136",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:24:11Z",
+              "commit": null,
+              "note": "post-checkpoint validate + status captured; exit 0"
+            }
+          ]
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-002",
+      "track": "Foundation",
+      "title": "Tool-enabled Full Access headless execution with live events, interrupt, and resume",
+      "owning_prompts": [
+        "P01",
+        "P03",
+        "P04",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "tool-turn",
+          "description": "One real tool-enabled task starts, streams, finishes through the installed runtime",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "stream",
+          "description": "Live events are observed, validated and survive unknown event types",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "interrupt-resume",
+          "description": "Interrupt and resume produce truthful receipts and no silent replay",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "route",
+          "description": "Effective provider and resolved model match the configured route",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-003",
+      "track": "Foundation",
+      "title": "Cost parity gate, zero idle inference, no hidden model or routing changes",
+      "owning_prompts": [
+        "P01",
+        "P12",
+        "P22",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "no-idle-inference",
+          "description": "Idle UI, navigation, exports and reconnects cause zero provider requests",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "parity",
+          "description": "Paired direct/Mona cost per accepted task recorded with method and confidence",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "transparency",
+          "description": "Unknown usage or price is labeled unknown, never zero or invented",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-004",
+      "track": "Core",
+      "title": "Native folder and background launch, single-instance dispatch, safe paths, idempotent registration",
+      "owning_prompts": [
+        "P09",
+        "P21",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "folder-launch",
+          "description": "Explorer folder command opens or registers the project once",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "background-launch",
+          "description": "Folder-background command behaves equivalently",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "single-instance",
+          "description": "Second launch dispatches the path to the running owner without duplication",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "safe-paths",
+          "description": "Spaces, Unicode, quoting, duplicates, missing/inaccessible paths and drive roots are handled",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "idempotent-registration",
+          "description": "Repeated launches never duplicate a project entry",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-005",
+      "track": "Core",
+      "title": "Project catalog lifecycle without deleting user source",
+      "owning_prompts": [
+        "P05",
+        "P07",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "catalog-actions",
+          "description": "Create, open, rename label, archive, pin, search, relocate and reveal work",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "no-source-delete",
+          "description": "Removing a catalog entry never deletes project files",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "relocation",
+          "description": "Moved or aliased paths rebind deliberately instead of duplicating a project",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-006",
+      "track": "Core",
+      "title": "Accessible Daybreak/Afterglow desktop shell with density, scale and reduced motion",
+      "owning_prompts": [
+        "P02",
+        "P06",
+        "P07",
+        "P22",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "daybreak",
+          "description": "Daybreak theme meets measured contrast and hierarchy requirements",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "afterglow",
+          "description": "Afterglow theme meets the same accessibility bar",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "accessibility",
+          "description": "Keyboard access, visible focus, 200% scaling and screen-reader checks recorded",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "density-motion",
+          "description": "Density modes share one information architecture; reduced motion respected",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-007",
+      "track": "Core",
+      "title": "Streaming conversation, drafts, file references, copy/export, code rendering",
+      "owning_prompts": [
+        "P03",
+        "P08",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "streaming",
+          "description": "Turn output streams into the conversation without fabricated content",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "drafts",
+          "description": "Composer drafts survive navigation and restart",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "file-references",
+          "description": "File references work and are shown exactly as sent",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "copy-export",
+          "description": "Copy and export preserve real content",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-008",
+      "track": "Core",
+      "title": "Explicit Plan/Work and effective permission display without silent widening",
+      "owning_prompts": [
+        "P03",
+        "P08",
+        "P16",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "plan-work",
+          "description": "Plan and Work modes are explicit and switchable",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "permission-display",
+          "description": "Effective permission posture and Full Access badge reflect the running runtime",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "no-silent-widening",
+          "description": "No UI action widens permissions without an explicit recorded decision",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-009",
+      "track": "Core",
+      "title": "Prompt work board with dependencies, acceptance criteria and deterministic eligibility",
+      "owning_prompts": [
+        "P10",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "prompt-catalog",
+          "description": "Prompts are listed with dependencies and acceptance criteria",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "dependencies",
+          "description": "Blocked prompts cannot start before prerequisites are verified",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "eligibility",
+          "description": "Eligible-task selection is deterministic and explainable",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-010",
+      "track": "Core",
+      "title": "Durable state, handoff, decisions, requirement traceability, attempt ledger, conflict detection",
+      "owning_prompts": [
+        "P00",
+        "P05",
+        "P10",
+        "P23"
+      ],
+      "status": "partial",
+      "criteria": [
+        {
+          "id": "state-schema",
+          "description": "Build state validates against a versioned schema",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-validation.txt",
+              "sha256": "5d6dab1e0d3ec631c3562c366de6146f0ed0e2c1dff9c7f57ca6572024c3a295",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:42Z",
+              "commit": null,
+              "note": "state v1 validated by ajv against tools/build/schema/state.schema.json"
+            }
+          ]
+        },
+        {
+          "id": "atomic-replace",
+          "description": "State writes are atomic and keep a recoverable prior copy",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-tests.txt",
+              "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:42Z",
+              "commit": null,
+              "note": "temp write + fsync + rename; prior revision backed up; interrupted write promoted by recover"
+            }
+          ]
+        },
+        {
+          "id": "conflict-detection",
+          "description": "Stale revisions are refused instead of overwritten",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-tests.txt",
+              "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:42Z",
+              "commit": null,
+              "note": "stale --expected-revision exits 4 without writing"
+            }
+          ]
+        },
+        {
+          "id": "handoff",
+          "description": "Handoff carries current prompt, verified work, next action and open issues",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-bootstrap.md",
+              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:53Z",
+              "commit": null,
+              "note": "first handoff described; VOLATILE .mona/build/HANDOFF.md is intentionally not hash-pinned"
+            }
+          ]
+        },
+        {
+          "id": "traceability",
+          "description": "Requirement evidence is tracked per criterion with paths and hashes",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P00-bootstrap.md",
+              "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:53Z",
+              "commit": null,
+              "note": "ledger structure and counts described"
+            }
+          ]
+        },
+        {
+          "id": "attempt-ledger",
+          "description": "Attempt history is append-only with no-progress counts preserved",
+          "status": "passed",
+          "evidence": [
+            {
+              "path": ".mona/build/attempts.jsonl",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T00:23:42Z",
+              "commit": null,
+              "note": "append-only ledger exists and is empty because no attempt was needed; product-level state/migrations remain P05/P10"
+            }
+          ]
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-011",
+      "track": "Core",
+      "title": "Three-attempt enforcement with honest visibility of engine-internal loops",
+      "owning_prompts": [
+        "P11",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "counter",
+          "description": "Attempts and consecutive no-progress counts are recorded per stable problem ID",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "stop-at-three",
+          "description": "A third no-progress attempt blocks the problem and records required help",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "persistence-across-restart",
+          "description": "Attempt counts survive restart and are never silently reset",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "engine-boundary",
+          "description": "The enforcement boundary for engine-internal retries is stated, not overstated",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-012",
+      "track": "Core",
+      "title": "Pause after task, interrupt now, queue cancel, resume, stop owned descendants, truthful partial outcomes",
+      "owning_prompts": [
+        "P04",
+        "P08",
+        "P11",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "pause-after-task",
+          "description": "Pause-after-task stops at the next queue boundary",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "interrupt-now",
+          "description": "Interrupt-now returns an engine receipt without claiming rollback",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "queue-cancel",
+          "description": "Cancelling queued work prevents future starts only",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "stop-descendants",
+          "description": "Owned descendants are stopped without killing unrelated processes",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "truthful-partial",
+          "description": "Partial or uncertain outcomes are labeled as such",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-013",
+      "track": "Core",
+      "title": "Cost lens with usage, cache evidence, attribution, unknowns, budgets and export",
+      "owning_prompts": [
+        "P12",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "usage-attribution",
+          "description": "Usage is attributed by thread, turn and task without double counting",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "cache-evidence",
+          "description": "Cache hit/miss evidence is shown only when the provider reports it",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "unknown-handling",
+          "description": "Missing price or usage is visibly unknown",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "budgets",
+          "description": "Optional budgets warn before dispatch and disclose their enforcement limit",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "export",
+          "description": "Cost export labels provider-reported versus locally estimated figures",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-014",
+      "track": "Core",
+      "title": "Changes, tests, artifacts, receipts and provenance with large-output handling",
+      "owning_prompts": [
+        "P08",
+        "P13",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "diffs",
+          "description": "Diffs render from real workspace state with virtualization",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "tests-evidence",
+          "description": "Test runs link to their real output and exit status",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "provenance",
+          "description": "Every change and receipt attributes its source",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "large-output",
+          "description": "Large outputs are bounded or streamed without freezing the UI",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-015",
+      "track": "Core",
+      "title": "Git status/branch/worktree awareness, selected commits, non-Git operation, conflict-aware restore",
+      "owning_prompts": [
+        "P13",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "git-awareness",
+          "description": "Branch, status and worktree state are read from the real repository",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "selected-commits",
+          "description": "Only explicitly selected changes are committed",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "non-git",
+          "description": "Projects without Git remain usable",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "restore",
+          "description": "Restore refuses conflicting scope and never destroys later user work",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-016",
+      "track": "Core",
+      "title": "Crash/reconnect recovery, duplicate event suppression, uncertain submission reconciliation",
+      "owning_prompts": [
+        "P03",
+        "P04",
+        "P05",
+        "P20",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "crash-reconnect",
+          "description": "Renderer/main restart reconnects and reconciles without replaying tool work",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "dedupe",
+          "description": "Duplicate events are suppressed by identity and cursor",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "uncertain-submission",
+          "description": "A lost submission is reported as unknown and reconciled, never blindly retried",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-017",
+      "track": "Core",
+      "title": "Deterministic activity digest, tray attention, quiet hours, notifications without inference",
+      "owning_prompts": [
+        "P14",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "deterministic-digest",
+          "description": "Digest is computed locally from recorded events",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "tray-attention",
+          "description": "Tray state reflects running, blocked and completed work",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "quiet-hours",
+          "description": "Notifications respect quiet hours and deduplicate",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "no-inference",
+          "description": "No notification or digest path calls a model",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-018",
+      "track": "Complete",
+      "title": "Agent observatory with parent/child graph, ownership, lifecycle and spend boundaries",
+      "owning_prompts": [
+        "P15",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "graph",
+          "description": "Parent/child relationships and task ownership are shown truthfully",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "lifecycle",
+          "description": "Child lifecycle states come from engine events",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "spend",
+          "description": "Child spend is shown when exposed and unknown otherwise",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-019",
+      "track": "Complete",
+      "title": "Native goals, fleets, workflows, queue/runs and artifacts without a competing scheduler",
+      "owning_prompts": [
+        "P15",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "native-features",
+          "description": "Goals, fleets and workflows use verified engine features",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "no-competing-scheduler",
+          "description": "Only one component owns execution scheduling per task",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "artifacts",
+          "description": "Run artifacts and history are inspectable",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-020",
+      "track": "Complete",
+      "title": "Provider/model/profile selection with effective route visibility and Flash default",
+      "owning_prompts": [
+        "P16",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "route-selection",
+          "description": "Route selection is explicit and scoped",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "effective-visibility",
+          "description": "Requested versus effective model, endpoint and reasoning are displayed",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "reasoning-controls",
+          "description": "Only controls supported by the selected route are offered",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "flash-default",
+          "description": "Victor’s working Flash route stays the default",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-021",
+      "track": "Complete",
+      "title": "MCP, skills, plugins, hooks, rules and instruction management with provenance",
+      "owning_prompts": [
+        "P17",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "mcp",
+          "description": "MCP servers can be inspected and managed through engine mechanisms",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "skills-plugins",
+          "description": "Skills, plugins and hooks show scope, provenance and health",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "config-safety",
+          "description": "Edits never replace unknown configuration keys",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-022",
+      "track": "Complete",
+      "title": "Command palette and capability explorer over the entire pinned surface",
+      "owning_prompts": [
+        "P18",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "palette",
+          "description": "Palette ranks projects, prompts, actions and capabilities locally",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "explorer",
+          "description": "Capability explorer lists every pinned-engine capability with status",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "coverage",
+          "description": "No supported capability lacks a documented surface or explicit gap",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-023",
+      "track": "Complete",
+      "title": "Integrated terminal and read-only advanced logs with isolation",
+      "owning_prompts": [
+        "P18",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "terminal",
+          "description": "Terminal runs a real qualified PTY with copy, search and resize",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "logs",
+          "description": "Engine logs are viewable read-only with bounded memory",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "isolation",
+          "description": "Terminal cannot reach the renderer IPC bridge",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-024",
+      "track": "Complete",
+      "title": "Local project memory, context preview, prompt library and resume packet",
+      "owning_prompts": [
+        "P10",
+        "P19",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "search",
+          "description": "Project history and decisions are searchable locally",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "context-preview",
+          "description": "Exactly what will be sent as context is previewable",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "resume-packet",
+          "description": "A redacted resume packet can be exported and re-imported",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-025",
+      "track": "Complete",
+      "title": "Settings backup/restore, migration, retention, diagnostics bundle, offline browsing",
+      "owning_prompts": [
+        "P05",
+        "P19",
+        "P20",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "backup-restore",
+          "description": "Backup and restore use a maintenance lock and verified journals",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "migration",
+          "description": "Migrations are versioned and recoverable",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "diagnostics",
+          "description": "Diagnostics bundles are local and redacted by default",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "offline",
+          "description": "Projects remain browsable when the runtime is unavailable",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-026",
+      "track": "Complete",
+      "title": "Secure local boundary: renderer isolation, narrow IPC, runtime auth, redaction, path and Markdown safety",
+      "owning_prompts": [
+        "P02",
+        "P20",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "renderer-isolation",
+          "description": "Renderer is sandboxed with context isolation and no Node integration",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "narrow-ipc",
+          "description": "Named, schema-validated IPC operations replace general exec/fs access",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "runtime-auth",
+          "description": "Runtime binds loopback with a token that never appears in URLs or renderer state",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "redaction",
+          "description": "Secrets are redacted from logs, diagnostics and exports",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "content-safety",
+          "description": "Markdown, links and paths are constrained against traversal and injection",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-027",
+      "track": "Complete",
+      "title": "Signed per-user installer workflow, modern Windows 11 menu, update compatibility, clean uninstall",
+      "owning_prompts": [
+        "P21",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "installer",
+          "description": "Per-user install and uninstall with Mona-owned components only",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "modern-menu",
+          "description": "Windows 11 modern context menu works on the target system",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "uninstall",
+          "description": "Uninstall removes Mona registration and preserves projects and engine history",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "signing",
+          "description": "Signing/distribution prerequisites are recorded; unsigned test packages are labeled",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-028",
+      "track": "Complete",
+      "title": "Automated and human QA, performance budgets, feature matrix, release evidence and documentation",
+      "owning_prompts": [
+        "P22",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "automated-qa",
+          "description": "Automated unit and integration suites run on the reference machine",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "human-qa",
+          "description": "Keyboard, screen-reader and scaling walkthroughs are recorded",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "performance",
+          "description": "Startup, idle CPU, memory and shutdown budgets are measured",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "feature-matrix",
+          "description": "Release evidence ties each supported feature to a passing check",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-029",
+      "track": "Core",
+      "title": "Model-free quick wins: Resume Brief, Focus Mode, evidence-linked completion cards, keyboard-first navigation",
+      "owning_prompts": [
+        "P06",
+        "P07",
+        "P14",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "resume-brief",
+          "description": "Resume Brief is generated from state without inference",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "focus-mode",
+          "description": "Focus Mode reduces panels without hiding required controls",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "evidence-cards",
+          "description": "Completion claims link to the governing evidence",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "keyboard-flow",
+          "description": "Core flows are reachable without a mouse",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    },
+    {
+      "id": "MONA-030",
+      "track": "Complete",
+      "title": "No artificial feature hiding: honest unsupported states, version drift detection, upgrade qualification",
+      "owning_prompts": [
+        "P01",
+        "P18",
+        "P22",
+        "P23"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "unsupported-states",
+          "description": "Unsupported features explain the exact reason and never appear enabled",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "version-drift",
+          "description": "Runtime version changes are detected and unsafe operations disabled",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "upgrade-qualification",
+          "description": "Upgrades are explicit tested compatibility decisions",
+          "status": "pending",
+          "evidence": []
+        },
+        {
+          "id": "coverage-report",
+          "description": "A coverage report states what is qualified, partial or blocked",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": []
+    }
+  ]
+}

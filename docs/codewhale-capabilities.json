@@ -1,0 +1,869 @@
+{
+  "schema_version": 1,
+  "captured_utc": "2026-11-12T00:22:06Z",
+  "engine": {
+    "product": "Codewhale",
+    "version": "0.10.2",
+    "commit": "ff466b2ed0bf",
+    "install_method": "winget package HunterBown.CodeWhale",
+    "executable": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+    "resolved_binary": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Packages\\HunterBown.CodeWhale_Microsoft.Winget.Source_8wekyb3d8bbwe\\codewhale.exe",
+    "platform": "windows-x64",
+    "home": "%USERPROFILE%\\.codewhale"
+  },
+  "transports": [
+    {
+      "name": "app-server --http",
+      "description": "Full HTTP/SSE Runtime API under /v1/*; documented canonical surface",
+      "default_bind": "127.0.0.1:7878",
+      "auth": "--auth-token, CODEWHALE_RUNTIME_TOKEN, or DEEPSEEK_RUNTIME_TOKEN",
+      "qualified": false
+    },
+    {
+      "name": "app-server --stdio",
+      "description": "Smaller JSON-RPC compatibility control transport; tool-free turns need allowed_tools: []",
+      "default_bind": "stdio",
+      "auth": "process boundary",
+      "qualified": false
+    },
+    {
+      "name": "app-server --socket",
+      "description": "Desktop daemon JSON-RPC on a user-private local endpoint; requires daemon/attach",
+      "default_bind": "named pipe under ~/.codewhale/run",
+      "auth": "client authentication + daemon/attach",
+      "qualified": false
+    },
+    {
+      "name": "exec",
+      "description": "Headless one-shot CLI; --auto offers tools with Full Access by default",
+      "default_bind": "n/a",
+      "auth": "existing provider credentials",
+      "qualified": false
+    }
+  ],
+  "inventory_scope": "Top-level CLI commands of the pinned build. Subcommand arguments, config schema, HTTP routes, tools, skills, plugins and hooks remain to be enumerated at P01/P18.",
+  "coverage_notes": {
+    "upstream_overlap": "This build already ships a browser client (`codewhale web`, `codewhale rc`) and a runtime server (`serve`, `app-server`). Per spec section 2.3, reassess upstream desktop progress at G0 and before release instead of duplicating it blindly.",
+    "rows": 43,
+    "qualified": 0
+  },
+  "rows": [
+    {
+      "id": "CAP-0001",
+      "upstream": {
+        "name": "run",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: interactive or non-interactive task runner (TUI). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0002",
+      "upstream": {
+        "name": "doctor",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none-by-default",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: diagnostics; --probe-api/--probe-search make live calls only when asked. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0003",
+      "upstream": {
+        "name": "session-diagnostics",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: summarizes failure signals without raw content. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0004",
+      "upstream": {
+        "name": "scorecard",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: scores recorded turn metrics. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0005",
+      "upstream": {
+        "name": "models",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: cached model list; --update refreshes catalogs over the network. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0006",
+      "upstream": {
+        "name": "speech",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: TTS audio generation (paid model call). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0007",
+      "upstream": {
+        "name": "sessions",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: lists saved sessions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0008",
+      "upstream": {
+        "name": "receipts",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: files, commands, web/MCP calls, agents and failures for a session. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0009",
+      "upstream": {
+        "name": "resume",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: resumes a saved session; may send model requests. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0010",
+      "upstream": {
+        "name": "rc",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: interactive session handed to the Codewhale web app. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0011",
+      "upstream": {
+        "name": "fork",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: forks a saved session. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0012",
+      "upstream": {
+        "name": "init",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: creates a default AGENTS.md. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0013",
+      "upstream": {
+        "name": "install",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: installs a plugin bundle without trusting/enabling it. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0014",
+      "upstream": {
+        "name": "setup",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: scaffolds MCP config and skills directories. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0015",
+      "upstream": {
+        "name": "remote-setup",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: generates a remote deploy bundle. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0016",
+      "upstream": {
+        "name": "exec",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: headless one-shot; --auto adds tools and defaults to Full Access. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0017",
+      "upstream": {
+        "name": "fleet",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: durable fleet runs; schedules native child agents. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0018",
+      "upstream": {
+        "name": "workflow",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: runs checked-in workflows. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0019",
+      "upstream": {
+        "name": "lane",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: manages running workflow instances and runtime backends. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0020",
+      "upstream": {
+        "name": "review",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: code review over a git diff. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0021",
+      "upstream": {
+        "name": "apply",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: applies a patch file or stdin to the working tree. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0022",
+      "upstream": {
+        "name": "eval",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: offline evaluation harness. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0023",
+      "upstream": {
+        "name": "mcp",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: MCP server configuration. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0024",
+      "upstream": {
+        "name": "features",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: inspects feature flags. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0025",
+      "upstream": {
+        "name": "integrations",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: connects third-party harnesses (e.g. dsh). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0026",
+      "upstream": {
+        "name": "serve",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: local server; compatibility alias of app-server --http/--mobile. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0027",
+      "upstream": {
+        "name": "web",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: opens the bundled browser client over the Runtime API. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0028",
+      "upstream": {
+        "name": "login",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: account/provider sign-in; writes credentials. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0029",
+      "upstream": {
+        "name": "logout",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "destructive",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: removes saved authentication state for every provider. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0030",
+      "upstream": {
+        "name": "auth",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: credential and provider-mode management. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0031",
+      "upstream": {
+        "name": "account",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: Codewhale account management (cloud). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0032",
+      "upstream": {
+        "name": "dispatch",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "unknown",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: cloud computer task; help states cloud computers are paused. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0033",
+      "upstream": {
+        "name": "mcp-server",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: runs Codewhale as an MCP server over stdio. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0034",
+      "upstream": {
+        "name": "config",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: read/write/list configuration values. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0035",
+      "upstream": {
+        "name": "model",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: resolves or lists available models. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0036",
+      "upstream": {
+        "name": "thread",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: thread/session metadata, resume and fork flows. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0037",
+      "upstream": {
+        "name": "sandbox",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: evaluates sandbox/approval policy decisions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0038",
+      "upstream": {
+        "name": "app-server",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "mixed",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "model",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: HTTP/SSE runtime API (--http), stdio/socket compatibility transports. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0039",
+      "upstream": {
+        "name": "completion",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: generates shell completions. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0040",
+      "upstream": {
+        "name": "metrics",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: usage rollup from the audit log and session store. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0041",
+      "upstream": {
+        "name": "update",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "write",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: updates the release binary (package-managed installs get migration instructions). Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0042",
+      "upstream": {
+        "name": "providers",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: exports the provider route catalog. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    },
+    {
+      "id": "CAP-0043",
+      "upstream": {
+        "name": "help",
+        "surface": "cli",
+        "source": "codewhale --help",
+        "version": "0.10.2+ff466b2ed0bf"
+      },
+      "platform": "windows-x64",
+      "class": "read",
+      "permission_implications": "not yet qualified (see P01/P18)",
+      "cost_implications": "none",
+      "required_arguments": "not yet qualified (see P01/P18)",
+      "chosen_integration": null,
+      "ui_location": null,
+      "tests": [],
+      "status": "unqualified",
+      "gap": "P00 seed only: help for commands. Arguments, permissions, integration label and tests are qualified at P01 (G2) and P18."
+    }
+  ]
+}

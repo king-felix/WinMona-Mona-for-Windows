@@ -1,0 +1,3 @@
+﻿# Byte-exact checkouts: evidence digests are recorded over working-tree bytes,
+# so the repository must not rewrite line endings on checkout.
+* -text

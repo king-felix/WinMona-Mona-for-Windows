@@ -1,0 +1,32 @@
+﻿# Dependencies and build output
+node_modules/
+/dist/
+/out/
+/build/
+*.tsbuildinfo
+
+# Local machine state (never committed)
+.mona/build/tmp/
+.mona/build/backup/
+.mona/build/history/
+.mona/build/local/
+.mona/build/.lock
+
+# Codewhale runtime state (engine-owned, machine-specific)
+.codewhale/state/
+
+# Logs, coverage, editor and OS noise
+*.log
+coverage/
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# Secrets — never commit
+.env
+.env.*
+*.pem
+*.pfx
+*.key
+secrets.json

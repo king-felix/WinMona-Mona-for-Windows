@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mona/build/state.schema.json",
+  "title": "Mona build state (.mona/build/state.json)",
+  "description": "Durable ledger for building Mona itself. Separate from the future product state under .mona/project/.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "revision",
+    "project",
+    "spec_version",
+    "spec_sha256",
+    "prompt_file_sha256",
+    "current_prompt",
+    "last_verified_commit",
+    "tasks",
+    "next_eligible_prompts",
+    "last_checkpoint_utc"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "project": { "const": "Mona" },
+    "spec_version": { "type": "string", "minLength": 1 },
+    "spec_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "prompt_file_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "current_prompt": { "type": "string", "pattern": "^P[0-9]{2}$" },
+    "last_verified_commit": { "type": ["string", "null"] },
+    "last_checkpoint_utc": { "type": ["string", "null"] },
+    "next_eligible_prompts": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^P[0-9]{2}$" },
+      "uniqueItems": true
+    },
+    "tasks": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^P[0-9]{2}$" },
+      "additionalProperties": { "$ref": "#/definitions/task" }
+    },
+    "notes": { "type": "string" }
+  },
+  "definitions": {
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "requirements",
+        "completed_steps",
+        "remaining_steps",
+        "evidence",
+        "blocker_ids"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "running",
+            "verifying",
+            "completed",
+            "blocked",
+            "interrupted",
+            "skipped"
+          ]
+        },
+        "requirements": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^MONA-[0-9]{3}$" },
+          "uniqueItems": true
+        },
+        "completed_steps": { "type": "array", "items": { "type": "string" } },
+        "remaining_steps": { "type": "array", "items": { "type": "string" } },
+        "evidence": { "type": "array", "items": { "$ref": "#/definitions/evidenceRef" } },
+        "blocker_ids": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^ISSUE-[0-9]{4}$" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "note": { "type": "string" },
+        "kind": { "enum": ["real", "fixture", "human", "generated", "document"] },
+        "recorded_utc": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "commit": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

@@ -1,0 +1,906 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-11-12T00:20:54Z",
+  "purpose": "Deterministic section/requirement/prompt index for Mona_Project.md and Mona_PROMPTS.md. Regenerate with `node tools/build/cli.mjs index`.",
+  "files": [
+    {
+      "path": "Mona_Project.md",
+      "sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
+      "bytes": 57063,
+      "lines": 584,
+      "requirement_ids": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-003",
+        "MONA-004",
+        "MONA-005",
+        "MONA-006",
+        "MONA-007",
+        "MONA-008",
+        "MONA-009",
+        "MONA-010",
+        "MONA-011",
+        "MONA-012",
+        "MONA-013",
+        "MONA-014",
+        "MONA-015",
+        "MONA-016",
+        "MONA-017",
+        "MONA-018",
+        "MONA-019",
+        "MONA-020",
+        "MONA-021",
+        "MONA-022",
+        "MONA-023",
+        "MONA-024",
+        "MONA-025",
+        "MONA-026",
+        "MONA-027",
+        "MONA-028",
+        "MONA-029",
+        "MONA-030"
+      ],
+      "prompt_ids": [
+        "P00",
+        "P01",
+        "P23"
+      ],
+      "prompt_sections": [],
+      "sections": [
+        {
+          "level": 1,
+          "heading": "Mona — Project specification",
+          "start_line": 1,
+          "end_line": 584,
+          "sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671"
+        },
+        {
+          "level": 2,
+          "heading": "1. The product",
+          "start_line": 9,
+          "end_line": 26,
+          "sha256": "89d64904ba9534303a2a7eab8b1b465e35b9948492e26d1da058a6b7641f8cfa"
+        },
+        {
+          "level": 3,
+          "heading": "Non-negotiable product promises",
+          "start_line": 17,
+          "end_line": 26,
+          "sha256": "9f09dcbf474200fe9f0420531438afe372032b904e7a2e08ccaed31cc63187ab"
+        },
+        {
+          "level": 2,
+          "heading": "2. Feasibility and decision gates",
+          "start_line": 27,
+          "end_line": 54,
+          "sha256": "958fda4f6227f50efab2d35517f8970d324b5230008b1fc798bdce2c05f5b63d"
+        },
+        {
+          "level": 3,
+          "heading": "2.1 What the research establishes",
+          "start_line": 29,
+          "end_line": 36,
+          "sha256": "2fce4c6725163c647cc4c43515cdd53d00b7e753dfe1c9efa94f156252c65b75"
+        },
+        {
+          "level": 3,
+          "heading": "2.2 Verdict",
+          "start_line": 37,
+          "end_line": 50,
+          "sha256": "34d9cc3c11afe381eb542dd2b6c034b3398f5b513e69864157a3605ab5baefd7"
+        },
+        {
+          "level": 3,
+          "heading": "2.3 Why Mona should exist alongside upstream UI",
+          "start_line": 51,
+          "end_line": 54,
+          "sha256": "907da7d2f8296d84f4b13e3d64a50bd609f0008f6cd712e29d7e3a81f7595021"
+        },
+        {
+          "level": 2,
+          "heading": "3. Platform and technology decisions",
+          "start_line": 55,
+          "end_line": 79,
+          "sha256": "6df2e41b917820caed58f2625e217f2fceae060ddf909b00054a514c2dd4438d"
+        },
+        {
+          "level": 3,
+          "heading": "3.1 Platform scope",
+          "start_line": 57,
+          "end_line": 63,
+          "sha256": "ca30afaed77a106da609fbf27b3ad94885ec6d44063b4984e3adf8bbb489277c"
+        },
+        {
+          "level": 3,
+          "heading": "3.2 Chosen stack",
+          "start_line": 64,
+          "end_line": 79,
+          "sha256": "ae3ae10a1506d8fc17655d9378530fdd3c4bc1938d7f42c9965a093c7f528f2c"
+        },
+        {
+          "level": 2,
+          "heading": "4. The visual experience",
+          "start_line": 80,
+          "end_line": 132,
+          "sha256": "346160f75c230e1ade3e0883782d48f64cfe47c7346bc3276aedfe794f34dd60"
+        },
+        {
+          "level": 3,
+          "heading": "4.1 Art direction: a luminous working studio",
+          "start_line": 82,
+          "end_line": 105,
+          "sha256": "da46bc72396e9260ff8979e04b5345c2701f7ace557781f31cb92cfa71b1ba38"
+        },
+        {
+          "level": 3,
+          "heading": "4.2 Main layout",
+          "start_line": 106,
+          "end_line": 116,
+          "sha256": "06ed00da6d1fce943878042a1118e5228e149de0371ad2cb65e39381fa2e97a5"
+        },
+        {
+          "level": 3,
+          "heading": "4.3 Views and meaningful empty states",
+          "start_line": 117,
+          "end_line": 132,
+          "sha256": "b69bad3c2d2ae0091439b12adbb2d37072f1c0497a4af3aa6604c53d55eb397a"
+        },
+        {
+          "level": 2,
+          "heading": "5. User journeys",
+          "start_line": 133,
+          "end_line": 162,
+          "sha256": "cb6549e07e3f193af67fa17bff2531870a3faa9421e835817383818d13579877"
+        },
+        {
+          "level": 3,
+          "heading": "J1 — Start from Explorer",
+          "start_line": 135,
+          "end_line": 146,
+          "sha256": "a1d7a2ebca609b7d257700c14005d385c69c2b1d2141b4137132ba71820f3846"
+        },
+        {
+          "level": 3,
+          "heading": "J2 — Assign a bounded prompt",
+          "start_line": 147,
+          "end_line": 150,
+          "sha256": "49dbcf06712692a82c281aab5892d5f30ab96726cfa93f3c4ae4a57a11238834"
+        },
+        {
+          "level": 3,
+          "heading": "J3 — Return after a closed window or interrupted session",
+          "start_line": 151,
+          "end_line": 154,
+          "sha256": "5250fcf51b7d4a2f4f77ce468d4a04166d26bd22f2f6859cd1aa6a9f92dde6df"
+        },
+        {
+          "level": 3,
+          "heading": "J4 — Understand and resolve a blocker",
+          "start_line": 155,
+          "end_line": 158,
+          "sha256": "b6caeee1294b8fa33f028113b388b5567ea561a25afd2df10657fae25b587261"
+        },
+        {
+          "level": 3,
+          "heading": "J5 — Review and keep useful work",
+          "start_line": 159,
+          "end_line": 162,
+          "sha256": "426e9f71f541274dc210eb19b7372c917cba44fdbabecdd830cf61d25bb7d789"
+        },
+        {
+          "level": 2,
+          "heading": "6. Architecture and ownership",
+          "start_line": 163,
+          "end_line": 227,
+          "sha256": "38a29fe5e3c059d1fbc95b9e4f9386ca4a901150ee911512ed3fb5b4115da30c"
+        },
+        {
+          "level": 3,
+          "heading": "6.1 Boundaries",
+          "start_line": 176,
+          "end_line": 183,
+          "sha256": "d17990dc15d9d30422832507d29b70d9759ba781d28f220b080567c3e51183c2"
+        },
+        {
+          "level": 3,
+          "heading": "6.2 Primary integration",
+          "start_line": 184,
+          "end_line": 193,
+          "sha256": "eb083f01545f0c3d8fa7b9303d41ecddd78af2d632cac5d50879a030c9374351"
+        },
+        {
+          "level": 3,
+          "heading": "6.3 Mona’s proposed adapter interface",
+          "start_line": 194,
+          "end_line": 216,
+          "sha256": "a5df8f334f747ee4c2f34d7c7fde98e8a05cd193a47980f4d2a867517294fc93"
+        },
+        {
+          "level": 3,
+          "heading": "6.4 Process lifecycle",
+          "start_line": 217,
+          "end_line": 227,
+          "sha256": "7752e9f1e15b9005fa132efa9f816d333d99a6d76499de5f5f247f6bf2701bc5"
+        },
+        {
+          "level": 2,
+          "heading": "7. Feature and requirement catalog",
+          "start_line": 228,
+          "end_line": 280,
+          "sha256": "e8d627489930259795640c82dd7c160ae143b7ed16bec0e582f7157daed952e1"
+        },
+        {
+          "level": 3,
+          "heading": "7.1 Capability coverage process",
+          "start_line": 265,
+          "end_line": 280,
+          "sha256": "99613bb905caef6e3d7db670233c2927bab23026246b9e87bcf59299ecd55e56"
+        },
+        {
+          "level": 2,
+          "heading": "8. Project execution and continuity",
+          "start_line": 281,
+          "end_line": 383,
+          "sha256": "8728492ae4bcf4ce912ee3402f93845cd938219f3548496c41b9586096ed3879"
+        },
+        {
+          "level": 3,
+          "heading": "8.1 Two layers of state",
+          "start_line": 283,
+          "end_line": 313,
+          "sha256": "6d850de18ff33bb6120744d76bda4f019afe6a514531368fe37e95eae2fe0611"
+        },
+        {
+          "level": 3,
+          "heading": "8.2 Task state machine",
+          "start_line": 314,
+          "end_line": 332,
+          "sha256": "37aca07381474e8398503b1675179de4ba968a11196f369c95b3d54c4f600587"
+        },
+        {
+          "level": 3,
+          "heading": "8.3 Minimal build state example",
+          "start_line": 333,
+          "end_line": 363,
+          "sha256": "05fba22e6953c5c72159f30cb915a334e7e64b86750c3e2eef18fc2e5c77e6f0"
+        },
+        {
+          "level": 3,
+          "heading": "8.4 The three-attempt rule, precisely",
+          "start_line": 364,
+          "end_line": 379,
+          "sha256": "c4acf471fa7af1f58bd3b08b5feaafa44cfe7d4e8760b39de26460b707cb3ece"
+        },
+        {
+          "level": 3,
+          "heading": "8.5 Resume algorithm",
+          "start_line": 380,
+          "end_line": 383,
+          "sha256": "4f03bc8ed556724ab30ad425b78e2f0f5efc5365a11852410dc0723478af952f"
+        },
+        {
+          "level": 2,
+          "heading": "9. Economics and DeepSeek-oriented execution",
+          "start_line": 384,
+          "end_line": 434,
+          "sha256": "b6f8058603d5ac7dd45452071a67c67e9fe2df06d4831c694e40ddbf50e87120"
+        },
+        {
+          "level": 3,
+          "heading": "9.1 Zero inference UI overhead is the default",
+          "start_line": 386,
+          "end_line": 393,
+          "sha256": "9b3c777de6413679e9071b1c31746a7163d1148315fb5f257b62165be7c66f75"
+        },
+        {
+          "level": 3,
+          "heading": "9.2 Build-agent operating style",
+          "start_line": 394,
+          "end_line": 407,
+          "sha256": "4614f63f1079534dee3d840625c428fd268d335b881dfbc6a7bd14d5624acda2"
+        },
+        {
+          "level": 3,
+          "heading": "9.3 Cost calculation and presentation",
+          "start_line": 408,
+          "end_line": 419,
+          "sha256": "2a7d46596677a6d877bc8ee7764e1dc1227ef5e0fa53c5b3fc2e0e4d4b32c5e9"
+        },
+        {
+          "level": 3,
+          "heading": "9.4 Benchmark protocol and gate",
+          "start_line": 420,
+          "end_line": 434,
+          "sha256": "1ab25930635a0d8ab355bbc14e0a0b8c8f4bfac8caf07925c6e27997d3461403"
+        },
+        {
+          "level": 2,
+          "heading": "10. Data, events, recovery, and concurrency",
+          "start_line": 435,
+          "end_line": 458,
+          "sha256": "b8aec27c6eead5599b830fe0d7d5c3e4c3e567745fb4ae26986774357d100412"
+        },
+        {
+          "level": 3,
+          "heading": "10.1 Local data model",
+          "start_line": 437,
+          "end_line": 444,
+          "sha256": "5e59f62e70e41b6bfaad121bcdd6356c9723d9a376591623d23c795cf1705008"
+        },
+        {
+          "level": 3,
+          "heading": "10.2 Submission safety",
+          "start_line": 445,
+          "end_line": 452,
+          "sha256": "34cd092367ed2fadf5f2a74b7652ea75d80de88dbaf40ab28e0616c2d700213c"
+        },
+        {
+          "level": 3,
+          "heading": "10.3 Concurrency and scheduler ownership",
+          "start_line": 453,
+          "end_line": 458,
+          "sha256": "375fae5692fa2b9490af23c57699825208999db431f4177edf80452bc7964e27"
+        },
+        {
+          "level": 2,
+          "heading": "11. Full capability workbench",
+          "start_line": 459,
+          "end_line": 480,
+          "sha256": "d79eafdf6e5fd54a1f41514bf8221ea0552b7e65d08069ed8ca7f0a8ad4451de"
+        },
+        {
+          "level": 3,
+          "heading": "Providers and models",
+          "start_line": 461,
+          "end_line": 464,
+          "sha256": "2d72d82d717863b7e2f803eeb1fad6dd60d5554872d0e9f3dd1fb985b75ccc83"
+        },
+        {
+          "level": 3,
+          "heading": "Extensions",
+          "start_line": 465,
+          "end_line": 468,
+          "sha256": "26f1c7e38121b76245de7b9c33a3d6331c9ee613a6aa2c64e7a78cc86ae84ebe"
+        },
+        {
+          "level": 3,
+          "heading": "Agents and workflows",
+          "start_line": 469,
+          "end_line": 472,
+          "sha256": "97a7d8b7e8f18f00e475c4b7ef3e4f72837988d309cdf9b2a3f74ea44447b64b"
+        },
+        {
+          "level": 3,
+          "heading": "Terminal and command palette",
+          "start_line": 473,
+          "end_line": 476,
+          "sha256": "d26734d5a58a50f4ceaaa813e43d26519221d446d603b2519166ade00704336a"
+        },
+        {
+          "level": 3,
+          "heading": "Source review and snapshots",
+          "start_line": 477,
+          "end_line": 480,
+          "sha256": "72f88593a7e81bc60d92a2333c52316e02788a55a55a3b5ff84651c2ae92258f"
+        },
+        {
+          "level": 2,
+          "heading": "12. Delight that does not cost tokens",
+          "start_line": 481,
+          "end_line": 494,
+          "sha256": "78e53cb0d444474b3e34b4dde416476f63dd5e8a31a9a2dc1b5e616566a21776"
+        },
+        {
+          "level": 2,
+          "heading": "13. Security and permission model",
+          "start_line": 495,
+          "end_line": 504,
+          "sha256": "cd7c84559019bbceb1566ba1e0c3037f858d1522a6c6aba44e798c0ecf26f95b"
+        },
+        {
+          "level": 2,
+          "heading": "14. Explorer integration and installation",
+          "start_line": 505,
+          "end_line": 518,
+          "sha256": "cb267f6700be36a3790a21eebef57bbda07cefbbf9c5516f0d78bb623afb544c"
+        },
+        {
+          "level": 2,
+          "heading": "15. Quality targets and acceptance",
+          "start_line": 519,
+          "end_line": 552,
+          "sha256": "0fac17d6d9ada29655bf2e6e7e9ee2bade99c9e4988da75bb1533aa0d3df4869"
+        },
+        {
+          "level": 2,
+          "heading": "16. Scope discipline and release definitions",
+          "start_line": 553,
+          "end_line": 562,
+          "sha256": "c00a069742045a122fd6d46ea2599607f1e49762ca3b1223a94bd0ba419e65c3"
+        },
+        {
+          "level": 2,
+          "heading": "17. Definition of done for every implementation prompt",
+          "start_line": 563,
+          "end_line": 568,
+          "sha256": "baa5d45c3408d3010c6802007290ae20f9c2273c7d21adb0ce5a8d401192a92b"
+        },
+        {
+          "level": 2,
+          "heading": "18. Sources and evidence boundaries",
+          "start_line": 569,
+          "end_line": 584,
+          "sha256": "49522746497a370df51250eaa261ab2e601cbe81811dcffb2f11f56d81cd0f65"
+        }
+      ]
+    },
+    {
+      "path": "Mona_PROMPTS.md",
+      "sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
+      "bytes": 61503,
+      "lines": 658,
+      "requirement_ids": [
+        "MONA-002",
+        "MONA-004"
+      ],
+      "prompt_ids": [
+        "P00",
+        "P01",
+        "P02",
+        "P03",
+        "P04",
+        "P05",
+        "P06",
+        "P07",
+        "P08",
+        "P09",
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16",
+        "P17",
+        "P18",
+        "P19",
+        "P20",
+        "P21",
+        "P22",
+        "P23"
+      ],
+      "prompt_sections": [
+        {
+          "id": "P00",
+          "heading": "P00 — Bootstrap the project and establish ground truth",
+          "start_line": 182
+        },
+        {
+          "id": "P01",
+          "heading": "P01 — Prove headless integration and preserve the economics",
+          "start_line": 204
+        },
+        {
+          "id": "P02",
+          "heading": "P02 — Create the desktop foundation and strict contracts",
+          "start_line": 224
+        },
+        {
+          "id": "P03",
+          "heading": "P03 — Implement the real versioned engine adapter",
+          "start_line": 242
+        },
+        {
+          "id": "P04",
+          "heading": "P04 — Own runtime processes and stopping behavior correctly",
+          "start_line": 260
+        },
+        {
+          "id": "P05",
+          "heading": "P05 — Build transactional project state and safe migrations",
+          "start_line": 276
+        },
+        {
+          "id": "P06",
+          "heading": "P06 — Build Mona’s distinctive design system",
+          "start_line": 292
+        },
+        {
+          "id": "P07",
+          "heading": "P07 — Assemble the project catalog and desktop shell",
+          "start_line": 308
+        },
+        {
+          "id": "P08",
+          "heading": "P08 — Deliver the live work studio",
+          "start_line": 324
+        },
+        {
+          "id": "P09",
+          "heading": "P09 — Make the first right-click launch work",
+          "start_line": 340
+        },
+        {
+          "id": "P10",
+          "heading": "P10 — Implement prompt execution and durable continuation",
+          "start_line": 356
+        },
+        {
+          "id": "P11",
+          "heading": "P11 — Enforce the three-attempt rule and clear stop controls",
+          "start_line": 372
+        },
+        {
+          "id": "P12",
+          "heading": "P12 — Build the cost ledger and optional budget controls",
+          "start_line": 390
+        },
+        {
+          "id": "P13",
+          "heading": "P13 — Make changes, evidence, Git, and restore trustworthy",
+          "start_line": 408
+        },
+        {
+          "id": "P14",
+          "heading": "P14 — Deliver the daily-use polish without inference overhead",
+          "start_line": 424
+        },
+        {
+          "id": "P15",
+          "heading": "P15 — Surface native agents, goals, fleets, and workflows",
+          "start_line": 442
+        },
+        {
+          "id": "P16",
+          "heading": "P16 — Expose providers, models, permissions, and effective settings",
+          "start_line": 458
+        },
+        {
+          "id": "P17",
+          "heading": "P17 — Make tools and extensions manageable",
+          "start_line": 474
+        },
+        {
+          "id": "P18",
+          "heading": "P18 — Complete advanced access and the capability explorer",
+          "start_line": 490
+        },
+        {
+          "id": "P19",
+          "heading": "P19 — Finish project memory, portable handoff, and diagnostics",
+          "start_line": 506
+        },
+        {
+          "id": "P20",
+          "heading": "P20 — Harden recovery and test hostile or failing inputs",
+          "start_line": 522
+        },
+        {
+          "id": "P21",
+          "heading": "P21 — Deliver the modern Windows menu and installation lifecycle",
+          "start_line": 538
+        },
+        {
+          "id": "P22",
+          "heading": "P22 — Run whole-product QA and prove the remaining claims",
+          "start_line": 554
+        },
+        {
+          "id": "P23",
+          "heading": "P23 — Package the release candidate and finish the handoff",
+          "start_line": 572
+        }
+      ],
+      "sections": [
+        {
+          "level": 1,
+          "heading": "Mona — Execution prompts and durable build protocol",
+          "start_line": 1,
+          "end_line": 634,
+          "sha256": "a7c058da2ea9cb890b685b8518000780695716f9c35b9e2ffcabc9a4271bf4df"
+        },
+        {
+          "level": 2,
+          "heading": "1. How Victor uses this file",
+          "start_line": 7,
+          "end_line": 83,
+          "sha256": "79642979cd2edf135c39d52f063940fe2f8827db21ad006579a1c14d706a5912"
+        },
+        {
+          "level": 3,
+          "heading": "First-session prompt — copy/paste",
+          "start_line": 15,
+          "end_line": 42,
+          "sha256": "af2d4df57bc08764313449be6fdb09716f7bd7345c3621e6f08f97b8720a184e"
+        },
+        {
+          "level": 3,
+          "heading": "Every later session — copy/paste",
+          "start_line": 43,
+          "end_line": 65,
+          "sha256": "70ae496e92bdecb2c25088e5807bf2520abe7acffe27167556b0559fdff85c2a"
+        },
+        {
+          "level": 3,
+          "heading": "Optional explicit assignment",
+          "start_line": 66,
+          "end_line": 73,
+          "sha256": "ea1ae6a07b0c68ade5fdfedc8be7e63fab7332dd4adaaa53995030e278989e78"
+        },
+        {
+          "level": 3,
+          "heading": "Optional queued session",
+          "start_line": 74,
+          "end_line": 83,
+          "sha256": "a084774befafe1d11b09bfe98a5391887a40f2a8bf92ae27e4aabbb2beb52949"
+        },
+        {
+          "level": 2,
+          "heading": "2. Shared operating contract — applies to every prompt",
+          "start_line": 84,
+          "end_line": 146,
+          "sha256": "8f17bd7f1f5611d09c6ed198d3aa0aeb9eb3a98772b9d31424063ef84c497372"
+        },
+        {
+          "level": 3,
+          "heading": "O1 — Authority and scope",
+          "start_line": 86,
+          "end_line": 93,
+          "sha256": "bc95388e640fdbf27e38a6bac04825fdb42b43dd155424cf85e42f460a236038"
+        },
+        {
+          "level": 3,
+          "heading": "O2 — Efficient execution",
+          "start_line": 94,
+          "end_line": 103,
+          "sha256": "65357c6c70c7b19e7b7016aa789d66b8bce3a66ed546aedca554efe073b88432"
+        },
+        {
+          "level": 3,
+          "heading": "O3 — Three attempts, persistent across sessions",
+          "start_line": 104,
+          "end_line": 113,
+          "sha256": "ab7a2d3aabab2de583858572a1a5d6b305eb88c665f22c14e05cea6c1edfdd67"
+        },
+        {
+          "level": 3,
+          "heading": "O4 — Start and checkpoint protocol",
+          "start_line": 114,
+          "end_line": 127,
+          "sha256": "06dd71f4c4391a6326f53348fa810347c10e93d01d482458312754b0618b4f88"
+        },
+        {
+          "level": 3,
+          "heading": "O5 — Definition of done and report",
+          "start_line": 128,
+          "end_line": 146,
+          "sha256": "5afb96315708626386d30358271e40524a7878adfdce70684360784e1e0d6f8f"
+        },
+        {
+          "level": 2,
+          "heading": "3. Prompt map and dependency order",
+          "start_line": 147,
+          "end_line": 179,
+          "sha256": "e73c92e1060a44746f6d769ca3f88213fe0a596d6469fe1b0169580a6197bbdd"
+        },
+        {
+          "level": 2,
+          "heading": "4. The execution prompts",
+          "start_line": 180,
+          "end_line": 589,
+          "sha256": "46f7e9ae522cbdf31b81d276ba4b740173345d1cfa1d1f84089abda83abfd2c4"
+        },
+        {
+          "level": 3,
+          "heading": "P00 — Bootstrap the project and establish ground truth",
+          "start_line": 182,
+          "end_line": 203,
+          "sha256": "b9c41707965a7f3e1fd48523358aac6190c8f2472ceae7c28037f7e37ba76e27"
+        },
+        {
+          "level": 3,
+          "heading": "P01 — Prove headless integration and preserve the economics",
+          "start_line": 204,
+          "end_line": 223,
+          "sha256": "276f9918cb8432fc75a849cef2752eeba0da3a1f8a28e5ff01f853b5479a6823"
+        },
+        {
+          "level": 3,
+          "heading": "P02 — Create the desktop foundation and strict contracts",
+          "start_line": 224,
+          "end_line": 241,
+          "sha256": "13bcebd520cd6d6f10ab97d539c82dbfb46ceae03e5f07c67854edb52e06e481"
+        },
+        {
+          "level": 3,
+          "heading": "P03 — Implement the real versioned engine adapter",
+          "start_line": 242,
+          "end_line": 259,
+          "sha256": "d6ddadfa3cc7ec25596a63344662531f7ea5fb9b9bc6178f9e15f07c751e3d0d"
+        },
+        {
+          "level": 3,
+          "heading": "P04 — Own runtime processes and stopping behavior correctly",
+          "start_line": 260,
+          "end_line": 275,
+          "sha256": "5ef3b6cbf69e4d6f91355f6360f66281b6222cadf3cb73c5fc44d1968a9deee4"
+        },
+        {
+          "level": 3,
+          "heading": "P05 — Build transactional project state and safe migrations",
+          "start_line": 276,
+          "end_line": 291,
+          "sha256": "fbbcc294a72bb9740914bca06827ace5f561228017ea10017b8e7a83780dcb85"
+        },
+        {
+          "level": 3,
+          "heading": "P06 — Build Mona’s distinctive design system",
+          "start_line": 292,
+          "end_line": 307,
+          "sha256": "833c048044ab2c65b0876a0829f18613354c781dfd0a3ff6cc246274d6da59cb"
+        },
+        {
+          "level": 3,
+          "heading": "P07 — Assemble the project catalog and desktop shell",
+          "start_line": 308,
+          "end_line": 323,
+          "sha256": "a2a55cf67e68879a8eed0d8f3120be4224f03358321485d58421368239defc0f"
+        },
+        {
+          "level": 3,
+          "heading": "P08 — Deliver the live work studio",
+          "start_line": 324,
+          "end_line": 339,
+          "sha256": "689d8e51861fec47f97e08d06a6749af5b732f9a4fff5c1931687e6cfc1e072f"
+        },
+        {
+          "level": 3,
+          "heading": "P09 — Make the first right-click launch work",
+          "start_line": 340,
+          "end_line": 355,
+          "sha256": "b3371fa7adc1d88f74cb8290a372070a4f662601902824fadfa813b3c1c55d87"
+        },
+        {
+          "level": 3,
+          "heading": "P10 — Implement prompt execution and durable continuation",
+          "start_line": 356,
+          "end_line": 371,
+          "sha256": "a1e9c2afe7063ed3d0867d63efeb7ac0a0463856f729ba6d015bff8f6eb6d577"
+        },
+        {
+          "level": 3,
+          "heading": "P11 — Enforce the three-attempt rule and clear stop controls",
+          "start_line": 372,
+          "end_line": 389,
+          "sha256": "067b88e087a77aabd0f29791c5648d41c75b2e977087c3b1b6800ada8dcfb4ce"
+        },
+        {
+          "level": 3,
+          "heading": "P12 — Build the cost ledger and optional budget controls",
+          "start_line": 390,
+          "end_line": 407,
+          "sha256": "2f68bb2c90ecc5923f269bef3b785d2dcf6d4e64a25ea475bc99220d67951c55"
+        },
+        {
+          "level": 3,
+          "heading": "P13 — Make changes, evidence, Git, and restore trustworthy",
+          "start_line": 408,
+          "end_line": 423,
+          "sha256": "e42f1c9a2a4f2631a262086b91b5c52d0e7bf336350595ef8fcd33d51b5aaca9"
+        },
+        {
+          "level": 3,
+          "heading": "P14 — Deliver the daily-use polish without inference overhead",
+          "start_line": 424,
+          "end_line": 441,
+          "sha256": "8fb4f2586b3001aa836770e253bbb5d5a80ca3389bb684b239f5531061e911bc"
+        },
+        {
+          "level": 3,
+          "heading": "P15 — Surface native agents, goals, fleets, and workflows",
+          "start_line": 442,
+          "end_line": 457,
+          "sha256": "f5e20affec6b4c73989cb964a2f5b19a9305a367773eedbd5129f6de52697a18"
+        },
+        {
+          "level": 3,
+          "heading": "P16 — Expose providers, models, permissions, and effective settings",
+          "start_line": 458,
+          "end_line": 473,
+          "sha256": "3343ab79efd519ac3ff6f985f685b0e210de3e58855004fa9b5bc8361249057a"
+        },
+        {
+          "level": 3,
+          "heading": "P17 — Make tools and extensions manageable",
+          "start_line": 474,
+          "end_line": 489,
+          "sha256": "0145f25ad585adfec6c10811352231cb561f5e96258aad153e99cc9614b9df18"
+        },
+        {
+          "level": 3,
+          "heading": "P18 — Complete advanced access and the capability explorer",
+          "start_line": 490,
+          "end_line": 505,
+          "sha256": "884397a49c1c1f6c7e7650bc72e38da8457e72c8051ac168aefadbf28ce3dcbe"
+        },
+        {
+          "level": 3,
+          "heading": "P19 — Finish project memory, portable handoff, and diagnostics",
+          "start_line": 506,
+          "end_line": 521,
+          "sha256": "1d080084cdbde57202e835a66a2353b3405d049b3adf4448459570d257f359e4"
+        },
+        {
+          "level": 3,
+          "heading": "P20 — Harden recovery and test hostile or failing inputs",
+          "start_line": 522,
+          "end_line": 537,
+          "sha256": "d15a6a5dac0814c1d124082a19c0d2a341e95e413cf166e391dab387d7948ae6"
+        },
+        {
+          "level": 3,
+          "heading": "P21 — Deliver the modern Windows menu and installation lifecycle",
+          "start_line": 538,
+          "end_line": 553,
+          "sha256": "a8886d1495c229869eac520b2de9f4cf167a16530ec8c23f93ca96365b8a429d"
+        },
+        {
+          "level": 3,
+          "heading": "P22 — Run whole-product QA and prove the remaining claims",
+          "start_line": 554,
+          "end_line": 571,
+          "sha256": "f4a5d22781dfeeb19682cea3c486a02919277fa4f578be02215b58e49ce3a60e"
+        },
+        {
+          "level": 3,
+          "heading": "P23 — Package the release candidate and finish the handoff",
+          "start_line": 572,
+          "end_line": 589,
+          "sha256": "5e748368abdbb2dadc09ee16019a8f08e665ca25132d3f41324373fcd76cec83"
+        },
+        {
+          "level": 2,
+          "heading": "5. Evidence and state templates",
+          "start_line": 590,
+          "end_line": 634,
+          "sha256": "d2104d8be059747bf057b8717496c10335c5ea3df714fcd7f25b56733afb0060"
+        },
+        {
+          "level": 3,
+          "heading": "Requirement evidence record",
+          "start_line": 592,
+          "end_line": 612,
+          "sha256": "653ebc4d62064d78cacbff85c7589479abda42bbbb3ab6ae53fb1ce8e1250dea"
+        },
+        {
+          "level": 3,
+          "heading": "Problem and attempt record",
+          "start_line": 613,
+          "end_line": 631,
+          "sha256": "fd328adf4381f78ec0cce5f0232aab6519b60b21b1eaaf2b46617fe1ad35a628"
+        },
+        {
+          "level": 3,
+          "heading": "Short handoff structure",
+          "start_line": 632,
+          "end_line": 634,
+          "sha256": "34e638055b2f396732d031d83213e58722cad80fdfd4767d34316db6d50eff56"
+        },
+        {
+          "level": 1,
+          "heading": "Mona build handoff",
+          "start_line": 635,
+          "end_line": 658,
+          "sha256": "51683931ae8e2c8c8d5afcd5620371e96264ae7f25fee736f88002e052dabc30"
+        },
+        {
+          "level": 2,
+          "heading": "6. Final implementation reminders",
+          "start_line": 651,
+          "end_line": 658,
+          "sha256": "670dae9a520d10fe56899f121ac3c0e5143b287cc025a5bc38ba29b22b5445ff"
+        }
+      ]
+    }
+  ]
+}

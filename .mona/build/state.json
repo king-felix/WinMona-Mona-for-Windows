@@ -1,0 +1,367 @@
+{
+  "schema_version": 1,
+  "revision": 3,
+  "project": "Mona",
+  "spec_version": "1.0",
+  "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
+  "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
+  "current_prompt": "P01",
+  "last_verified_commit": null,
+  "tasks": {
+    "P00": {
+      "status": "completed",
+      "requirements": [
+        "MONA-001",
+        "MONA-010"
+      ],
+      "completed_steps": [
+        "environment, engine and provider route discovered and recorded (redacted)",
+        "AGENTS.md, Git repository, .gitignore established; no remote",
+        "requirement ledger (24 prompts, 30 requirements, 114 criteria) and spec index with hashes",
+        "bootstrap utility: index/init/validate/checkpoint/recover/evidence with atomic writes",
+        "11 bootstrap tests pass; interrupted checkpoint recovery verified",
+        "capability inventory seeded (43 command rows, 4 transports, all unqualified)",
+        "discovery report, DECISIONS D-0001..D-0008, BLOCKERS (none open), first handoff",
+        "post-checkpoint audit recorded (validate OK, state revision 2)"
+      ],
+      "remaining_steps": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P00-bootstrap.md",
+          "sha256": "4656ebfe3b31df6c17b1a63794d38ab478f7efbb843d8a38e6a6048a401dd821",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:23:57Z",
+          "commit": null
+        },
+        {
+          "path": "docs/evidence/P00-tests.txt",
+          "sha256": "a3d80193c803f6d1f4f51c4aaf244ce9c78a7facddfba4b3b02c1032d48eca76",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:23:57Z",
+          "commit": null
+        },
+        {
+          "path": "docs/evidence/P00-validation.txt",
+          "sha256": "5d6dab1e0d3ec631c3562c366de6146f0ed0e2c1dff9c7f57ca6572024c3a295",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:23:57Z",
+          "commit": null
+        },
+        {
+          "path": "docs/discovery-report.md",
+          "sha256": "19096ab1be2133936180121d8ff55ddccfda2ab6e846d8086e615dd37cd03acc",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:23:57Z",
+          "commit": null
+        },
+        {
+          "path": "docs/evidence/P00-final-audit.txt",
+          "sha256": "334af28e6a78d21c7d557b7d02fa1c126f00a8e870d05ad1b659d86252bf0136",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T00:24:11Z",
+          "commit": null
+        }
+      ],
+      "blocker_ids": []
+    },
+    "P01": {
+      "status": "pending",
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-003",
+        "MONA-030"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P02": {
+      "status": "pending",
+      "requirements": [
+        "MONA-006",
+        "MONA-026"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P03": {
+      "status": "pending",
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-007",
+        "MONA-008",
+        "MONA-016"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P04": {
+      "status": "pending",
+      "requirements": [
+        "MONA-002",
+        "MONA-012",
+        "MONA-016"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P05": {
+      "status": "pending",
+      "requirements": [
+        "MONA-005",
+        "MONA-010",
+        "MONA-016",
+        "MONA-025"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P06": {
+      "status": "pending",
+      "requirements": [
+        "MONA-006",
+        "MONA-029"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P07": {
+      "status": "pending",
+      "requirements": [
+        "MONA-005",
+        "MONA-006",
+        "MONA-029"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P08": {
+      "status": "pending",
+      "requirements": [
+        "MONA-007",
+        "MONA-008",
+        "MONA-012",
+        "MONA-014"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P09": {
+      "status": "pending",
+      "requirements": [
+        "MONA-004"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P10": {
+      "status": "pending",
+      "requirements": [
+        "MONA-009",
+        "MONA-010",
+        "MONA-024"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P11": {
+      "status": "pending",
+      "requirements": [
+        "MONA-011",
+        "MONA-012"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P12": {
+      "status": "pending",
+      "requirements": [
+        "MONA-003",
+        "MONA-013"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P13": {
+      "status": "pending",
+      "requirements": [
+        "MONA-014",
+        "MONA-015"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P14": {
+      "status": "pending",
+      "requirements": [
+        "MONA-017",
+        "MONA-029"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P15": {
+      "status": "pending",
+      "requirements": [
+        "MONA-018",
+        "MONA-019"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P16": {
+      "status": "pending",
+      "requirements": [
+        "MONA-008",
+        "MONA-020"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P17": {
+      "status": "pending",
+      "requirements": [
+        "MONA-021"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P18": {
+      "status": "pending",
+      "requirements": [
+        "MONA-022",
+        "MONA-023",
+        "MONA-030"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P19": {
+      "status": "pending",
+      "requirements": [
+        "MONA-024",
+        "MONA-025"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P20": {
+      "status": "pending",
+      "requirements": [
+        "MONA-016",
+        "MONA-025",
+        "MONA-026"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P21": {
+      "status": "pending",
+      "requirements": [
+        "MONA-004",
+        "MONA-027"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P22": {
+      "status": "pending",
+      "requirements": [
+        "MONA-003",
+        "MONA-006",
+        "MONA-028",
+        "MONA-030"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    },
+    "P23": {
+      "status": "pending",
+      "requirements": [
+        "MONA-001",
+        "MONA-002",
+        "MONA-003",
+        "MONA-004",
+        "MONA-005",
+        "MONA-006",
+        "MONA-007",
+        "MONA-008",
+        "MONA-009",
+        "MONA-010",
+        "MONA-011",
+        "MONA-012",
+        "MONA-013",
+        "MONA-014",
+        "MONA-015",
+        "MONA-016",
+        "MONA-017",
+        "MONA-018",
+        "MONA-019",
+        "MONA-020",
+        "MONA-021",
+        "MONA-022",
+        "MONA-023",
+        "MONA-024",
+        "MONA-025",
+        "MONA-026",
+        "MONA-027",
+        "MONA-028",
+        "MONA-029",
+        "MONA-030"
+      ],
+      "completed_steps": [],
+      "remaining_steps": [],
+      "evidence": [],
+      "blocker_ids": []
+    }
+  },
+  "next_eligible_prompts": [
+    "P01"
+  ],
+  "last_checkpoint_utc": "2026-11-12T00:24:11Z"
+}

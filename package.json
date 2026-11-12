@@ -1,0 +1,19 @@
+{
+  "name": "mona",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Mona — a local desktop workbench for Codewhale. Bootstrap build tooling lives here until P02 creates apps/desktop.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "mona": "node tools/build/cli.mjs",
+    "index": "node tools/build/cli.mjs index",
+    "validate": "node tools/build/cli.mjs validate",
+    "test": "node --test tests/bootstrap"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0"
+  }
+}

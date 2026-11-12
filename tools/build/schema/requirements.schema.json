@@ -1,0 +1,130 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "mona/build/requirements.schema.json",
+  "title": "Mona requirement and prompt traceability ledger (docs/requirements.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "revision", "spec", "prompts", "requirements"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "companion_file", "version", "sha256", "companion_sha256"],
+      "properties": {
+        "file": { "const": "Mona_Project.md" },
+        "companion_file": { "const": "Mona_PROMPTS.md" },
+        "version": { "type": "string" },
+        "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "companion_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "indexed_utc": { "type": "string" }
+      }
+    },
+    "prompts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "deliverable", "prerequisites", "requirements"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^P[0-9]{2}$" },
+          "title": { "type": "string", "minLength": 1 },
+          "deliverable": { "type": "string", "minLength": 1 },
+          "prerequisites": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^P[0-9]{2}$" },
+            "uniqueItems": true
+          },
+          "requirements": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^MONA-[0-9]{3}$" },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "track",
+          "title",
+          "owning_prompts",
+          "status",
+          "criteria",
+          "verified_commit",
+          "tested_environment",
+          "open_issue_ids"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^MONA-[0-9]{3}$" },
+          "track": { "enum": ["Foundation", "Core", "Complete", "Later"] },
+          "title": { "type": "string", "minLength": 1 },
+          "owning_prompts": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^P[0-9]{2}$" },
+            "uniqueItems": true
+          },
+          "status": {
+            "enum": ["pending", "partial", "verified", "blocked", "skipped"]
+          },
+          "criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "status", "evidence"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+                "description": { "type": "string" },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "partial",
+                    "passed",
+                    "failed",
+                    "blocked",
+                    "not_applicable"
+                  ]
+                },
+                "evidence": {
+                  "type": "array",
+                  "items": { "$ref": "#/definitions/evidenceRef" }
+                }
+              }
+            }
+          },
+          "verified_commit": { "type": ["string", "null"] },
+          "tested_environment": { "type": ["string", "null"] },
+          "open_issue_ids": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^ISSUE-[0-9]{4}$" },
+            "uniqueItems": true
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "evidenceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+        "note": { "type": "string" },
+        "kind": { "enum": ["real", "fixture", "human", "generated", "document"] },
+        "recorded_utc": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T" },
+        "commit": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

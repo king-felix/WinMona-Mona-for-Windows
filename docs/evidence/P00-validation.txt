@@ -1,0 +1,5 @@
+﻿# node tools/build/cli.mjs validate --verbose
+# captured 2026-11-12T00:23:27Z
+
+warn: counts: prompts=24 requirements=30 criteria=114 tasks=24
+OK: state revision 1; 24 tasks; 30 requirements; 1 warning(s)

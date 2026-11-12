@@ -1,0 +1,36 @@
+﻿# Post-checkpoint audit  2026-11-12T00:24:00Z
+# node tools/build/cli.mjs validate --verbose
+
+warn: counts: prompts=24 requirements=30 criteria=114 tasks=24
+OK: state revision 2; 24 tasks; 30 requirements; 1 warning(s)
+
+# node tools/build/cli.mjs status
+
+{
+  "revision": 2,
+  "current_prompt": "P01",
+  "prompts": {
+    "completed": 1,
+    "pending": 23
+  },
+  "eligible": [
+    "P01"
+  ],
+  "requirements": {
+    "partial": 2,
+    "pending": 28
+  },
+  "last_checkpoint_utc": "2026-11-12T00:23:57Z"
+}
+
+# git status --short (before initial commit)
+
+?? .gitattributes
+?? .gitignore
+?? AGENTS.md
+?? Mona_PROMPTS.md
+?? Mona_Project.md
+?? docs/
+?? package-lock.json
+?? package.json
+?? tests/

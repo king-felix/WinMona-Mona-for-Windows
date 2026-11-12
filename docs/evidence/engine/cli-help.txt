@@ -1,0 +1,108 @@
+﻿Usage: codewhale [OPTIONS] [PROMPT]
+       codewhale [OPTIONS] <COMMAND> [ARGS]
+
+Commands:
+  run                  Run an interactive or non-interactive task
+  doctor               Run Codewhale diagnostics
+  session-diagnostics  Summarize local session failure signals without raw content
+  scorecard            Score recorded turn metrics against an optional baseline
+  models               List cached models; use --update to refresh configured provider catalogs
+  speech               Generate speech audio with Xiaomi MiMo TTS models [alias: tts]
+  sessions             List saved sessions
+  receipts             Show what a session did: files, commands, web and MCP calls, agents, approvals, and failures. `codewhale receipts [ID|--last] [--format md|json]` [alias: receipt]
+  resume               Resume a saved session
+  rc                   Launch an interactive session and hand it to the Codewhale web app
+  fork                 Fork a saved session
+  init                 Create a default AGENTS.md in the current directory
+  install              Install a plugin bundle without trusting or enabling it
+  setup                Bootstrap MCP config and/or skills directories
+  remote-setup         Generate a remote Codewhale agent deploy bundle (cloud + chat bridge)
+  exec                 Run a non-interactive prompt
+  fleet                Manage durable Agent fleet runs
+  workflow             Run checked-in Workflows through a Lane Runtime backend
+  lane                 Manage running workflow instances (Lanes) and Runtime backends (#4176)
+  review               Run a Codewhale-powered code review over a git diff
+  apply                Apply a patch file or stdin to the working tree
+  eval                 Run the offline evaluation harness
+  mcp                  Manage MCP servers
+  features             Inspect feature flags
+  integrations         Connect third-party harnesses through Codewhale (e.g. `integrations dsh status`)
+  serve                Run a local Codewhale server
+  web                  Open the first-class local browser client over the canonical Runtime API
+  login                Sign in to an existing Codewhale account; new accounts are not open
+  logout               Remove saved authentication state (every provider key, OAuth login, the Codewhale account session). Asks before deleting
+  auth                 Manage authentication credentials and provider mode
+  account              Manage an existing Codewhale account; new accounts are not open [alias: cloud]
+  dispatch             Run a task on a Codewhale cloud computer (not available: cloud computers and accounts are paused for new users)
+  mcp-server           Run MCP server mode over stdio
+  config               Read/write/list config values
+  model                Resolve or list available models across providers
+  thread               Manage thread/session metadata and resume/fork flows
+  sandbox              Evaluate sandbox/approval policy decisions
+  app-server           Expose the full Engine API with --http, or smaller compatibility controls
+  completion           Generate shell completions [alias: completions]
+  metrics              Print a usage rollup from the audit log and session store
+  update               Update this release binary from GitHub (package-managed installs get migration instructions)
+  providers            Export the route catalog (`providers export --json`)
+  help                 Print this message or the help of the given subcommand(s)
+
+Arguments:
+  [PROMPT]...  Initial prompt for the interactive session. Use `exec` for a non-interactive run
+
+Options:
+      --config <CONFIG>
+          Path to the config file to load instead of the default
+      --profile <PROFILE>
+          Config profile to apply (a `[profiles.<name>]` table)
+  -C, --workspace <DIR>
+          Workspace directory for Codewhale file tools (`-w` is a legacy alias)
+      --mouse-capture
+          Enable terminal mouse capture for scrolling and transcript selection
+      --no-mouse-capture
+          Disable terminal mouse capture for terminal-native text selection
+      --skip-onboarding
+          Skip onboarding screens
+      --fresh
+          Start a fresh session without automatic resume or crash recovery
+      --no-project-config
+          Skip project config and workspace overlays for this run
+      --enable <FEATURE>
+          Enable a feature for this run (repeatable)
+      --disable <FEATURE>
+          Disable a feature for this run (repeatable)
+      --max-subagents <MAX_SUBAGENTS>
+          Maximum number of concurrent sub-agents (1-128; default 64)
+  -v, --verbose
+          Enable verbose logging
+      --provider <PROVIDER>
+          Provider selector; exec/fleet also accept configured custom provider identifiers
+      --model <MODEL>
+          Model to use for this run (not saved)
+      --verbosity <LEVEL>
+          Controls transcript and output verbosity (normal, concise)
+      --log-level <LOG_LEVEL>
+          Log level for this run (for example `info`, `debug`, or `trace`)
+      --telemetry <BOOL>
+          Control aggregate usage counting (default on; Codewhale + PostHog; durable off: config set telemetry false; CODEWHALE_TELEMETRY=0 always wins) [possible values: true, false]
+      --approval-policy <APPROVAL_POLICY>
+          Tool approval policy for this run: on-request, untrusted, or never
+      --sandbox-mode <SANDBOX_MODE>
+          Sandbox mode for this run: read-only, workspace-write, danger-full-access, or external-sandbox. danger-full-access disables the sandbox entirely
+      --api-key <API_KEY>
+          Provider API key for this run (not saved). Visible in the process list; prefer `auth set --api-key-stdin` or the provider's env var
+      --base-url <BASE_URL>
+          Provider base URL for this run (not saved)
+  -c, --continue
+          Continue the most recent interactive session for this workspace
+  -r, --resume <SESSION_ID>
+          Resume a saved interactive session by id or unique id prefix
+      --session-id <SESSION_ID>
+          Alias of `--resume` matching `codewhale exec --session-id`
+  -p, --prompt <PROMPT>
+          
+      --set <KEY=VALUE>
+          Per-run config override (`KEY=VALUE`), repeatable, never saved. Runtime keys: provider, model/default_text_model, verbosity, approval_policy, sandbox_mode, telemetry. Dedicated flags win; managed policy still applies. `config set` persists instead. Long-only: short `-c` is already `--continue`
+  -h, --help
+          Print help
+  -V, --version
+          Print version
