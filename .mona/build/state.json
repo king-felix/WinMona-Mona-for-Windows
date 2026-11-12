@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 64,
+  "revision": 65,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P20",
+  "current_prompt": "P21",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -1296,15 +1296,51 @@
       "blocker_ids": []
     },
     "P20": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-016",
         "MONA-025",
         "MONA-026"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "22-scenario failure matrix with real-file and real-process injection; renderer crash covered by the live lifecycle probe",
+        "interrupted restore hardened: staged copy, integrity verification and atomic rename; live database remains intact at all three injected failure points",
+        "failed database open no longer leaks a SQLite handle; corrupt file preserved and movable",
+        "IPC audit: all 67 handled channels reject an untrusted sender; payload schemas re-checked",
+        "security boundary review across renderer, bridge, runtime auth, secrets, terminal, imports and paths; no release-blocking finding",
+        "10 new tests; 60 files / 506 Vitest tests pass; MONA-016, MONA-025 and MONA-026 verified"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P20-failure-matrix.md",
+          "sha256": "a45716324d2f02c8a3d78d093c3b5fd7704db46fcba92640dd36be06135a0a49",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:48:43Z",
+          "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7"
+        },
+        {
+          "path": "docs/evidence/P20-security-review.md",
+          "sha256": "e5e447468580b47cab9a4e132af6bab9a13bcd7283c02681e47a8e9d95bfbaae",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:48:43Z",
+          "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7"
+        },
+        {
+          "path": "docs/evidence/P20-tests.txt",
+          "sha256": "f9b349c8a7e4c987146bea3d796d59d82b0101f4f1c76016aeafb43e6638b6ac",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:48:43Z",
+          "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7"
+        },
+        {
+          "path": "docs/evidence/P20-checks.txt",
+          "sha256": "af2968c48bd20682809d5d4b900cbae09c04bc931c515223635a3af003db74c8",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T16:48:43Z",
+          "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7"
+        }
+      ],
       "blocker_ids": []
     },
     "P21": {
@@ -1372,7 +1408,7 @@
     }
   },
   "next_eligible_prompts": [
-    "P20"
+    "P21"
   ],
-  "last_checkpoint_utc": "2026-11-12T16:41:19Z"
+  "last_checkpoint_utc": "2026-11-12T16:48:43Z"
 }

@@ -1,0 +1,128 @@
+P20 checks — 2026-11-12T09:47:50.3517523-07:00
+
+== npm run typecheck ==
+
+> mona@0.0.0 typecheck
+> npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/project-state && npm run typecheck -w @mona/ui && npm run typecheck -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/project-state@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/ui@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/desktop@0.1.0 typecheck
+> tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.preload.json && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit
+
+
+typecheck exit: 0
+
+== npm run lint ==
+
+> mona@0.0.0 lint
+> eslint .
+
+
+lint exit: 0
+
+== npm run format:check ==
+
+> mona@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+
+format exit: 0
+
+== npm run build ==
+
+> mona@0.0.0 build
+> npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/project-state@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/ui@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/desktop@0.1.0 build
+> npm run clean && npm run build:main && node scripts/copy-capabilities.mjs && npm run build:preload && npm run build:renderer
+
+
+> @mona/desktop@0.1.0 clean
+> node -e "require('node:fs').rmSync('dist',{recursive:true,force:true})"
+
+
+> @mona/desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+copied capability ledger -> X:\AI_projects\Mona\apps\desktop\dist\resources\capabilities.json
+
+> @mona/desktop@0.1.0 build:preload
+> esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  dist\preload\preload.cjs  11.8kb
+
+Done in 7ms
+
+> @mona/desktop@0.1.0 build:renderer
+> vite build
+
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 41 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/renderer/index.html                            0.73 kB │ gzip:   0.40 kB
+dist/renderer/assets/TerminalDrawer-BmfB5bmM.css    3.52 kB │ gzip:   0.96 kB
+dist/renderer/assets/index-CzEbowzB.css            30.39 kB │ gzip:   5.83 kB
+dist/renderer/assets/TerminalDrawer-BYMOGTPo.js   371.57 kB │ gzip:  95.50 kB │ map:   801.33 kB
+dist/renderer/assets/index-DYZFwC4a.js            377.13 kB │ gzip: 107.66 kB │ map: 1,465.05 kB
+
+[32m✓ built in 248ms[39m
+
+build exit: 0
+
+== npm run check:build -w @mona/desktop ==
+
+> @mona/desktop@0.1.0 check:build
+> node scripts/check-build.mjs
+
+build checks passed: 7 renderer files, CSP replaced, no fixtures, no credentials, 71 named preload channels
+
+check:build exit: 0
+
+== node tools/build/cli.mjs validate ==
+OK: state revision 64; 24 tasks; 30 requirements; 0 warning(s)
+
+validate exit: 0

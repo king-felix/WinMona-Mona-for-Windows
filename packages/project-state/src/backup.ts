@@ -72,12 +72,31 @@ function schemaVersionOf(db: DatabaseSync): number {
   return typeof row?.version === 'number' ? row.version : 0;
 }
 
+function removeStagedSidecars(staged: string): void {
+  for (const suffix of ['-wal', '-shm'] as const) rmSync(`${staged}${suffix}`, { force: true });
+}
+
+function removeStaged(staged: string): void {
+  try {
+    rmSync(staged, { force: true });
+    removeStagedSidecars(staged);
+  } catch {
+    /* best effort; the error that matters is the original one */
+  }
+}
+
 export type RestoreOptions = {
   backupFile: string;
   expectedSha256?: string;
   /** Directory used to park the current database before replacement. */
   recoveryDirectory: string;
   now?: () => Date;
+  /** Injected checkpoints for failure tests; they run with the store closed. */
+  hooks?: {
+    afterPark?: () => void;
+    afterCopy?: () => void;
+    beforeReplace?: () => void;
+  };
 };
 
 export type RestoreReceipt = {
@@ -112,19 +131,49 @@ export async function restoreBackup(store: ProjectStore, options: RestoreOptions
     const stamp = (options.now ?? (() => new Date()))().toISOString().replace(/[:.]/g, '-');
     mkdirSync(options.recoveryDirectory, { recursive: true });
     const parked = path.join(options.recoveryDirectory, `pre-restore-${stamp}.sqlite`);
+    // Stage the replacement beside the live file and rename it into place. A
+    // failure before the rename leaves the live database byte-identical; the
+    // parked copy and the verified backup both survive for recovery.
+    const staged = path.join(path.dirname(live), `.mona-restore-${stamp}.sqlite.tmp`);
 
     store.close();
-    copyFileSync(live, parked);
-    for (const suffix of ['-wal', '-shm'] as const) {
-      const sidecar = `${live}${suffix}`;
-      if (existsSync(sidecar)) copyFileSync(sidecar, `${parked}${suffix}`);
+    try {
+      copyFileSync(live, parked);
+      for (const suffix of ['-wal', '-shm'] as const) {
+        const sidecar = `${live}${suffix}`;
+        if (existsSync(sidecar)) copyFileSync(sidecar, `${parked}${suffix}`);
+      }
+      options.hooks?.afterPark?.();
+
+      rmSync(staged, { force: true });
+      copyFileSync(options.backupFile, staged);
+      const stagedIntegrity = verifyDatabaseFile(staged);
+      if (stagedIntegrity !== 'ok') {
+        throw stateError(
+          'corrupt_state',
+          'the staged replacement failed verification; the live database was not replaced',
+          stagedIntegrity,
+        );
+      }
+      options.hooks?.afterCopy?.();
+
+      for (const suffix of ['-wal', '-shm'] as const) {
+        const sidecar = `${live}${suffix}`;
+        if (existsSync(sidecar)) rmSync(sidecar, { force: true });
+      }
+      options.hooks?.beforeReplace?.();
+      renameSync(staged, live);
+      removeStagedSidecars(staged);
+      store.reopen();
+    } catch (error) {
+      removeStaged(staged);
+      try {
+        store.reopen();
+      } catch {
+        /* the caller still sees the original failure */
+      }
+      throw error;
     }
-    copyFileSync(options.backupFile, live);
-    for (const suffix of ['-wal', '-shm'] as const) {
-      const sidecar = `${live}${suffix}`;
-      if (existsSync(sidecar)) rmSync(sidecar, { force: true });
-    }
-    store.reopen();
     return {
       restoredFrom: options.backupFile,
       parkedCurrentFile: parked,

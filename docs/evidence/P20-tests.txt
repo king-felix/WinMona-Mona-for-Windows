@@ -1,0 +1,324 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mX:/AI_projects/Mona[39m
+
+node.exe : warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git 
+touches it
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: in the... Git touches it:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/project-state/src/store.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 2893[2mms[22m[39m
+   [32m✓[39m single write path and revision checks [2m(4)[22m
+     [33m[2m✓[22m[39m rolls back the whole transaction when a write fails part way[33m 319[2mms[22m[39m
+     [33m[2m✓[22m[39m survives a real process crash during an open transaction[33m 422[2mms[22m[39m
+   [32m✓[39m project identity [2m(5)[22m
+     [33m[2m✓[22m[39m registering the same folder twice yields one project[33m 318[2mms[22m[39m
+     [33m[2m✓[22m[39m a moved folder requires an explicit rebind instead of a second project[33m 340[2mms[22m[39m
+     [33m[2m✓[22m[39m nested worktrees stay distinct roots sharing one repository key[33m 370[2mms[22m[39m
+     [33m[2m✓[22m[39m removing a catalog entry never deletes the folder[33m 355[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/memory-service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 2775[2mms[22m[39m
+   [32m✓[39m MemoryService search [2m(2)[22m
+     [33m[2m✓[22m[39m reports an unindexed project and then searches recorded state locally[33m 338[2mms[22m[39m
+     [33m[2m✓[22m[39m searches project files on demand and says what it skipped[33m 360[2mms[22m[39m
+   [32m✓[39m MemoryService prompt shelf [2m(1)[22m
+     [33m[2m✓[22m[39m saves, previews and versions a prompt, then exports and imports packs[33m 416[2mms[22m[39m
+   [32m✓[39m MemoryService portable bundles [2m(4)[22m
+     [33m[2m✓[22m[39m exports a handoff and imports it into another folder with requalification[33m 644[2mms[22m[39m
+     [33m[2m✓[22m[39m backs up and restores settings without exposing credentials[33m 360[2mms[22m[39m
+     [33m[2m✓[22m[39m previews diagnostics with the home path and credentials redacted[32m 300[2mms[22m[39m
+     [33m[2m✓[22m[39m treats a cancelled dialog as a refusal, not a crash[33m 356[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/renderer/App.test.tsx [2m([22m[2m18 tests[22m[2m)[22m[33m 2190[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-service.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 3035[2mms[22m[39m
+   [32m✓[39m catalog service [2m(8)[22m
+     [33m[2m✓[22m[39m opens a folder, lists it, and does not start the engine or create a thread[33m 339[2mms[22m[39m
+     [33m[2m✓[22m[39m renames, pins, archives, restores, searches and removes without deleting files[33m 422[2mms[22m[39m
+     [33m[2m✓[22m[39m deduplicates aliases and requires a deliberate rebind after a move[33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m creates a new folder and rejects unsafe names[33m 336[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps drafts, views, costs and runtime bindings separate when switching projects[33m 494[2mms[22m[39m
+     [33m[2m✓[22m[39m reports engine start failure and leaves the project usable offline[33m 387[2mms[22m[39m
+     [33m[2m✓[22m[39m survives a restart: catalog and UI state reload from disk[33m 401[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/catalog.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 3264[2mms[22m[39m
+   [32m✓[39m project catalog [2m(9)[22m
+     [33m[2m✓[22m[39m reads a branch from HEAD for a repository and a linked worktree[33m 467[2mms[22m[39m
+     [33m[2m✓[22m[39m deduplicates a path alias instead of creating a second project[33m 363[2mms[22m[39m
+     [33m[2m✓[22m[39m renames, pins, archives, restores and searches without touching the folder[33m 420[2mms[22m[39m
+     [33m[2m✓[22m[39m removes only the catalog entry and never deletes the folder or its files[33m 363[2mms[22m[39m
+     [33m[2m✓[22m[39m requires a deliberate rebind after a folder moves[33m 321[2mms[22m[39m
+     [33m[2m✓[22m[39m records runtime bindings and project usage without turning unknown into zero[33m 338[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps nested repositories as distinct catalog entries[33m 484[2mms[22m[39m
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/project-state/src/briefing.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 3341[2mms[22m[39m
+   [32m✓[39m BriefingService.resumeBrief [2m(2)[22m
+     [33m[2m✓[22m[39m projects the recorded task, blocker, test, change and spend rows[33m 2385[2mms[22m[39m
+     [33m[2m✓[22m[39m returns an honest no-change state instead of a fabricated zero[33m 354[2mms[22m[39m
+   [32m✓[39m BriefingService.sinceYouLeft [2m(1)[22m
+     [33m[2m✓[22m[39m groups only rows inside the window and stays deterministic[33m 596[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/p20-recovery.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 3311[2mms[22m[39m
+   [32m✓[39m interrupted restore [2m(4)[22m
+     [33m[2m✓[22m[39m leaves the live database intact when the restore fails at afterPark[33m 567[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves the live database intact when the restore fails at afterCopy[33m 621[2mms[22m[39m
+     [33m[2m✓[22m[39m leaves the live database intact when the restore fails at beforeReplace[33m 620[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the backup and parked copy when the live path cannot be replaced[33m 509[2mms[22m[39m
+   [32m✓[39m suspicious folders and paths [2m(2)[22m
+     [33m[2m✓[22m[39m registers a folder with spaces, symbols and non-ASCII characters exactly once[33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses evidence paths that traverse outside the workspace[33m 331[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/costs.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 3477[2mms[22m[39m
+   [32m✓[39m cost ledger ingestion [2m(7)[22m
+     [33m[2m✓[22m[39m estimates from the active rate revision and records that revision[33m 314[2mms[22m[39m
+     [33m[2m✓[22m[39m attributes usage by turn, task and session[33m 402[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps history when a new rate revision is appended and offers an explicit recalculation[33m 315[2mms[22m[39m
+   [32m✓[39m budgets [2m(5)[22m
+     [33m[2m✓[22m[39m warns, then blocks the next dispatch, and never promises an invoice cap[33m 342[2mms[22m[39m
+     [33m[2m✓[22m[39m includes unreleased reservations in the projection and releases them[33m 350[2mms[22m[39m
+     [33m[2m✓[22m[39m does not count unknown records as spent when evaluating a budget[33m 311[2mms[22m[39m
+     [33m[2m✓[22m[39m scopes a day budget to the caller-visible local day[33m 317[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/state.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 3640[2mms[22m[39m
+   [32m✓[39m backup and restore [2m(3)[22m
+     [33m[2m✓[22m[39m backs up, restores, and parks the replaced database without deleting it[33m 557[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a backup whose digest does not match, leaving the live database untouched[33m 411[2mms[22m[39m
+     [33m[2m✓[22m[39m quiesces writers: a write during maintenance is refused, then accepted again[33m 407[2mms[22m[39m
+   [32m✓[39m project export and import [2m(3)[22m
+     [33m[2m✓[22m[39m exports portable status without machine-local bindings and re-imports it atomically[33m 577[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a tampered export by digest before writing anything[33m 585[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses an import older than the local revision unless explicitly accepted[33m 344[2mms[22m[39m
+   [32m✓[39m opening existing state [2m(1)[22m
+     [33m[2m✓[22m[39m backs up an existing database before migrating without deadlocking the barrier[33m 410[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-dispatch.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 3865[2mms[22m[39m
+   [32m✓[39m launch dispatch [2m(11)[22m
+     [33m[2m✓[22m[39m opens a folder, records the studio view, starts the runtime and sends no task[33m 405[2mms[22m[39m
+     [33m[2m✓[22m[39m reuses an existing project and coalesces two identical fast launches[33m 394[2mms[22m[39m
+     [33m[2m✓[22m[39m re-launching after the first launch settles does not duplicate the project[33m 460[2mms[22m[39m
+     [33m[2m✓[22m[39m processes two different fast launches in order and reports the busy runtime honestly[33m 481[2mms[22m[39m
+     [33m[2m✓[22m[39m asks for a project folder when the shell selected a drive root[33m 355[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to create a second project when a moved folder needs a deliberate rebind[33m 345[2mms[22m[39m
+     [33m[2m✓[22m[39m does not rewrite a saved profile that is not full access[33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m records an engine failure as an opened project, not a ready one[33m 339[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/provider-workbench.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 494[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/migrations.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1148[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/studio.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1449[2mms[22m[39m
+   [32m✓[39m studio persistence [2m(6)[22m
+     [33m[2m✓[22m[39m keeps a replayed engine sequence out of the timeline[33m 305[2mms[22m[39m
+     [33m[2m✓[22m[39m advances the thread cursor and records a turn exactly once[33m 347[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ui-state.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1060[2mms[22m[39m
+   [32m✓[39m UI state store [2m(9)[22m
+     [33m[2m✓[22m[39m bounds draft text and session count[33m 528[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/diagnostics-bundle.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1331[2mms[22m[39m
+   [32m✓[39m diagnostic bundle preview [2m(4)[22m
+     [33m[2m✓[22m[39m is local, redacted by default and reports artifact state honestly[33m 361[2mms[22m[39m
+     [33m[2m✓[22m[39m verifies artifact digests only when asked and reports mismatches[33m 352[2mms[22m[39m
+     [33m[2m✓[22m[39m exports exactly the bytes that were previewed[33m 341[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/agent-observatory.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1565[2mms[22m[39m
+   [32m✓[39m agent observatory [2m(5)[22m
+     [33m[2m✓[22m[39m reports a scheduled start with no observed lease instead of claiming execution[33m 1545[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/handoff.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 5038[2mms[22m[39m
+   [32m✓[39m portable handoff export [2m(2)[22m
+     [33m[2m✓[22m[39m carries state, decisions and evidence pointers without machine-local bindings[33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m includes only explicitly selected files and refuses credential-shaped ones[33m 409[2mms[22m[39m
+   [32m✓[39m portable handoff import [2m(5)[22m
+     [33m[2m✓[22m[39m requalifies a folder and reconstructs pointers without executing anything[33m 810[2mms[22m[39m
+     [33m[2m✓[22m[39m identifies missing evidence and refuses to carry completion over[33m 744[2mms[22m[39m
+     [33m[2m✓[22m[39m identifies a changed artifact digest[33m 784[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a tampered bundle, a missing folder and a non-empty target[33m 761[2mms[22m[39m
+     [33m[2m✓[22m[39m exports a concise resume packet that re-imports the same pointers[33m 727[2mms[22m[39m
+   [32m✓[39m bundle paths cannot escape the extraction root [2m(2)[22m
+     [33m[2m✓[22m[39m refuses a malicious member at import and extraction time[33m 417[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/settings.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1870[2mms[22m[39m
+   [32m✓[39m settings backup [2m(2)[22m
+     [33m[2m✓[22m[39m rejects a tampered backup and a digest that does not match[33m 306[2mms[22m[39m
+   [32m✓[39m settings restore [2m(3)[22m
+     [33m[2m✓[22m[39m takes the maintenance barrier and appends a new settings version[33m 538[2mms[22m[39m
+     [33m[2m✓[22m[39m does not leave a partial version when the transaction fails[33m 448[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/memory.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 2028[2mms[22m[39m
+   [32m✓[39m MemoryIndex [2m(4)[22m
+     [33m[2m✓[22m[39m indexes permitted state deterministically and finds it by AND terms[33m 386[2mms[22m[39m
+     [33m[2m✓[22m[39m honours the retention policy for history projections[33m 308[2mms[22m[39m
+   [32m✓[39m MemoryIndex.searchFiles [2m(3)[22m
+     [33m[2m✓[22m[39m searches on demand, skips ignored, secret and binary files, and writes nothing[33m 423[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a one-character query and a missing project folder[33m 376[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/attempts.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1919[2mms[22m[39m
+   [32m✓[39m three-attempt rule [2m(6)[22m
+     [33m[2m✓[22m[39m blocks a problem at the third consecutive no-progress attempt and gives up the fourth[33m 392[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps the counters across a session restart and never resets by acknowledgement[33m 480[2mms[22m[39m
+     [33m[2m✓[22m[39m reopens only with new evidence or a Victor decision, and keeps the total[33m 377[2mms[22m[39m
+     [33m[2m✓[22m[39m blocks the linked task and propagates the block to dependants while independent work continues[33m 372[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/journal.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 80[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-target.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 86[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/capability-service.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 98[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/attention.test.ts [2m([22m[2m13 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-service.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 5177[2mms[22m[39m
+   [32m✓[39m live studio service [2m(14)[22m
+     [33m[2m✓[22m[39m streams a real turn into user, assistant and outcome items exactly once[33m 530[2mms[22m[39m
+     [33m[2m✓[22m[39m raises one local attention event per settled turn and per blocked problem[33m 395[2mms[22m[39m
+     [33m[2m✓[22m[39m renders tool calls as cards with the real tool input[33m 348[2mms[22m[39m
+     [33m[2m✓[22m[39m suppresses a replayed engine sequence instead of duplicating the row[33m 356[2mms[22m[39m
+     [33m[2m✓[22m[39m surfaces an approval wait and offers a real interrupt receipt[33m 415[2mms[22m[39m
+     [33m[2m✓[22m[39m truncates oversized output and labels it[33m 328[2mms[22m[39m
+     [33m[2m✓[22m[39m composes explicit file references into the prompt exactly as sent[33m 339[2mms[22m[39m
+     [33m[2m✓[22m[39m turns a dropped stream into reconnecting, then running after a replay[33m 360[2mms[22m[39m
+     [33m[2m✓[22m[39m starts Plan work in its own engine thread and keeps Work history[33m 370[2mms[22m[39m
+     [33m[2m✓[22m[39m pauses after the current task and refuses new work until resumed[33m 404[2mms[22m[39m
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+ [32m✓[39m apps/desktop/src/renderer/TerminalDrawer.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 525[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/terminal-host.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/http.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 40[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/extensions.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/adapter.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/native.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m packages/contracts/src/contracts.test.ts [2m([22m[2m24 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/prompts.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m packages/ui/src/ui.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 359[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/memory-ipc.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/configuration.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 28[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/diagnostics.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/cli.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/catalog-ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/work-control.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/terminal-ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/studio-ipc.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/engine-host.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/provider-ipc.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m packages/ui/src/palette.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 110[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/agents-ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/extensions-ipc.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/capability-ipc.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/ipc.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mpreviews 
+the exact prompt and inserts it only on request
+[22m[39mThe current testing environment is not configured to support act(...)
+
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+ [32m✓[39m apps/desktop/src/main/extensions-service.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mpreviews 
+the exact prompt and inserts it only on request
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mpreviews 
+the exact prompt and inserts it only on request
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+ [32m✓[39m apps/desktop/src/main/ipc-audit.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mpreviews 
+the exact prompt and inserts it only on request
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mruns a 
+local search and shows the hit with its kind
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mruns a 
+local search and shows the hit with its kind
+[22m[39mThe current testing environment is not configured to support act(...)
+
+ [32m✓[39m packages/ui/src/contrast.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mruns a 
+local search and shows the hit with its kind
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mruns a 
+local search and shows the hit with its kind
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mruns a 
+local search and shows the hit with its kind
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+The current testing environment is not configured to support act(...)
+
+[90mstderr[2m | apps/desktop/src/renderer/MemoryPanel.test.tsx[2m > [22m[2mMemoryPanel[2m > [22m[2mexports a 
+handoff and previews diagnostics with a redacted path
+[22m[39mThe current testing environment is not configured to support act(...)
+
+ [32m✓[39m apps/desktop/src/renderer/MemoryPanel.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 89[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/security.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/terminal-service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m apps/desktop/src/main/launch-ipc.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m packages/project-state/src/tasks.test.ts [2m([22m[2m24 tests[22m[2m)[22m[33m 6695[2mms[22m[39m
+   [32m✓[39m task dependencies and deterministic eligibility [2m(5)[22m
+     [33m[2m✓[22m[39m rejects dependency cycles, self-links and cross-workspace links without losing prior edges[33m 368[2mms[22m[39m
+     [33m[2m✓[22m[39m keeps a blocked prompt from starting until its prerequisite is verified[33m 426[2mms[22m[39m
+     [33m[2m✓[22m[39m does not change an independent task status when work runs out of order[33m 462[2mms[22m[39m
+     [33m[2m✓[22m[39m allows one active task per workspace but one per workspace across two workspaces[33m 455[2mms[22m[39m
+     [33m[2m✓[22m[39m never lets Mona schedule a native-owned task[33m 303[2mms[22m[39m
+   [32m✓[39m task state machine and evidence-gated completion [2m(8)[22m
+     [33m[2m✓[22m[39m refuses completion until every required check and human item is satisfied[33m 372[2mms[22m[39m
+     [33m[2m✓[22m[39m records a failing check without satisfying the criterion and reopens verification[33m 388[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects an evidence hash that does not match the artifact[33m 333[2mms[22m[39m
+     [33m[2m✓[22m[39m cannot complete a task that never configured acceptance criteria[33m 333[2mms[22m[39m
+     [33m[2m✓[22m[39m makes a completed task stale when its evidence artifact changes[33m 390[2mms[22m[39m
+     [33m[2m✓[22m[39m re-hashes linked evidence at completion even without an explicit revalidate[33m 400[2mms[22m[39m
+     [33m[2m✓[22m[39m blocks and unblocks only with recorded material[33m 330[2mms[22m[39m
+     [33m[2m✓[22m[39m skips only with an explicit recorded decision[33m 302[2mms[22m[39m
+   [32m✓[39m resume, reconciliation and queue boundaries [2m(4)[22m
+     [33m[2m✓[22m[39m resumes an interrupted task at its recorded step[33m 309[2mms[22m[39m
+   [32m✓[39m project export and import carry task provenance [2m(2)[22m
+     [33m[2m✓[22m[39m round-trips user-authored criteria, requirements and completed evidence[33m 381[2mms[22m[39m
+ [32m✓[39m packages/ui/src/markdown.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[32m 23[2mms[22m[39m
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.mona/project/project.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'file.txt', LF will be replaced by CRLF the next time Git touches it
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+fatal: not a git repository (or any of the parent directories): .git
+ [32m✓[39m packages/project-state/src/changes.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 10012[2mms[22m[39m
+   [32m✓[39m workspace change receipts [2m(3)[22m
+     [33m[2m✓[22m[39m reports added, modified and deleted paths against a baseline without claiming authorship[33m 385[2mms[22m[39m
+     [33m[2m✓[22m[39m does not present pre-existing user edits as agent changes[33m 349[2mms[22m[39m
+   [32m✓[39m git selection and restore [2m(5)[22m
+     [33m[2m✓[22m[39m commits only the selected path and preserves unrelated staged work[33m 3322[2mms[22m[39m
+     [33m[2m✓[22m[39m shows a text diff from Git instead of inventing one[33m 2472[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses a restore when the file changed after the preview[33m 1641[2mms[22m[39m
+     [33m[2m✓[22m[39m refuses to restore paths that would discard staged changes[33m 1148[2mms[22m[39m
+ [32m✓[39m packages/adapter/src/supervisor.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 25850[2mms[22m[39m
+   [32m✓[39m process tree ownership [2m(1)[22m
+     [33m[2m✓[22m[39m stops a real owned process tree and leaves an unrelated node process alive[33m 2989[2mms[22m[39m
+   [32m✓[39m RuntimeSupervisor [2m(9)[22m
+     [33m[2m✓[22m[39m starts the runtime with an authenticated loopback identity and a token-free ownership record[33m 5191[2mms[22m[39m
+     [33m[2m✓[22m[39m stops a real descendant spawned by the owned runtime[33m 4408[2mms[22m[39m
+     [33m[2m✓[22m[39m clears a stale pid record and starts a fresh runtime[33m 4329[2mms[22m[39m
+     [33m[2m✓[22m[39m does not kill a live pid whose creation identity changed[33m 336[2mms[22m[39m
+     [33m[2m✓[22m[39m restarts a crashed runtime a bounded number of times without submitting work[33m 7932[2mms[22m[39m
+     [33m[2m✓[22m[39m fails the start when the runtime exits before it is usable[33m 448[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m60 passed[39m[22m[90m (60)[39m
+[2m      Tests [22m [1m[32m506 passed[39m[22m[90m (506)[39m
+[2m   Start at [22m 09:47:24
+[2m   Duration [22m 26.30s[2m (tests 87%, import 7%, environment 5%, transform 1%)[22m
+

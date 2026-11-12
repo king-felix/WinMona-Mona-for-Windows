@@ -39,13 +39,27 @@ export function openDatabase(options: DatabaseOptions): OpenDatabase {
   if (options.file !== ':memory:') {
     mkdirSync(dirname(options.file), { recursive: true });
   }
-  const db = new DatabaseSync(options.file, { readOnly: options.readOnly ?? false });
-  db.exec(`PRAGMA busy_timeout = ${options.busyTimeoutMs ?? 5_000}`);
-  db.exec('PRAGMA foreign_keys = ON');
-  if (!options.readOnly) {
-    db.exec(`PRAGMA journal_mode = ${options.journalMode ?? 'wal'}`);
-    db.exec('PRAGMA synchronous = FULL');
+  let db: DatabaseSync | null = null;
+  try {
+    db = new DatabaseSync(options.file, { readOnly: options.readOnly ?? false });
+    db.exec(`PRAGMA busy_timeout = ${options.busyTimeoutMs ?? 5_000}`);
+    db.exec('PRAGMA foreign_keys = ON');
+    if (!options.readOnly) {
+      db.exec(`PRAGMA journal_mode = ${options.journalMode ?? 'wal'}`);
+      db.exec('PRAGMA synchronous = FULL');
+    }
+  } catch (error) {
+    // A file that is not a database (or cannot be opened) must not stay locked:
+    // the caller needs to preserve and inspect it, and Windows refuses to move
+    // or delete a file with a live SQLite handle.
+    try {
+      db?.close();
+    } catch {
+      /* the open failure is the error that matters */
+    }
+    throw error;
   }
+  const opened = db;
 
   let depth = 0;
   const transaction = <T>(fn: (database: DatabaseSync) => T): T => {
@@ -71,9 +85,9 @@ export function openDatabase(options: DatabaseOptions): OpenDatabase {
   };
 
   return {
-    db,
+    db: opened,
     file: options.file,
-    close: () => db.close(),
+    close: () => opened.close(),
     integrityCheck: () => {
       const row = db.prepare('PRAGMA integrity_check').get() as { integrity_check?: unknown } | undefined;
       const value = row?.integrity_check;

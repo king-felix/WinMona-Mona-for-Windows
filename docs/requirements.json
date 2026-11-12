@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 296,
+  "revision": 300,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1932,6 +1932,14 @@
               "recorded_utc": "2026-11-12T04:36:57Z",
               "commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
               "note": "P04 lifecycle probe re-run during P07 regression: renderer crash recreates the window, runtime survives, quit-and-stop receipts intact"
+            },
+            {
+              "path": "docs/evidence/P20-failure-matrix.md",
+              "sha256": "a45716324d2f02c8a3d78d093c3b5fd7704db46fcba92640dd36be06135a0a49",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:48:37Z",
+              "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
+              "note": "P20 re-tested renderer crash, lost stream, lost submission response, duplicate replay, corrupt metadata and restore interruption with passing evidence; main hard kill remains composed (P20-ISSUE-001)."
             }
           ]
         },
@@ -1974,7 +1982,7 @@
           ]
         }
       ],
-      "verified_commit": "9a7d1adae587b785ac766c01caf80b3c886ccbbc",
+      "verified_commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2537,6 +2545,14 @@
               "recorded_utc": "2026-11-12T02:23:01Z",
               "commit": "ad74116",
               "note": "P05 evidence recorded at commit ad74116"
+            },
+            {
+              "path": "docs/evidence/P20-failure-matrix.md",
+              "sha256": "a45716324d2f02c8a3d78d093c3b5fd7704db46fcba92640dd36be06135a0a49",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:48:37Z",
+              "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
+              "note": "P20 failure injection at afterPark/afterCopy/beforeReplace leaves the live database intact; restore now stages, verifies and atomically renames, and removes staged sidecars."
             }
           ]
         },
@@ -2586,7 +2602,7 @@
           ]
         }
       ],
-      "verified_commit": "7cd82e908de6eb21accc58e29dd59a2c491f94a9",
+      "verified_commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -2599,7 +2615,7 @@
         "P20",
         "P23"
       ],
-      "status": "partial",
+      "status": "verified",
       "criteria": [
         {
           "id": "renderer-isolation",
@@ -2634,7 +2650,7 @@
         {
           "id": "runtime-auth",
           "description": "Runtime binds loopback with a token that never appears in URLs or renderer state",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-foundation.md",
@@ -2643,13 +2659,21 @@
               "recorded_utc": "2026-11-12T01:41:49Z",
               "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "runtime bearer token handling qualified at P01 and wrapped by the P03 adapter; desktop wiring lands with P04/P07"
+            },
+            {
+              "path": "docs/evidence/P20-security-review.md",
+              "sha256": "e5e447468580b47cab9a4e132af6bab9a13bcd7283c02681e47a8e9d95bfbaae",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:48:37Z",
+              "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
+              "note": "Runtime token not in argv/renderer, loopback bind verified, 401 mapped without token; new IPC audit proves all 67 handled channels reject untrusted senders."
             }
           ]
         },
         {
           "id": "redaction",
           "description": "Secrets are redacted from logs, diagnostics and exports",
-          "status": "partial",
+          "status": "passed",
           "evidence": [
             {
               "path": "docs/evidence/P02-build.txt",
@@ -2658,6 +2682,14 @@
               "recorded_utc": "2026-11-12T01:41:22Z",
               "commit": "8c48ed379dfe4835b80511379c80b5320c1555bb",
               "note": "built renderer scanned for credential material, fixtures and remote origins; diagnostics redaction is P19"
+            },
+            {
+              "path": "docs/evidence/P20-security-review.md",
+              "sha256": "e5e447468580b47cab9a4e132af6bab9a13bcd7283c02681e47a8e9d95bfbaae",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T16:48:38Z",
+              "commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
+              "note": "Logs, settings backups, handoffs and diagnostics redact credentials and home paths; secret scan and bundle check pass."
             }
           ]
         },
@@ -2677,8 +2709,8 @@
           ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "43e99daa8fa232f01d33ecd21e29c161a3e419f7",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {

@@ -1189,3 +1189,39 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Constrains:** a redacted backup restores `[redacted]` placeholders where a
   credential value lived; the user must re-enter the credential through the
   engine's credential store, which Mona does not own.
+## D-0094 - Restore stages, verifies and atomically renames the replacement
+
+- **Decision:** a restore copies the chosen backup to a temporary file beside the
+  live database, verifies its `integrity_check`, removes the live WAL sidecars
+  only after that succeeds, and renames the staged file over the live file.
+  Failures remove the staged file and its sidecars and reopen the original
+  store. The parked pre-restore copy and the backup are never deleted.
+- **Why:** the previous direct copy could leave a partial live database if the
+  process failed between truncate and completion, even though a valid parked
+  copy existed. P20 failure injection at three points proved the new ordering
+  keeps the live data readable and the store usable.
+- **Constrains:** the staged file lives in the database directory, so a full disk
+  can still refuse the restore; the refusal leaves the live database untouched.
+
+## D-0095 - A failed database open closes its handle and preserves the file
+
+- **Decision:** `openDatabase` closes a `DatabaseSync` if pragma setup fails and
+  rethrows the original error. `openState` does not delete, rename or replace a
+  file it cannot open.
+- **Why:** Windows keeps a file locked while a SQLite handle exists, so a corrupt
+  database could not be moved for inspection. P20's corrupt-state test now
+  proves the file is byte-identical and movable after the failed open.
+- **Constrains:** the UI reports local state unavailable and stays inspectable;
+  recovery is a human decision on the preserved file, not an automatic reset.
+
+## D-0096 - One IPC audit test guards every handled channel
+
+- **Decision:** `apps/desktop/src/main/ipc-audit.test.ts` wires all IPC modules
+  with an untrusted sender and a null service, then asserts every handled
+  channel answers `untrusted_sender`. The build check separately enforces the
+  exact preload channel list.
+- **Why:** per-module tests showed the pattern but not that every channel follows
+  it. A central audit makes a missed guard a failing test rather than a review
+  oversight. Event channels are push-only and are not in the handled set.
+- **Constrains:** adding a channel requires updating the checked-in preload list,
+  and the audit fails if the wrapper does not check the sender first.
