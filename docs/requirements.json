@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 131,
+  "revision": 136,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -758,9 +758,9 @@
               "path": "docs/evidence/P06-shots.json",
               "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:15:03Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "Daybreak tokens measured from the shipped stylesheet: 14 pairs pass AA, body ink 15.9:1"
+              "recorded_utc": "2026-11-12T03:15:23Z",
+              "commit": "b026819",
+              "note": "P06 evidence recorded at commit b026819"
             }
           ]
         },
@@ -781,9 +781,9 @@
               "path": "docs/evidence/P06-design.md",
               "sha256": "9c672ce73bddfa913e4e3e93251093cb7b9b525bc0a0452b5987557eef97b794",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:14:50Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "Afterglow measured at the same bar (body 14.4:1, all pairs AA); a Daybreak-overwrite bug was found by inspecting the captures and fixed"
+              "recorded_utc": "2026-11-12T03:15:23Z",
+              "commit": "b026819",
+              "note": "P06 evidence recorded at commit b026819"
             }
           ]
         },
@@ -804,9 +804,9 @@
               "path": "docs/evidence/P06-shots.json",
               "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:14:50Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "real keyboard traversal: 14 focus stops per theme/density, focus rule ships and paints, zero unnamed controls, zero duplicate ids"
+              "recorded_utc": "2026-11-12T03:15:23Z",
+              "commit": "b026819",
+              "note": "P06 evidence recorded at commit b026819"
             }
           ]
         },
@@ -827,14 +827,14 @@
               "path": "docs/design-system.md",
               "sha256": "1a9dd51bc773dadb1313d7e7c0b2c3894510992a5d1fc5b0ace13c30d35f5bc0",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:14:50Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "compact and comfortable share one information architecture; reduced-motion zeroes all durations and the skeleton animation"
+              "recorded_utc": "2026-11-12T03:15:23Z",
+              "commit": "b026819",
+              "note": "P06 evidence recorded at commit b026819"
             }
           ]
         }
       ],
-      "verified_commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
+      "verified_commit": "b026819",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1974,9 +1974,9 @@
               "path": "docs/evidence/P06-shots.json",
               "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
               "kind": "document",
-              "recorded_utc": "2026-11-12T03:14:50Z",
-              "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732",
-              "note": "core harness flows reachable by Tab alone; dialogs/menus/tabs have explicit arrow, Escape and focus-restoration tests"
+              "recorded_utc": "2026-11-12T03:15:23Z",
+              "commit": "b026819",
+              "note": "P06 evidence recorded at commit b026819"
             }
           ]
         }

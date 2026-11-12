@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 22,
+  "revision": 23,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -416,50 +416,50 @@
           "path": "docs/evidence/P06-design.md",
           "sha256": "9c672ce73bddfa913e4e3e93251093cb7b9b525bc0a0452b5987557eef97b794",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:22Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/evidence/P06-shots.json",
           "sha256": "e8ed393a21c6d5098f99c1c7bf025f967367afcf2c94ecd22277bccb1392f060",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/evidence/P06-shots-log.txt",
           "sha256": "0a61a901a73829bb6d8f3eca422b7ef760cfb82894f688575e60ece89881204a",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/evidence/P06-tests.txt",
           "sha256": "b55551418cb2f2e8fe29414c2d6fca544380ba145a131003521e17bd5cdbbf36",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/evidence/P06-checks.txt",
           "sha256": "4b98e3bb93de19669f4899948f40647a1ef8a296a6a14a537225a9346b827075",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/evidence/P06-build.txt",
           "sha256": "06fca662a1914cc93db78cb0f6aba0bd3a7b57465c3092d36d9c2ac48c7c3c28",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         },
         {
           "path": "docs/design-system.md",
           "sha256": "1a9dd51bc773dadb1313d7e7c0b2c3894510992a5d1fc5b0ace13c30d35f5bc0",
           "kind": "document",
-          "recorded_utc": "2026-11-12T03:15:03Z",
-          "commit": "b3cafc3925c6b17f96013d87dc068471ed38c732"
+          "recorded_utc": "2026-11-12T03:15:23Z",
+          "commit": "b026819041ffd26c611f7d360d49e6a5adabe4c9"
         }
       ],
       "blocker_ids": []
@@ -689,5 +689,5 @@
   "next_eligible_prompts": [
     "P07"
   ],
-  "last_checkpoint_utc": "2026-11-12T03:15:03Z"
+  "last_checkpoint_utc": "2026-11-12T03:15:23Z"
 }
