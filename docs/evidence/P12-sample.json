@@ -1,0 +1,140 @@
+{
+  "prompt": "P12",
+  "generatedUtc": "2026-11-12T07:45:55.241Z",
+  "providerRequests": 0,
+  "csvPath": "docs\\evidence\\P12-cost-export.csv",
+  "steps": [
+    {
+      "name": "rate card",
+      "detail": {
+        "id": "rate_4d162e04414744b7b9bb0788c6397fe5",
+        "provider": "deepseek",
+        "model": "deepseek-flash",
+        "currency": "USD",
+        "unitTokens": 1000000,
+        "cacheHitMicros": 28000,
+        "cacheMissMicros": 280000,
+        "outputMicros": 420000,
+        "reasoningMicros": null,
+        "source": "P12 sample rate revision",
+        "sourceUrl": null,
+        "revision": "sample-2026-11-01",
+        "effectiveFrom": "2026-11-01T00:00:00.000Z",
+        "recordedAt": "2026-11-12T07:45:55.226Z"
+      }
+    },
+    {
+      "name": "ingest",
+      "detail": {
+        "providerReportedMicros": 1234,
+        "estimatedMicros": 798,
+        "estimatedRevision": "sample-2026-11-01",
+        "duplicateRefused": true,
+        "unknownIsNull": true
+      }
+    },
+    {
+      "name": "budget",
+      "detail": {
+        "id": "bdg_0d9c6d2f59ab41dcad1aaf123edf37b6",
+        "projectId": "prj_2d4c09f060eb49bd9c0b4e5884e89df9",
+        "scope": "project",
+        "sessionId": null,
+        "limitMicros": 50000,
+        "warnMicros": 4000,
+        "stopMicros": 5000,
+        "createdAt": "2026-11-12T07:45:55.237Z",
+        "updatedAt": "2026-11-12T07:45:55.237Z"
+      }
+    },
+    {
+      "name": "evaluation",
+      "detail": {
+        "action": "allow",
+        "decisions": [
+          {
+            "budgetId": "bdg_0d9c6d2f59ab41dcad1aaf123edf37b6",
+            "scope": "project",
+            "sessionId": null,
+            "action": "allow",
+            "limitMicros": 50000,
+            "warnAtMicros": 4000,
+            "stopAtMicros": 5000,
+            "spentMicros": 2032,
+            "reservedMicros": 0,
+            "projectedMicros": 2032,
+            "unknownRecords": 1,
+            "detail": "projected 2032 microUSD is below the 4000 warning threshold"
+          }
+        ],
+        "disclosure": "This is a local dispatch limit computed from recorded usage and reservations, not a provider invoice cap. In-flight requests may complete after a stop request and may overshoot the limit."
+      }
+    },
+    {
+      "name": "lens totals",
+      "detail": {
+        "records": 3,
+        "providerReportedMicros": 1234,
+        "estimatedMicros": 798,
+        "knownMicros": 2032,
+        "unknownRecords": 1,
+        "unknownReasons": [
+          {
+            "reason": "provider did not report complete usage",
+            "count": 1
+          }
+        ],
+        "tokens": {
+          "cacheHit": 2010,
+          "cacheMiss": 4010,
+          "input": null,
+          "output": 1010,
+          "reasoning": null
+        },
+        "latestRecordedAt": "2026-11-12T07:45:55.234Z"
+      }
+    },
+    {
+      "name": "by session",
+      "detail": [
+        {
+          "sessionId": "ses_p12",
+          "totals": {
+            "records": 3,
+            "providerReportedMicros": 1234,
+            "estimatedMicros": 798,
+            "knownMicros": 2032,
+            "unknownRecords": 1,
+            "unknownReasons": [
+              {
+                "reason": "provider did not report complete usage",
+                "count": 1
+              }
+            ],
+            "tokens": {
+              "cacheHit": 2010,
+              "cacheMiss": 4010,
+              "input": null,
+              "output": 1010,
+              "reasoning": null
+            },
+            "latestRecordedAt": "2026-11-12T07:45:55.234Z"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rate freshness",
+      "detail": [
+        {
+          "provider": "deepseek",
+          "model": "deepseek-flash",
+          "revision": "sample-2026-11-01",
+          "effectiveFrom": "2026-11-01T00:00:00.000Z",
+          "recordedAt": "2026-11-12T07:45:55.226Z",
+          "source": "P12 sample rate revision"
+        }
+      ]
+    }
+  ]
+}

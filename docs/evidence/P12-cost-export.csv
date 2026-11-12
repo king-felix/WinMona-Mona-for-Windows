@@ -1,0 +1,4 @@
+recorded_at,thread_id,turn_id,task_id,provider,model,cache_hit_tokens,cache_miss_tokens,input_tokens,output_tokens,reasoning_tokens,cost_micros,cost_usd,cost_label,rate_revision,unknown_reason
+"2026-11-12T07:45:55.228Z","thr_p12_sample","turn_reported","tsk_16d6a6d1441f443e9e5958aed322e540","deepseek","deepseek-flash","1000","2000","","500","","1234","0.001234","provider-reported","",""
+"2026-11-12T07:45:55.231Z","thr_p12_sample","turn_estimated","tsk_16d6a6d1441f443e9e5958aed322e540","deepseek","deepseek-flash","1000","2000","","500","","798","0.000798","locally-estimated","sample-2026-11-01",""
+"2026-11-12T07:45:55.234Z","thr_p12_sample","turn_unknown","","deepseek","deepseek-flash","10","10","","10","","","","unknown (provider did not report complete usage)","","provider did not report complete usage"

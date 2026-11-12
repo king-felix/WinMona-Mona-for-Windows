@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "revision": 34,
+  "revision": 41,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
   "prompt_file_sha256": "ee5bb80e55dd96649e0ac74856744aec6c13400b87ccf726f02ed894b5bc7086",
-  "current_prompt": "P11",
+  "current_prompt": "P14",
   "last_verified_commit": null,
   "tasks": {
     "P00": {
@@ -748,36 +748,216 @@
       "blocker_ids": []
     },
     "P11": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-011",
         "MONA-012"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "schema v4: problems + problem_transitions, attempts extended with attempt_no, progress_reason, actor",
+        "stable problem id from project + symptom fingerprint; two counters with evidence-gated reset",
+        "third no-progress attempt blocks with required help; fourth attempt refused not_eligible",
+        "dependency-block propagation with blockedByProblemIds; independent work stays eligible",
+        "task claim/resume/dispatch guards; blocker-paused queue state and released transition",
+        "native-owned pause returns partial; enforcement-boundary document written",
+        "6 attempt tests plus a 12-step sample run with zero provider requests"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P11-attempts.md",
+          "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-attempts-report.md",
+          "sha256": "12ec5525d7a155a45716e47375f41e4c8880d7ec76a06c2068c6b1e525d6e1b9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-sample.json",
+          "sha256": "dd50ec34379d89e7ea5e80782e843e72609e7815617a1ceeb63fcfb6c56998b9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-gates.txt",
+          "sha256": "839636edf7636230e1a2ec918ee804a73a6ed83d7fa70d2c816c80831fa58ec1",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-checks.txt",
+          "sha256": "70be266bdd6c8426a8c59fceeaa8d9830252b85807f49b497b47d6673a156788",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-build.txt",
+          "sha256": "fe06abf6315cce4c19ee10d2806d041fc53060c15e8cd4ec5c348ceecfd7c73a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:31Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        }
+      ],
       "blocker_ids": []
     },
     "P12": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-003",
         "MONA-013"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "schema v5: usage record origins, rate_cards, budgets, reservations, budget events",
+        "CostLedger: ingest with dedupe, three cost origins, per-turn/task/session views, CSV export",
+        "estimateCost exact microUSD arithmetic for disjoint, inclusive and separately-billed reasoning buckets",
+        "append-only rate revisions with an explicit read-only recalculation view",
+        "optional session/project/day budgets with warn and stop, reservations and a disclosure string",
+        "studio submit gated by budgets; zero-inference boundary test asserts no thread open or submission"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P12-costs-adr.md",
+          "sha256": "a54eeaca5ffdcabd07017b04abdfe42d7c04d0c6d31bc41d53f438d11d32093d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:50:03Z",
+          "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657"
+        },
+        {
+          "path": "docs/evidence/P12-costs.md",
+          "sha256": "dbb48492a672cbb9c8ed0c98ef842e6aeb9caad337bfd58bffe0639bbd1fd565",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:50:03Z",
+          "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657"
+        },
+        {
+          "path": "docs/evidence/P12-sample.json",
+          "sha256": "c733c993e8e4faec679134c90e5ac8cebb60d4f540abf7cb825bb86695a9fe3e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:50:03Z",
+          "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657"
+        },
+        {
+          "path": "docs/evidence/P12-cost-export.csv",
+          "sha256": "d59dadcbb104388b8352d4cbe5fb76044156660d3967dfd70aa48aaad7d60536",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:50:03Z",
+          "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657"
+        }
+      ],
       "blocker_ids": []
     },
     "P13": {
-      "status": "pending",
+      "status": "completed",
       "requirements": [
         "MONA-014",
         "MONA-015"
       ],
-      "completed_steps": [],
+      "completed_steps": [
+        "schema v6: change baselines, test receipts, restore receipts",
+        "ChangeService baselines and change reports with tool_recorded vs unattributed attribution",
+        "Git service: porcelain status, worktree detection, pathspec commit, bounded text diff",
+        "hash-guarded writeFileFresh and restore preview/refusal/applied with receipts",
+        "test receipts link command, exit code, commit and a bounded output artifact",
+        "non-Git behaviour stated honestly; no second snapshot engine",
+        "10 change/git tests plus a Git sample run with zero provider requests"
+      ],
       "remaining_steps": [],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/P13-review.md",
+          "sha256": "a754124b955d056113d276ffd3e88e89f195e59f9eefd8d434f0d83f73fd9cce",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P13-sample.json",
+          "sha256": "2b21871a6098b33e5a1cc2c9b42a3c086e512360c4c061ae4c20a9ca9d07630c",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-gates.txt",
+          "sha256": "839636edf7636230e1a2ec918ee804a73a6ed83d7fa70d2c816c80831fa58ec1",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-checks.txt",
+          "sha256": "70be266bdd6c8426a8c59fceeaa8d9830252b85807f49b497b47d6673a156788",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-13-build.txt",
+          "sha256": "fe06abf6315cce4c19ee10d2806d041fc53060c15e8cd4ec5c348ceecfd7c73a",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-attempts.md",
+          "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-attempts-report.md",
+          "sha256": "12ec5525d7a155a45716e47375f41e4c8880d7ec76a06c2068c6b1e525d6e1b9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P11-sample.json",
+          "sha256": "dd50ec34379d89e7ea5e80782e843e72609e7815617a1ceeb63fcfb6c56998b9",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P12-costs-adr.md",
+          "sha256": "a54eeaca5ffdcabd07017b04abdfe42d7c04d0c6d31bc41d53f438d11d32093d",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P12-costs.md",
+          "sha256": "dbb48492a672cbb9c8ed0c98ef842e6aeb9caad337bfd58bffe0639bbd1fd565",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P12-sample.json",
+          "sha256": "c733c993e8e4faec679134c90e5ac8cebb60d4f540abf7cb825bb86695a9fe3e",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        },
+        {
+          "path": "docs/evidence/P12-cost-export.csv",
+          "sha256": "d59dadcbb104388b8352d4cbe5fb76044156660d3967dfd70aa48aaad7d60536",
+          "kind": "document",
+          "recorded_utc": "2026-11-12T07:52:36Z",
+          "commit": "6411ea1102a0b766ec566d8cc0c25293a29c1403"
+        }
+      ],
       "blocker_ids": []
     },
     "P14": {
@@ -923,9 +1103,9 @@
     }
   },
   "next_eligible_prompts": [
-    "P11",
-    "P12",
-    "P13"
+    "P14",
+    "P15",
+    "P16"
   ],
-  "last_checkpoint_utc": "2026-11-12T07:19:06Z"
+  "last_checkpoint_utc": "2026-11-12T07:52:36Z"
 }

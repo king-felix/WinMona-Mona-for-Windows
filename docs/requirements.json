@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 203,
+  "revision": 230,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -583,6 +583,14 @@
               "recorded_utc": "2026-11-12T01:02:19Z",
               "commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
               "note": "5s idle, discovery, thread create, history, event reconnect all moved zero tokens"
+            },
+            {
+              "path": "docs/evidence/P12-costs.md",
+              "sha256": "dbb48492a672cbb9c8ed0c98ef842e6aeb9caad337bfd58bffe0639bbd1fd565",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:48Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "studio view/pause/resume and a refused budget submit drove zero thread opens and zero submissions against the fake adapter"
             }
           ]
         },
@@ -617,7 +625,7 @@
           ]
         }
       ],
-      "verified_commit": "a94a9759a5af0eccae3b329f813427c3100cf13c",
+      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1364,35 +1372,87 @@
         "P11",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "counter",
           "description": "Attempts and consecutive no-progress counts are recorded per stable problem ID",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:39Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "stable problem id derived from project + symptom fingerprint; append-only attempt rows; two counters"
+            }
+          ]
         },
         {
           "id": "stop-at-three",
           "description": "A third no-progress attempt blocks the problem and records required help",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P11-sample.json",
+              "sha256": "dd50ec34379d89e7ea5e80782e843e72609e7815617a1ceeb63fcfb6c56998b9",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:47Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "third no-progress attempt blocks with recorded help_needed; the fourth recordAttempt is refused not_eligible"
+            },
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:47Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "block transition and fourth-attempt refusal are described with their call sites"
+            }
+          ]
         },
         {
           "id": "persistence-across-restart",
           "description": "Attempt counts survive restart and are never silently reset",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P11-sample.json",
+              "sha256": "dd50ec34379d89e7ea5e80782e843e72609e7815617a1ceeb63fcfb6c56998b9",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:47Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "a second AttemptService on the same database reads total 2 / consecutive 2; acknowledge leaves both unchanged"
+            },
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:47Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "counters live in SQLite rows; acknowledgement writes a same-status audit transition only"
+            }
+          ]
         },
         {
           "id": "engine-boundary",
           "description": "The enforcement boundary for engine-internal retries is stated, not overstated",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:48Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "mechanical vs cooperative vs unobservable boundaries stated; nested engine loops are cooperative only"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1427,6 +1487,22 @@
               "recorded_utc": "2026-11-12T06:12:06Z",
               "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
               "note": "the studio control strip pauses the queue after the running turn; the next submit is refused until Resume (unit + live control strip)"
+            },
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:48Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "pause-after-task stops the next start; a native-owned run returns outcome partial instead of claiming a stop"
+            },
+            {
+              "path": "docs/evidence/P11-sample.json",
+              "sha256": "dd50ec34379d89e7ea5e80782e843e72609e7815617a1ceeb63fcfb6c56998b9",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:48Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "bloker-paused queue refuses starts and resume until releaseProblem with the matching problem id"
             }
           ]
         },
@@ -1503,11 +1579,19 @@
               "recorded_utc": "2026-11-12T06:12:07Z",
               "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
               "note": "an engine stop during a turn becomes failed/outcome-uncertain; an approval wait is labeled and interruptible, never a silent spinner"
+            },
+            {
+              "path": "docs/evidence/P11-attempts.md",
+              "sha256": "6da6a910a6d902b47667d4fc1dde71fdc1c99bf46a1b9b2ae5f2b3dcb4d2b5fe",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:48Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "partial and outcome_unknown receipts keep their detail; rollback is never claimed"
             }
           ]
         }
       ],
-      "verified_commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
+      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1519,41 +1603,118 @@
         "P12",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "usage-attribution",
           "description": "Usage is attributed by thread, turn and task without double counting",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P12-costs.md",
+              "sha256": "dbb48492a672cbb9c8ed0c98ef842e6aeb9caad337bfd58bffe0639bbd1fd565",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "per turn/task/session views; dedupe_key unique index; parent aggregates excluded from totals"
+            },
+            {
+              "path": "docs/evidence/P12-cost-export.csv",
+              "sha256": "d59dadcbb104388b8352d4cbe5fb76044156660d3967dfd70aa48aaad7d60536",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "three attributed records with distinct origins and task ids"
+            }
+          ]
         },
         {
           "id": "cache-evidence",
           "description": "Cache hit/miss evidence is shown only when the provider reports it",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P12-costs-adr.md",
+              "sha256": "a54eeaca5ffdcabd07017b04abdfe42d7c04d0c6d31bc41d53f438d11d32093d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "disjoint and inclusive cache semantics defined; cache evidence shown only when reported; missing cache buckets stay unknown"
+            }
+          ]
         },
         {
           "id": "unknown-handling",
           "description": "Missing price or usage is visibly unknown",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P12-costs-adr.md",
+              "sha256": "a54eeaca5ffdcabd07017b04abdfe42d7c04d0c6d31bc41d53f438d11d32093d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "unknown is a stored value with a reason and no cost; never summed as zero"
+            },
+            {
+              "path": "docs/evidence/P12-sample.json",
+              "sha256": "c733c993e8e4faec679134c90e5ac8cebb60d4f540abf7cb825bb86695a9fe3e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "the unknown ingest stores cost null with reason provider"
+            }
+          ]
         },
         {
           "id": "budgets",
           "description": "Optional budgets warn before dispatch and disclose their enforcement limit",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P12-costs-adr.md",
+              "sha256": "a54eeaca5ffdcabd07017b04abdfe42d7c04d0c6d31bc41d53f438d11d32093d",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:49Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "optional session/project/day budgets with warn and stop thresholds and a disclosure string"
+            },
+            {
+              "path": "docs/evidence/P12-sample.json",
+              "sha256": "c733c993e8e4faec679134c90e5ac8cebb60d4f540abf7cb825bb86695a9fe3e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:50Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "project budget evaluated with reservations; action and disclosure recorded"
+            }
+          ]
         },
         {
           "id": "export",
           "description": "Cost export labels provider-reported versus locally estimated figures",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P12-sample.json",
+              "sha256": "c733c993e8e4faec679134c90e5ac8cebb60d4f540abf7cb825bb86695a9fe3e",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:50Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "CSV export path recorded alongside the ledger totals"
+            },
+            {
+              "path": "docs/evidence/P12-cost-export.csv",
+              "sha256": "d59dadcbb104388b8352d4cbe5fb76044156660d3967dfd70aa48aaad7d60536",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:50Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "every row labeled provider-reported, locally-estimated or unknown (reason)"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {
@@ -1585,6 +1746,14 @@
               "recorded_utc": "2026-11-12T06:12:07Z",
               "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
               "note": "live run changed hello.txt, ran node check.mjs (exit 0, MONA_STUDIO_CHECK_PASS), and the outcome card names the changed path"
+            },
+            {
+              "path": "docs/evidence/P13-sample.json",
+              "sha256": "2b21871a6098b33e5a1cc2c9b42a3c086e512360c4c061ae4c20a9ca9d07630c",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:50Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "test receipt links command, exit 0, output digest and commit"
             }
           ]
         },
@@ -1600,6 +1769,14 @@
               "recorded_utc": "2026-11-12T06:12:07Z",
               "commit": "6350c416456d0dbc18330c95946e2c2b94a57ff5",
               "note": "tool cards carry the runtime's own tool input; the outcome names cost source and changed paths; usage rows name their engine pricing source"
+            },
+            {
+              "path": "docs/evidence/P13-review.md",
+              "sha256": "a754124b955d056113d276ffd3e88e89f195e59f9eefd8d434f0d83f73fd9cce",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:50Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "tool_recorded vs unattributed attribution from recorded tool paths; no timing inference"
             }
           ]
         },
@@ -1631,35 +1808,87 @@
         "P13",
         "P23"
       ],
-      "status": "pending",
+      "status": "verified",
       "criteria": [
         {
           "id": "git-awareness",
           "description": "Branch, status and worktree state are read from the real repository",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P13-sample.json",
+              "sha256": "2b21871a6098b33e5a1cc2c9b42a3c086e512360c4c061ae4c20a9ca9d07630c",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:51Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "branch, head, staged/unstaged/untracked and worktree facts read from a real repository"
+            }
+          ]
         },
         {
           "id": "selected-commits",
           "description": "Only explicitly selected changes are committed",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P13-sample.json",
+              "sha256": "2b21871a6098b33e5a1cc2c9b42a3c086e512360c4c061ae4c20a9ca9d07630c",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:51Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "git commit -- <paths> committed only b.txt and left the user staged a.txt in the index"
+            },
+            {
+              "path": "docs/evidence/P13-review.md",
+              "sha256": "a754124b955d056113d276ffd3e88e89f195e59f9eefd8d434f0d83f73fd9cce",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:51Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "pathspec commit keeps unrelated staged work out of the agent commit"
+            }
+          ]
         },
         {
           "id": "non-git",
           "description": "Projects without Git remain usable",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P13-review.md",
+              "sha256": "a754124b955d056113d276ffd3e88e89f195e59f9eefd8d434f0d83f73fd9cce",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:51Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "non-Git folders stay usable: status none, no textual baseline, commit refused, no snapshot engine invented"
+            }
+          ]
         },
         {
           "id": "restore",
           "description": "Restore refuses conflicting scope and never destroys later user work",
-          "status": "pending",
-          "evidence": []
+          "status": "passed",
+          "evidence": [
+            {
+              "path": "docs/evidence/P13-sample.json",
+              "sha256": "2b21871a6098b33e5a1cc2c9b42a3c086e512360c4c061ae4c20a9ca9d07630c",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:51Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "restore refused on a stale hash and applied only after the expected hash matched"
+            },
+            {
+              "path": "docs/evidence/P13-review.md",
+              "sha256": "a754124b955d056113d276ffd3e88e89f195e59f9eefd8d434f0d83f73fd9cce",
+              "kind": "document",
+              "recorded_utc": "2026-11-12T07:49:52Z",
+              "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+              "note": "restore refuses staged, conflicted, untracked and changed-after-preview scope; non-Git scope explained"
+            }
+          ]
         }
       ],
-      "verified_commit": null,
-      "tested_environment": null,
+      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+      "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
     {

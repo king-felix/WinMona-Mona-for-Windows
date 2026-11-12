@@ -9,7 +9,7 @@ import {
   type ParsedEngineEvent,
   type UsageEvidence,
 } from '@mona/contracts';
-import type { ProjectStore, StudioThreadRow, TimelineItemRow } from '@mona/project-state';
+import type { CostLedger, ProjectStore, StudioThreadRow, TimelineItemRow } from '@mona/project-state';
 import { z } from 'zod';
 import type { EngineSummary } from './engine-host.js';
 import type {
@@ -41,6 +41,10 @@ export type StudioServiceDeps = {
   /** Minimum interval between streaming body writes to the database. */
   flushIntervalMs?: number;
   pickReferences?: (project: { id: string; canonicalPath: string }) => Promise<string[] | null>;
+  /** True when a native workflow is independently dispatching work for this project. */
+  nativeDispatcherActive?: (projectId: string) => boolean;
+  /** Optional ledger: budgets gate the next dispatch, never mid-flight work. */
+  costs?: CostLedger;
 };
 
 type Success<T> = { ok: true; data: T };
@@ -173,6 +177,8 @@ export class StudioService {
   private readonly maxItemChars: number;
   private readonly flushIntervalMs: number;
   private readonly pickReferences: StudioServiceDeps['pickReferences'];
+  private readonly nativeDispatcherActive: StudioServiceDeps['nativeDispatcherActive'];
+  private readonly costs: StudioServiceDeps['costs'];
   private readonly states = new Map<string, ProjectState>();
 
   constructor(deps: StudioServiceDeps) {
@@ -183,6 +189,8 @@ export class StudioService {
     this.maxItemChars = deps.maxItemChars ?? DEFAULT_MAX_ITEM_CHARS;
     this.flushIntervalMs = deps.flushIntervalMs ?? DEFAULT_FLUSH_MS;
     this.pickReferences = deps.pickReferences;
+    this.nativeDispatcherActive = deps.nativeDispatcherActive;
+    this.costs = deps.costs;
   }
 
   async view(projectId: string, sessionId: string, mode?: StudioMode): Promise<ServiceResult<StudioView>> {
@@ -289,11 +297,42 @@ export class StudioService {
         ),
       };
     }
+    if (state.queue.snapshot().blocked) {
+      const blocked = state.queue.snapshot().blocked;
+      return {
+        ok: false,
+        error: errorResult(
+          'invalid_request',
+          `Dispatch is blocked by problem ${blocked?.problemId ?? 'unknown'}. Record new evidence or a Victor decision first.`,
+        ),
+      };
+    }
     if (state.queue.snapshot().pauseRequested) {
       return {
         ok: false,
         error: errorResult('invalid_request', 'The queue is paused after the last task. Resume to send new work.'),
       };
+    }
+    if (this.costs) {
+      const budget = await this.costs.evaluateBudget({ projectId: input.projectId, sessionId: input.sessionId });
+      if (budget.action === 'block_next_dispatch') {
+        const detail = budget.decisions
+          .filter((decision) => decision.action === 'block_next_dispatch')
+          .map((decision) => decision.detail)
+          .join('; ');
+        return {
+          ok: false,
+          error: errorResult(
+            'invalid_request',
+            'The configured cost budget stops the next dispatch. In-flight work is not interrupted.',
+            false,
+            detail || undefined,
+          ),
+        };
+      }
+      if (budget.action === 'warn') {
+        this.diagnostic(state, `budget warning: ${budget.decisions.map((decision) => decision.detail).join('; ')}`);
+      }
     }
 
     state.run = {
@@ -382,7 +421,13 @@ export class StudioService {
       const task = state.queue.enqueue({ taskId: receipt.submissionId, label: text.slice(0, 80) });
       const next = state.queue.startNext();
       if (next) {
-        state.queue.markActive({ taskId: task.taskId, threadId, turnId: receipt.turnId, label: task.label });
+        state.queue.markActive({
+          taskId: task.taskId,
+          threadId,
+          turnId: receipt.turnId,
+          label: task.label,
+          owner: 'mona_queue',
+        });
       }
     }
     this.maybeSubscribe(state, project.canonicalPath, adapter);
@@ -446,8 +491,39 @@ export class StudioService {
     if (!state) {
       return { ok: false, error: errorResult('not_found', 'No studio session is open for that project.') };
     }
-    const receipt = state.queue.pauseAfterTask();
-    this.diagnostic(state, `pause after task: ${receipt.outcome}`);
+    const receipt = state.queue.pauseAfterTask({
+      nativeDispatcherActive: this.nativeDispatcherActive?.(projectId) === true,
+    });
+    this.diagnostic(state, `pause after task: ${receipt.outcome}${receipt.detail ? ` (${receipt.detail})` : ''}`);
+    if (receipt.outcome === 'partial') {
+      state.run = { ...state.run, detail: receipt.detail ?? state.run.detail };
+    }
+    this.pushState(state);
+    return { ok: true, data: { run: state.run, control: this.controlFor(state) } };
+  }
+
+  /** Blocker-paused: refuse new starts until the problem reopens with evidence. */
+  blockOnProblem(
+    projectId: string,
+    input: { problemId: string; taskId?: string | null; detail: string },
+  ): ServiceResult<{ run: StudioRun; control: StudioControl }> {
+    const state = this.findState(projectId);
+    if (!state) {
+      return { ok: false, error: errorResult('not_found', 'No studio session is open for that project.') };
+    }
+    const receipt = state.queue.blockOnProblem(input);
+    this.diagnostic(state, `blocked: ${input.problemId} (${receipt.outcome})`);
+    this.pushState(state);
+    return { ok: true, data: { run: state.run, control: this.controlFor(state) } };
+  }
+
+  releaseProblem(projectId: string, problemId: string): ServiceResult<{ run: StudioRun; control: StudioControl }> {
+    const state = this.findState(projectId);
+    if (!state) {
+      return { ok: false, error: errorResult('not_found', 'No studio session is open for that project.') };
+    }
+    const receipt = state.queue.releaseProblem(problemId);
+    this.diagnostic(state, `release ${problemId}: ${receipt.outcome}`);
     this.pushState(state);
     return { ok: true, data: { run: state.run, control: this.controlFor(state) } };
   }
@@ -1267,6 +1343,9 @@ export class StudioService {
       queueState: snapshot.state,
       lastOutcome: snapshot.lastOutcome,
       interrupt: state.interrupt,
+      blockedProblem: snapshot.blocked
+        ? { problemId: snapshot.blocked.problemId, taskId: snapshot.blocked.taskId, detail: snapshot.blocked.detail }
+        : null,
     };
   }
 

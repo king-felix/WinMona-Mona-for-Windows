@@ -1,0 +1,165 @@
+{
+  "prompt": "P13",
+  "generatedUtc": "2026-11-12T07:46:08.431Z",
+  "providerRequests": 0,
+  "steps": [
+    {
+      "name": "repository",
+      "detail": {
+        "kind": "git",
+        "unavailableReason": null,
+        "branch": "main",
+        "head": "8ffb71c",
+        "worktreeOf": null,
+        "staged": [],
+        "unstaged": [],
+        "untracked": [],
+        "conflicts": []
+      }
+    },
+    {
+      "name": "baseline",
+      "detail": {
+        "id": "bsl_50339a7df75a495c96170847a94c2def",
+        "fileCount": 2
+      }
+    },
+    {
+      "name": "change report",
+      "detail": {
+        "baseline": {
+          "id": "bsl_50339a7df75a495c96170847a94c2def",
+          "label": "task start",
+          "capturedAt": "2026-11-12T07:46:06.201Z",
+          "fileCount": 2,
+          "truncated": false
+        },
+        "counts": {
+          "added": 1,
+          "modified": 2,
+          "deleted": 0,
+          "toolRecorded": 2,
+          "unattributed": 1
+        },
+        "changes": [
+          {
+            "path": "a.txt",
+            "change": "modified",
+            "attribution": "unattributed",
+            "bytes": 14,
+            "binary": false,
+            "preview": "text"
+          },
+          {
+            "path": "b.txt",
+            "change": "modified",
+            "attribution": "tool_recorded",
+            "bytes": 15,
+            "binary": false,
+            "preview": "text"
+          },
+          {
+            "path": "new.txt",
+            "change": "added",
+            "attribution": "tool_recorded",
+            "bytes": 15,
+            "binary": false,
+            "preview": "text"
+          }
+        ],
+        "attributionNote": "Only paths recorded by tool events are labeled tool_recorded. Everything else is an unattributed workspace change; pre-existing user edits were already in the baseline and are not shown as agent work."
+      }
+    },
+    {
+      "name": "text diff",
+      "detail": {
+        "path": "b.txt",
+        "available": true,
+        "text": "diff --git a/b.txt b/b.txt\nindex 62721e7..1037198 100644\n--- a/b.txt\n+++ b/b.txt\n@@ -1 +1 @@\n-b committed\n+b agent change\n",
+        "truncated": false,
+        "reason": null
+      }
+    },
+    {
+      "name": "selected commit",
+      "detail": {
+        "committed": true,
+        "commit": "5bd0dbc",
+        "detail": "[main 5bd0dbc] P13 sample: change b only\n 1 file changed, 1 insertion(+), 1 deletion(-)"
+      }
+    },
+    {
+      "name": "status after selected commit",
+      "detail": {
+        "branch": "main",
+        "staged": [
+          "a.txt"
+        ],
+        "unstaged": [],
+        "untracked": [
+          "new.txt"
+        ]
+      }
+    },
+    {
+      "name": "test receipt",
+      "detail": {
+        "id": "tst_3df941bd98b141cbbf747fcde1abe38c",
+        "projectId": "prj_ea5de59681544e03a0c6ccd1539f2720",
+        "taskId": null,
+        "command": "node check.mjs",
+        "exitCode": 0,
+        "outcome": "passed",
+        "startedAt": null,
+        "finishedAt": null,
+        "durationMs": null,
+        "commit": "5bd0dbc",
+        "outputPath": null,
+        "outputSha256": "2517b43161c2ef84e4bb1a4b5e9789846753776fb6f9aeda42db15c1a896f3ae",
+        "outputBytes": 20,
+        "outputTruncated": false,
+        "createdAt": "2026-11-12T07:46:07.270Z"
+      }
+    },
+    {
+      "name": "restore preview",
+      "detail": {
+        "scope": [
+          "b.txt"
+        ],
+        "excluded": [],
+        "conflicts": [],
+        "current": [
+          {
+            "path": "b.txt",
+            "sha256": "7d643c280e63e7ac3220c8ce5946ebb149bafd3aa21057d5b026cd235ad93af3"
+          }
+        ],
+        "head": "5bd0dbc",
+        "unsupported": []
+      }
+    },
+    {
+      "name": "restore refused",
+      "detail": {
+        "outcome": "refused",
+        "restored": [],
+        "detail": "b.txt changed since the preview; refusing to overwrite later work"
+      }
+    },
+    {
+      "name": "restore applied",
+      "detail": {
+        "outcome": "applied",
+        "restored": [
+          "b.txt"
+        ],
+        "detail": "restored the previewed paths to HEAD"
+      }
+    },
+    {
+      "name": "content after restore",
+      "detail": "b agent change"
+    }
+  ]
+}

@@ -160,7 +160,11 @@ export type TaskEligibility = {
   eligible: boolean;
   reason: string;
   checks: EligibilityCheck[];
+  /** Problems that block this task directly, or through a prerequisite. */
+  blockedByProblemIds: string[];
 };
+
+type ProblemBlocker = { problemId: string; title: string };
 
 export type TaskBoardEntry = {
   task: WorkTask;
@@ -546,12 +550,13 @@ export class TaskService {
         .all(projectId) as Array<{ id: string }>;
       const tasks = rows.map((row) => this.loadTask(db, row.id)).filter((task): task is WorkTask => task !== null);
       const statuses = new Map(tasks.map((task) => [task.id, task.status] as const));
+      const blocked = this.blockedProblemMap(db, projectId);
       const entries: TaskBoardEntry[] = tasks.map((task) => ({
         task,
-        eligibility: this.eligibilityFor(task, project.canonical_path, statuses, 'mona_queue'),
+        eligibility: this.eligibilityFor(task, project.canonical_path, statuses, 'mona_queue', blocked),
       }));
       const eligible = entries.filter((entry) => entry.eligibility.eligible).map((entry) => entry.task.id);
-      const next = this.selectNext(tasks, project.canonical_path, 'mona_queue')?.id ?? null;
+      const next = this.selectNext(tasks, project.canonical_path, 'mona_queue', blocked)?.id ?? null;
       return { projectId, generatedAt: this.now().toISOString(), tasks: entries, eligible, next };
     });
   }
@@ -571,10 +576,14 @@ export class TaskService {
       if (!project) throw stateError('not_found', `project ${projectId} does not exist`);
       const tasks = this.tasksForProject(db, projectId);
       const owner = options.owner ?? 'mona_queue';
-      const task = this.selectNext(tasks, project.canonical_path, owner);
+      const blocked = this.blockedProblemMap(db, projectId);
+      const task = this.selectNext(tasks, project.canonical_path, owner, blocked);
       if (!task) return null;
       const statuses = new Map(tasks.map((entry) => [entry.id, entry.status] as const));
-      return { task, eligibility: this.eligibilityFor(task, project.canonical_path, statuses, owner) };
+      return {
+        task,
+        eligibility: this.eligibilityFor(task, project.canonical_path, statuses, owner, blocked),
+      };
     });
   }
 
@@ -597,6 +606,16 @@ export class TaskService {
       }
       const deps = this.dependencyStatus(tx.db, task);
       if (!deps.ok) throw stateError('not_eligible', deps.reason);
+      const blockedProblem = tx.db
+        .prepare("SELECT id, title FROM problems WHERE task_id = ? AND status = 'blocked' LIMIT 1")
+        .get(taskId) as { id?: string; title?: string } | undefined;
+      if (blockedProblem?.id) {
+        throw stateError(
+          'not_eligible',
+          `task ${taskId} is blocked by problem ${blockedProblem.id}: ${blockedProblem.title ?? 'unrecorded symptom'}`,
+          'record new evidence or a Victor decision to reopen the problem; acknowledgement does not reset the counter',
+        );
+      }
       const active = tx.db
         .prepare("SELECT id FROM tasks WHERE project_id = ? AND status IN ('running','verifying') AND id <> ?")
         .get(row.project_id, taskId) as { id?: string } | undefined;
@@ -948,6 +967,15 @@ export class TaskService {
       const task = this.loadTask(tx.db, taskId) as WorkTask;
       const deps = this.dependencyStatus(tx.db, task);
       if (!deps.ok) throw stateError('not_eligible', deps.reason);
+      const blockedProblem = tx.db
+        .prepare("SELECT id FROM problems WHERE task_id = ? AND status = 'blocked' LIMIT 1")
+        .get(taskId) as { id?: string } | undefined;
+      if (blockedProblem?.id) {
+        throw stateError(
+          'not_eligible',
+          `task ${taskId} is blocked by problem ${blockedProblem.id}; reopen the problem before resuming`,
+        );
+      }
       const active = tx.db
         .prepare("SELECT id FROM tasks WHERE project_id = ? AND status IN ('running','verifying') AND id <> ?")
         .get(row.project_id, taskId) as { id?: string } | undefined;
@@ -1722,11 +1750,16 @@ export class TaskService {
     return rows.map((row) => this.loadTask(db, row.id)).filter((task): task is WorkTask => task !== null);
   }
 
-  private selectNext(tasks: readonly WorkTask[], projectPath: string, owner: ExecutionOwner): WorkTask | null {
+  private selectNext(
+    tasks: readonly WorkTask[],
+    projectPath: string,
+    owner: ExecutionOwner,
+    blocked: ReadonlyMap<string, ProblemBlocker> = new Map(),
+  ): WorkTask | null {
     const statuses = new Map(tasks.map((task) => [task.id, task.status] as const));
     const candidates = tasks
       .filter((task) => task.executionOwner === owner)
-      .filter((task) => this.eligibilityFor(task, projectPath, statuses, owner).eligible);
+      .filter((task) => this.eligibilityFor(task, projectPath, statuses, owner, blocked).eligible);
     const ranked = [...candidates].sort((left, right) => {
       const leftResume = left.status === 'interrupted' ? 0 : 1;
       const rightResume = right.status === 'interrupted' ? 0 : 1;
@@ -1746,8 +1779,10 @@ export class TaskService {
     projectPath: string,
     statuses: ReadonlyMap<string, TaskStatus>,
     dispatcherOwner: ExecutionOwner,
+    blocked: ReadonlyMap<string, ProblemBlocker> = new Map(),
   ): TaskEligibility {
     const checks: EligibilityCheck[] = [];
+    const blockedByProblemIds: string[] = [];
     const activeStatus = task.status === 'pending' || task.status === 'interrupted';
     checks.push({
       name: 'status',
@@ -1761,16 +1796,33 @@ export class TaskService {
       checks.push({ name: 'closed', ok: false, detail: `task is already ${task.status}` });
     }
     const unfinished = task.dependencies.filter((dependency) => statuses.get(dependency) !== 'completed');
+    const blockedPrerequisites = unfinished
+      .map((dependency) => ({ dependency, blocker: blocked.get(dependency) }))
+      .filter((entry): entry is { dependency: string; blocker: ProblemBlocker } => Boolean(entry.blocker));
+    blockedByProblemIds.push(...blockedPrerequisites.map((entry) => entry.blocker.problemId));
     checks.push({
       name: 'prerequisites',
       ok: unfinished.length === 0,
       detail:
-        unfinished.length === 0
-          ? task.dependencies.length === 0
-            ? 'no prerequisites'
-            : `prerequisites completed: ${task.dependencies.join(', ')}`
-          : `waiting on ${unfinished.join(', ')}`,
+        blockedPrerequisites.length > 0
+          ? `waiting on ${blockedPrerequisites
+              .map((entry) => `${entry.dependency} (blocked by problem ${entry.blocker.problemId})`)
+              .join(', ')}`
+          : unfinished.length === 0
+            ? task.dependencies.length === 0
+              ? 'no prerequisites'
+              : `prerequisites completed: ${task.dependencies.join(', ')}`
+            : `waiting on ${unfinished.join(', ')}`,
     });
+    const ownBlocker = blocked.get(task.id);
+    if (ownBlocker) {
+      blockedByProblemIds.push(ownBlocker.problemId);
+      checks.push({
+        name: 'problem',
+        ok: false,
+        detail: `blocked by problem ${ownBlocker.problemId}: ${ownBlocker.title}`,
+      });
+    }
     checks.push({
       name: 'owner',
       ok: task.executionOwner === dispatcherOwner,
@@ -1790,7 +1842,23 @@ export class TaskService {
         ? 'interrupted work resumes before new work'
         : 'ready to start'
       : (checks.find((check) => !check.ok)?.detail ?? 'not eligible');
-    return { taskId: task.id, eligible, reason, checks };
+    return {
+      taskId: task.id,
+      eligible,
+      reason,
+      checks,
+      blockedByProblemIds: [...new Set(blockedByProblemIds)],
+    };
+  }
+
+  /** Tasks with a blocked problem, directly or as a prerequisite. */
+  private blockedProblemMap(db: DatabaseSync, projectId: string): Map<string, ProblemBlocker> {
+    const rows = db
+      .prepare(
+        "SELECT task_id, id, title FROM problems WHERE project_id = ? AND status = 'blocked' AND task_id IS NOT NULL",
+      )
+      .all(projectId) as Array<{ task_id: string; id: string; title: string }>;
+    return new Map(rows.map((row) => [row.task_id, { problemId: row.id, title: row.title }]));
   }
 
   private dependencyStatus(db: DatabaseSync, task: WorkTask): { ok: boolean; reason: string } {

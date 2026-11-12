@@ -119,6 +119,46 @@ describe('WorkQueue transitions', () => {
     expect(receipt.outcome).toBe('partial');
     expect(receipt.stop?.outcome).toBe('uncertain');
   });
+
+  it('labels a native-owned pause as partial instead of claiming the native run stopped', () => {
+    const queue = new WorkQueue();
+    queue.enqueue({ taskId: 'tsk_1', label: 'first' });
+    queue.startNext();
+    queue.markActive({ ...active(), owner: 'native_workflow' });
+    const receipt = queue.pauseAfterTask();
+    expect(receipt.accepted).toBe(true);
+    expect(receipt.outcome).toBe('partial');
+    expect(receipt.detail).toContain('native workflow');
+    expect(receipt.rollback_claimed).toBe(false);
+  });
+
+  it('labels a pause as partial when a native dispatcher is active even if the queue is idle', () => {
+    const queue = new WorkQueue();
+    const receipt = queue.pauseAfterTask({ nativeDispatcherActive: true });
+    expect(receipt.outcome).toBe('partial');
+    expect(queue.snapshot().pauseRequested).toBe(true);
+  });
+
+  it('refuses starts while a problem blocks the queue, then releases it explicitly', () => {
+    const queue = new WorkQueue();
+    queue.enqueue({ taskId: 'tsk_1', label: 'first' });
+    const blocked = queue.blockOnProblem({
+      problemId: 'prb_1',
+      taskId: 'tsk_1',
+      detail: 'three attempts without material progress',
+    });
+    expect(blocked.outcome).toBe('applied');
+    expect(queue.snapshot().state).toBe('blocked');
+    expect(queue.startNext()).toBeNull();
+    const refusal = queue.resumeQueue();
+    expect(refusal.outcome).toBe('rejected');
+    expect(refusal.detail).toContain('prb_1');
+    const wrong = queue.releaseProblem('prb_2');
+    expect(wrong.outcome).toBe('rejected');
+    const released = queue.releaseProblem('prb_1');
+    expect(released.outcome).toBe('applied');
+    expect(queue.startNext()?.taskId).toBe('tsk_1');
+  });
 });
 
 describe('desktop lifecycle matrix', () => {

@@ -76,6 +76,8 @@ export type StudioControl = {
   queueState: string;
   lastOutcome: string | null;
   interrupt: { outcome: string; detail: string | null; at: string } | null;
+  /** Set when a blocked problem refuses the next dispatch. */
+  blockedProblem: { problemId: string; taskId: string | null; detail: string } | null;
 };
 
 export type StudioCapability = { status: 'supported' | 'unsupported'; reason: string | null };

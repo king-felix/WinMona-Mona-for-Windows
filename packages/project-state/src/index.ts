@@ -10,6 +10,10 @@ export * from './backup.js';
 export * from './export.js';
 export * from './journal.js';
 export * from './tasks.js';
+export * from './attempts.js';
+export * from './costs.js';
+export * from './git.js';
+export * from './changes.js';
 
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';

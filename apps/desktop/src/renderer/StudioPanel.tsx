@@ -318,6 +318,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
 
   const items = studio?.items ?? [];
   const pending = studio?.pending ?? null;
+  const blockedProblem = studio?.control.blockedProblem ?? null;
   const thread = studio?.thread ?? null;
 
   const permissionLabel = thread
@@ -497,6 +498,25 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           )}
         </div>
       </div>
+
+      {blockedProblem ? (
+        <div className="pending-card" role="alert" data-testid="studio-blocked-problem">
+          <div className="mona-row">
+            <Badge tone="critical">Blocked</Badge>
+            <span className="mona-mono">{blockedProblem.problemId}</span>
+          </div>
+          <p>{blockedProblem.detail}</p>
+          <p className="mona-muted">
+            Three attempts made no material progress, so Mona stops this problem. New work is refused until the problem
+            is reopened with new evidence or a Victor decision; acknowledging this card does not reset the count.
+          </p>
+          <div className="mona-row">
+            <Button size="sm" onClick={() => setShowDiagnostics(true)}>
+              Show diagnostics
+            </Button>
+          </div>
+        </div>
+      ) : null}
 
       {paused ? (
         <p className="mona-muted" data-testid="queue-paused">

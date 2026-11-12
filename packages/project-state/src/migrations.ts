@@ -342,6 +342,208 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX task_dependencies_reverse ON task_dependencies(depends_on);
     `,
   },
+  {
+    version: 4,
+    name: 'attempt-rule',
+    sql: `
+      -- One stable problem is one recurring unresolved issue. The problem id is
+      -- derived from project + symptom fingerprint so a new session cannot mint
+      -- a fresh counter for the same symptom.
+      CREATE TABLE problems (
+        id TEXT PRIMARY KEY,
+        project_id TEXT REFERENCES projects(id) ON DELETE CASCADE,
+        task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL,
+        requirement_id TEXT,
+        title TEXT NOT NULL,
+        symptom_fingerprint TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'open',
+        total_attempts INTEGER NOT NULL DEFAULT 0,
+        consecutive_no_progress INTEGER NOT NULL DEFAULT 0,
+        stop_threshold INTEGER NOT NULL DEFAULT 3,
+        help_needed TEXT,
+        blocked_at TEXT,
+        resolved_at TEXT,
+        resolution TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (status IN ('open', 'blocked', 'resolved')),
+        CHECK (total_attempts >= 0),
+        CHECK (consecutive_no_progress >= 0),
+        CHECK (stop_threshold >= 1)
+      );
+      CREATE UNIQUE INDEX problems_fingerprint ON problems(project_id, symptom_fingerprint);
+      CREATE INDEX problems_status ON problems(project_id, status);
+
+      CREATE TABLE problem_transitions (
+        id TEXT PRIMARY KEY,
+        problem_id TEXT NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
+        from_status TEXT,
+        to_status TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        actor TEXT NOT NULL,
+        evidence_path TEXT,
+        at TEXT NOT NULL
+      );
+      CREATE INDEX problem_transitions_problem ON problem_transitions(problem_id, at);
+
+      -- The v1 attempts table is extended rather than replaced so history that
+      -- already exists stays where it is. attempt_no is per problem and never
+      -- renumbered; a rejected continuation is not written as an attempt.
+      ALTER TABLE attempts ADD COLUMN requirement_id TEXT;
+      ALTER TABLE attempts ADD COLUMN attempt_no INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE attempts ADD COLUMN progress_reason TEXT;
+      ALTER TABLE attempts ADD COLUMN actor TEXT NOT NULL DEFAULT 'mona';
+      ALTER TABLE attempts ADD COLUMN kind TEXT NOT NULL DEFAULT 'attempt';
+      CREATE INDEX attempts_problem ON attempts(problem_id, attempt_no);
+    `,
+  },
+  {
+    version: 5,
+    name: 'cost-ledger',
+    sql: `
+      -- Usage rows gain the fields a cost lens needs without rewriting history:
+      -- provider/model identity, the token buckets, how the cost was obtained,
+      -- and the rate revision that applied when it was recorded.
+      ALTER TABLE usage_records ADD COLUMN provider TEXT;
+      ALTER TABLE usage_records ADD COLUMN model TEXT;
+      ALTER TABLE usage_records ADD COLUMN input_tokens INTEGER;
+      ALTER TABLE usage_records ADD COLUMN reasoning_tokens INTEGER;
+      ALTER TABLE usage_records ADD COLUMN cache_known INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE usage_records ADD COLUMN cost_source TEXT NOT NULL DEFAULT 'unknown';
+      ALTER TABLE usage_records ADD COLUMN rate_revision TEXT;
+      ALTER TABLE usage_records ADD COLUMN dedupe_key TEXT;
+      ALTER TABLE usage_records ADD COLUMN task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL;
+      ALTER TABLE usage_records ADD COLUMN parent_turn_id TEXT;
+      ALTER TABLE usage_records ADD COLUMN unknown_reason TEXT;
+
+      -- A replayed turn usage event or a repeated aggregate ingest is the same
+      -- cost, not a second one.
+      CREATE UNIQUE INDEX usage_records_dedupe ON usage_records(dedupe_key) WHERE dedupe_key IS NOT NULL;
+      CREATE INDEX usage_records_project ON usage_records(project_id, recorded_at);
+      CREATE INDEX usage_records_turn ON usage_records(turn_id);
+
+      -- Rates are revisioned rows. A price change appends a revision; it never
+      -- edits the row an older usage record was priced with.
+      CREATE TABLE rate_cards (
+        id TEXT PRIMARY KEY,
+        provider TEXT NOT NULL,
+        model TEXT NOT NULL,
+        currency TEXT NOT NULL DEFAULT 'USD',
+        unit_tokens INTEGER NOT NULL DEFAULT 1000000,
+        cache_hit_micros INTEGER,
+        cache_miss_micros INTEGER NOT NULL,
+        output_micros INTEGER NOT NULL,
+        reasoning_micros INTEGER,
+        source TEXT NOT NULL,
+        source_url TEXT,
+        revision TEXT NOT NULL,
+        effective_from TEXT NOT NULL,
+        recorded_at TEXT NOT NULL,
+        UNIQUE (provider, model, revision),
+        CHECK (unit_tokens > 0),
+        CHECK (cache_miss_micros >= 0),
+        CHECK (output_micros >= 0),
+        CHECK (cache_hit_micros IS NULL OR cache_hit_micros >= 0),
+        CHECK (reasoning_micros IS NULL OR reasoning_micros >= 0)
+      );
+      CREATE INDEX rate_cards_lookup ON rate_cards(provider, model, effective_from);
+
+      CREATE TABLE budgets (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        scope TEXT NOT NULL,
+        session_id TEXT,
+        limit_micros INTEGER NOT NULL,
+        warn_micros INTEGER,
+        stop_micros INTEGER,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        CHECK (scope IN ('session', 'project', 'day')),
+        CHECK (limit_micros > 0),
+        CHECK (warn_micros IS NULL OR (warn_micros >= 0 AND warn_micros <= limit_micros)),
+        CHECK (stop_micros IS NULL OR (stop_micros >= 0 AND stop_micros <= limit_micros))
+      );
+      CREATE UNIQUE INDEX budgets_scope ON budgets(project_id, scope, COALESCE(session_id, ''));
+
+      CREATE TABLE budget_reservations (
+        id TEXT PRIMARY KEY,
+        budget_id TEXT NOT NULL REFERENCES budgets(id) ON DELETE CASCADE,
+        label TEXT NOT NULL,
+        estimated_micros INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        released_at TEXT,
+        CHECK (estimated_micros >= 0)
+      );
+      CREATE INDEX budget_reservations_budget ON budget_reservations(budget_id, released_at);
+
+      CREATE TABLE budget_events (
+        id TEXT PRIMARY KEY,
+        budget_id TEXT NOT NULL REFERENCES budgets(id) ON DELETE CASCADE,
+        action TEXT NOT NULL,
+        spent_micros INTEGER NOT NULL,
+        limit_micros INTEGER NOT NULL,
+        detail TEXT,
+        at TEXT NOT NULL
+      );
+      CREATE INDEX budget_events_budget ON budget_events(budget_id, at);
+    `,
+  },
+  {
+    version: 6,
+    name: 'change-receipts',
+    sql: `
+      -- A baseline is a hash map, not a second snapshot engine: enough to say
+      -- what changed and to label attribution honestly, not enough to restore.
+      CREATE TABLE change_baselines (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL,
+        label TEXT NOT NULL,
+        entries_json TEXT NOT NULL,
+        file_count INTEGER NOT NULL,
+        truncated INTEGER NOT NULL DEFAULT 0,
+        captured_at TEXT NOT NULL,
+        CHECK (file_count >= 0),
+        CHECK (truncated IN (0, 1))
+      );
+      CREATE INDEX change_baselines_project ON change_baselines(project_id, captured_at);
+      CREATE INDEX change_baselines_task ON change_baselines(task_id, captured_at);
+
+      CREATE TABLE test_receipts (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        task_id TEXT REFERENCES tasks(id) ON DELETE SET NULL,
+        command TEXT NOT NULL,
+        exit_code INTEGER,
+        outcome TEXT NOT NULL,
+        started_at TEXT,
+        finished_at TEXT,
+        duration_ms INTEGER,
+        commit_sha TEXT,
+        output_path TEXT,
+        output_sha256 TEXT,
+        output_bytes INTEGER,
+        output_truncated INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        CHECK (outcome IN ('passed', 'failed', 'unknown')),
+        CHECK (output_truncated IN (0, 1))
+      );
+      CREATE INDEX test_receipts_project ON test_receipts(project_id, created_at);
+
+      CREATE TABLE restore_receipts (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        scope_json TEXT NOT NULL,
+        excluded_json TEXT NOT NULL,
+        conflicts_json TEXT NOT NULL,
+        outcome TEXT NOT NULL,
+        detail TEXT,
+        at TEXT NOT NULL,
+        CHECK (outcome IN ('applied', 'refused', 'partial'))
+      );
+      CREATE INDEX restore_receipts_project ON restore_receipts(project_id, at);
+    `,
+  },
 ];
 
 export type MigrationReport = {

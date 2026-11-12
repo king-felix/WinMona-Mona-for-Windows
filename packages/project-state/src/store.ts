@@ -81,11 +81,25 @@ export type UsageInput = {
   projectId?: string | null;
   threadId?: string | null;
   turnId?: string | null;
+  taskId?: string | null;
+  parentTurnId?: string | null;
+  provider?: string | null;
+  model?: string | null;
   cacheHitTokens?: number | null;
   cacheMissTokens?: number | null;
+  inputTokens?: number | null;
   outputTokens?: number | null;
+  reasoningTokens?: number | null;
+  /** True only when the provider reported both cache buckets. */
+  cacheKnown?: boolean;
   costMicros?: number | null;
   costKnown: boolean;
+  /** provider_reported | estimated | unknown */
+  costSource?: string;
+  rateRevision?: string | null;
+  unknownReason?: string | null;
+  /** Stable identity for replay and aggregate dedupe. */
+  dedupeKey?: string | null;
   source: string;
 };
 
@@ -989,21 +1003,40 @@ export class WriteTransaction {
     if (!input.costKnown && input.costMicros !== null && input.costMicros !== undefined) {
       throw stateError('invalid_request', 'a usage record marked unknown must not carry a cost value');
     }
+    if (input.dedupeKey) {
+      const seen = this.db.prepare('SELECT id FROM usage_records WHERE dedupe_key = ?').get(input.dedupeKey) as
+        { id?: string } | undefined;
+      if (seen?.id) return seen.id;
+    }
+    const costSource = input.costSource ?? (input.costKnown ? 'provider_reported' : 'unknown');
     this.db
       .prepare(
-        `INSERT INTO usage_records(id, project_id, thread_id, turn_id, cache_hit_tokens, cache_miss_tokens, output_tokens, cost_micros, cost_known, source, recorded_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO usage_records(id, project_id, thread_id, turn_id, task_id, parent_turn_id, provider, model,
+           cache_hit_tokens, cache_miss_tokens, input_tokens, output_tokens, reasoning_tokens, cache_known,
+           cost_micros, cost_known, cost_source, rate_revision, unknown_reason, dedupe_key, source, recorded_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         id,
         input.projectId ?? null,
         input.threadId ?? null,
         input.turnId ?? null,
+        input.taskId ?? null,
+        input.parentTurnId ?? null,
+        input.provider ?? null,
+        input.model ?? null,
         input.cacheHitTokens ?? null,
         input.cacheMissTokens ?? null,
+        input.inputTokens ?? null,
         input.outputTokens ?? null,
+        input.reasoningTokens ?? null,
+        input.cacheKnown ? 1 : 0,
         input.costMicros ?? null,
         input.costKnown ? 1 : 0,
+        costSource,
+        input.rateRevision ?? null,
+        input.unknownReason ?? null,
+        input.dedupeKey ?? null,
         input.source,
         this.now(),
       );

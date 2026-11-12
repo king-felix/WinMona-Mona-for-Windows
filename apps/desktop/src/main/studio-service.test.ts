@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ThreadId, parseEngineEvent, toEventEnvelope, type ParsedEngineEvent } from '@mona/contracts';
 import type { EngineAdapter } from '@mona/adapter';
 import { applyMigrations } from '@mona/project-state';
-import { ProjectStore } from '@mona/project-state';
+import { CostLedger, ProjectStore } from '@mona/project-state';
 import type { EngineSummary } from './engine-host.js';
 import { StudioService, composePrompt } from './studio-service.js';
 import type { StudioEvent, StudioView } from '../shared/studio.js';
@@ -640,5 +640,103 @@ describe('live studio service', () => {
     // never silently rewrites display state.
     expect(state.thread?.permissionPosture).toBe('full_access');
     expect(state.thread?.allowShell).toBe(true);
+  });
+});
+
+describe('cost and dispatch boundary', () => {
+  it('gates the next dispatch by budget and makes no provider request for UI actions', async () => {
+    const store = await openStore('cost-boundary');
+    const project = await makeProject(store, 'cost-boundary');
+    const adapter = new FakeAdapter(project.path);
+    const events: StudioEvent[] = [];
+    const ledger = new CostLedger(store, { now: () => new Date('2026-11-12T12:00:00.000Z') });
+    await ledger.setBudget({
+      projectId: project.id,
+      scope: 'project',
+      limitMicros: 1_000,
+      warnMicros: 500,
+      stopMicros: 1_000,
+    });
+    await ledger.ingest({
+      projectId: project.id,
+      turnId: 'turn_prior',
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      buckets: { cacheHitTokens: 0, cacheMissTokens: 1, outputTokens: 1 },
+      cost: { kind: 'provider_reported', micros: 1_000, source: 'fixture' },
+      source: 'fixture',
+    });
+    const service = new StudioService({
+      store,
+      engine: {
+        summary: () => ({
+          state: 'connected',
+          detail: 'fake runtime connected',
+          workspace: project.path,
+          pid: 1,
+          endpoint: 'http://127.0.0.1:7801',
+          compatibility: 'qualified',
+          descriptors: [],
+        }),
+        adapter: () => adapter as unknown as EngineAdapter,
+      },
+      emit: (event) => events.push(event),
+      costs: ledger,
+      flushIntervalMs: 0,
+    });
+    cleanup.push(async () => service.close());
+
+    // Reading the studio and pausing/resuming are local operations.
+    expect((await service.view(project.id, 'ses_budget')).ok).toBe(true);
+    expect(service.pause(project.id).ok).toBe(true);
+    expect(service.resume(project.id).ok).toBe(true);
+    expect((await service.view(project.id, 'ses_budget')).ok).toBe(true);
+    expect(adapter.threadCalls).toHaveLength(0);
+    expect(adapter.submissions).toHaveLength(0);
+
+    const blocked = await service.submit({
+      projectId: project.id,
+      sessionId: 'ses_budget',
+      text: 'run the task',
+      mode: 'agent',
+      references: [],
+    });
+    expect(blocked.ok).toBe(false);
+    if (!blocked.ok) expect(blocked.error.message).toContain('budget');
+    expect(adapter.threadCalls).toHaveLength(0);
+    expect(adapter.submissions).toHaveLength(0);
+  });
+
+  it('reports a native-owned pause as partial instead of claiming it stopped', async () => {
+    const store = await openStore('native-pause');
+    const project = await makeProject(store, 'native-pause');
+    const adapter = new FakeAdapter(project.path);
+    const service = new StudioService({
+      store,
+      engine: {
+        summary: () => ({
+          state: 'connected',
+          detail: 'fake runtime connected',
+          workspace: project.path,
+          pid: 1,
+          endpoint: 'http://127.0.0.1:7801',
+          compatibility: 'qualified',
+          descriptors: [],
+        }),
+        adapter: () => adapter as unknown as EngineAdapter,
+      },
+      emit: () => undefined,
+      nativeDispatcherActive: () => true,
+      flushIntervalMs: 0,
+    });
+    cleanup.push(async () => service.close());
+    await service.view(project.id, 'ses_native');
+    const paused = service.pause(project.id);
+    expect(paused.ok).toBe(true);
+    if (paused.ok) {
+      expect(paused.data.control.pauseRequested).toBe(true);
+      expect(paused.data.run.detail).toContain('native workflow');
+    }
+    expect(adapter.submissions).toHaveLength(0);
   });
 });

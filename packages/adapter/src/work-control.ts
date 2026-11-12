@@ -7,7 +7,7 @@ import type { ShutdownReceipt } from './supervisor.js';
  * Queue boundaries are Mona's. Interrupt is the engine's. They are different
  * transitions and never share a receipt.
  */
-export type WorkQueueState = 'idle' | 'running' | 'paused' | 'stopping' | 'stopped';
+export type WorkQueueState = 'idle' | 'running' | 'paused' | 'blocked' | 'stopping' | 'stopped';
 
 export type QueuedTask = {
   taskId: string;
@@ -21,10 +21,13 @@ export type ActiveWork = {
   turnId: TurnId;
   startedAt: string;
   label: string;
+  /** Who dispatches this run. A native owner is not Mona's queue. */
+  owner?: 'mona_queue' | 'native_workflow';
 };
 
 export type ControlReceipt = {
-  action: 'pause_after_task' | 'interrupt_now' | 'cancel_queued' | 'resume_queue';
+  action:
+    'pause_after_task' | 'interrupt_now' | 'cancel_queued' | 'resume_queue' | 'block_on_problem' | 'release_problem';
   accepted: boolean;
   at: string;
   outcome: 'applied' | 'no_active_work' | 'rejected' | 'outcome_unknown' | 'partial';
@@ -49,6 +52,7 @@ export type WorkSnapshot = {
   active: ActiveWork | null;
   queued: QueuedTask[];
   pauseRequested: boolean;
+  blocked: { problemId: string; taskId: string | null; detail: string } | null;
   lastOutcome: string | null;
 };
 
@@ -68,6 +72,7 @@ export class WorkQueue {
   private active: ActiveWork | null = null;
   private queued: QueuedTask[] = [];
   private pauseRequested = false;
+  private blocked: WorkSnapshot['blocked'] = null;
   private lastOutcome: string | null = null;
 
   constructor(options: WorkQueueOptions = {}) {
@@ -81,6 +86,7 @@ export class WorkQueue {
       active: this.active ? { ...this.active } : null,
       queued: this.queued.map((task) => ({ ...task })),
       pauseRequested: this.pauseRequested,
+      blocked: this.blocked ? { ...this.blocked } : null,
       lastOutcome: this.lastOutcome,
     };
   }
@@ -105,6 +111,10 @@ export class WorkQueue {
   startNext(): QueuedTask | null {
     if (this.state === 'stopping' || this.state === 'stopped') return null;
     if (this.active !== null) return null;
+    if (this.blocked) {
+      this.state = 'blocked';
+      return null;
+    }
     if (this.pauseRequested) {
       this.state = 'paused';
       return null;
@@ -131,14 +141,19 @@ export class WorkQueue {
   completeActive(outcome: string): WorkSnapshot {
     this.active = null;
     this.lastOutcome = outcome;
-    if (this.pauseRequested) this.state = 'paused';
+    if (this.blocked) this.state = 'blocked';
+    else if (this.pauseRequested) this.state = 'paused';
     else this.state = 'idle';
     this.onEvent?.({ type: 'completed', at: this.now().toISOString(), detail: outcome });
     return this.snapshot();
   }
 
-  /** Stop after the current task. Never interrupts the running turn. */
-  pauseAfterTask(): ControlReceipt {
+  /**
+   * Stop after the current task. Never interrupts the running turn. When a
+   * native workflow owns the run, Mona's queue boundary cannot stop that
+   * dispatcher, and the receipt says so instead of implying a full pause.
+   */
+  pauseAfterTask(options: { nativeDispatcherActive?: boolean } = {}): ControlReceipt {
     const at = this.now().toISOString();
     if (this.state === 'stopping' || this.state === 'stopped') {
       return {
@@ -151,8 +166,20 @@ export class WorkQueue {
       };
     }
     this.pauseRequested = true;
-    if (this.active === null) this.state = 'paused';
+    if (this.active === null) this.state = this.blocked ? 'blocked' : 'paused';
     this.onEvent?.({ type: 'pause_requested', at });
+    const nativeOwned = options.nativeDispatcherActive === true || this.active?.owner === 'native_workflow';
+    if (nativeOwned) {
+      return {
+        action: 'pause_after_task',
+        accepted: true,
+        at,
+        outcome: 'partial',
+        detail:
+          'Mona will not start another queued task, but a native workflow owns this run and continues independently; pause it through its own owner',
+        rollback_claimed: false,
+      };
+    }
     return {
       action: 'pause_after_task',
       accepted: true,
@@ -165,9 +192,69 @@ export class WorkQueue {
 
   resumeQueue(): ControlReceipt {
     const at = this.now().toISOString();
+    if (this.blocked) {
+      return {
+        action: 'resume_queue',
+        accepted: false,
+        at,
+        outcome: 'rejected',
+        detail: `problem ${this.blocked.problemId} is blocked; reopen it with new evidence before resuming`,
+        rollback_claimed: false,
+      };
+    }
     this.pauseRequested = false;
     if (this.state === 'paused') this.state = this.active ? 'running' : 'idle';
     return { action: 'resume_queue', accepted: true, at, outcome: 'applied', rollback_claimed: false };
+  }
+
+  /**
+   * Blocker-paused state. The queue refuses to start anything until the linked
+   * problem is reopened with new evidence; independent work is not cancelled.
+   */
+  blockOnProblem(input: { problemId: string; taskId?: string | null; detail: string }): ControlReceipt {
+    const at = this.now().toISOString();
+    this.blocked = { problemId: input.problemId, taskId: input.taskId ?? null, detail: input.detail };
+    this.pauseRequested = true;
+    if (this.active === null) this.state = 'blocked';
+    this.onEvent?.({ type: 'blocked', at, detail: input.problemId });
+    return {
+      action: 'block_on_problem',
+      accepted: true,
+      at,
+      outcome: 'applied',
+      detail: input.detail,
+      rollback_claimed: false,
+    };
+  }
+
+  /** Clear a blocker-paused queue after the problem reopens with new evidence. */
+  releaseProblem(problemId: string): ControlReceipt {
+    const at = this.now().toISOString();
+    if (!this.blocked) {
+      return {
+        action: 'release_problem',
+        accepted: false,
+        at,
+        outcome: 'rejected',
+        detail: 'the queue is not blocked',
+        rollback_claimed: false,
+      };
+    }
+    if (this.blocked.problemId !== problemId) {
+      return {
+        action: 'release_problem',
+        accepted: false,
+        at,
+        outcome: 'rejected',
+        detail: `the queue is blocked by ${this.blocked.problemId}, not ${problemId}`,
+        rollback_claimed: false,
+      };
+    }
+    this.blocked = null;
+    this.pauseRequested = false;
+    this.state = this.active ? 'running' : 'idle';
+    this.onEvent?.({ type: 'released', at, detail: problemId });
+    return { action: 'release_problem', accepted: true, at, outcome: 'applied', rollback_claimed: false };
   }
 
   /** Cancels future starts only. It cannot cancel a running turn. */

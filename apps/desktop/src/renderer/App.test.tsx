@@ -103,7 +103,7 @@ function emptyStudio(): StudioView {
     thread: null,
     items: [],
     run: { state: 'idle', detail: 'Ready. Nothing has been sent.', turnId: null, submission: null, startedAt: null },
-    control: { pauseRequested: false, queueState: 'idle', lastOutcome: null, interrupt: null },
+    control: { pauseRequested: false, queueState: 'idle', lastOutcome: null, interrupt: null, blockedProblem: null },
     pending: null,
     diagnostics: [],
     capabilities: {
@@ -591,7 +591,13 @@ describe('Mona shell', () => {
             submission: null,
             startedAt: null,
           },
-          control: { pauseRequested: false, queueState: 'running', lastOutcome: null, interrupt: null },
+          control: {
+            pauseRequested: false,
+            queueState: 'running',
+            lastOutcome: null,
+            interrupt: null,
+            blockedProblem: null,
+          },
           pending: {
             kind: 'approval',
             approvalId: 'appr_1',
@@ -645,6 +651,56 @@ describe('Mona shell', () => {
     const rendered = document.querySelectorAll('[data-testid="timeline-assistant"]');
     expect(rendered).toHaveLength(1);
     expect(rendered[0]?.textContent).toContain('MONA_OK');
+    await act(async () => root.unmount());
+  });
+
+  it('shows the blocked-problem card and makes no completion claim', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({ state: 'connected', workspace: alpha.canonicalPath }),
+      spends: {},
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    await act(async () => {
+      for (const handler of store.studioHandlers ?? []) {
+        handler({
+          type: 'state',
+          projectId: alpha.id,
+          thread: null,
+          run: {
+            state: 'idle',
+            detail: 'Ready.',
+            turnId: null,
+            submission: null,
+            startedAt: null,
+          },
+          control: {
+            pauseRequested: true,
+            queueState: 'blocked',
+            lastOutcome: null,
+            interrupt: null,
+            blockedProblem: {
+              problemId: 'prb_0123456789abcdef0123456789abcdef',
+              taskId: 'tsk_1',
+              detail: 'Victor: confirm the expected fixture contents for this check.',
+            },
+          },
+          pending: null,
+        });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    const card = document.querySelector('[data-testid="studio-blocked-problem"]');
+    expect(card?.textContent).toContain('prb_0123456789abcdef0123456789abcdef');
+    expect(card?.textContent).toContain('Victor: confirm the expected fixture contents');
+    expect(card?.textContent).toContain('does not reset the count');
     await act(async () => root.unmount());
   });
 

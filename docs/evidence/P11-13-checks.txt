@@ -1,0 +1,44 @@
+﻿Mona P11/P12/P13 static checks
+generated_utc: 2026-11-12T07:51:26Z
+node: v26.13.1 npm: 11.20.0 platform: win32-x64
+
+=== npm run typecheck ===
+
+> mona@0.0.0 typecheck
+> npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/project-state && npm run typecheck -w @mona/ui && npm run typecheck -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/project-state@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/ui@0.1.0 typecheck
+> tsc -p tsconfig.json --noEmit
+
+
+> @mona/desktop@0.1.0 typecheck
+> tsc -p tsconfig.main.json --noEmit && tsc -p tsconfig.preload.json && tsc -p tsconfig.renderer.json --noEmit && tsc -p tsconfig.test.json --noEmit
+
+npm run typecheck exit=0
+=== npm run lint ===
+
+> mona@0.0.0 lint
+> eslint .
+
+npm run lint exit=0
+=== npm run format:check ===
+
+> mona@0.0.0 format:check
+> prettier --check .
+
+Checking formatting...
+All matched files use Prettier code style!
+npm run format:check exit=0

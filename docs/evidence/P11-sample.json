@@ -1,0 +1,203 @@
+{
+  "prompt": "P11",
+  "generatedUtc": "2026-11-12T07:45:52.099Z",
+  "providerRequests": 0,
+  "steps": [
+    {
+      "name": "register project",
+      "detail": {
+        "projectId": "prj_4a8d81e6adf7463dbfc3d4055366ed70"
+      }
+    },
+    {
+      "name": "claim blocked task",
+      "detail": {
+        "taskId": "tsk_6acd5617397241bfb58ed05f7a2fbea2",
+        "status": "running"
+      }
+    },
+    {
+      "name": "open problem",
+      "detail": {
+        "problemId": "prb_93f0cee7ae98aa07b0ca2d4a14f565e2",
+        "fingerprint": "check exits 1 with the same stack line"
+      }
+    },
+    {
+      "name": "no-progress attempt",
+      "detail": {
+        "attemptNo": 1,
+        "total": 1,
+        "consecutive": 1
+      }
+    },
+    {
+      "name": "no-progress attempt",
+      "detail": {
+        "attemptNo": 2,
+        "total": 2,
+        "consecutive": 2
+      }
+    },
+    {
+      "name": "acknowledge",
+      "detail": {
+        "consecutiveUnchanged": 2,
+        "totalUnchanged": 2
+      }
+    },
+    {
+      "name": "new session reads the persisted counter",
+      "detail": {
+        "total": 2,
+        "consecutive": 2
+      }
+    },
+    {
+      "name": "third attempt blocks",
+      "detail": {
+        "blockedNow": true,
+        "status": "blocked",
+        "handoff": {
+          "problemId": "prb_93f0cee7ae98aa07b0ca2d4a14f565e2",
+          "title": "Failing check cannot be reproduced",
+          "status": "blocked",
+          "requirementId": "MONA-011",
+          "taskId": "tsk_6acd5617397241bfb58ed05f7a2fbea2",
+          "totalAttempts": 3,
+          "consecutiveNoProgress": 3,
+          "stopThreshold": 3,
+          "blockedAt": "2026-11-12T07:45:52.080Z",
+          "helpNeeded": "Victor: confirm the expected fixture contents for this check.",
+          "attempts": [
+            {
+              "id": "att_be1edc6ebadc44d4858f19869ee1a33c",
+              "problemId": "prb_93f0cee7ae98aa07b0ca2d4a14f565e2",
+              "attemptNo": 1,
+              "requirementId": "MONA-011",
+              "symptomFingerprint": "check exits 1 with the same stack line",
+              "hypothesis": "hypothesis 1",
+              "action": "action 1",
+              "observedResult": "same stack line",
+              "evidencePath": "evidence/attempt-1.txt",
+              "materialProgress": false,
+              "progressReason": null,
+              "consecutiveNoProgress": 1,
+              "actor": "mona",
+              "createdAt": "2026-11-12T07:45:52.067Z"
+            },
+            {
+              "id": "att_b811deda039f4a10a39ccff79331cf8a",
+              "problemId": "prb_93f0cee7ae98aa07b0ca2d4a14f565e2",
+              "attemptNo": 2,
+              "requirementId": "MONA-011",
+              "symptomFingerprint": "check exits 1 with the same stack line",
+              "hypothesis": "hypothesis 2",
+              "action": "action 2",
+              "observedResult": "same stack line",
+              "evidencePath": "evidence/attempt-2.txt",
+              "materialProgress": false,
+              "progressReason": null,
+              "consecutiveNoProgress": 2,
+              "actor": "mona",
+              "createdAt": "2026-11-12T07:45:52.073Z"
+            },
+            {
+              "id": "att_c927b63fef0840e3be085828ad092bd8",
+              "problemId": "prb_93f0cee7ae98aa07b0ca2d4a14f565e2",
+              "attemptNo": 3,
+              "requirementId": "MONA-011",
+              "symptomFingerprint": "check exits 1 with the same stack line",
+              "hypothesis": "the fixture is stale",
+              "action": "regenerated the fixture",
+              "observedResult": "same stack line",
+              "evidencePath": "evidence/attempt-3.txt",
+              "materialProgress": false,
+              "progressReason": null,
+              "consecutiveNoProgress": 3,
+              "actor": "mona",
+              "createdAt": "2026-11-12T07:45:52.080Z"
+            }
+          ],
+          "evidencePaths": [
+            "evidence/attempt-1.txt",
+            "evidence/attempt-2.txt",
+            "evidence/attempt-3.txt"
+          ],
+          "acknowledgmentDoesNotReset": true
+        },
+        "taskBlocked": true
+      }
+    },
+    {
+      "name": "fourth attempt refused by Mona-owned logic",
+      "detail": {
+        "refused": true,
+        "code": "not_eligible",
+        "message": "problem prb_93f0cee7ae98aa07b0ca2d4a14f565e2 is blocked after 3 no-progress attempts"
+      }
+    },
+    {
+      "name": "board after the block",
+      "detail": {
+        "entries": [
+          {
+            "id": "tsk_6acd5617397241bfb58ed05f7a2fbea2",
+            "title": "Blocked task",
+            "status": "blocked",
+            "eligible": false,
+            "reason": "blocked work does not start",
+            "blockedByProblemIds": [
+              "prb_93f0cee7ae98aa07b0ca2d4a14f565e2"
+            ]
+          },
+          {
+            "id": "tsk_e0289d42fc8b44b3a74be07575035e52",
+            "title": "Dependent task",
+            "status": "pending",
+            "eligible": false,
+            "reason": "waiting on tsk_6acd5617397241bfb58ed05f7a2fbea2 (blocked by problem prb_93f0cee7ae98aa07b0ca2d4a14f565e2)",
+            "blockedByProblemIds": [
+              "prb_93f0cee7ae98aa07b0ca2d4a14f565e2"
+            ]
+          },
+          {
+            "id": "tsk_24a78d9985ad40f483496a7ccabf43bc",
+            "title": "Independent task",
+            "status": "pending",
+            "eligible": true,
+            "reason": "ready to start",
+            "blockedByProblemIds": []
+          }
+        ],
+        "next": "tsk_24a78d9985ad40f483496a7ccabf43bc",
+        "independentId": "tsk_24a78d9985ad40f483496a7ccabf43bc",
+        "dependentId": "tsk_e0289d42fc8b44b3a74be07575035e52"
+      }
+    },
+    {
+      "name": "claim of the blocked task refused",
+      "detail": {
+        "refused": true,
+        "code": "not_eligible"
+      }
+    },
+    {
+      "name": "reopen with new evidence",
+      "detail": {
+        "status": "open",
+        "consecutive": 0,
+        "total": 3
+      }
+    },
+    {
+      "name": "audit trail",
+      "detail": [
+        "- -> open: problem opened",
+        "open -> open: acknowledged: shown in the tray; counters unchanged",
+        "open -> blocked: stop threshold reached: 3 attempts without material progress",
+        "blocked -> open: reopened: the fixture contents were confirmed by Victor (total attempts preserved at 3)"
+      ]
+    }
+  ]
+}

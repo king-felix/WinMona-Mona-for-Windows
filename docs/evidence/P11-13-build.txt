@@ -1,0 +1,74 @@
+﻿Mona P11/P12/P13 production build
+generated_utc: 2026-11-12T07:51:46Z
+node: v26.13.1 npm: 11.20.0 platform: win32-x64
+
+=== npm run build ===
+
+> mona@0.0.0 build
+> npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop
+
+
+> @mona/contracts@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/adapter@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/project-state@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/ui@0.1.0 build
+> tsc -p tsconfig.json
+
+
+> @mona/desktop@0.1.0 build
+> npm run clean && npm run build:main && npm run build:preload && npm run build:renderer
+
+
+> @mona/desktop@0.1.0 clean
+> node -e "require('node:fs').rmSync('dist',{recursive:true,force:true})"
+
+
+> @mona/desktop@0.1.0 build:main
+> tsc -p tsconfig.main.json
+
+
+> @mona/desktop@0.1.0 build:preload
+> esbuild src/preload/preload.ts --bundle --platform=node --format=cjs --external:electron --outfile=dist/preload/preload.cjs
+
+node.exe : 
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  dist\preload\preload.cjs  4.3kb
+
+Done in 7ms
+
+> @mona/desktop@0.1.0 build:renderer
+> vite build
+
+[36mvite v8.3.8 [32mbuilding client environment for production...[36m[39m
+transforming...
+✓ 27 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/renderer/index.html                   0.73 kB │ gzip:  0.40 kB
+dist/renderer/assets/index-CQRV0ZnR.css   23.65 kB │ gzip:  4.76 kB
+dist/renderer/assets/index-DsFJovat.js   291.07 kB │ gzip: 87.57 kB │ map: 1,251.86 kB
+
+[32m✓ built in 119ms[39m
+build exit=0
+
+=== npm run check:build -w @mona/desktop ===
+
+> @mona/desktop@0.1.0 check:build
+> node scripts/check-build.mjs
+
+build checks passed: 4 renderer files, CSP replaced, no fixtures, no credentials, 27 named preload channels
+check exit=0

@@ -755,3 +755,148 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   project must not be able to corrupt or impersonate Mona's build state.
 - **Constrains:** the product never depends on the bootstrap utility to boot; the
   bootstrap validator stays the authority for the Mona ledger only.
+
+## D-0060 — One problem id per symptom, derived rather than minted
+
+- **Decision:** a problem id is `prb_sha256(project_id + symptom_fingerprint)`,
+  with a unique index on `(project_id, symptom_fingerprint)`. The attempt counter
+  belongs to that row; a new session or a new task that meets the same symptom
+  lands on the same counter.
+- **Why:** spec 8.4 and O3 both say a new session must not reset the count. A
+  model-chosen id string is a rename waiting to happen; a digest is not.
+- **Constrains:** re-wording a symptom creates a different problem. That is
+  acceptable because the fingerprint is recorded verbatim, and the board shows
+  it; it is not acceptable to derive ids from attempt order.
+
+## D-0061 — Two counters, and only one of them may reset
+
+- **Decision:** `total_attempts` is append-only per problem.
+  `consecutive_no_progress` resets only through an attempt that records
+  `material_progress = true` **and** a `progress_reason`. Supplying one without
+  the other is refused. Acknowledgement, reopening and session restarts leave
+  both counters as they were, except that reopening resets the consecutive count
+  with the new evidence recorded in `problem_transitions`.
+- **Why:** O3 requires material progress to be demonstrable. Making the reason
+  mandatory is what distinguishes "a required test now passes" from "more code".
+- **Constrains:** the store refuses an inconsistent attempt row, so a caller
+  cannot hand-wave progress through a boolean alone.
+
+## D-0062 — The block lives in the database, not in the scheduler
+
+- **Decision:** the third consecutive no-progress attempt transitions the
+  problem to `blocked` in the same transaction that appends the attempt.
+  `TaskService.claim`, `resumeTask` and `AttemptService.assertDispatchable`
+  refuse a task whose problem is blocked, and `eligibilityFor` propagates the
+  block to dependants with the problem id in `blockedByProblemIds`.
+  `WorkQueue.blockOnProblem` puts the queue in a `blocked` state that
+  `resumeQueue` cannot clear.
+- **Why:** "stop trying" has to be true for every dispatch path, including a
+  future one that forgets to check. The database row plus three call-site checks
+  is the smallest mechanism that survives new callers.
+- **Constrains:** a blocked task must be reopened (with evidence or a Victor
+  decision) before it can be claimed; independent tasks in the same workspace
+  stay eligible and are selected.
+
+## D-0063 — Pause is Mona's boundary; a native owner gets a partial receipt
+
+- **Decision:** `pauseAfterTask({ nativeDispatcherActive })` returns
+  `outcome: 'partial'` with a detail naming the native workflow whenever a
+  native dispatcher owns the run. `StudioService.pause` accepts this through an
+  injected `nativeDispatcherActive` probe.
+- **Why:** spec 10.3 separates queue boundaries from engine operations, and spec
+  8.4 forbids promising enforcement Mona does not have. Silently claiming a
+  pause while a native goal keeps dispatching would be exactly that promise.
+- **Constrains:** a full native pause needs the native surface (P15). Until
+  then, the receipt says so and the studio shows the partial detail.
+
+## D-0064 — Engine-internal attempt loops are cooperative, and the UI says so
+
+- **Decision:** Mona enforces attempt limits on its own dispatch and on structured
+  attempt reports. Inside one engine turn it injects a stable
+  `ENGINE_ATTEMPT_INSTRUCTION` and shows the enforcement boundary. It never
+  parses error strings to infer a loop, and it never pays a second model to
+  watch for repetition.
+- **Why:** a heuristic counter over log text is a guess presented as a
+  guarantee, which spec 8.4 explicitly forbids.
+- **Constrains:** `docs/evidence/P11-attempts.md` is the reference for what is
+  guaranteed; later prompts must not upgrade that claim without a verified
+  engine event.
+
+## D-0065 — Three cost origins, and unknown is a value
+
+- **Decision:** every usage record is `provider_reported`, `estimated` (a recorded
+  rate revision applied locally) or `unknown` (with a reason). Unknown carries no
+  cost value and is excluded from subtotals rather than added as zero.
+- **Why:** spec 9.3 requires provider-reported cost, local estimates and missing
+  data to be distinguishable, and "unknown cost ≠ zero" is a project
+  non-negotiable.
+- **Constrains:** the store refuses a cost value on an unknown row; the CSV
+  export labels the origin per row; the UI must not format a null as `$0.00`.
+
+## D-0066 — Rate revisions are append-only and recalculation is a view
+
+- **Decision:** `rate_cards` is keyed by `(provider, model, revision)`;
+  re-inserting an existing revision with different numbers is a `conflict`.
+  Usage rows keep the `rate_revision` that priced them. `recalculate` returns a
+  projection under another revision and writes nothing.
+- **Why:** spec 9.3 forbids retrospective rewriting of historical pricing without
+  an explicit recalculation view; a mutable rate row would silently rewrite every
+  past estimate.
+- **Constrains:** nothing may UPDATE a rate card's numbers. A price change is
+  a new revision with a later `effective_from`.
+
+## D-0067 — Budgets warn before dispatch and disclose their own limit
+
+- **Decision:** budgets are optional and scoped to session, project or day. A day
+  scope resolves to a UTC window computed from an explicit timezone offset.
+  Evaluation compares `spent + unreleased reservations` to warn/stop thresholds
+  and returns `allow | warn | block_next_dispatch`; only the *next* dispatch is
+  blocked, and every evaluation carries a disclosure string.
+- **Why:** spec 9.3 permits optional user-set limits but forbids presenting them
+  as an invoice cap. The disclosure travels with the result instead of living in
+  documentation only.
+- **Constrains:** no mandatory budget for ordinary authorized work; in-flight
+  turns are never interrupted for cost; unknown records are reported, not priced.
+
+## D-0068 — Change attribution comes from recorded tool paths, not from timing
+
+- **Decision:** a change is labeled `tool_recorded` only when its path appears in
+  the recorded tool-event set; everything else is `unattributed`. Pre-existing
+  user edits are already inside the baseline and therefore never appear as agent
+  work.
+- **Why:** spec 7 and 11 require distinguishing attributable tool changes from
+  workspace-wide deltas, and explicitly forbid inferring sole agent authorship
+  from timing.
+- **Constrains:** no heuristic promotion of `unattributed` to `tool_recorded`; a
+  missing baseline produces `comparable: false`, not an empty diff.
+
+## D-0069 — A baseline is a hash map, not a snapshot engine
+
+- **Decision:** `change_baselines` stores path/sha/size/binary per file with
+  explicit exclusions and a file cap. Restore is Git `checkout --` behind a hash
+  guard. Non-Git folders report restore as unsupported.
+- **Why:** spec 11 says not to build a second incomplete snapshot engine as a
+  workaround for missing native behaviour. A hash map answers "what changed"
+  cheaply and cannot be mistaken for a restorable snapshot.
+- **Constrains:** restore refuses on staged changes, conflicts, untracked paths
+  and any hash mismatch; `reset --hard` and blanket clean are never used.
+
+## D-0070 — Selected commits use pathspecs, never the index
+
+- **Decision:** commit runs `git commit -m <msg> -- <paths>`, so only the selected
+  paths enter the commit and unrelated staged entries stay staged.
+- **Why:** spec 11 requires staged/unstaged/user work to stay separate and
+  forbids touching unrelated staged work. Committing the index would sweep a
+  user's staged file into an agent commit.
+- **Constrains:** a caller must pass explicit paths; an empty path list is
+  refused; `git` is invoked with an argument array and no shell string.
+
+## D-0071 — Editor writes are hash-guarded
+
+- **Decision:** `writeFileFresh` requires either `expectedSha256: null` (the file
+  must not exist) or the current file hash. A mismatch is a `conflict`, and the
+  write happens through an fsynced temp file plus rename.
+- **Why:** spec 11 requires fresh revisions and conflict detection, and forbids
+  overwriting an externally edited buffer.
+- **Constrains:** callers must keep the hash they read; there is no
+  "force overwrite" escape hatch in the service.
