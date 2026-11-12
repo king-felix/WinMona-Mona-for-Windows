@@ -1,14 +1,14 @@
 # Mona build handoff
 
 **Current prompt:** P09 — Make the first right-click launch work
-**Current status:** P00–P08 completed. State revision 27. Next eligible: P09.
+**Current status:** P00–P08 completed. State revision 28. Next eligible: P09.
 
-**Last verified commit / dirty work:** the P08 work is commit `pending` at the
-time this file was written; the checkpoint and journal rows recorded after it
-carry the real hash. `last_verified_commit` stays null because a state file
-cannot contain the hash of the commit that contains it. Verify with
-`node tools/build/cli.mjs validate` (OK, r27, 0 warnings) before trusting this
-file.
+**Last verified commit / dirty work:** the P08 work is commit `6d47537c31c1`
+(`P08: live studio over the real engine`); the journal
+(`checkpoints.jsonl`) carries the full hash. `last_verified_commit` stays null
+because a state file cannot contain the hash of the commit that contains it.
+Verify with `node tools/build/cli.mjs validate` (OK, r28, 0 warnings) before
+trusting this file.
 
 ## P08 result — a live studio over the real engine
 
@@ -125,7 +125,7 @@ None.
 - `npm run smoke -w @mona/desktop` (`P08-shell-smoke.json`) → pass, 25 named
   bridge methods, 335 MB.
 - `npm run catalog -w @mona/desktop` (`P08-catalog-regression.json`) → 21/21.
-- `node tools/build/cli.mjs validate` → OK, r27, 0 warnings.
+- `node tools/build/cli.mjs validate` → OK, r28, 0 warnings.
 - Spend: one live turn in the final evidence run (~$0.0015 engine-priced). Every
   other P08 check ran without a provider request.
 
