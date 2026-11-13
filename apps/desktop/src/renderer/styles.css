@@ -94,7 +94,11 @@ body {
 .layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
+  /* One bounded row: the scroll region must not grow past the shell and paint
+     over the status bar when the window scale is raised. */
+  grid-template-rows: minmax(0, 1fr);
   min-height: 0;
+  overflow: hidden;
 }
 
 .rail {
@@ -227,6 +231,52 @@ body {
   grid-template-columns: minmax(0, 1fr) 300px;
   gap: var(--space-4);
   min-height: 0;
+}
+
+/* Closing the Inspector gives its whole column to the work surface. The rail is
+   a labelled control, not a hidden gesture: nothing disappears unaccountably. */
+.workspace.inspector-collapsed {
+  grid-template-columns: minmax(0, 1fr) 32px;
+}
+
+.inspector-rail {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+}
+
+.inspector-rail-button {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--muted);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  writing-mode: vertical-rl;
+}
+
+.inspector-rail-button:hover {
+  color: var(--ink);
+  border-color: var(--border-strong);
+}
+
+/* The label reads vertically; the chevron must stay upright next to it. */
+.inspector-rail-button [aria-hidden='true'] {
+  writing-mode: horizontal-tb;
+  font-size: var(--text-md);
+  line-height: 1;
+}
+
+.inspector-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
 .workspace-main {
@@ -398,6 +448,30 @@ body {
   flex-wrap: wrap;
 }
 
+/* Window scale: two step buttons and the current percentage, which is also the
+   reset control. Sized in em so the control scales with what it controls. */
+.zoom-control {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.zoom-control .ghost-button {
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.zoom-control .zoom-value {
+  min-width: 4.5ch;
+  font-variant-numeric: tabular-nums;
+}
+
+.zoom-control .ghost-button[disabled] {
+  color: var(--muted);
+  opacity: 0.55;
+  cursor: default;
+}
+
 .drawer {
   max-height: 42vh;
   overflow: auto;
@@ -426,7 +500,8 @@ body {
 }
 
 @media (max-width: 1100px) {
-  .workspace {
+  .workspace,
+  .workspace.inspector-collapsed {
     grid-template-columns: minmax(0, 1fr);
   }
   .layout {
@@ -851,7 +926,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-height: calc(100vh - 220px);
+  max-height: calc(100vh - 190px);
   overflow: auto;
 }
 

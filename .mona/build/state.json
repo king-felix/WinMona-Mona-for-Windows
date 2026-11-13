@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 81,
+  "revision": 82,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1470,7 +1470,12 @@
         "installed probes re-run on the rebuilt bytes: a11y 12/12, idle memory 370.5 MB, cold 421 ms / warm 722 ms, install verify ok",
         "artifact rebuilt and re-qualified: 1,673 files / 452,709,537 bytes; MSIX sha256 5a7a6455...44ee; install verify exits 0 and the identity package reports Status Ok",
         "recorded D-0111: the 370.5-377.1 MB idle deviation is accepted for 0.1.0; the 350 MB target is unchanged, no text claims it is met, MONA-028 stays partial on the human checks",
-        "added install-mona.cmd: per-user install, installed smoke verification and app start in one double-clickable file; ran it (exit 0) and launched Mona non-elevated for testing"
+        "added install-mona.cmd: per-user install, installed smoke verification and app start in one double-clickable file; ran it (exit 0) and launched Mona non-elevated for testing",
+        "Inspector collapses to a labelled rail and starts closed: timeline width 933px collapsed vs 665-680px open, choice remembered, Focus Mode unchanged",
+        "Ctrl +/-/0 scales the whole window through a fixed 50-200% ladder applied in the main process, persisted in state/appearance.json, with an honest status-bar control",
+        "fixed a work area that painted over the status bar at raised scale; the live probe now asserts the boundary",
+        "P24 appearance probe 19/19 on the development and installed builds; a11y still 12/12; 558 Vitest in 68 files; npm run ci exit 0",
+        "artifact rebuilt and reinstalled: 1,681 files, MSIX sha256 8c815f83..., package Status Ok, verify --smoke exit 0"
       ],
       "remaining_steps": [
         "human right-click on a folder and a folder background confirming the modern menu entry; registration is proven, appearance is not",
@@ -1646,6 +1651,41 @@
           "kind": "document",
           "recorded_utc": "2026-11-13T00:08:29Z",
           "commit": "6dd47e1ea521d094973d97784d39432f08b24047"
+        },
+        {
+          "path": "docs/evidence/P24-appearance.md",
+          "sha256": "4eb178805d32c1539444c6b5aa6d770cd0487ce3423c88640f65b0644179dfd7",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:23:09Z",
+          "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
+        },
+        {
+          "path": "docs/evidence/P24-appearance-installed.json",
+          "sha256": "2e6687df190f89ff38067e0a658c414614521a0513405ce9570cc2a214f4fa46",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:23:09Z",
+          "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
+        },
+        {
+          "path": "docs/evidence/P24-package.json",
+          "sha256": "af907312e2eaa3c896848d6dc39f7862bc56c764e6a36870f100682a9fb8fd3e",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:23:09Z",
+          "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
+        },
+        {
+          "path": "docs/evidence/P24-install.json",
+          "sha256": "d8cbfb92c18814c28b086a111ce332a515aa0a41ff5ff0df397142ec1704584e",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:23:09Z",
+          "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
+        },
+        {
+          "path": "docs/evidence/P24-a11y-dev.json",
+          "sha256": "42f5b38cb49a0b5ec8c36b48c2235f1f0a913d7bd476818c1212f1b38d3b1963",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:23:09Z",
+          "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
         }
       ],
       "blocker_ids": [
@@ -1654,5 +1694,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-13T00:08:29Z"
+  "last_checkpoint_utc": "2026-11-13T00:23:09Z"
 }

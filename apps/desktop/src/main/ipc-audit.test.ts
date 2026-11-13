@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { AppInfo } from '../shared/ipc.js';
 import type { AttentionView } from '../shared/attention.js';
+import type { AppearanceView } from '../shared/appearance.js';
 import type { LaunchStateView } from '../shared/launch.js';
 import { registerAgentIpc } from './agents-ipc.js';
+import { registerAppearanceIpc } from './appearance-ipc.js';
 import { registerAttentionIpc } from './attention-ipc.js';
 import { registerBriefingIpc } from './briefing-ipc.js';
 import { registerCapabilityIpc } from './capability-ipc.js';
@@ -45,6 +47,12 @@ function wireEverything(): Map<string, (event: unknown, payload: unknown) => unk
     view: () => ({}) as AttentionView,
     update: () => ({}) as AttentionView,
     quitAndStop: () => undefined,
+  });
+  registerAppearanceIpc({
+    handle,
+    isTrustedSender: untrusted,
+    view: () => ({}) as AppearanceView,
+    zoom: () => ({}) as AppearanceView,
   });
   registerBriefingIpc({ handle, isTrustedSender: untrusted, service: () => null, ui: () => null });
   registerMemoryIpc({ handle, isTrustedSender: untrusted, service: () => null });

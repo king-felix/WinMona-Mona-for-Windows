@@ -12,6 +12,7 @@ import type {
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
 import type { AttentionFocus, AttentionView } from '../shared/attention.js';
+import type { AppearanceView } from '../shared/appearance.js';
 import type { BriefingView } from '../shared/briefing.js';
 import type { ExtensionsView, CapabilityExplorerView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
@@ -97,6 +98,16 @@ function defaultAttention(): AttentionView {
     quietNow: false,
     quietDetail: 'Quiet hours are off. Notifications can be delivered at any time.',
     lastEvent: null,
+  };
+}
+
+function defaultAppearance(): AppearanceView {
+  return {
+    zoomFactor: 1,
+    zoomPercent: 100,
+    canZoomIn: true,
+    canZoomOut: true,
+    detail: 'Scale 100%',
   };
 }
 
@@ -266,6 +277,7 @@ type Store = {
   launchHandlers?: Array<(receipt: LaunchReceipt) => void>;
   launch?: LaunchReceipt | null;
   attention?: AttentionView;
+  appearance?: AppearanceView;
   briefing?: BriefingView;
   focusHandlers?: Array<(focus: AttentionFocus) => void>;
   layouts?: Array<{ projectId: string; layout: string }>;
@@ -797,6 +809,23 @@ function bridgeFor(store: Store): Window['mona'] {
       return ok(store.attention);
     },
     attentionQuitStop: async () => ok({ requested: true, detail: 'Quit requested.' }),
+    appearanceGet: async () => ok(store.appearance ?? defaultAppearance()),
+    appearanceZoom: async ({ direction }: { direction: 'in' | 'out' | 'reset' }) => {
+      const ladder = [0.5, 0.6, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2];
+      const current = store.appearance?.zoomFactor ?? 1;
+      const index = ladder.indexOf(current) < 0 ? ladder.indexOf(1) : ladder.indexOf(current);
+      const stepped = ladder[Math.max(0, Math.min(ladder.length - 1, index + (direction === 'in' ? 1 : -1)))] ?? 1;
+      const next = direction === 'reset' ? 1 : stepped;
+      store.appearance = {
+        zoomFactor: next,
+        zoomPercent: Math.round(next * 100),
+        canZoomIn: next < 2,
+        canZoomOut: next > 0.5,
+        detail: `Scale ${Math.round(next * 100)}%`,
+      };
+      return ok(store.appearance);
+    },
+    onAppearance: () => () => undefined,
     onAttentionFocus: (handler: (focus: AttentionFocus) => void) => {
       const list = (store.focusHandlers ??= []);
       list.push(handler);
@@ -863,6 +892,28 @@ afterEach(() => {
 });
 
 describe('Mona shell', () => {
+  it('steps the window scale from the status bar and disables exhausted directions honestly', async () => {
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
+      projects: [],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+    });
+    const { root } = await render();
+    expect(document.querySelector('[data-testid="zoom-value"]')?.textContent).toBe('100%');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('button[aria-label="Larger scale"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('[data-testid="zoom-value"]')?.textContent).toBe('110%');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('button[aria-label^="Window scale"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('[data-testid="zoom-value"]')?.textContent).toBe('100%');
+    await act(async () => root.unmount());
+  });
+
   it('shows a real empty catalog state without demanding an API key', async () => {
     (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
       projects: [],
@@ -1504,7 +1555,23 @@ describe('Mona shell', () => {
       button('Studio').dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await new Promise((resolve) => setTimeout(resolve, 30));
     });
+    // The Inspector is a reference panel: closed by default so the timeline owns
+    // the width, and reachable through one labelled control.
+    expect(document.querySelector('aside[aria-label="Inspector"]')).toBeNull();
+    expect(document.querySelector('.workspace')?.className).toContain('inspector-collapsed');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('button[aria-label="Show Inspector"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
     expect(document.querySelector('aside[aria-label="Inspector"]')).not.toBeNull();
+    expect(document.querySelector('.workspace')?.className).not.toContain('inspector-collapsed');
+    expect(localStorage.getItem('mona.inspector')).toBe('open');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('button[aria-label="Hide Inspector"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(document.querySelector('aside[aria-label="Inspector"]')).toBeNull();
+    expect(localStorage.getItem('mona.inspector')).toBe('collapsed');
     await act(async () => {
       button('Focus').dispatchEvent(new MouseEvent('click', { bubbles: true }));
       await new Promise((resolve) => setTimeout(resolve, 30));

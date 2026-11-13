@@ -91,6 +91,9 @@ node tools/install/cli.mjs uninstall
 - **Agents, memory, extensions, capabilities.** Native goals/fleets/runs, local term search
   over recorded state, MCP/skill/plugin/hook inventory, and a capability explorer over the
   pinned engine surface — each row says what is qualified, discovered, or unavailable.
+- **A shell that yields to the work.** The Inspector collapses to a rail so the agent timeline
+  owns the width, and <kbd>Ctrl</kbd>+<kbd>+</kbd>/<kbd>−</kbd>/<kbd>0</kbd> scale the whole
+  window in fixed steps when the display is far away.
 
 ## Documentation
 

@@ -28,6 +28,7 @@ import { MemoryPanel } from './MemoryPanel.js';
 import { ChangesPanel } from './ChangesPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
 import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
+import type { AppearanceView } from '../shared/appearance.js';
 import type { BriefingView } from '../shared/briefing.js';
 import type {
   CatalogProject,
@@ -45,6 +46,9 @@ type Theme = 'daybreak' | 'afterglow';
 type Notice = { tone: Tone; title: string; body: string };
 
 const HARNESS_SCREENS: HarnessScreenId[] = ['home', 'studio', 'work', 'cost', 'blocker', 'settings', 'states'];
+
+/** Remembers whether the inspector reference panel is open. Layout only. */
+const INSPECTOR_STORAGE_KEY = 'mona.inspector';
 
 const NAV: Array<{ id: ProjectView; label: string; hint: string }> = [
   { id: 'home', label: 'Home', hint: 'Projects, recents, and what needs attention' },
@@ -150,6 +154,16 @@ export function App(): React.JSX.Element {
   const [identityColor, setIdentityColor] = useState('#1F5F8B');
   const [identityMonogram, setIdentityMonogram] = useState('');
   const [quitOpen, setQuitOpen] = useState(false);
+  // The inspector is a reference panel, not the work surface. It starts collapsed
+  // so the timeline gets the width, and the choice is remembered per machine.
+  const [inspectorOpen, setInspectorOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(INSPECTOR_STORAGE_KEY) === 'open';
+    } catch {
+      return false;
+    }
+  });
+  const [appearance, setAppearance] = useState<AppearanceView | null>(null);
   const appliedLaunch = useRef(0);
   const liveSelection = useRef<{ projectId: string | null; sessionId: string | null; draft: string }>({
     projectId: null,
@@ -395,6 +409,36 @@ export function App(): React.JSX.Element {
   useEffect(() => {
     document.documentElement.dataset.density = attention?.settings.density ?? 'comfortable';
   }, [attention?.settings.density]);
+
+  // The inspector preference is presentation only, so it lives with the theme
+  // rather than in the database: there is nothing to migrate and nothing to lose.
+  useEffect(() => {
+    try {
+      localStorage.setItem(INSPECTOR_STORAGE_KEY, inspectorOpen ? 'open' : 'collapsed');
+    } catch {
+      /* storage is optional; the panel still toggles for this session */
+    }
+  }, [inspectorOpen]);
+
+  // Window scale. The main process owns the value (it applies it to the window and
+  // handles the shortcut), so the status bar reads it and follows its pushes.
+  useEffect(() => {
+    let alive = true;
+    const unsubscribe = window.mona.onAppearance((view) => setAppearance(view));
+    void (async () => {
+      const result = await window.mona.appearanceGet();
+      if (alive && result.ok) setAppearance(result.data);
+    })();
+    return () => {
+      alive = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const changeZoom = useCallback(async (direction: 'in' | 'out' | 'reset') => {
+    const result = await window.mona.appearanceZoom({ direction });
+    if (result.ok) setAppearance(result.data);
+  }, []);
 
   // Success notices are transient confirmations, not state the user must clear.
   // Warnings and failures stay until dismissed.
@@ -1119,7 +1163,7 @@ export function App(): React.JSX.Element {
             </div>
           ) : null}
 
-          <div className="workspace">
+          <div className={`workspace${!focusMode && !inspectorOpen ? ' inspector-collapsed' : ''}`}>
             <div className="workspace-main">
               {screen === 'home' ? (
                 <HomeView
@@ -1292,13 +1336,29 @@ export function App(): React.JSX.Element {
                 />
               )}
             </div>
-            {focusMode ? null : (
+            {focusMode ? null : inspectorOpen ? (
               <InspectorPanel
                 project={selected}
                 ui={ui}
                 engine={engine}
                 engineWorkspaceMatches={engineWorkspaceMatches}
+                onCollapse={() => setInspectorOpen(false)}
               />
+            ) : (
+              <div className="inspector-rail">
+                <button
+                  type="button"
+                  className="inspector-rail-button"
+                  onClick={() => setInspectorOpen(true)}
+                  aria-label="Show Inspector"
+                  aria-expanded={false}
+                  aria-controls="inspector-panel"
+                  title="Show the Inspector panel. The timeline gets this width while it is closed."
+                >
+                  <span aria-hidden="true">‹</span>
+                  <span>Inspector</span>
+                </button>
+              </div>
             )}
           </div>
         </main>
@@ -1368,6 +1428,38 @@ export function App(): React.JSX.Element {
           ) : null}
         </span>
         <div className="statusbar-actions">
+          <div className="zoom-control" role="group" aria-label="Window scale">
+            <button
+              type="button"
+              className="ghost-button zoom-step"
+              onClick={() => void changeZoom('out')}
+              disabled={!appearance?.canZoomOut}
+              aria-label="Smaller scale"
+              title="Smaller scale (Ctrl+-)"
+            >
+              <span aria-hidden="true">−</span>
+            </button>
+            <button
+              type="button"
+              className="ghost-button zoom-value"
+              onClick={() => void changeZoom('reset')}
+              data-testid="zoom-value"
+              aria-label={`Window scale ${appearance ? appearance.zoomPercent : 100} percent. Reset to 100 percent.`}
+              title="Reset the scale to 100% (Ctrl+0)"
+            >
+              {appearance ? `${appearance.zoomPercent}%` : '100%'}
+            </button>
+            <button
+              type="button"
+              className="ghost-button zoom-step"
+              onClick={() => void changeZoom('in')}
+              disabled={!appearance?.canZoomIn}
+              aria-label="Larger scale"
+              title="Larger scale (Ctrl++)"
+            >
+              <span aria-hidden="true">+</span>
+            </button>
+          </div>
           <button
             type="button"
             className="ghost-button"
@@ -1595,6 +1687,10 @@ export function App(): React.JSX.Element {
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>/</kbd> or <kbd>?</kbd> this list
+          </li>
+          <li>
+            <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>−</kbd> make everything larger or smaller;{' '}
+            <kbd>Ctrl</kbd>+<kbd>0</kbd> returns to 100%. Controls and panels reflow together
           </li>
           <li>
             <kbd>Ctrl</kbd>+<kbd>Enter</kbd> submit the composed prompt
@@ -2071,16 +2167,23 @@ function InspectorPanel({
   ui,
   engine,
   engineWorkspaceMatches,
+  onCollapse,
 }: {
   project: CatalogProject | null;
   ui: UiStateView | null;
   engine: EngineView | null;
   engineWorkspaceMatches: boolean;
+  onCollapse: () => void;
 }): React.JSX.Element {
   const entry = project ? ui?.projects[project.id] : null;
   return (
-    <aside className="inspector panel" aria-label="Inspector">
-      <h2>Inspector</h2>
+    <aside className="inspector panel" aria-label="Inspector" id="inspector-panel">
+      <div className="inspector-head">
+        <h2>Inspector</h2>
+        <Button size="sm" onClick={onCollapse} aria-label="Hide Inspector" title="Hide the Inspector">
+          Hide
+        </Button>
+      </div>
       {project ? (
         <>
           <div className="inspector-block">

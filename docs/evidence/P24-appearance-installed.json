@@ -1,0 +1,145 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true,
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p24-appearance-ym4vqn\\appearance-project"
+    },
+    {
+      "name": "the studio timeline is on screen",
+      "ok": true
+    },
+    {
+      "name": "the Inspector is closed by default",
+      "ok": true,
+      "detail": {
+        "collapsedWorkspace": "workspace inspector-collapsed",
+        "railPresent": true
+      }
+    },
+    {
+      "name": "a labelled control reopens it",
+      "ok": true
+    },
+    {
+      "name": "the collapsed state is the layout class, not a hidden panel",
+      "ok": true
+    },
+    {
+      "name": "the timeline column is captured while collapsed",
+      "ok": true,
+      "detail": {
+        "narrow": 948
+      }
+    },
+    {
+      "name": "the Inspector opens from the rail",
+      "ok": true,
+      "detail": {
+        "timelineWidthCollapsed": 948,
+        "timelineWidthOpen": 680
+      }
+    },
+    {
+      "name": "opening it costs the timeline width, so closing it really gives space back",
+      "ok": true
+    },
+    {
+      "name": "the open Inspector is captured",
+      "ok": true
+    },
+    {
+      "name": "the Inspector closes again and the width returns",
+      "ok": true,
+      "detail": {
+        "restored": 948,
+        "narrow": 948
+      }
+    },
+    {
+      "name": "Ctrl+= makes everything larger",
+      "ok": true,
+      "detail": {
+        "startZoom": 1,
+        "afterPlus": 1.1
+      }
+    },
+    {
+      "name": "the status bar reports the applied scale, not an intention",
+      "ok": true,
+      "detail": {
+        "label": "110%"
+      }
+    },
+    {
+      "name": "Ctrl+- makes everything smaller",
+      "ok": true,
+      "detail": {
+        "afterPlus": 1.1,
+        "afterMinus": 1
+      }
+    },
+    {
+      "name": "at a larger scale the page has no horizontal overflow",
+      "ok": true,
+      "detail": {
+        "zoom": 1.5,
+        "overflow": 0,
+        "composer": 544,
+        "strip": 81,
+        "overlap": 0
+      }
+    },
+    {
+      "name": "the work area ends above the status bar instead of painting over it",
+      "ok": true,
+      "detail": {
+        "overlap": 0
+      }
+    },
+    {
+      "name": "the composer is still laid out at a larger scale",
+      "ok": true
+    },
+    {
+      "name": "the larger scale is captured",
+      "ok": true
+    },
+    {
+      "name": "Ctrl+0 returns to 100%",
+      "ok": true,
+      "detail": {
+        "reset": 1
+      }
+    },
+    {
+      "name": "the chosen scale is persisted beside the other UI preferences",
+      "ok": true,
+      "detail": {
+        "file": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p24-appearance-ym4vQn\\profile\\state\\appearance.json",
+        "persisted": {
+          "schema": 1,
+          "zoomFactor": 1
+        }
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p24-installed\\studio-inspector-collapsed.png",
+      "label": "studio-inspector-collapsed"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p24-installed\\studio-inspector-open.png",
+      "label": "studio-inspector-open"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p24-installed\\studio-scaled-up.png",
+      "label": "studio-scaled-up"
+    }
+  ],
+  "zoomFile": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p24-appearance-ym4vQn\\profile\\state\\appearance.json",
+  "capturedAt": "2026-11-13T00:21:58.315Z",
+  "providerRequests": 0
+}

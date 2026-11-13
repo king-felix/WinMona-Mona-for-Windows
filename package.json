@@ -38,7 +38,8 @@
     "mona:install": "node tools/install/cli.mjs install",
     "mona:uninstall": "node tools/install/cli.mjs uninstall",
     "mona:status": "node tools/install/cli.mjs status",
-    "qa": "npm run qa -w @mona/desktop"
+    "qa": "npm run qa -w @mona/desktop",
+    "appearance": "npm run appearance -w @mona/desktop"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

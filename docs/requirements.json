@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 351,
+  "revision": 353,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1004,6 +1004,14 @@
               "recorded_utc": "2026-11-12T19:44:29Z",
               "commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
               "note": "release candidate re-capture: 34 screenshots, 4 audits clean, 0 duplicate ids, 0 unnamed controls, focus ring on every stop, both themes and densities"
+            },
+            {
+              "path": "docs/evidence/P24-a11y-dev.json",
+              "sha256": "42f5b38cb49a0b5ec8c36b48c2235f1f0a913d7bd476818c1212f1b38d3b1963",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T00:22:58Z",
+              "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f",
+              "note": "accessibility probe re-run after the layout change: 12/12 including no horizontal overflow and a laid-out composer at 200% zoom; the collapsed Inspector keeps a labelled, keyboard-reachable control instead of hiding state"
             }
           ]
         },
@@ -1027,11 +1035,19 @@
               "recorded_utc": "2026-11-12T03:15:23Z",
               "commit": "b026819",
               "note": "P06 evidence recorded at commit b026819"
+            },
+            {
+              "path": "docs/evidence/P24-appearance.md",
+              "sha256": "4eb178805d32c1539444c6b5aa6d770cd0487ce3423c88640f65b0644179dfd7",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T00:22:55Z",
+              "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f",
+              "note": "window scale is user-adjustable: Ctrl +/-/0 steps a fixed 50-200% ladder applied to the web contents, handled in the main process, persisted, with an honest status-bar control; live probe 19/19 on development and installed builds; density modes and reduced motion unchanged and still covered by the recorded design-system evidence"
             }
           ]
         }
       ],
-      "verified_commit": "28e0979386e005e1d321b9dd1b772f5f0fb5afec",
+      "verified_commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },

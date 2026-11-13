@@ -1,0 +1,24 @@
+executable: C:\Users\victo\AppData\Local\Programs\Mona\Mona.exe
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-p24-appearance-ym4vQn\appearance-project
+
+
+PASS a real project opens through the catalog :: "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p24-appearance-ym4vqn\\appearance-project"
+PASS the studio timeline is on screen
+PASS the Inspector is closed by default :: {"collapsedWorkspace":"workspace inspector-collapsed","railPresent":true}
+PASS a labelled control reopens it
+PASS the collapsed state is the layout class, not a hidden panel
+PASS the timeline column is captured while collapsed :: {"narrow":948}
+PASS the Inspector opens from the rail :: {"timelineWidthCollapsed":948,"timelineWidthOpen":680}
+PASS opening it costs the timeline width, so closing it really gives space back
+PASS the open Inspector is captured
+PASS the Inspector closes again and the width returns :: {"restored":948,"narrow":948}
+PASS Ctrl+= makes everything larger :: {"startZoom":1,"afterPlus":1.1}
+PASS the status bar reports the applied scale, not an intention :: {"label":"110%"}
+PASS Ctrl+- makes everything smaller :: {"afterPlus":1.1,"afterMinus":1}
+PASS at a larger scale the page has no horizontal overflow :: {"zoom":1.5,"overflow":0,"composer":544,"strip":81,"overlap":0}
+PASS the work area ends above the status bar instead of painting over it :: {"overlap":0}
+PASS the composer is still laid out at a larger scale
+PASS the larger scale is captured
+PASS Ctrl+0 returns to 100% :: {"reset":1}
+PASS the chosen scale is persisted beside the other UI preferences :: {"file":"X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p24-appearance-ym4vQn\\profile\\state\\appearance.json","persisted":{"schema":1,"zoomFactor":1}}
+mona: applied 7 state migration(s) to version 7

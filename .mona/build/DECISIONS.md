@@ -1440,3 +1440,30 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   are still human-only. A later memory pass must re-measure the installed candidate, not infer.
 - **Verified by:** `docs/evidence/P23-memory-acceptance.md` (the measurement table and this
   decision), `P23-memory-installed-2.json`, `P23-qa-installed-2.json`.
+
+## D-0112 - Window scale lives in the main process on a fixed ladder
+
+- **Decision:** Ctrl +/=, -, and 0 step a fixed ladder (50-200 % in twelve rungs) applied with
+  `webContents.setZoomFactor`, handled in `before-input-event` in the main process, and persisted
+  in `state/appearance.json`. The renderer may request a direction only, never a number.
+- **Why:** the shortcut must work with focus anywhere, including the terminal drawer and dialogs,
+  and scaling the whole web contents is what makes every panel reflow together instead of one
+  column growing against fixed neighbours. A bounded ladder keeps a stray keypress from asking for
+  an unreadable window and lets the UI disable an exhausted direction honestly.
+- **Constrains:** scale is presentation only and must never be conflated with density (a design
+  token change) or with a provider/model setting. Probes get their own profile, so a scale chosen
+  on this machine cannot leak into evidence runs.
+- **Verified by:** `appearance.test.ts` (8 tests), the IPC audit, and `docs/evidence/P24-appearance.md`
+  (19 live steps with synthetic key input, on development and installed builds).
+
+## D-0113 - The Inspector is a collapsed reference panel, and its choice is not schema state
+
+- **Decision:** the Inspector starts collapsed to a 32 px labelled rail; the open/closed choice is
+  stored in `localStorage`, not in the project database. Focus Mode still hides it.
+- **Why:** the timeline is the work surface and a fixed 300 px reference column was costing it the
+  width (measured 253-268 px). A layout preference needs no migration, and putting it in the
+  ledger would imply durable project meaning it does not have.
+- **Constrains:** the collapsed state must remain a labelled, keyboard-reachable control with
+  `aria-expanded`; the panel may never become invisible-but-focusable.
+- **Verified by:** the renderer test that opens, closes and persists it, and the live probe
+  (`timelineWidthCollapsed` vs `timelineWidthOpen`).

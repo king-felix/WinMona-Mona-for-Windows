@@ -1,4 +1,5 @@
 import type { AttentionBridge } from '../shared/attention.js';
+import type { AppearanceBridge } from '../shared/appearance.js';
 import type { AgentBridge } from '../shared/agents.js';
 import type { BriefingBridge } from '../shared/briefing.js';
 import type { CatalogBridge } from '../shared/catalog.js';
@@ -23,6 +24,7 @@ declare global {
       TerminalBridge &
       LaunchBridge &
       AttentionBridge &
+      AppearanceBridge &
       BriefingBridge &
       MemoryBridge &
       ChangesBridge & {

@@ -17,7 +17,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 127,926 | `5a7a645582602d80bb389c252b7b465fc4808c722a957fc7367ed8dfc46544ee` |
+| `Mona-0.1.0-x64.msix` | 127,928 | `8c815f83e830b28937fe615fb1fa1e11e37b4cc61c15ada9d68e841a4839abc2` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -25,8 +25,8 @@ Payload and program identity:
 
 | Artifact | Value |
 |---|---|
-| Install payload | `build/install-stage`, **1,673 files**, 452,709,537 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `2d052cda2a987b60b5214ce5e6fd90beaf7acebe80e801c06b9ceedc9c0b610e` |
+| Install payload | `build/install-stage`, **1,681 files**, 452,756,367 bytes |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `2125d7350b22cc6c34024fa86bd4e006dbfc9a64657bf7bcbc861e6b5c295cec` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |
@@ -170,6 +170,26 @@ P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
   saveable, with a test that iterates the list.
 - **Release documentation**: README, user guide, developer guide, compatibility policy,
   third-party notices, contributing, security policy, changelog, this note.
+
+## Layout round
+
+Two display controls were added after the candidate was qualified, because the reference machine
+is driven from a TV:
+
+- **The Inspector collapses** to a 32 px rail and starts closed, returning 253–268 px of width to
+  the agent timeline (measured 933 px vs 665–680 px). Open with the rail button, close with
+  **Hide**; the choice is remembered, and Focus Mode still hides it.
+- **<kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>−</kbd> / <kbd>0</kbd> scale the whole window** through a
+  fixed 50–200 % ladder, handled in the main process so it works with focus anywhere. A status
+  bar control shows the applied percentage, disables the exhausted direction and resets on click;
+  the choice persists in `state/appearance.json`. Because the whole web contents scales, every
+  panel reflows together rather than one column growing.
+- A layout defect was found at 150 % and fixed: the work area had been painting over the status
+  bar. The live probe now asserts the boundary.
+
+Verification: `docs/evidence/P24-appearance.md`, 19 live steps and three screenshots on both the
+development and the installed build; 558 Vitest tests in 68 files; the accessibility probe still
+passes 12/12 at 200 % zoom.
 
 ## Known issues
 

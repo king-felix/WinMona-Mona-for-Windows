@@ -150,7 +150,30 @@ only with new evidence or a recorded decision.
 - Deleting a project from the catalog never deletes a file. Neither does archiving, renaming or
   uninstalling.
 
-## 12. Privacy
+## 12. Working comfortably: the Inspector and the window scale
+
+**The Inspector panel.** The right-hand Inspector shows the project path, repository, runtime
+binding, drafts and agent counts. It is a reference panel, not the work surface, so it starts
+**closed** and the conversation timeline takes the full width. Open it with the **‹ Inspector**
+rail on the right edge (or the **Hide**/**Show** controls on the panel itself). The choice is
+remembered on this machine. Focus Mode hides it entirely and restores your choice when you
+leave Focus Mode.
+
+**Window scale.** Everything in the window — type, controls, panels, the timeline — scales
+together, so the layout reflows instead of one column growing while the rest stays fixed:
+
+- <kbd>Ctrl</kbd>+<kbd>+</kbd> (or <kbd>Ctrl</kbd>+<kbd>=</kbd>) makes everything larger.
+- <kbd>Ctrl</kbd>+<kbd>-</kbd> makes everything smaller.
+- <kbd>Ctrl</kbd>+<kbd>0</kbd> returns to 100%.
+
+The same three steps are on the status bar as **−**, the current percentage, and **+**; click the
+percentage to reset. The ladder runs from 50% to 200% in fixed steps, and a step that would go
+past either end is disabled rather than silently clamped. The chosen scale is saved in
+`%APPDATA%\@mona\desktop\state\appearance.json` and restored on the next launch. This is a
+display preference only: it changes no product behaviour, sends nothing, and does not affect
+what is recorded.
+
+## 13. Privacy
 
 - No telemetry, no analytics endpoint, no remote content in the window.
 - The renderer cannot reach the file system, the shell, or the network; it calls named,
@@ -161,7 +184,7 @@ only with new evidence or a recorded decision.
 - Conversation export writes exactly the recorded timeline to a file you choose; it calls no
   model.
 
-## 13. Updates
+## 14. Updates
 
 `node tools/install/cli.mjs install` (or `upgrade`) replaces the program tree atomically and
 leaves user data alone. If Mona is running:
@@ -172,7 +195,7 @@ leaves user data alone. If Mona is running:
 Explorer is never restarted by the installer. The current build has no automatic update channel;
 checking for a newer Mona is a manual, local operation.
 
-## 14. Uninstall
+## 15. Uninstall
 
 ```powershell
 node tools/install/cli.mjs uninstall
@@ -183,7 +206,7 @@ installer-created test certificate. It keeps your projects, `%LOCALAPPDATA%\Mona
 (artifacts, backups, logs) and `~/.codewhale`. Remove those directories yourself only when you
 intend to lose the history.
 
-## 15. Known limits in 0.1.0
+## 16. Known limits in 0.1.0
 
 - The Windows 11 modern menu needs a trusted signing certificate; on this reference machine the
   verified elevated import is done and the package registers. A human right-click confirming the

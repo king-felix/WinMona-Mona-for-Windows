@@ -25,7 +25,8 @@
     "qa": "node scripts/qa.mjs",
     "changes": "node scripts/changes.mjs",
     "memory": "node scripts/memory.mjs",
-    "a11y": "node scripts/a11y.mjs"
+    "a11y": "node scripts/a11y.mjs",
+    "appearance": "node scripts/appearance.mjs"
   },
   "dependencies": {
     "@mona/adapter": "0.1.0",

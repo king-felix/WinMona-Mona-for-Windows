@@ -96,6 +96,21 @@ the notes say so.
   the documented per-user install, verifies the installed build and starts Mona. It downloads
   nothing, needs no elevation, and publishes nothing.
 
+### Changed in the layout round
+
+- **The Inspector is collapsible and starts closed.** It was a fixed 300 px column competing with
+  the conversation; it now collapses to a labelled 32 px rail, which returns 260–270 px of width
+  to the timeline (measured 933 px vs 665–680 px in the live probe). Open with the rail button or
+  **Show**, close with **Hide**; the choice is remembered. Focus Mode still hides it.
+- **Ctrl +/−/0 scales the whole window.** A fixed 50%–200% ladder applied to the web contents, so
+  type, controls and panels reflow together instead of one column growing. Handled in the main
+  process, so it works with focus anywhere, including the terminal drawer. A status-bar control
+  shows the applied percentage, disables the exhausted direction, and resets on click. The choice
+  persists in `state/appearance.json`.
+- **The work area no longer paints over the status bar at high scale.** `.layout` is now one
+  bounded grid row, so the scroll region ends above the footer; found and fixed with a live
+  measurement at 150%.
+
 ### Known issues
 
 - **Modern Windows 11 menu: registered, not yet seen.** The package registers and both verbs are

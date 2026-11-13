@@ -1,8 +1,8 @@
 # Mona build handoff
 
 **Current prompt:** P23 — release candidate and final handoff. **Status: completed**, plus the
-elevated round. State revision 80; ledger revision 350. All 24 prompts are delivered; there is no
-next eligible prompt.
+elevated and layout rounds. State revision 82; ledger revision 353. All 24 prompts are delivered;
+there is no next eligible prompt.
 
 **The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027's
 `modern-menu` criterion is registered but not seen (a human right-click is owed), MONA-028 is
@@ -11,14 +11,32 @@ unchanged**) and on the human-only checks. Nothing was relabelled and no complet
 
 **Local install for Victor:** double-click `install-mona.cmd` in the repository root (or run
 `node tools/install/cli.mjs install --smoke`). It installs per user to
-`%LOCALAPPDATA%\Programs\Mona`, verifies the installed build and starts Mona. Ran on 2026-11-12:
-exit 0, installed smoke ok, app up non-elevated.
+`%LOCALAPPDATA%\Programs\Mona`, verifies the installed build and starts Mona. The layout round's
+build was installed and verified on 2026-11-12 (1,681 files, `verify --smoke` exit 0) and left
+closed for testing; re-running the launcher is idempotent.
 
 Nothing was published: no remote, no package feed, no certificate purchase, no public repo.
 Local commits only. The license decision is deliberately unresolved.
 
 Verify before trusting this file: `node tools/build/cli.mjs validate` (expect OK, 0 warnings)
 and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
+
+## Layout round result
+
+- **Inspector collapsed by default.** `.workspace` yields its 300 px column; the panel collapses to
+  a 32 px labelled rail with an upright chevron. Measured timeline width **933 px collapsed vs
+  665–680 px open**. The choice persists in `localStorage` (`mona.inspector`); Focus Mode unchanged.
+- **<kbd>Ctrl</kbd>+<kbd>+</kbd>/<kbd>−</kbd>/<kbd>0</kbd> scale the window.** A fixed 50–200 %
+  ladder applied in the main process (`before-input-event` → `setZoomFactor`), so it works with
+  focus anywhere including the terminal. Persisted in `state/appearance.json`; status-bar control
+  shows the applied percentage, disables the exhausted rung, and resets on click. Three validated
+  IPC channels, sender-checked, in the existing audit.
+- **Defect found and fixed by measuring:** at 150 % the work area painted over the status bar.
+  `.layout` is now one bounded row; the probe asserts `studio-region.bottom <= statusbar.top`.
+- **Verified:** `npm run appearance` **19/19** on development and installed builds
+  (`P24-appearance.md`); `npm run a11y` 12/12 after the change; 558 Vitest / 68 files; `ci` exit 0.
+- **Artifact:** 1,681 files / 452,756,367 bytes; MSIX sha256 `8c815f83…9abc2`; installed,
+  `Status: Ok`, `verify --smoke` exit 0. Spend: **0 µUSD**.
 
 ## Elevated round result
 

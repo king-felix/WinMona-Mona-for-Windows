@@ -47,8 +47,9 @@ import {
   type AttentionFocus,
   type AttentionView,
 } from '../shared/attention.js';
-import { resolveEngineExecutable } from './engine-host-config.js';
+import { APPEARANCE_CHANNELS, type AppearanceView } from '../shared/appearance.js';
 import { openLocalState, type LocalState } from './local-state.js';
+import { resolveEngineExecutable } from './engine-host-config.js';
 import { runLifecycleProbe } from './lifecycle-probe.js';
 import { runCatalogProbe } from './catalog-probe.js';
 import { runStudioProbe } from './studio-probe.js';
@@ -60,6 +61,7 @@ import { runQaProbe } from './qa-probe.js';
 import { runChangesProbe } from './changes-probe.js';
 import { runMemoryProbe } from './memory-probe.js';
 import { runA11yProbe } from './a11y-probe.js';
+import { runAppearanceProbe } from './appearance-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
@@ -71,6 +73,8 @@ import {
   type AttentionEvent,
 } from './attention.js';
 import { registerAttentionIpc } from './attention-ipc.js';
+import { appearanceView, nextZoomFactor, readZoom, writeZoom, zoomShortcut } from './appearance.js';
+import { registerAppearanceIpc } from './appearance-ipc.js';
 import { registerBriefingIpc } from './briefing-ipc.js';
 import { MemoryService } from './memory-service.js';
 import { registerMemoryIpc } from './memory-ipc.js';
@@ -134,6 +138,11 @@ const a11yHistoryRows = Number.parseInt(process.env.MONA_A11Y_HISTORY ?? '300', 
 const changesOut = process.env.MONA_CHANGES_OUT ?? path.join(process.cwd(), 'mona-changes.json');
 const changesWorkspace = process.env.MONA_CHANGES_WORKSPACE ?? null;
 const changesShots = process.env.MONA_CHANGES_SHOTS ?? path.join(process.cwd(), 'mona-changes-shots');
+// P24 appearance probe: collapsible Inspector and Ctrl +/-/0 window scaling.
+const appearanceTest = process.argv.includes('--appearance-probe');
+const appearanceOut = process.env.MONA_APPEARANCE_OUT ?? path.join(process.cwd(), 'mona-appearance.json');
+const appearanceWorkspace = process.env.MONA_APPEARANCE_WORKSPACE ?? null;
+const appearanceShots = process.env.MONA_APPEARANCE_SHOTS ?? path.join(process.cwd(), 'mona-appearance-shots');
 const terminalTest = process.argv.includes('--terminal-test');
 const terminalOut = process.env.MONA_TERMINAL_OUT ?? path.join(process.cwd(), 'mona-terminal.json');
 const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
@@ -142,7 +151,7 @@ const terminalShots = process.env.MONA_TERMINAL_SHOTS ?? path.join(process.cwd()
 // desktop; the P08 probe captures five live frames.
 // Memory measurement deliberately keeps hardware acceleration: the GPU process
 // is part of the real process set and must be measured, not designed away.
-if (shotsTest || studioTest || launchTest || polishTest || terminalTest || changesTest)
+if (shotsTest || studioTest || launchTest || polishTest || terminalTest || changesTest || appearanceTest)
   app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
@@ -191,6 +200,30 @@ const attentionPlanner = new NotificationPlanner();
 let lastAttentionEvent: AttentionEventView | null = null;
 let lastCompletedAt: string | null = null;
 let latestStudio: { projectId: string; run: StudioRun; blocked: boolean } | null = null;
+
+// Window scale. Persisted beside the other UI preferences so a scale chosen for a
+// television survives a restart; applied to every window this process creates.
+const appearanceFile = path.join(app.getPath('userData'), 'state', 'appearance.json');
+let zoomFactor = readZoom(appearanceFile);
+
+/** Push the observed scale to every live window, including a recreated one. */
+function broadcastAppearance(): void {
+  const view = appearanceView(zoomFactor);
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.isDestroyed()) {
+      window.webContents.setZoomFactor(zoomFactor);
+      window.webContents.send(APPEARANCE_CHANNELS.event, view);
+    }
+  }
+}
+
+/** Step the window scale and persist it. Structural change only: no data, no inference. */
+function stepZoom(direction: 'in' | 'out' | 'reset'): AppearanceView {
+  zoomFactor = nextZoomFactor(zoomFactor, direction);
+  writeZoom(appearanceFile, zoomFactor);
+  broadcastAppearance();
+  return appearanceView(zoomFactor);
+}
 
 /**
  * Victor's DS Full Access profile, recorded once in local state. It states the
@@ -845,6 +878,12 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         setTimeout(() => app.quit(), 0);
       },
     });
+    registerAppearanceIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      view: () => appearanceView(zoomFactor),
+      zoom: (direction) => stepZoom(direction),
+    });
     registerBriefingIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -900,6 +939,33 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         profile: null,
         focusComposer: false,
       });
+    }
+
+    if (appearanceTest && appearanceWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runAppearanceProbe({
+        window: probeWindow,
+        outputPath: appearanceOut,
+        shotsDirectory: appearanceShots,
+        workspace: appearanceWorkspace,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        zoomFile: appearanceFile,
+      })
+        .then((result) => {
+          fs.mkdirSync(path.dirname(appearanceOut), { recursive: true });
+          fs.writeFileSync(appearanceOut, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(appearanceOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
     }
 
     if (a11yTest && a11yWorkspace && mainWindow) {
@@ -1372,6 +1438,25 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
 
 function createMainWindow(): BrowserWindow {
   const window = new BrowserWindow(windowOptions(preloadPath, { isDev }));
+  // Scale first, then show: a window that opens at one size and jumps to another
+  // is worse than a slightly later paint.
+  window.webContents.setZoomFactor(zoomFactor);
+  // Ctrl +/-/0 wherever focus is, including the terminal drawer. Handled here
+  // rather than in the renderer so a focused iframe, textarea or xterm cannot
+  // swallow it, and so the same code path serves every window.
+  window.webContents.on('before-input-event', (event, input) => {
+    if (input.type !== 'keyDown') return;
+    const direction = zoomShortcut({
+      key: input.key,
+      code: input.code,
+      control: input.control,
+      meta: input.meta,
+      alt: input.alt,
+    });
+    if (!direction) return;
+    event.preventDefault();
+    stepZoom(direction);
+  });
   window.once('ready-to-show', () => {
     if (!smokeTest) window.show();
   });

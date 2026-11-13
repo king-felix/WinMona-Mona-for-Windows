@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { APP_INFO_CHANNEL } from '../shared/channels.js';
 import { ATTENTION_CHANNELS, type AttentionFocus } from '../shared/attention.js';
+import { APPEARANCE_CHANNELS, type AppearanceView } from '../shared/appearance.js';
 import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
@@ -68,6 +69,16 @@ const bridge = Object.freeze({
     ipcRenderer.on(ATTENTION_CHANNELS.focus, listener);
     return () => {
       ipcRenderer.removeListener(ATTENTION_CHANNELS.focus, listener);
+    };
+  },
+  appearanceGet: () => ipcRenderer.invoke(APPEARANCE_CHANNELS.get, {}),
+  appearanceZoom: (input: { direction: 'in' | 'out' | 'reset' }) => ipcRenderer.invoke(APPEARANCE_CHANNELS.zoom, input),
+  /** The main process pushes a new window scale after a Ctrl +/-/0 shortcut. */
+  onAppearance: (handler: (view: AppearanceView) => void) => {
+    const listener = (_event: unknown, payload: AppearanceView): void => handler(payload);
+    ipcRenderer.on(APPEARANCE_CHANNELS.event, listener);
+    return () => {
+      ipcRenderer.removeListener(APPEARANCE_CHANNELS.event, listener);
     };
   },
   studioGet: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
