@@ -1425,3 +1425,18 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   uninstaller's owned-certificate cleanup.
 - **Verified by:** `P23-untrust-check.json` (both stores absent after removal, `rootUntouched:
   true`) followed by a successful re-import.
+
+## D-0111 - The 370.5-377.1 MB deviation is accepted for 0.1.0; the 350 MB target is not moved
+
+- **Decision:** Victor accepted the measured idle-memory deviation on 2026-11-12. The 350 MB
+  target stands unchanged, MONA-028's `performance` criterion keeps its measured numbers and
+  stays `partial`, and the next evidence-led memory step stays unauthorized rather than
+  cancelled.
+- **Why:** the deviation is a known, measured, reproducible cost of Chromium's process baseline
+  on this host, not a defect hidden by the number. Accepting it is a release judgement the user
+  is entitled to make; rewriting the target would destroy the only thing the target does.
+- **Constrains:** no release text may claim the budget is met, no feature may be removed to reach
+  350 MB, and MONA-028 remains `partial` because the Narrator and physical 200 % scaling checks
+  are still human-only. A later memory pass must re-measure the installed candidate, not infer.
+- **Verified by:** `docs/evidence/P23-memory-acceptance.md` (the measurement table and this
+  decision), `P23-memory-installed-2.json`, `P23-qa-installed-2.json`.

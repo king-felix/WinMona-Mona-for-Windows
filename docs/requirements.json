@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 350,
+  "revision": 351,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -3049,6 +3049,14 @@
               "recorded_utc": "2026-11-12T20:58:51Z",
               "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d",
               "note": "rebuilt installed candidate: 370.5 MB idle working set (average 382.5 MB, 11 samples, 20,000 seeded rows, 120 of 500 rendered, +28.5 MB to expand the window); 350 MB target still unmet; startup cold 421 ms / warm 722 ms in P23-qa-installed-2.json"
+            },
+            {
+              "path": "docs/evidence/P23-memory-acceptance.md",
+              "sha256": "07b96eb844cae8c3826ee611dffd17654219f6f0f4c4b65b30c2e8f083cbf28c",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T00:08:20Z",
+              "commit": "6dd47e1ea521d094973d97784d39432f08b24047",
+              "note": "Victor accepted the measured 370.5-377.1 MB deviation for 0.1.0 (D-0111); the 350 MB target is unchanged and unmet, the criterion carries the measured numbers and stays partial, and the next evidence-led step is not authorized"
             }
           ]
         },

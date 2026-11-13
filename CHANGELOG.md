@@ -89,7 +89,12 @@ the notes say so.
   cannot diverge. This is hardening, not a proven fix: direct CLSID activation is not a valid
   test for packaged shell commands (a known-good third-party package fails it identically).
 - **Memory re-measured on the final bytes:** 370.5 MB idle with the 20,000-row workload; the
-  350 MB target is still unmet and nothing was relabelled.
+  350 MB target is still unmet and nothing was relabelled. **Victor accepted the deviation on
+  2026-11-12** (D-0111): the target is unchanged, no text claims it is met, and MONA-028 stays
+  partial on the human-only checks.
+- **A double-clickable local installer exists.** `install-mona.cmd` in the repository root runs
+  the documented per-user install, verifies the installed build and starts Mona. It downloads
+  nothing, needs no elevation, and publishes nothing.
 
 ### Known issues
 

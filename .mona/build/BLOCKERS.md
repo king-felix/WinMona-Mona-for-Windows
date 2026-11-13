@@ -11,10 +11,10 @@ Acknowledging a blocker never resets its counter or clears the row.
 This is not a three-attempt blocker; it is recorded here because it needs Victor.
 
 - **Memory:** 404 MB at the start of P23, **370.5 MB** on the installed candidate on the
-  current bytes (range 370.5–377.1 MB across runs) after two attempts with material progress;
-  the 350 MB target is unchanged (D-0104, D-0107). Two rows in `attempts.jsonl`; the third is
-  reserved for the next evidence-led step in `docs/evidence/P23-followup.md` §2.7. Victor either
-  accepts the recorded progress with the target still unmet, or authorizes that next step.
+  current bytes (range 370.5 to 377.1 MB across runs). **Accepted by Victor on 2026-11-12**
+  (D-0111): the 350 MB target is unchanged and still unmet, no release text claims it is met,
+  and the next evidence-led step stays unauthorized. Two rows remain in `attempts.jsonl`; the
+  third slot is unused because an explicit decision closed the item, not a fix.
 - **Screen reader:** a Narrator walkthrough is human-only (P22-ISSUE-004). The
   automated half is done and recorded: `P23-a11y-installed-2.json`, 12/12 steps on the current
   bytes.

@@ -15,8 +15,9 @@ Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 
 - 28 of 30 product requirements **verified** against recorded evidence.
 - **MONA-028 is partial**: idle memory is 370.5–377.1 MB on the installed candidate against a
-  350 MB internal target (down from 404 MB after windowing rendered timeline rows), and the
-  Windows screen-reader and physical 200% scaling checks need a person.
+  350 MB internal target (down from 404 MB after windowing rendered timeline rows). The deviation
+  is **accepted for 0.1.0** by decision (D-0111); the target itself is unchanged and not met. The
+  Windows screen-reader and physical 200% scaling checks still need a person.
 - **MONA-027 is registered, not yet seen**: the certificate is trusted on this reference
   machine through the verified elevated import, the identity package registers (`Status: Ok`)
   with both modern-menu verbs declared, and the classic menu is verified. A human right-click
@@ -40,6 +41,12 @@ The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/r
 - Node.js 22+ only to build from source or to run the build tooling.
 
 ## Install from this repository
+
+Double-click **`install-mona.cmd`** in the repository root. It runs the same per-user installer
+described below, verifies the installed build, and starts Mona. It downloads nothing, publishes
+nothing and needs no elevation.
+
+The equivalent command sequence, if you prefer a terminal:
 
 ```powershell
 npm ci

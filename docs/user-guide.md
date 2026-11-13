@@ -8,6 +8,11 @@ something is not verified, it says so. Every screen named here exists in the shi
 Prerequisites: Windows 11 x64, an installed Codewhale engine, and a provider configured in
 Codewhale. Mona does not need, ask for, or store a provider key.
 
+The short path: double-click **`install-mona.cmd`** in the repository root. It installs per user,
+verifies the installed build and starts Mona.
+
+The same thing from a terminal:
+
 ```powershell
 npm ci
 npm run build
@@ -184,7 +189,8 @@ intend to lose the history.
   verified elevated import is done and the package registers. A human right-click confirming the
   entry has not been recorded, so treat first appearance as unconfirmed.
 - The screen-reader walkthrough and physical 200% scaling check are human-only and outstanding.
-- Idle memory measured 370.5 MB across four processes (internal target 350 MB).
+- Idle memory measured 370.5 MB across four processes (internal target 350 MB; the deviation is
+  accepted for 0.1.0, the target is not met).
 - Paint frame timing was not measured; the measurement window was not presented.
 - Restore covers HEAD only; arbitrary-commit restore is not implemented.
 - The engine's own terminal route is unavailable on Windows; Mona's own ConPTY terminal is used

@@ -1,8 +1,9 @@
 # Mona 0.1.0 — release candidate notes
 
 **Status: release candidate, not 1.0 complete.** Foundation and Core requirements are
-verified. Two Complete-track requirements are not: MONA-027 is blocked on a machine-policy
-decision, MONA-028 is partial on a measured memory miss and two human-only checks.
+verified. Two Complete-track requirements are not: MONA-027's modern menu is registered but no
+person has yet seen or clicked the entry, and MONA-028 is partial on a measured memory miss
+(accepted for 0.1.0 by decision, target still unmet) and two human-only checks.
 
 - Built: 2026-11-12 (local time), reference machine.
 - Tested platform: Windows 11 Pro 10.0.26200 (25H2), AMD Ryzen 7 5800X, 32 GB RAM, x64.
@@ -172,11 +173,13 @@ P22-ISSUE-003 "did not reproduce" — its cause is still unknown.
 
 ## Known issues
 
-- **P23-ISSUE-002 / ISSUE-0023 — the modern Windows 11 menu is not registered.** The package is
-  test-signed and its signer is verified, but machine trust has not been provisioned because the
-  step needs an elevated shell. Classic menu works; modern menu is unproven.
-- **P23-ISSUE-001 — idle memory 371.4–377.1 MB** across four processes against the 350 MB target.
-  Improved from 404 MB by windowing rendered timeline rows; still unmet (D-0107).
+- **P23-ISSUE-002 / ISSUE-0023 — the modern Windows 11 menu is registered but unseen.** Machine
+  trust was provisioned by the verified elevated import, the identity package registers
+  (`Status: Ok`) and both verbs are declared, but no human right-click has confirmed the entry.
+  Classic menu works.
+- **P23-ISSUE-001 — idle memory 370.5–377.1 MB** across four processes against the 350 MB target.
+  Improved from 404 MB by windowing rendered timeline rows. The deviation is **accepted for
+  0.1.0** (D-0111); the target is unchanged and still unmet.
 - **P22-ISSUE-004 — screen-reader walkthrough and physical 200% scaling** remain human-only.
   The automated accessibility probe passes 12/12 and is not a substitute.
 - **P23-ISSUE-004 — conversation export's Save dialog** is unit-tested with a real file write and
@@ -226,14 +229,14 @@ evidence-led step in `docs/evidence/P23-followup.md` §2.7 and is not started on
 
 ## Next human actions
 
-1. Run the one elevated trust command in `BLOCKERS.md` ISSUE-0023, then
-   `node tools/install/cli.mjs install --force`, then right-click a folder and a folder
-   background and confirm the entry appears in the Windows 11 modern menu.
+1. Right-click a folder and a folder background and confirm **Start new DS project with Mona**
+   appears in the Windows 11 modern menu (not only under **Show more options**). Registration,
+   signer and publisher are already verified; this is the only observation still owed.
 2. Classic menu by hand: right-click a folder and a folder background, choose
    **Start new DS project with Mona**, confirm the project opens with the composer focused and
    nothing sent.
 3. Work through `docs/evidence/P23-human-checklist.md`: Narrator walkthrough, physical 200%
    scaling, and the conversation export Save dialog (success and cancel).
-4. Decide the memory question: accept 371.4–377.1 MB with the target still unmet, or authorize the
-   next evidence-led step in `docs/evidence/P23-followup.md` §2.7.
+4. Memory question: **decided** — the 371.4–377.1 MB deviation is accepted for 0.1.0 (D-0111);
+   the next evidence-led step in `docs/evidence/P23-followup.md` §2.7 stays unauthorized.
 5. Decide the license before any public distribution. It remains unresolved on purpose.

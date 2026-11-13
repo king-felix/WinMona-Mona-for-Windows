@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 80,
+  "revision": 81,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1468,7 +1468,9 @@
         "identity payload now ships the MonaMenu.dll its manifest declares, guarded at stage and package time and covered by a test",
         "recorded that direct CLSID activation is invalid evidence for packaged shell commands (a known-good third-party package fails it identically)",
         "installed probes re-run on the rebuilt bytes: a11y 12/12, idle memory 370.5 MB, cold 421 ms / warm 722 ms, install verify ok",
-        "artifact rebuilt and re-qualified: 1,673 files / 452,709,537 bytes; MSIX sha256 5a7a6455...44ee; install verify exits 0 and the identity package reports Status Ok"
+        "artifact rebuilt and re-qualified: 1,673 files / 452,709,537 bytes; MSIX sha256 5a7a6455...44ee; install verify exits 0 and the identity package reports Status Ok",
+        "recorded D-0111: the 370.5-377.1 MB idle deviation is accepted for 0.1.0; the 350 MB target is unchanged, no text claims it is met, MONA-028 stays partial on the human checks",
+        "added install-mona.cmd: per-user install, installed smoke verification and app start in one double-clickable file; ran it (exit 0) and launched Mona non-elevated for testing"
       ],
       "remaining_steps": [
         "human right-click on a folder and a folder background confirming the modern menu entry; registration is proven, appearance is not",
@@ -1637,6 +1639,13 @@
           "kind": "document",
           "recorded_utc": "2026-11-12T21:04:03Z",
           "commit": "b2558ebca6a8bb58617dbbb26866e9e91d3f846d"
+        },
+        {
+          "path": "docs/evidence/P23-memory-acceptance.md",
+          "sha256": "07b96eb844cae8c3826ee611dffd17654219f6f0f4c4b65b30c2e8f083cbf28c",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T00:08:29Z",
+          "commit": "6dd47e1ea521d094973d97784d39432f08b24047"
         }
       ],
       "blocker_ids": [
@@ -1645,5 +1654,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-12T21:04:03Z"
+  "last_checkpoint_utc": "2026-11-13T00:08:29Z"
 }

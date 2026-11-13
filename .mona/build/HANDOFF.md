@@ -6,8 +6,13 @@ next eligible prompt.
 
 **The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027's
 `modern-menu` criterion is registered but not seen (a human right-click is owed), MONA-028 is
-partial on memory (370.5–377.1 MB vs 350 MB) and on the human-only checks. Nothing was
-relabelled and no complete claim was made.
+partial on memory (370.5–377.1 MB vs 350 MB, **accepted for 0.1.0 by D-0111 with the target
+unchanged**) and on the human-only checks. Nothing was relabelled and no complete claim was made.
+
+**Local install for Victor:** double-click `install-mona.cmd` in the repository root (or run
+`node tools/install/cli.mjs install --smoke`). It installs per user to
+`%LOCALAPPDATA%\Programs\Mona`, verifies the installed build and starts Mona. Ran on 2026-11-12:
+exit 0, installed smoke ok, app up non-elevated.
 
 Nothing was published: no remote, no package feed, no certificate purchase, no public repo.
 Local commits only. The license decision is deliberately unresolved.
@@ -54,8 +59,9 @@ and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
    a verified `modern-menu` criterion.
 2. **Remaining human checks** in the same checklist: Narrator walkthrough, physical 200% scaling,
    conversation export through the real Save dialog.
-3. **Decide memory:** accept 370.5–377.1 MB with the 350 MB target unmet, or authorize the next
-   evidence-led step (`docs/evidence/P23-followup.md` §2.7). The target is unchanged.
+3. **Memory: decided.** 370.5–377.1 MB is accepted for 0.1.0 (D-0111); the 350 MB target is
+   unchanged and unmet, and the next evidence-led step stays unauthorized. Do not reopen it
+   without a new measurement on an installed candidate.
 4. **Decide the license** before any public distribution.
 5. Keep the trust scoped: `node tools/install/cli.mjs untrust-test-certificate` (elevated) removes
    exactly this thumbprint from both `TrustedPeople` stores when it is no longer wanted.
