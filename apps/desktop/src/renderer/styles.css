@@ -1604,3 +1604,137 @@ body {
   border-radius: var(--radius-sm);
   background: var(--surface-sunken);
 }
+
+/* Cost lens and Work board. Both read recorded rows and write only what the
+   person asks for: one budget, or one task. */
+.cost-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+}
+
+.cost-rows li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  align-items: baseline;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cost-rows li:last-child {
+  border-bottom: none;
+}
+
+.cost-group summary {
+  cursor: pointer;
+  padding: var(--space-1) 0;
+}
+
+.cost-actions,
+.work-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.cost-budget-form,
+.task-form {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--canvas);
+}
+
+.cost-budget-form h3,
+.task-form h3 {
+  margin: 0;
+  font-size: var(--text-md);
+}
+
+.cost-budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.cost-budget-form label,
+.task-form label {
+  display: grid;
+  gap: 2px;
+}
+
+.cost-budget-form input,
+.cost-budget-form select,
+.task-form input,
+.task-form select,
+.task-form textarea {
+  padding: var(--space-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.cost-disclosure {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: var(--space-1);
+}
+
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.task-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.task-card[data-status='blocked'] {
+  border-color: var(--critical);
+}
+
+.task-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.task-steps,
+.task-criteria,
+.task-evidence {
+  margin: 0;
+  padding-left: var(--space-5);
+  display: grid;
+  gap: 2px;
+}
+
+.task-steps li,
+.task-criteria li {
+  line-height: var(--leading-base);
+}
+
+.work-badges,
+.cost-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}

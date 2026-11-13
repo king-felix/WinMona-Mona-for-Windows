@@ -1,0 +1,31 @@
+executable: C:\Users\victo\AppData\Local\Programs\Mona\Mona.exe
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-p25-surfaces-Tza718\surfaces-project
+
+
+PASS a real project opens through the catalog :: "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p25-surfaces-tza718\\surfaces-project"
+PASS the shell is ready before it is driven
+PASS the first navigation click opens the Cost lens and stays there :: {"active":"Cost","section":"cost-title","bridge":"function","error":null,"hasKnown":true,"railButtons":1,"settled":"Cost"}
+PASS the Cost lens renders recorded rows :: {"seeded":{"knownMicros":3500,"unknownRecords":1}}
+PASS known cost matches the ingested micro-USD total :: {"known":"$0.0035 + 1 unknown","seeded":{"knownMicros":3500,"unknownRecords":1}}
+PASS unknown-priced rows are counted and never folded into the money :: {"known":"$0.0035 + 1 unknown","unknownText":"1"}
+PASS the provider-reported and locally-estimated splits are both stated
+PASS the stale P12 placeholder is gone
+PASS the header spend chip agrees with the Cost lens after it loads :: {"chip":"$0.0035 + unknown"}
+PASS the Cost lens is captured
+PASS a budget can be set from the Cost lens :: {"budgetsText":"Project totallimit $2.5000 · warn $2.0000 · stop $2.5000updated 2026-11-13T08:14:03.007Z"}
+PASS the saved budget shows the limit, warn and stop thresholds it will enforce
+PASS the evaluation states that this is a local dispatch limit
+PASS the budgeted Cost lens is captured
+PASS CSV export wrote a file with the recorded rows :: {"rows":4}
+PASS the CSV header carries cost_label and unknown_reason
+PASS every CSV row labels provider-reported, locally-estimated or unknown :: ["provider-reported","locally-estimated","unknown (provider did not report usage)"]
+PASS the Work board renders tasks the service recorded :: {"titles":["Wire the probe","Ship it"],"ids":["tsk_2b96f089a0fe4233948aff5ba734cf5c","tsk_93ebe5428f48414ab7400c6a44c3fc01"]}
+PASS the stale P10 placeholder is gone
+PASS a seeded task title is on the board
+PASS steps and acceptance criteria are shown, not summarised
+PASS a blocked dependency is explained rather than shown as an unlabelled disabled control
+PASS the Work board is captured
+PASS a task can be added from the Work board
+PASS the new task is pending and eligible, with nothing started
+PASS the task-created board is captured
+mona: applied 7 state migration(s) to version 7

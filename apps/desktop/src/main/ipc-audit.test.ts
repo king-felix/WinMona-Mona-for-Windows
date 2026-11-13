@@ -10,12 +10,14 @@ import { registerBriefingIpc } from './briefing-ipc.js';
 import { registerCapabilityIpc } from './capability-ipc.js';
 import { registerCatalogIpc } from './catalog-ipc.js';
 import { registerChangesIpc } from './changes-ipc.js';
+import { registerCostIpc } from './cost-ipc.js';
 import { registerExtensionIpc } from './extensions-ipc.js';
 import { registerIpc, type IpcHandle } from './ipc.js';
 import { registerLaunchIpc } from './launch-ipc.js';
 import { registerMemoryIpc } from './memory-ipc.js';
 import { registerProviderIpc } from './provider-ipc.js';
 import { registerStudioIpc } from './studio-ipc.js';
+import { registerTaskIpc } from './tasks-ipc.js';
 import { registerTerminalIpc } from './terminal-ipc.js';
 
 /**
@@ -54,6 +56,13 @@ function wireEverything(): Map<string, (event: unknown, payload: unknown) => unk
     view: () => ({}) as AppearanceView,
     zoom: () => ({}) as AppearanceView,
   });
+  registerCostIpc({
+    handle,
+    isTrustedSender: untrusted,
+    ledger: () => null,
+    saveCsv: async () => ({ saved: false, path: null, note: 'not wired in the audit' }),
+  });
+  registerTaskIpc({ handle, isTrustedSender: untrusted, service: () => null });
   registerBriefingIpc({ handle, isTrustedSender: untrusted, service: () => null, ui: () => null });
   registerMemoryIpc({ handle, isTrustedSender: untrusted, service: () => null });
   return listeners;

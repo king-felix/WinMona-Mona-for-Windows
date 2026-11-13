@@ -17,7 +17,7 @@ All under `%LOCALAPPDATA%\Mona\artifacts\`:
 
 | Artifact | Bytes | SHA-256 |
 |---|---|---|
-| `Mona-0.1.0-x64.msix` | 127,928 | `8c815f83e830b28937fe615fb1fa1e11e37b4cc61c15ada9d68e841a4839abc2` |
+| `Mona-0.1.0-x64.msix` | 127,928 | `9f6b1cb3c81ecac3f3b2ccef7a2e78dfda4ef5c10a534896759e7879acb27ace` |
 | `Mona-test-signing-0.1.0.cer` | 792 | `3268b236318b2f2fcb7d5388bf9684a58f98a6f711e1c9089919a6544918fc1d` |
 | `SHA256SUMS-0.1.0.txt` | 180 | lists both of the above |
 
@@ -25,8 +25,8 @@ Payload and program identity:
 
 | Artifact | Value |
 |---|---|
-| Install payload | `build/install-stage`, **1,681 files**, 452,756,367 bytes |
-| Payload manifest | `build/install-stage/checksums.json`, sha256 `2125d7350b22cc6c34024fa86bd4e006dbfc9a64657bf7bcbc861e6b5c295cec` |
+| Install payload | `build/install-stage`, **1,695 files**, 452,888,542 bytes |
+| Payload manifest | `build/install-stage/checksums.json`, sha256 `dd811fbcbf6cc021a1e48fb00a13de2c1eea2380ffab1c9b4a42e9cfbfb05bd6` |
 | `Mona.exe` | 249,270,272 bytes, sha256 `207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492` |
 | `MonaMenu.dll` | sha256 `a6a595e149370290d8b9eea3e6c7ec23294a2b84e37374a966a6bf2786749bcd` |
 | Identity package | `MonaWorkbench`, sparse, version `0.1.0.0`, x64 |
@@ -190,6 +190,25 @@ is driven from a TV:
 Verification: `docs/evidence/P24-appearance.md`, 19 live steps and three screenshots on both the
 development and the installed build; 558 Vitest tests in 68 files; the accessibility probe still
 passes 12/12 at 200 % zoom.
+
+## Surfaces round — two screens that had never been wired
+
+A reported sentence on the Cost screen — "Budget controls and export arrive with P12" — was
+accurate. P12 had shipped the ledger, but the renderer had no budget or export channel, and the
+Work board printed "No tasks recorded" unconditionally. Both screens existed as placeholders.
+
+- **Cost lens**: provider-reported and locally-estimated totals kept separate, unknown count with
+  reasons, per-task/session/turn breakdown, rate revisions, project/day/session budgets with the
+  live verdict, and CSV export whose every row is labelled by origin.
+- **Work board**: tasks with steps, acceptance criteria, evidence staleness, dependency edges and
+  the task service's own eligibility reason; adding a task records it as pending and starts
+  nothing.
+- **Correction to the record**: MONA-009 `prompt-catalog` and MONA-013 `budgets`/`export` were
+  verified on service-level evidence alone (D-0114). They now cite live-window evidence.
+
+Verification: `docs/evidence/P25-surfaces.md`, 26 live steps and four screenshots on both builds;
+575 Vitest tests in 70 files; accessibility 12/12 on the installed build. The native Save dialog
+for CSV export is not automated and is stated as such.
 
 ## Known issues
 

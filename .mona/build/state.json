@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 82,
+  "revision": 83,
   "project": "Mona",
   "spec_version": "1.0",
   "spec_sha256": "48086e7192729fcc46526db7f90bb599bb233e86311d2f93b3b43ee119baa671",
@@ -1475,7 +1475,13 @@
         "Ctrl +/-/0 scales the whole window through a fixed 50-200% ladder applied in the main process, persisted in state/appearance.json, with an honest status-bar control",
         "fixed a work area that painted over the status bar at raised scale; the live probe now asserts the boundary",
         "P24 appearance probe 19/19 on the development and installed builds; a11y still 12/12; 558 Vitest in 68 files; npm run ci exit 0",
-        "artifact rebuilt and reinstalled: 1,681 files, MSIX sha256 8c815f83..., package Status Ok, verify --smoke exit 0"
+        "artifact rebuilt and reinstalled: 1,681 files, MSIX sha256 8c815f83..., package Status Ok, verify --smoke exit 0",
+        "Cost lens now exposes budgets (project/day/session with warn/stop), the live budget verdict, per-task/session/turn breakdown, rate revisions and CSV export labelled by cost origin",
+        "Work board now renders real tasks with steps, acceptance criteria, evidence staleness, dependency edges and the service's eligibility reason; adding a task records it pending and starts nothing",
+        "header spend chip and Cost lens now read the same rows; a live probe caught them disagreeing",
+        "recorded that MONA-009 prompt-catalog and MONA-013 budgets/export had been verified on service-level evidence only; D-0114 makes surface evidence the requirement for user-facing criteria",
+        "npm run surfaces 26/26 on development and installed builds; 575 Vitest in 70 files; npm run ci exit 0; a11y 12/12 on installed",
+        "artifact rebuilt, installed and smoke-verified: 1,695 files, MSIX sha256 9f6b1cb3..."
       ],
       "remaining_steps": [
         "human right-click on a folder and a folder background confirming the modern menu entry; registration is proven, appearance is not",
@@ -1686,6 +1692,41 @@
           "kind": "document",
           "recorded_utc": "2026-11-13T00:23:09Z",
           "commit": "aedaf2b73e86b9e08725bdb3ec2529fc29d2fd4f"
+        },
+        {
+          "path": "docs/evidence/P25-surfaces.md",
+          "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T08:16:05Z",
+          "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28"
+        },
+        {
+          "path": "docs/evidence/P25-surfaces-installed.json",
+          "sha256": "b3f0318196c8cce0ed15f6c429aace450ce300ed8010179bb1de6cb66d75ddf7",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T08:16:05Z",
+          "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28"
+        },
+        {
+          "path": "docs/evidence/P25-package.json",
+          "sha256": "2bc678ba08d07b2ed3583e225184c7828f80849fa30687f0b20e4df3b0804d8c",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T08:16:05Z",
+          "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28"
+        },
+        {
+          "path": "docs/evidence/P25-install.json",
+          "sha256": "6c99e43cfa92d630e4ff0dbab973fe37fb229702412c8766027c554fa8c01b65",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T08:16:05Z",
+          "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28"
+        },
+        {
+          "path": "docs/evidence/P25-a11y-installed.json",
+          "sha256": "42f5b38cb49a0b5ec8c36b48c2235f1f0a913d7bd476818c1212f1b38d3b1963",
+          "kind": "document",
+          "recorded_utc": "2026-11-13T08:16:05Z",
+          "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28"
         }
       ],
       "blocker_ids": [
@@ -1694,5 +1735,5 @@
     }
   },
   "next_eligible_prompts": [],
-  "last_checkpoint_utc": "2026-11-13T00:23:09Z"
+  "last_checkpoint_utc": "2026-11-13T08:16:05Z"
 }

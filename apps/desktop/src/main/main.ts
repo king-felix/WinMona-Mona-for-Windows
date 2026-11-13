@@ -26,6 +26,8 @@ import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
 import { ChangesService } from './changes-service.js';
 import { registerChangesIpc } from './changes-ipc.js';
+import { registerCostIpc } from './cost-ipc.js';
+import { registerTaskIpc } from './tasks-ipc.js';
 import { AgentObservatoryService } from './agent-observatory.js';
 import { registerAgentIpc } from './agents-ipc.js';
 import { EngineConfigCli } from './engine-config.js';
@@ -62,6 +64,7 @@ import { runChangesProbe } from './changes-probe.js';
 import { runMemoryProbe } from './memory-probe.js';
 import { runA11yProbe } from './a11y-probe.js';
 import { runAppearanceProbe } from './appearance-probe.js';
+import { runSurfacesProbe } from './surfaces-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
 import {
@@ -143,6 +146,12 @@ const appearanceTest = process.argv.includes('--appearance-probe');
 const appearanceOut = process.env.MONA_APPEARANCE_OUT ?? path.join(process.cwd(), 'mona-appearance.json');
 const appearanceWorkspace = process.env.MONA_APPEARANCE_WORKSPACE ?? null;
 const appearanceShots = process.env.MONA_APPEARANCE_SHOTS ?? path.join(process.cwd(), 'mona-appearance-shots');
+// P25 surfaces probe: the Cost lens and the Work board, driven against real rows.
+const surfacesTest = process.argv.includes('--surfaces-probe');
+const surfacesOut = process.env.MONA_SURFACES_OUT ?? path.join(process.cwd(), 'mona-surfaces.json');
+const surfacesWorkspace = process.env.MONA_SURFACES_WORKSPACE ?? null;
+const surfacesShots = process.env.MONA_SURFACES_SHOTS ?? path.join(process.cwd(), 'mona-surfaces-shots');
+const surfacesExport = process.env.MONA_SURFACES_EXPORT ?? path.join(process.cwd(), 'mona-cost-export.csv');
 const terminalTest = process.argv.includes('--terminal-test');
 const terminalOut = process.env.MONA_TERMINAL_OUT ?? path.join(process.cwd(), 'mona-terminal.json');
 const terminalWorkspace = process.env.MONA_TERMINAL_WORKSPACE ?? null;
@@ -151,7 +160,16 @@ const terminalShots = process.env.MONA_TERMINAL_SHOTS ?? path.join(process.cwd()
 // desktop; the P08 probe captures five live frames.
 // Memory measurement deliberately keeps hardware acceleration: the GPU process
 // is part of the real process set and must be measured, not designed away.
-if (shotsTest || studioTest || launchTest || polishTest || terminalTest || changesTest || appearanceTest)
+if (
+  shotsTest ||
+  studioTest ||
+  launchTest ||
+  polishTest ||
+  terminalTest ||
+  changesTest ||
+  appearanceTest ||
+  surfacesTest
+)
   app.disableHardwareAcceleration();
 // The P06 fixture harness is development-only. A production window must never
 // render fixture projects, fake spend, or fake engine badges.
@@ -188,6 +206,10 @@ let studioService: StudioService | null = null;
 let changesService: ChangesService | null = null;
 /** The same ChangeService the briefing and Changes surfaces read; kept for the release probe. */
 let ownedChangeService: ChangeService | null = null;
+// The task service and cost ledger outlive the boot block so the Work and Cost
+// surfaces can read them; both were previously only reachable from Studio.
+let ownedTaskService: TaskService | null = null;
+let ownedCostLedger: CostLedger | null = null;
 let observatoryService: AgentObservatoryService | null = null;
 let providerService: ProviderWorkbenchService | null = null;
 let extensionsService: ExtensionsService | null = null;
@@ -593,6 +615,8 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       const taskService = new TaskService(localState.store);
       const attemptService = new AttemptService(localState.store, { tasks: taskService });
       const costLedger = new CostLedger(localState.store);
+      ownedTaskService = taskService;
+      ownedCostLedger = costLedger;
       const changeService = new ChangeService(localState.store);
       ownedChangeService = changeService;
       briefingService = new BriefingService(localState.store, {
@@ -884,6 +908,50 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       view: () => appearanceView(zoomFactor),
       zoom: (direction) => stepZoom(direction),
     });
+    registerCostIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      ledger: () => ownedCostLedger,
+      saveCsv: async ({ projectId, content }) => {
+        // Probe seam: a native save dialog cannot be clicked from a probe. This is
+        // reachable only with --surfaces-probe plus an explicit destination, and
+        // the probe report says the dialog itself is not covered.
+        if (surfacesTest && process.env.MONA_SURFACES_EXPORT) {
+          const target = path.resolve(surfacesExport);
+          fs.mkdirSync(path.dirname(target), { recursive: true });
+          fs.writeFileSync(target, content, 'utf8');
+          return {
+            saved: true,
+            path: target,
+            note: `Probe wrote the recorded usage rows to ${target}. The save dialog is not exercised in a probe.`,
+          };
+        }
+        const options = {
+          title: 'Export recorded cost as CSV',
+          defaultPath: path.join(app.getPath('documents'), `mona-cost-${projectId}.csv`),
+          filters: [{ name: 'CSV', extensions: ['csv'] }],
+        };
+        const owner = mainWindow && !mainWindow.isDestroyed() ? mainWindow : null;
+        const picked = owner ? await dialog.showSaveDialog(owner, options) : await dialog.showSaveDialog(options);
+        if (picked.canceled || !picked.filePath) {
+          return { saved: false, path: null, note: 'Export cancelled. Nothing was written.' };
+        }
+        // Temp file then rename, so a failed write can never truncate a real file.
+        const temporary = `${picked.filePath}.tmp-${process.pid}`;
+        fs.writeFileSync(temporary, content, 'utf8');
+        fs.renameSync(temporary, picked.filePath);
+        return {
+          saved: true,
+          path: picked.filePath,
+          note: `Wrote the recorded usage rows to ${picked.filePath}.`,
+        };
+      },
+    });
+    registerTaskIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => ownedTaskService,
+    });
     registerBriefingIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -964,6 +1032,108 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         })
         .catch((error: unknown) => {
           fs.writeFileSync(appearanceOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+    }
+
+    if (surfacesTest && surfacesWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      // Seeding goes through the real services, so the probe reads rows a user
+      // could have produced. Nothing here opens a thread or submits a prompt.
+      const seedTask = async (projectId: string): Promise<{ titles: string[]; ids: string[] }> => {
+        const service = ownedTaskService;
+        if (!service) return { titles: [], ids: [] };
+        const first = await service.createTask({
+          projectId,
+          title: 'Wire the probe',
+          owner: 'mona_queue',
+          ordinal: 1,
+          steps: [{ title: 'write the code' }, { title: 'run it' }],
+          criteria: [{ description: 'the tests pass' }],
+        });
+        const second = await service.createTask({
+          projectId,
+          title: 'Ship it',
+          owner: 'mona_queue',
+          ordinal: 2,
+          dependsOn: [first.id],
+        });
+        return { titles: [first.title, second.title], ids: [first.id, second.id] };
+      };
+      const seedCost = async (
+        projectId: string,
+        taskId: string | null,
+      ): Promise<{ knownMicros: number; unknownRecords: number }> => {
+        const ledger = ownedCostLedger;
+        if (!ledger) return { knownMicros: 0, unknownRecords: 0 };
+        await ledger.putRate({
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          cacheMissMicros: 1_000_000,
+          outputMicros: 2_000_000,
+          unitTokens: 1_000_000,
+          revision: 'probe-1',
+          source: 'probe rate card, not a provider price',
+        });
+        await ledger.ingest({
+          projectId,
+          taskId,
+          turnId: 'turn_probe_provider',
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          buckets: { inputTokens: 1_200, outputTokens: 300, cacheKnown: false },
+          cost: { kind: 'provider_reported', micros: 2_500, source: 'probe provider report' },
+          source: 'surfaces probe',
+          dedupeKey: 'probe-provider-report',
+        });
+        await ledger.ingest({
+          projectId,
+          taskId,
+          turnId: 'turn_probe_estimate',
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          buckets: { cacheHitTokens: 0, cacheMissTokens: 1_000, outputTokens: 0, cacheKnown: true },
+          cost: { kind: 'local_estimate' },
+          source: 'surfaces probe',
+          dedupeKey: 'probe-local-estimate',
+        });
+        await ledger.ingest({
+          projectId,
+          taskId: null,
+          turnId: 'turn_probe_unknown',
+          provider: 'deepseek',
+          model: 'deepseek-flash',
+          buckets: {},
+          cost: { kind: 'unknown', reason: 'provider did not report usage' },
+          source: 'surfaces probe',
+          dedupeKey: 'probe-unknown-cost',
+        });
+        const totals = await ledger.totals(projectId);
+        return { knownMicros: totals.knownMicros, unknownRecords: totals.unknownRecords };
+      };
+      void runSurfacesProbe({
+        window: probeWindow,
+        outputPath: surfacesOut,
+        shotsDirectory: surfacesShots,
+        workspace: surfacesWorkspace,
+        exportPath: surfacesExport,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        seedTask,
+        seedCost,
+      })
+        .then((result) => {
+          fs.mkdirSync(path.dirname(surfacesOut), { recursive: true });
+          fs.writeFileSync(surfacesOut, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(surfacesOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
     }

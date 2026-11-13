@@ -63,6 +63,20 @@ the notes say so.
 - **Evidence paths are overridable** in the design-system probe, so a later prompt re-captures
   into its own artifacts instead of overwriting the prompt that first produced them.
 
+### Changed in the surfaces round
+
+- **The Cost lens is real.** Budgets (project/day/session, warn/stop), the live budget verdict,
+  per-task/session/turn breakdown, rate revisions and CSV export are now on the screen. Before,
+  the screen ended with "Budget controls and export arrive with P12" while no cost channel
+  existed at all; the service had been complete since P12, the surface had not.
+- **The Work board is real.** It renders every task with steps, acceptance criteria, evidence,
+  dependency edges and the service's eligibility reason, and can add a pending task. Before, the
+  screen printed "No tasks recorded" unconditionally — false state whenever tasks existed.
+- **The header spend chip and the Cost lens now agree.** Opening the lens refreshes the chip from
+  the same `usage_records` table; a live probe caught them disagreeing.
+- **Corrected the basis for two verified requirements** (MONA-009 `prompt-catalog`, MONA-013
+  `budgets`/`export`): their evidence had been service-level only (D-0114).
+
 ### Fixed during the 0.1.0 build
 
 - Double-encoded UTF-8 in `App.tsx` and one test string (PowerShell round trip), now guarded by

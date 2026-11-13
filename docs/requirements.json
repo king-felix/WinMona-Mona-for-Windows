@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 353,
+  "revision": 361,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1251,6 +1251,14 @@
               "recorded_utc": "2026-11-12T07:18:55Z",
               "commit": "fbce73169b7557b962960947837d21e053c288c9",
               "note": "the task-state suite builds and asserts a board from real SQLite tasks"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:14:56Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "the Work board now renders tasks with steps, acceptance criteria, evidence and requirement refs from the task service; the previous screen printed 'No tasks recorded' unconditionally, which was false whenever tasks existed. Proven by 26 live steps on development and installed builds"
             }
           ]
         },
@@ -1274,6 +1282,14 @@
               "recorded_utc": "2026-11-12T07:18:56Z",
               "commit": "fbce73169b7557b962960947837d21e053c288c9",
               "note": "24 task-state tests exercise prerequisite gating and cycle rejection"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:14:56Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "a dependent task is shown ineligible with the service's stated reason and its dependency edge; eligibility is copied, never recomputed in the view (no second scheduler)"
             }
           ]
         },
@@ -1297,11 +1313,19 @@
               "recorded_utc": "2026-11-12T07:18:56Z",
               "commit": "fbce73169b7557b962960947837d21e053c288c9",
               "note": "selection order and one-task runOnce behavior asserted"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:15:01Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "the board reports the service's eligible list, next task and per-task reason; the probe asserts eligible/next and that a dependency-blocked task states its reason"
             }
           ]
         }
       ],
-      "verified_commit": "fbce73169b7557b962960947837d21e053c288c9",
+      "verified_commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },
@@ -1705,6 +1729,14 @@
               "recorded_utc": "2026-11-12T07:49:49Z",
               "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
               "note": "three attributed records with distinct origins and task ids"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:14:56Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "per-task, per-session and per-turn breakdowns are now renderable from the recorded lens and proven in the live window; rows are attributed to a real task id seeded through TaskService"
             }
           ]
         },
@@ -1720,6 +1752,14 @@
               "recorded_utc": "2026-11-12T07:49:49Z",
               "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
               "note": "disjoint and inclusive cache semantics defined; cache evidence shown only when reported; missing cache buckets stay unknown"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:15:01Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "cache tokens are rendered only when the provider reported both buckets; otherwise they stay 'unknown' in the lens and are absent from the summary row"
             }
           ]
         },
@@ -1743,6 +1783,14 @@
               "recorded_utc": "2026-11-12T07:49:49Z",
               "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
               "note": "the unknown ingest stores cost null with reason provider"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:15:00Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "the live Cost lens shows the unknown count beside known money and per-reason breakdown; the probe seeded an unknown-priced row and asserts it is counted and never folded into the total"
             }
           ]
         },
@@ -1766,6 +1814,14 @@
               "recorded_utc": "2026-11-12T07:49:50Z",
               "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
               "note": "project budget evaluated with reservations; action and disclosure recorded"
+            },
+            {
+              "path": "docs/evidence/P25-surfaces.md",
+              "sha256": "689bc4e5dbadc8579afda8aaec51e1f1aefe2feb7d71c73e6f2195a610736b24",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:14:50Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "the Cost lens now exposes budgets: set from the UI, list shows limit/warn/stop, and the live evaluation reports allow/warn/block_next_dispatch with the ledger's own disclosure. Earlier evidence for this criterion was service-level only and the renderer had no budget channel; the surface is now proven by 26 live steps on development and installed builds (D-0114)"
             }
           ]
         },
@@ -1789,11 +1845,19 @@
               "recorded_utc": "2026-11-12T07:49:50Z",
               "commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
               "note": "every row labeled provider-reported, locally-estimated or unknown (reason)"
+            },
+            {
+              "path": "docs/evidence/P25-cost-export.csv",
+              "sha256": "573e2128f3dc8b2741e6c5ff94a782685cf22530891473d3b0f4be9100792874",
+              "kind": "document",
+              "recorded_utc": "2026-11-13T08:14:50Z",
+              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+              "note": "CSV export reachable from the Cost lens; the written file labels every row provider-reported, locally-estimated or unknown (cost_label and unknown_reason columns). The native Save dialog is not automated; the probe supplies a destination and says so"
             }
           ]
         }
       ],
-      "verified_commit": "5e6c3e8d0c7352f02bd3ee32871c864844bdf657",
+      "verified_commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },

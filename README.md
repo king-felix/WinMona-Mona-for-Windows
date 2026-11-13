@@ -106,6 +106,8 @@ node tools/install/cli.mjs uninstall
   issues, rollback.
 - [P23 follow-up](docs/evidence/P23-followup.md) — trust verification, memory breakdown,
   accessibility observations, startup measurements.
+- [Surfaces round](docs/evidence/P25-surfaces.md) ? the Cost lens and Work board wired to
+  their services, with the criterion-basis correction (D-0114).
 - [Elevated trust round](docs/evidence/P23-elevated-round.md) — the elevated import, package
   registration, the packaging guard, and the probe that proved nothing.
 - [Human checklist](docs/evidence/P23-human-checklist.md) — the checks that need a person.

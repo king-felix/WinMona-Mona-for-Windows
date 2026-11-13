@@ -1,8 +1,8 @@
 # Mona build handoff
 
 **Current prompt:** P23 — release candidate and final handoff. **Status: completed**, plus the
-elevated and layout rounds. State revision 82; ledger revision 353. All 24 prompts are delivered;
-there is no next eligible prompt.
+elevated, layout and surfaces rounds. State revision 83; ledger revision 361. All 24 prompts are
+delivered; there is no next eligible prompt.
 
 **The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027's
 `modern-menu` criterion is registered but not seen (a human right-click is owed), MONA-028 is
@@ -37,6 +37,25 @@ and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
   (`P24-appearance.md`); `npm run a11y` 12/12 after the change; 558 Vitest / 68 files; `ci` exit 0.
 - **Artifact:** 1,681 files / 452,756,367 bytes; MSIX sha256 `8c815f83…9abc2`; installed,
   `Status: Ok`, `verify --smoke` exit 0. Spend: **0 µUSD**.
+
+## Surfaces round result
+
+- **The Cost and Work screens had never been wired.** The Cost screen's own sentence ("Budget
+  controls and export arrive with P12") was true: the ledger was finished in P12 but the renderer
+  had no budget or export channel, and the Work screen printed "No tasks recorded"
+  unconditionally. Both are now real surfaces (`CostPanel.tsx`, `WorkPanel.tsx`) over five new
+  sender-checked channels.
+- **Evidence basis corrected (D-0114).** MONA-009 `prompt-catalog` and MONA-013
+  `budgets`/`export` had been marked passed on service-level tests only. They now cite
+  `docs/evidence/P25-surfaces.md`; the mistake is recorded, not erased.
+- **Verified:** `npm run surfaces` **26/26** on development and installed builds, with four
+  screenshots each; the probe seeds real `usage_records` and real tasks and reads the live DOM. A
+  header-vs-lens disagreement was caught and fixed. `npm run ci` exit 0 (575 Vitest / 70 files);
+  a11y 12/12 on the installed build.
+- **Not automated:** the native Save dialog for CSV export (the probe supplies a destination).
+  Content, labels and byte counts after the dialog are proven.
+- **Artifact:** 1,695 files / 452,888,542 bytes; MSIX sha256 `9f6b1cb3…7ace`; installed and
+  `verify --smoke` clean. Spend: **0 µUSD**.
 
 ## Elevated round result
 
@@ -115,6 +134,14 @@ and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
 
 ## Last relevant validation
 
+- `npm run ci` exit 0 (575 Vitest in 70 files, 14 bootstrap, 12 launch, 26 install, 8 spike,
+  typecheck, lint, format, production build).
+- `node tools/build/cli.mjs validate` OK; checkpoint r83.
+- Installed candidate: `npm run surfaces` 26/26, `npm run a11y` 12/12, `verify --smoke` exit 0.
+- Spend this round: **0 µUSD**. No provider request; no adapter, context or orchestration change.
+
+## Older validation
+
 - `npm run ci` exit 0 for the functional change (format, lint, typecheck, 549 Vitest in 67
   files, 14 bootstrap, 12 launch, 26 install, 8 spike, build); after the final comment edits,
   `format:check`, `lint` and the 26 install tests were re-run green.
@@ -124,6 +151,12 @@ and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
 - Spend this round: **0 µUSD**. No provider request; no adapter, context or orchestration change.
 
 ## Cautions
+
+- **A prompt number in the UI is a promise the product has not kept.** Two screens shipped with
+  "arrives with P10/P12" while the named prompt had shipped its service and never its surface.
+  Grep the renderer for `arrive with P`, `not yet wired` and `placeholder` before calling a
+  release candidate done, and treat any such string as a bug report (D-0114).
+- A closed requirement is not evidence that a person can reach the feature. Drive the app.
 
 - Edit source with byte-safe tools; a PowerShell `Get-Content`/`Set-Content` round trip
   double-encoded a file once, and a blank-line filter can silently destroy Markdown structure.

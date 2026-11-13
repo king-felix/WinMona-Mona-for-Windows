@@ -95,6 +95,13 @@ visible: **Pause after task**, **Interrupt now**, and any blocked problem.
 Plan completion is not task completion. Mona's work board requires evidence: a recorded test
 receipt, an artifact with a matching hash, or a recorded human check.
 
+**The Work board** (Alt+3) shows those tasks as the task service recorded them: status,
+steps, acceptance criteria (met or unmet, required or optional, check or human), evidence with
+its staleness flag, dependency and dependent edges, and which requirement each task traces to.
+A task states either *Eligible to start now* or the exact reason it is not, and the header
+names the single task the queue would take next. **Add a task** records a pending task with
+optional steps, criteria and one dependency; it starts nothing — you run work from Studio.
+
 ## 7. Resume after closing or interrupting
 
 - Closing the window keeps Mona in the tray while work runs, with a one-time explanation.
@@ -107,13 +114,24 @@ receipt, an artifact with a matching hash, or a recorded human check.
 
 ## 8. Costs
 
-The Cost lens shows recorded usage with its pricing source. Rules the interface follows:
+The Cost lens (Alt+6) shows recorded usage with its pricing source. Rules the interface
+follows:
 
-- Unknown is shown as unknown, never as zero.
-- Cached and non-cached input tokens are reported as the engine reports them.
-- Optional per-session, per-task or per-day budgets **warn** and **stop**; a stopped budget
-  blocks the next submission, never a mid-flight turn.
-- **Export CSV** writes the rows you can see, with their sources.
+- Unknown is shown as unknown, never as zero. The unknown count and each reason sit beside the
+  known total; they are never added into it.
+- The provider-reported total and the locally-estimated total are shown **separately**, so a
+  number's origin is visible at the cost of one glance.
+- Cached and non-cached input tokens appear only when the provider reported both buckets;
+  otherwise they read `unknown` rather than `0`.
+- The recorded usage is broken down by task, by session and by turn, and the rate cards in use
+  are listed with the revision each estimate came from.
+- Optional per-project, per-day or per-session budgets **warn** (default 80% of the limit) and
+  **stop** (default the limit). The lens states what the next dispatch would do right now, and
+  says plainly that this is a local dispatch limit — not a provider invoice cap, and in-flight
+  requests can overshoot it.
+- **Export CSV** writes the recorded rows to a file you choose. Each row is labelled
+  `provider-reported`, `locally-estimated` or `unknown (reason)`, with thread, turn, task and
+  rate revision columns.
 - Mona adds no inference of its own: idle, navigation, exports, reconnects, notification focus
   and studio replay cost nothing.
 

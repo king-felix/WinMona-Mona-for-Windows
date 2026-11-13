@@ -13,6 +13,8 @@ import type {
 import type { AppInfo } from '../shared/ipc.js';
 import type { AttentionFocus, AttentionView } from '../shared/attention.js';
 import type { AppearanceView } from '../shared/appearance.js';
+import type { CostLensView } from '../shared/cost.js';
+import type { TaskBoardView } from '../shared/tasks.js';
 import type { BriefingView } from '../shared/briefing.js';
 import type { ExtensionsView, CapabilityExplorerView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
@@ -98,6 +100,50 @@ function defaultAttention(): AttentionView {
     quietNow: false,
     quietDetail: 'Quiet hours are off. Notifications can be delivered at any time.',
     lastEvent: null,
+  };
+}
+
+function emptyCost(projectId: string): CostLensView {
+  const totals = {
+    records: 0,
+    providerReportedMicros: 0,
+    estimatedMicros: 0,
+    knownMicros: 0,
+    unknownRecords: 0,
+    unknownReasons: [],
+    tokens: { cacheHit: null, cacheMiss: null, input: null, output: null, reasoning: null },
+    latestRecordedAt: null,
+  };
+  return {
+    projectId,
+    totals,
+    byTurn: [],
+    byTask: [],
+    bySession: [],
+    rates: [],
+    budgets: [],
+    evaluation: { action: 'allow', decisions: [], disclosure: 'Local dispatch limit only.' },
+    disclosure: [],
+    empty: true,
+  };
+}
+
+function emptyBoard(projectId: string): TaskBoardView {
+  return {
+    projectId,
+    generatedAt: '2026-11-12T00:00:00.000Z',
+    tasks: [],
+    eligible: [],
+    next: null,
+    counts: {
+      pending: 0,
+      running: 0,
+      verifying: 0,
+      completed: 0,
+      blocked: 0,
+      interrupted: 0,
+      skipped: 0,
+    },
   };
 }
 
@@ -278,6 +324,8 @@ type Store = {
   launch?: LaunchReceipt | null;
   attention?: AttentionView;
   appearance?: AppearanceView;
+  cost?: CostLensView;
+  tasks?: TaskBoardView;
   briefing?: BriefingView;
   focusHandlers?: Array<(focus: AttentionFocus) => void>;
   layouts?: Array<{ projectId: string; layout: string }>;
@@ -826,6 +874,82 @@ function bridgeFor(store: Store): Window['mona'] {
       return ok(store.appearance);
     },
     onAppearance: () => () => undefined,
+    costLens: async ({ projectId }: { projectId: string }) => ok(store.cost ?? emptyCost(projectId)),
+    costSetBudget: async (input: { projectId: string; scope: string; limitMicros: number }) => {
+      const base = store.cost ?? emptyCost(input.projectId);
+      const budgets = base.budgets.filter((budget) => budget.scope !== input.scope);
+      store.cost = {
+        ...base,
+        budgets: [
+          ...budgets,
+          {
+            id: `bdg_${input.scope}`,
+            scope: input.scope as CostLensView['budgets'][number]['scope'],
+            sessionId: null,
+            limitMicros: input.limitMicros,
+            warnMicros: Math.floor(input.limitMicros * 0.8),
+            stopMicros: input.limitMicros,
+            updatedAt: '2026-11-12T00:00:00.000Z',
+          },
+        ],
+      };
+      return ok(store.cost);
+    },
+    costExport: async () =>
+      ok({
+        saved: true,
+        path: 'C:\\tmp\\mona-cost.csv',
+        bytes: 64,
+        rows: 2,
+        note: 'Wrote the recorded usage rows to C:\\tmp\\mona-cost.csv.',
+      }),
+    taskBoard: async ({ projectId }: { projectId: string }) => ok(store.tasks ?? emptyBoard(projectId)),
+    taskCreate: async (input: { projectId: string; title: string; steps?: string[]; criteria?: string[] }) => {
+      const base = store.tasks ?? emptyBoard(input.projectId);
+      const ordinals = base.tasks.map((task) => task.ordinal);
+      store.tasks = {
+        ...base,
+        counts: { ...base.counts, pending: base.counts.pending + 1 },
+        tasks: [
+          ...base.tasks,
+          {
+            id: `tsk_${base.tasks.length + 1}`,
+            title: input.title,
+            status: 'pending',
+            description: '',
+            owner: 'mona_queue',
+            ordinal: ordinals.length > 0 ? Math.max(...ordinals) + 1 : 1,
+            currentStep: null,
+            blockedReason: null,
+            skippedReason: null,
+            steps: (input.steps ?? []).map((title, index) => ({
+              id: `stp_${index}`,
+              position: index + 1,
+              title,
+              status: 'pending' as const,
+              detail: null,
+            })),
+            criteria: (input.criteria ?? []).map((description, index) => ({
+              id: `crt_${index}`,
+              description,
+              kind: 'check' as const,
+              required: true,
+              satisfied: false,
+              note: null,
+            })),
+            evidence: [],
+            dependencies: [],
+            dependents: [],
+            requirementRefs: [],
+            eligible: true,
+            eligibilityReason: 'no blocking dependency',
+            blockedByProblemIds: [],
+            updatedAt: '2026-11-12T00:00:00.000Z',
+          },
+        ],
+      };
+      return ok(store.tasks);
+    },
     onAttentionFocus: (handler: (focus: AttentionFocus) => void) => {
       const list = (store.focusHandlers ??= []);
       list.push(handler);
@@ -1581,6 +1705,129 @@ describe('Mona shell', () => {
     expect(document.querySelector('[data-testid="studio-run-state"]')?.textContent).toContain('Running');
     expect(button('Interrupt now')).toBeTruthy();
     expect(store.layouts).toContainEqual({ projectId: 'prj_alpha', layout: 'focus' });
+    await act(async () => root.unmount());
+  });
+
+  it('shows recorded cost and sets a budget from the Cost lens', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const cost: CostLensView = {
+      ...emptyCost(alpha.id),
+      empty: false,
+      totals: {
+        records: 3,
+        providerReportedMicros: 3_000,
+        estimatedMicros: 500,
+        knownMicros: 3_500,
+        unknownRecords: 1,
+        unknownReasons: [{ reason: 'provider did not report usage', count: 1 }],
+        tokens: { cacheHit: 100, cacheMiss: 900, input: null, output: 250, reasoning: null },
+        latestRecordedAt: '2026-11-12T00:00:00.000Z',
+      },
+      byTask: [
+        {
+          key: 'tsk_1',
+          label: 'tsk_1',
+          detail: null,
+          totals: {
+            records: 2,
+            providerReportedMicros: 3_000,
+            estimatedMicros: 0,
+            knownMicros: 3_000,
+            unknownRecords: 0,
+            unknownReasons: [],
+            tokens: { cacheHit: null, cacheMiss: null, input: null, output: null, reasoning: null },
+            latestRecordedAt: '2026-11-12T00:00:00.000Z',
+          },
+        },
+      ],
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+      cost,
+    });
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      button('Cost').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+
+    // The known total and the unknown count are both visible, and the unknown is
+    // never folded into the money.
+    expect(document.querySelector('[data-testid="cost-known"]')?.textContent).toContain('$0.0035');
+    expect(document.querySelector('[data-testid="cost-known"]')?.textContent).toContain('1 unknown');
+    expect(document.querySelector('[data-testid="cost-unknown"]')?.textContent).toBe('1');
+    expect(document.querySelector('[data-testid="cost-empty"]')).toBeNull();
+    // The provider/estimated split is stated where the number came from.
+    expect(document.body.textContent).toContain('provider $0.0030');
+    expect(document.body.textContent).toContain('estimated $0.0005');
+    // No stale "arrives with P12" placeholder survives.
+    expect(document.body.textContent).not.toContain('arrive with P12');
+
+    const limit = document.querySelector<HTMLInputElement>('input[aria-label="Budget limit in US dollars"]');
+    if (!limit) throw new Error('budget limit field missing');
+    await typeIntoInput(limit, '2.50');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('button[type="submit"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    expect(document.querySelector('[data-testid="cost-budgets"]')?.textContent).toContain('$2.5000');
+    expect(document.querySelector('[data-testid="cost-receipt"]')?.textContent).toContain('project total budget');
+
+    await act(async () => {
+      exactButton('Export CSV').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    expect(document.querySelector('[data-testid="cost-receipt"]')?.textContent).toContain('mona-cost.csv');
+    await act(async () => root.unmount());
+  });
+
+  it('shows the real work board and records a new task without starting it', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine(),
+      spends: {},
+    });
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    await act(async () => {
+      button('Work').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    expect(document.body.textContent).toContain('No tasks recorded');
+    expect(document.body.textContent).not.toContain('arrive with P10');
+
+    const title = document.querySelector<HTMLInputElement>('input[aria-label="Task title"]');
+    const steps = document.querySelector<HTMLTextAreaElement>('textarea[aria-label="Task steps, one per line"]');
+    const criteria = document.querySelector<HTMLTextAreaElement>(
+      'textarea[aria-label="Acceptance criteria, one per line"]',
+    );
+    if (!title || !steps || !criteria) throw new Error('task form fields missing');
+    await typeIntoInput(title, 'Check the export');
+    await typeInto(steps, 'open the dialog');
+    await typeInto(criteria, 'the file exists');
+    await act(async () => {
+      document.querySelector<HTMLButtonElement>('.task-form button[type="submit"]')?.click();
+      await new Promise((resolve) => setTimeout(resolve, 40));
+    });
+    const card = document.querySelector('[data-testid="task-card"]');
+    expect(card?.textContent).toContain('Check the export');
+    expect(card?.textContent).toContain('Pending');
+    expect(card?.textContent).toContain('open the dialog');
+    expect(card?.textContent).toContain('the file exists');
+    expect(document.querySelector('[data-testid="task-eligibility"]')?.textContent).toContain('Eligible');
+    expect(document.querySelector('[data-testid="work-count"]')?.textContent).toContain('1 task');
     await act(async () => root.unmount());
   });
 

@@ -6,12 +6,14 @@ import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
 import { CHANGES_CHANNELS } from '../shared/changes.js';
+import { COST_CHANNELS, type BudgetInputView } from '../shared/cost.js';
 import { CAPABILITY_CHANNELS } from '../shared/capabilities.js';
 import { EXTENSION_CHANNELS } from '../shared/extensions.js';
 import { LAUNCH_CHANNELS, type LaunchReceipt } from '../shared/launch.js';
 import { MEMORY_CHANNELS } from '../shared/memory.js';
 import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
+import { TASK_CHANNELS, type TaskCreateView } from '../shared/tasks.js';
 import { TERMINAL_CHANNELS, type TerminalEvent } from '../shared/terminal.js';
 
 /**
@@ -71,6 +73,11 @@ const bridge = Object.freeze({
       ipcRenderer.removeListener(ATTENTION_CHANNELS.focus, listener);
     };
   },
+  costLens: (input: { projectId: string; sessionId?: string | null }) => ipcRenderer.invoke(COST_CHANNELS.lens, input),
+  costSetBudget: (input: BudgetInputView) => ipcRenderer.invoke(COST_CHANNELS.setBudget, input),
+  costExport: (input: { projectId: string }) => ipcRenderer.invoke(COST_CHANNELS.exportCsv, input),
+  taskBoard: (input: { projectId: string }) => ipcRenderer.invoke(TASK_CHANNELS.board, input),
+  taskCreate: (input: TaskCreateView) => ipcRenderer.invoke(TASK_CHANNELS.create, input),
   appearanceGet: () => ipcRenderer.invoke(APPEARANCE_CHANNELS.get, {}),
   appearanceZoom: (input: { direction: 'in' | 'out' | 'reset' }) => ipcRenderer.invoke(APPEARANCE_CHANNELS.zoom, input),
   /** The main process pushes a new window scale after a Ctrl +/-/0 shortcut. */

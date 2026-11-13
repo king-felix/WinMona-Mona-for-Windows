@@ -1,0 +1,190 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true,
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p25-surfaces-qkzzt6\\surfaces-project"
+    },
+    {
+      "name": "the shell is ready before it is driven",
+      "ok": true
+    },
+    {
+      "name": "the first navigation click opens the Cost lens and stays there",
+      "ok": true,
+      "detail": {
+        "active": "Cost",
+        "section": "cost-title",
+        "bridge": "function",
+        "error": null,
+        "hasKnown": true,
+        "railButtons": 1,
+        "settled": "Cost"
+      }
+    },
+    {
+      "name": "the Cost lens renders recorded rows",
+      "ok": true,
+      "detail": {
+        "seeded": {
+          "knownMicros": 3500,
+          "unknownRecords": 1
+        }
+      }
+    },
+    {
+      "name": "known cost matches the ingested micro-USD total",
+      "ok": true,
+      "detail": {
+        "known": "$0.0035 + 1 unknown",
+        "seeded": {
+          "knownMicros": 3500,
+          "unknownRecords": 1
+        }
+      }
+    },
+    {
+      "name": "unknown-priced rows are counted and never folded into the money",
+      "ok": true,
+      "detail": {
+        "known": "$0.0035 + 1 unknown",
+        "unknownText": "1"
+      }
+    },
+    {
+      "name": "the provider-reported and locally-estimated splits are both stated",
+      "ok": true
+    },
+    {
+      "name": "the stale P12 placeholder is gone",
+      "ok": true
+    },
+    {
+      "name": "the header spend chip agrees with the Cost lens after it loads",
+      "ok": true,
+      "detail": {
+        "chip": "$0.0035 + unknown"
+      }
+    },
+    {
+      "name": "the Cost lens is captured",
+      "ok": true
+    },
+    {
+      "name": "a budget can be set from the Cost lens",
+      "ok": true,
+      "detail": {
+        "budgetsText": "Project totallimit $2.5000 · warn $2.0000 · stop $2.5000updated 2026-11-13T08:09:12.209Z"
+      }
+    },
+    {
+      "name": "the saved budget shows the limit, warn and stop thresholds it will enforce",
+      "ok": true
+    },
+    {
+      "name": "the evaluation states that this is a local dispatch limit",
+      "ok": true
+    },
+    {
+      "name": "the budgeted Cost lens is captured",
+      "ok": true
+    },
+    {
+      "name": "CSV export wrote a file with the recorded rows",
+      "ok": true,
+      "detail": {
+        "rows": 4
+      }
+    },
+    {
+      "name": "the CSV header carries cost_label and unknown_reason",
+      "ok": true
+    },
+    {
+      "name": "every CSV row labels provider-reported, locally-estimated or unknown",
+      "ok": true,
+      "detail": [
+        "provider-reported",
+        "locally-estimated",
+        "unknown (provider did not report usage)"
+      ]
+    },
+    {
+      "name": "the Work board renders tasks the service recorded",
+      "ok": true,
+      "detail": {
+        "titles": [
+          "Wire the probe",
+          "Ship it"
+        ],
+        "ids": [
+          "tsk_b787266aef324fa1aa8a2fc77174b9ca",
+          "tsk_e5abe99ad90d4439b3f88bf28c641f99"
+        ]
+      }
+    },
+    {
+      "name": "the stale P10 placeholder is gone",
+      "ok": true
+    },
+    {
+      "name": "a seeded task title is on the board",
+      "ok": true
+    },
+    {
+      "name": "steps and acceptance criteria are shown, not summarised",
+      "ok": true
+    },
+    {
+      "name": "a blocked dependency is explained rather than shown as an unlabelled disabled control",
+      "ok": true
+    },
+    {
+      "name": "the Work board is captured",
+      "ok": true
+    },
+    {
+      "name": "a task can be added from the Work board",
+      "ok": true
+    },
+    {
+      "name": "the new task is pending and eligible, with nothing started",
+      "ok": true
+    },
+    {
+      "name": "the task-created board is captured",
+      "ok": true
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p25\\cost-recorded.png",
+      "label": "cost-recorded"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p25\\cost-budget.png",
+      "label": "cost-budget"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p25\\work-board.png",
+      "label": "work-board"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-p25\\work-task-created.png",
+      "label": "work-task-created"
+    }
+  ],
+  "csv": {
+    "path": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p25-surfaces-qKzzT6\\mona-cost-export.csv",
+    "bytes": 749,
+    "header": "recorded_at,thread_id,turn_id,task_id,provider,model,cache_hit_tokens,cache_miss_tokens,input_tokens,output_tokens,reasoning_tokens,cost_micros,cost_usd,cost_label,rate_revision,unknown_reason",
+    "labels": [
+      "provider-reported",
+      "locally-estimated",
+      "unknown (provider did not report usage)"
+    ]
+  },
+  "capturedAt": "2026-11-13T08:09:14.500Z",
+  "providerRequests": 0
+}

@@ -26,6 +26,8 @@ import { ProviderWorkbench } from './ProviderWorkbench.js';
 import { BriefingPanel } from './BriefingPanel.js';
 import { MemoryPanel } from './MemoryPanel.js';
 import { ChangesPanel } from './ChangesPanel.js';
+import { CostPanel } from './CostPanel.js';
+import { WorkPanel } from './WorkPanel.js';
 import { projectIdentity, PROJECT_COLORS } from '../shared/identity.js';
 import type { AttentionFocus, AttentionView, Density } from '../shared/attention.js';
 import type { AppearanceView } from '../shared/appearance.js';
@@ -1285,7 +1287,7 @@ export function App(): React.JSX.Element {
                   }}
                 />
               ) : screen === 'work' ? (
-                <WorkView project={selected} />
+                <WorkPanel project={selected} />
               ) : screen === 'agents' ? (
                 <AgentsPanel project={selected} sessionId={sessionId} />
               ) : screen === 'extensions' ? (
@@ -1311,7 +1313,13 @@ export function App(): React.JSX.Element {
               ) : screen === 'changes' ? (
                 <ChangesPanel project={selected} />
               ) : screen === 'cost' ? (
-                <CostView info={info} project={selected} spend={spend} />
+                <CostPanel
+                  project={selected}
+                  sessionId={sessionId}
+                  onSpendChanged={() => {
+                    if (selected) void loadSpend(selected.id);
+                  }}
+                />
               ) : screen === 'capabilities' ? (
                 <CapabilitiesPanel
                   view={capabilities}
@@ -1885,89 +1893,6 @@ function HomeView({
           Selected: {selected.label}
         </p>
       ) : null}
-    </section>
-  );
-}
-
-function WorkView({ project }: { project: CatalogProject | null }): React.JSX.Element {
-  return (
-    <section className="panel" aria-labelledby="work-title">
-      <p className="eyebrow">Work</p>
-      <h2 id="work-title">Work board</h2>
-      <p className="lede">
-        Prompt dependencies, acceptance criteria, and deterministic eligible-task selection arrive with P10.
-      </p>
-      {project ? (
-        <EmptyState
-          title="No tasks recorded"
-          body="Unstarted tasks stay unstarted. Mona does not guess percentages or invent progress for this project."
-        />
-      ) : (
-        <EmptyState title="No project open" body="Choose a project before assigning a bounded prompt." />
-      )}
-      <div className="queue-note">
-        <h3>Queue</h3>
-        <p className="mona-muted">
-          Pause after task, interrupt now, and cancel queued connect to the engine in P08/P11. Queue controls are not
-          shown as enabled before they exist.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-function CostView({
-  info,
-  project,
-  spend,
-}: {
-  info: AppInfo | null;
-  project: CatalogProject | null;
-  spend: ProjectSpend | null;
-}): React.JSX.Element {
-  const view = formatSpend(spend);
-  return (
-    <section className="panel" aria-labelledby="cost-title">
-      <p className="eyebrow">Cost lens</p>
-      <h2 id="cost-title">Recorded spend</h2>
-      <p className="lede">
-        Only usage already recorded for this project is shown. A missing price is labeled unknown, never $0.00.
-      </p>
-      {project ? (
-        <div className="facts">
-          <div>
-            <span className="fact-label">Project</span>
-            <span className="fact-value">{project.label}</span>
-          </div>
-          <div>
-            <span className="fact-label">Known cost</span>
-            <span className="fact-value" data-testid="cost-known">
-              {view.label}
-            </span>
-          </div>
-          <div>
-            <span className="fact-label">Turns with usage</span>
-            <span className="fact-value">{spend?.turnCount ?? 0}</span>
-          </div>
-          <div>
-            <span className="fact-label">Unknown-priced records</span>
-            <span className="fact-value">{spend?.unknownCostRecords ?? 0}</span>
-          </div>
-          <div>
-            <span className="fact-label">Route</span>
-            <span className="fact-value">{info ? `${info.route.provider} · ${info.route.model}` : 'Unknown'}</span>
-          </div>
-          <div>
-            <span className="fact-label">Pricing source</span>
-            <span className="fact-value">{info?.route.source ?? 'Unknown'}</span>
-          </div>
-        </div>
-      ) : (
-        <EmptyState title="No project open" body="Open a project to see its recorded cost." />
-      )}
-      <p className="mona-muted">
-        Budget controls and export arrive with P12. No remaining balance is inferred locally.
-      </p>
     </section>
   );
 }

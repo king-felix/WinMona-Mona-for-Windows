@@ -1467,3 +1467,35 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   `aria-expanded`; the panel may never become invisible-but-focusable.
 - **Verified by:** the renderer test that opens, closes and persists it, and the live probe
   (`timelineWidthCollapsed` vs `timelineWidthOpen`).
+
+## D-0114 - A criterion that describes what a person can do needs surface-level evidence
+
+- **Decision:** MONA-013 `budgets`/`export` and MONA-009 `prompt-catalog` are now evidenced by
+  the live Cost lens and Work board (`docs/evidence/P25-surfaces.md`, 26 steps on development and
+  installed builds). They had previously been marked `passed` on service-level tests while the
+  renderer had no budget, export or task channel; the Cost screen said budgets "arrive with P12"
+  and the Work screen printed "No tasks recorded" unconditionally. The mistake is recorded here
+  rather than rewritten out of the history.
+- **Why:** "the service can do it" and "a person can do it" are different claims. Reading a
+  closed requirement as satisfied because its backend works let two visible stubs survive a
+  release-candidate pass. The product rule already says untested is not supported; this extends
+  it to unreachable is not delivered.
+- **Constrains:** any future criterion phrased as a user-facing capability must cite evidence
+  produced by driving the app (probe or recorded screenshots), not only package tests. Where an
+  OS surface cannot be automated (native Save dialog), the gap must be stated in the evidence.
+- **Verified by:** the surface probe, `cost-ipc.test.ts` (8), `tasks-ipc.test.ts` (7), two
+  renderer cases, the sender audit, and `P25-surfaces.json` / `P25-surfaces-installed.json`.
+
+## D-0115 - The work board and cost lens read their services; the view recomputes nothing
+
+- **Decision:** the Work board renders the task service's board verbatim, including eligibility
+  and its reason; the Cost lens renders the ledger's lens, budgets and live budget evaluation.
+  Neither view calculates eligibility, spend or remaining balance.
+- **Why:** a second calculation is a second source of truth, and this product deliberately has
+  one scheduler and one ledger. Copying the verdict keeps the screen honest when the service
+  changes its rules.
+- **Constrains:** task creation is the only write, and it records a pending task; it never starts
+  a run. Budget writes go through `CostLedger.setBudget`; the renderer can request a direction or
+  an amount, never a computed state.
+- **Verified by:** the IPC tests asserting the service verdict is preserved, and the live probe
+  asserting a dependency-blocked task shows the service reason.
