@@ -152,6 +152,26 @@ export class UiStateStore {
   }
 
   /**
+   * Opens a session id that was minted elsewhere (the durable new-conversation
+   * operation in the project store). It records the empty draft and makes the
+   * session current; an existing id is reused rather than duplicated.
+   */
+  ensureSession(projectId: string, sessionId: string): UiStateView {
+    const entry = this.ensure(projectId);
+    entry.currentSessionId = sessionId;
+    const existing = entry.sessions.find((session) => session.sessionId === sessionId);
+    if (existing) {
+      existing.updatedAt = this.timestamp();
+    } else {
+      entry.sessions.unshift({ sessionId, updatedAt: this.timestamp(), text: '' });
+    }
+    entry.sessions.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    if (entry.sessions.length > MAX_SESSIONS) entry.sessions.length = MAX_SESSIONS;
+    this.persist();
+    return this.view();
+  }
+
+  /**
    * A prompt is inserted into the composer only after explicit use; nothing is
    * sent. `saveFavorite` is the simple form, `savePrompt` is the versioned one.
    */

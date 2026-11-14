@@ -284,31 +284,42 @@ ${body}
 }
 
 function build() {
-  const derived = buildCatalog();
-  const text = renderModule(derived);
-  fs.mkdirSync(path.dirname(CATALOG_FILE), { recursive: true });
-  fs.writeFileSync(CATALOG_FILE, text, 'utf8');
-  console.log(
-    `wrote ${derived.rows.length} rows and ${derived.aliasCount} aliases -> ${path.relative(ROOT, CATALOG_FILE)}`,
-  );
+  return (async () => {
+    const derived = buildCatalog();
+    const text = await formatModule(renderModule(derived));
+    fs.mkdirSync(path.dirname(CATALOG_FILE), { recursive: true });
+    fs.writeFileSync(CATALOG_FILE, text, 'utf8');
+    console.log(
+      `wrote ${derived.rows.length} rows and ${derived.aliasCount} aliases -> ${path.relative(ROOT, CATALOG_FILE)}`,
+    );
+  })();
+}
+
+/** The repository formats with Prettier; the generated file must match it. */
+async function formatModule(text) {
+  const prettier = await import('prettier');
+  const config = (await prettier.resolveConfig(CATALOG_FILE)) ?? {};
+  return await prettier.format(text, { ...config, parser: 'typescript' });
 }
 
 function check() {
-  const derived = buildCatalog();
-  const expected = renderModule(derived);
-  const actual = fs.existsSync(CATALOG_FILE) ? fs.readFileSync(CATALOG_FILE, 'utf8') : '';
-  if (actual !== expected) {
-    console.error('slash catalog is stale; run: node tools/build/slash-catalog.mjs build');
-    process.exitCode = 1;
-    return;
-  }
-  console.log(`slash catalog is current: ${derived.rows.length} rows, ${derived.aliasCount} aliases`);
+  return (async () => {
+    const derived = buildCatalog();
+    const expected = await formatModule(renderModule(derived));
+    const actual = fs.existsSync(CATALOG_FILE) ? fs.readFileSync(CATALOG_FILE, 'utf8') : '';
+    if (actual !== expected) {
+      console.error('slash catalog is stale; run: node tools/build/slash-catalog.mjs build');
+      process.exitCode = 1;
+      return;
+    }
+    console.log(`slash catalog is current: ${derived.rows.length} rows, ${derived.aliasCount} aliases`);
+  })();
 }
 
 const command = process.argv[2] ?? 'help';
 if (command === 'capture') await capture();
-else if (command === 'build') build();
-else if (command === 'check') check();
+else if (command === 'build') await build();
+else if (command === 'check') await check();
 else {
   console.log('usage: node tools/build/slash-catalog.mjs <capture|build|check>');
   process.exitCode = command === 'help' ? 0 : 2;

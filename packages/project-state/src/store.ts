@@ -217,6 +217,19 @@ export type TimelinePage = {
 export const DEFAULT_TIMELINE_PAGE = 500;
 export const MAX_TIMELINE_PAGE = 2_000;
 
+/** One recorded new-conversation operation. */
+export type SessionRotation = {
+  id: string;
+  projectId: string;
+  oldSessionId: string;
+  newSessionId: string;
+  operationKey: string;
+  source: string;
+  createdAt: string;
+  /** True when an earlier dispatch with the same key created this row. */
+  replayed?: boolean;
+};
+
 /**
  * The one write path for local project state. Every mutation enters the
  * maintenance barrier and a single IMMEDIATE transaction; project-scoped writes
@@ -690,6 +703,65 @@ export class ProjectStore {
     });
   }
 
+  /**
+   * A new conversation, recorded durably and idempotently. The operation key is
+   * unique per project, so a retried dispatch (lost acknowledgement, a second
+   * press, a restart that retries the same key) returns the session it already
+   * created instead of minting a duplicate. No engine thread is created here.
+   */
+  async rotateSession(input: {
+    projectId: string;
+    oldSessionId: string;
+    operationKey: string;
+    source?: string;
+  }): Promise<SessionRotation | null> {
+    const operationKey = input.operationKey.trim();
+    if (!operationKey) throw stateError('invalid_request', 'a session rotation needs an operation key');
+    return await this.write((tx) => {
+      const project = tx.db.prepare('SELECT id FROM projects WHERE id = ?').get(input.projectId) as
+        { id?: string } | undefined;
+      if (!project?.id) return null;
+      const existing = tx.db
+        .prepare('SELECT * FROM session_rotations WHERE project_id = ? AND operation_key = ?')
+        .get(input.projectId, operationKey) as SessionRotationRecord | undefined;
+      if (existing) return { ...toSessionRotation(existing), replayed: true };
+      const row: SessionRotationRecord = {
+        id: `rot_${randomUUID()}`,
+        project_id: input.projectId,
+        old_session_id: input.oldSessionId,
+        new_session_id: `ses_${randomUUID().replaceAll('-', '')}`,
+        operation_key: operationKey,
+        source: (input.source ?? 'mona:new-conversation').slice(0, 80),
+        created_at: tx.now(),
+      };
+      tx.db
+        .prepare(
+          'INSERT INTO session_rotations(id, project_id, old_session_id, new_session_id, operation_key, source, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        )
+        .run(
+          row.id,
+          row.project_id,
+          row.old_session_id,
+          row.new_session_id,
+          row.operation_key,
+          row.source,
+          row.created_at,
+        );
+      return { ...toSessionRotation(row), replayed: false };
+    });
+  }
+
+  /** The recorded rotations for a project, newest first. */
+  async listSessionRotations(projectId: string, limit = 50): Promise<SessionRotation[]> {
+    const bounded = Math.max(1, Math.min(200, Math.trunc(limit)));
+    return await this.read((db) => {
+      const rows = db
+        .prepare('SELECT * FROM session_rotations WHERE project_id = ? ORDER BY created_at DESC LIMIT ?')
+        .all(projectId, bounded) as SessionRotationRecord[];
+      return rows.map((row) => toSessionRotation(row));
+    });
+  }
+
   /** Advances the replay cursor. This is bookkeeping, not user state. */
   async touchThread(threadId: string, lastSeq: number): Promise<void> {
     await this.write((tx) => {
@@ -957,6 +1029,28 @@ type TimelineRecord = {
   created_at: string;
   updated_at: string;
 };
+
+type SessionRotationRecord = {
+  id: string;
+  project_id: string;
+  old_session_id: string;
+  new_session_id: string;
+  operation_key: string;
+  source: string;
+  created_at: string;
+};
+
+function toSessionRotation(row: SessionRotationRecord): SessionRotation {
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    oldSessionId: row.old_session_id,
+    newSessionId: row.new_session_id,
+    operationKey: row.operation_key,
+    source: row.source,
+    createdAt: row.created_at,
+  };
+}
 
 function toTimelineItem(row: TimelineRecord): TimelineItemRow {
   return {

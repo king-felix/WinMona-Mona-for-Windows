@@ -107,6 +107,12 @@ engine-hidden rows marked hidden rather than dropped.
 
 ## Left for W05 and later
 
+> **Updated by W05.** `/new` and `/help` are now real Mona routes: typing them dispatches a typed
+> operation in the main process (see `docs/evidence/W05-dispatch.md`). The generated catalog in this
+> working tree therefore shows two `Mona route` rows, and the probe's refusal example is `/model`
+> rather than `/new`. Everything else in this section still holds: the remaining 107 rows are
+> `tui-only`, and physical 200 % scaling and Narrator sign-off remain W20's.
+
 - **Routing.** Every row is `tui-only`: W04 describes, it does not execute. W05 adds typed
   operations for the rows Mona can own (`/new` first) and the catalog route notes change with it.
 - **Physical scaling and Narrator.** The list is keyboard-operable, has listbox/option roles with

@@ -156,12 +156,14 @@
     },
     "new": {
       "costClass": "none",
+      "route": "mona",
       "sideEffects": "Starts a fresh engine conversation. History, drafts and usage records remain; no provider request is made until the new conversation is used.",
-      "routeNote": "Mona owns conversation creation, so this row is the bridge to a qualified operation in W05. Until that dispatch exists, the text stays visible and is not sent to the model."
+      "routeNote": "Mona starts the new conversation itself: the current session keeps its history, draft and usage, and the runtime opens a thread when the new conversation first sends work."
     },
     "help": {
       "costClass": "none",
-      "routeNote": "Mona's own autocomplete exposes the same catalog. The engine's /help output belongs to its terminal UI."
+      "route": "mona",
+      "routeNote": "Mona opens its own command catalog: every row comes from the engine's registry, and opening it makes no request."
     },
     "exit": {
       "costClass": "none",

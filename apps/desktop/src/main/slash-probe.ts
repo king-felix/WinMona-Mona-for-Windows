@@ -203,19 +203,19 @@ export async function runSlashProbe(input: SlashProbeInput): Promise<{
     escapedClosed,
   });
 
-  // 5. A recognized command is refused rather than sent to the model.
+  // 5. A terminal-only command is refused rather than sent to the model.
   await clearDraft();
-  await typeText('/new');
+  await typeText('/model');
   await pressCtrlEnter();
   const refusal = await evaluate<string | null>(`(() => {
     const body = document.body.textContent ?? '';
-    const at = body.indexOf('/new is a Codewhale command');
+    const at = body.indexOf('/model is a Codewhale command');
     return at === -1 ? null : body.slice(at, at + 320);
   })()`);
   const runState = await evaluate<string | null>(
     `document.querySelector('[data-testid="studio-run-state"]')?.textContent ?? null`,
   );
-  check('a recognized command is explained, not sent', refusal !== null && runState !== 'Running', {
+  check('a terminal-only command is explained, not sent', refusal !== null && runState !== 'Running', {
     refusal,
     runState,
   });
@@ -292,6 +292,41 @@ export async function runSlashProbe(input: SlashProbeInput): Promise<{
   window.webContents.setZoomFactor(1);
   await delay(300);
   await clearDraft();
+
+  // 9. /new is a real typed operation: the window follows the recorded session,
+  //    and the receipt names both identities. No runtime is involved.
+  const beforeSession = await evaluate<string | null>(
+    `document.querySelector('[data-testid="session-id"]')?.textContent ?? null`,
+  );
+  await clearDraft();
+  await typeText('/new');
+  await pressCtrlEnter();
+  const rotated = await waitFor(async () => {
+    const now = await evaluate<string | null>(
+      `document.querySelector('[data-testid="session-id"]')?.textContent ?? null`,
+    );
+    return now !== null && now !== beforeSession;
+  }, 10_000);
+  const afterSession = await evaluate<string | null>(
+    `document.querySelector('[data-testid="session-id"]')?.textContent ?? null`,
+  );
+  const rotationNotice = await evaluate<string | null>(`(() => {
+    const body = document.body.textContent ?? '';
+    const at = body.indexOf('Started a new conversation');
+    return at === -1 ? null : body.slice(at, at + 260);
+  })()`);
+  const runStateAfter = await evaluate<string | null>(
+    `document.querySelector('[data-testid="studio-run-state"]')?.textContent ?? null`,
+  );
+  check('/new starts a new conversation in the real window', rotated, {
+    beforeSession,
+    afterSession,
+    runStateAfter,
+  });
+  check('the new conversation says what happened and what was kept', rotationNotice !== null, {
+    rotationNotice,
+  });
+  await shot('slash-new-conversation');
 
   return {
     ok: steps.every((step) => step.ok),

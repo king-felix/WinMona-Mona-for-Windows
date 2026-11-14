@@ -1665,3 +1665,32 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Nothing command-shaped is sent silently.** A recognized command, an ambiguous prefix and a
   missing required argument each produce an explanation; the explicit ways to send text are an
   unknown word, prose, or a leading `\/` (whose escape is removed and reported).
+
+## D-0123 - A command is a typed operation, and a new conversation is a durable rotation
+
+- **Decision:** slash commands reach the main process through one typed channel
+  (`mona:command-dispatch`) carrying the text and an operation key. The main process re-parses the
+  text against the shipped catalog, refuses any row whose route is not `mona`, refuses a `mona` row
+  with no registered operation, validates that operation's arguments (both current operations take
+  none), refuses while a turn is in flight for that session, and only then acts. The renderer never
+  builds a shell string; there is no shell in the path at all.
+- **Why:** S03 forbids sending a recognized local command to the model, interpolating command text
+  into a shell, and faking a terminal-only result. Re-parsing in the main process means a renderer
+  bug or a forged payload cannot reach an operation by mislabelling the text, and the catalog cannot
+  drift from the dispatcher: an unregistered `mona` route is refused loudly rather than simulated.
+- **`/new` is `ProjectStore.rotateSession`** (migration 8): old session, new session and operation
+  key in one transaction, with `UNIQUE(project_id, operation_key)` and `UNIQUE(new_session_id)`.
+  - A retry with the same key returns the same conversation (`replayed: true`), so a lost
+    acknowledgement, a second press or a restart-retry cannot duplicate it.
+  - The key is scoped per project, so a project switch cannot redirect a pending dispatch.
+  - Busy sessions refuse before writing; disconnected sessions are allowed because the operation is
+    local, and the receipt says `threadCreated: false` — the runtime opens a thread when the new
+    conversation first sends work.
+  - Old threads, timeline rows, usage and drafts are untouched; `session_rotations` is in the
+    replacement-import cleanup list, so an import cannot leave stale rotations behind.
+- **Only two routes exist:** `/new` and `/help`. `/model`, `/mode`, permissions and every other
+  route-changing command stay `tui-only` with their own notes, because changing the provider,
+  endpoint, model or permission posture is not something a composer command may do silently. The
+  profile test proves a dispatch leaves the saved settings untouched.
+- **What W17 inherits:** `rotateSession` plus the `new-conversation` operation is the shared,
+  idempotent primitive Prompt Runner will use, with both identities in the receipt.

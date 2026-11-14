@@ -24,6 +24,8 @@ import { LaunchDispatcher, type LaunchIntent } from './launch-dispatch.js';
 import { registerLaunchIpc } from './launch-ipc.js';
 import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
+import { CommandService } from './command-service.js';
+import { registerCommandIpc } from './command-ipc.js';
 import { ChangesService } from './changes-service.js';
 import { registerChangesIpc } from './changes-ipc.js';
 import { registerCostIpc } from './cost-ipc.js';
@@ -861,6 +863,16 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         });
       },
     });
+    const commandService = localState
+      ? new CommandService({
+          store: localState.store,
+          ensureSession: (projectId, sessionId) => {
+            if (!uiStateStore) throw new Error('local UI state is unavailable');
+            return uiStateStore.ensureSession(projectId, sessionId);
+          },
+          sessionBusy: (projectId, sessionId) => studioService?.sessionBusy(projectId, sessionId) ?? null,
+        })
+      : null;
     registerCatalogIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -870,6 +882,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
       service: () => studioService,
+    });
+    registerCommandIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      service: () => commandService,
     });
     registerChangesIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),

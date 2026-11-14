@@ -2,7 +2,7 @@
 import { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CatalogProject, EngineView } from '../shared/catalog.js';
+import type { CatalogProject, EngineView, UiStateView } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
 import type { StudioView } from '../shared/studio.js';
 import { StudioPanel } from './StudioPanel.js';
@@ -90,6 +90,7 @@ type BridgeOverrides = {
     limit?: number | undefined;
   }) => Promise<unknown>;
   search?: (input: { projectId: string; sessionId: string; query: string }) => Promise<unknown>;
+  command?: (input: { projectId: string; sessionId: string; text: string; operationKey: string }) => Promise<unknown>;
 };
 
 const studioHandlers: EventHandler[] = [];
@@ -111,6 +112,28 @@ function installBridge(next: StudioView, overrides: BridgeOverrides = {}): void 
         run: { state: 'running', detail: 'accepted', turnId: 'turn_test', submission: null, startedAt: null },
       },
     })),
+    commandDispatch: vi.fn(
+      overrides.command ??
+        (async () => ({
+          ok: true as const,
+          data: {
+            projectId: 'prj_a',
+            command: 'help',
+            via: 'name',
+            status: 'done',
+            code: 'ok',
+            detail: 'Opened the catalog.',
+            at: '2026-11-12T00:00:00.000Z',
+            operation: 'show-catalog',
+            oldSessionId: null,
+            newSessionId: null,
+            threadCreated: false,
+            providerRequest: false,
+            replayed: false,
+            ui: null,
+          },
+        })),
+    ),
     studioHistory: vi.fn(
       overrides.history ??
         (async () => ({
@@ -433,7 +456,13 @@ const liveInfo = {
   credentials: { detail: 'Codewhale manages credentials.' },
 } as unknown as AppInfo;
 
-function Interactive({ initialDraft = '' }: { initialDraft?: string }): React.JSX.Element {
+function Interactive({
+  initialDraft = '',
+  onNewConversation = () => undefined,
+}: {
+  initialDraft?: string;
+  onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void;
+}): React.JSX.Element {
   const [draft, setDraftValue] = useState(initialDraft);
   return (
     <StudioPanel
@@ -452,15 +481,21 @@ function Interactive({ initialDraft = '' }: { initialDraft?: string }): React.JS
       onNewSession={() => undefined}
       onLocate={() => undefined}
       onDraftSent={() => undefined}
+      onNewConversation={onNewConversation}
       onSpendRefresh={() => undefined}
     />
   );
 }
 
-async function renderInteractive(next: StudioView, initialDraft = ''): Promise<void> {
-  installBridge(next);
+async function renderInteractive(
+  next: StudioView,
+  initialDraft = '',
+  overrides: BridgeOverrides = {},
+  onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void,
+): Promise<void> {
+  installBridge(next, overrides);
   await act(async () => {
-    root.render(<Interactive initialDraft={initialDraft} />);
+    root.render(<Interactive initialDraft={initialDraft} onNewConversation={onNewConversation ?? (() => undefined)} />);
   });
   await act(async () => {
     await Promise.resolve();
@@ -558,13 +593,13 @@ describe('StudioPanel slash commands', () => {
     expect((container.querySelector('#draft') as HTMLTextAreaElement).value).toBe('/cost');
   });
 
-  it('refuses to send a recognized command and says what is left to do', async () => {
+  it('refuses to send a terminal-only command and says what is left to do', async () => {
     await renderInteractive(view(0));
-    const textarea = await typeIntoComposer('/new');
+    const textarea = await typeIntoComposer('/model');
     await press(textarea, 'Enter', { ctrlKey: true });
     expect(submitCalls()).toBe(0);
     const text = document.body.textContent ?? '';
-    expect(text.includes('/new is a Codewhale command')).toBe(true);
+    expect(text.includes('/model is a Codewhale command')).toBe(true);
     expect(text.includes('Start it with \\/ to send it to the model as ordinary text')).toBe(true);
   });
 
@@ -654,5 +689,132 @@ describe('StudioPanel slash command semantics', () => {
     await renderInteractive(view(0));
     await typeIntoComposer('Look here:\nC:\\work\\mona');
     expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
+  });
+});
+
+describe('StudioPanel command dispatch', () => {
+  const newUi = {
+    currentProjectId: 'prj_a',
+    projects: {
+      prj_a: {
+        sessions: [
+          { sessionId: 'ses_new', updatedAt: '2026-11-12T00:00:00.000Z', text: '' },
+          { sessionId: 'ses_1', updatedAt: '2026-11-12T00:00:00.000Z', text: '' },
+        ],
+      },
+    },
+    preferences: {},
+    warning: null,
+  } as unknown as UiStateView;
+
+  function receipt(overrides: Record<string, unknown> = {}) {
+    return {
+      ok: true as const,
+      data: {
+        projectId: 'prj_a',
+        command: 'new',
+        via: 'name',
+        status: 'done',
+        code: 'ok',
+        detail: 'Started a new conversation.',
+        at: '2026-11-12T00:00:00.000Z',
+        operation: 'new-conversation',
+        oldSessionId: 'ses_1',
+        newSessionId: 'ses_new',
+        threadCreated: false,
+        providerRequest: false,
+        replayed: false,
+        ui: newUi,
+        ...overrides,
+      },
+    };
+  }
+
+  it('dispatches /new through the typed bridge and follows the recorded session', async () => {
+    const seen: Array<{ text: string; operationKey: string }> = [];
+    const rotations: Array<{ oldSessionId: string | null; newSessionId: string }> = [];
+    await renderInteractive(
+      view(0),
+      '',
+      {
+        command: async (input) => {
+          seen.push({ text: input.text, operationKey: input.operationKey });
+          return receipt();
+        },
+      },
+      (input) => rotations.push({ oldSessionId: input.oldSessionId, newSessionId: input.newSessionId }),
+    );
+    const textarea = await typeIntoComposer('/new');
+    await press(textarea, 'Enter', { ctrlKey: true });
+
+    expect(submitCalls()).toBe(0);
+    expect(seen).toHaveLength(1);
+    expect(seen[0]?.text).toBe('/new');
+    expect(seen[0]?.operationKey).toMatch(/^cmd_[A-Za-z0-9]+$/);
+    expect(rotations).toEqual([{ oldSessionId: 'ses_1', newSessionId: 'ses_new' }]);
+    expect(document.body.textContent ?? '').toContain('Started a new conversation.');
+  });
+
+  it('shows a refusal from the main process without changing sessions', async () => {
+    const rotations: unknown[] = [];
+    await renderInteractive(
+      view(0),
+      '',
+      {
+        command: async () =>
+          receipt({
+            status: 'refused',
+            code: 'busy',
+            operation: 'new-conversation',
+            newSessionId: null,
+            ui: null,
+            detail: 'A turn is running in this session. Interrupt it or wait for it to finish.',
+          }),
+      },
+      (input) => rotations.push(input),
+    );
+    const textarea = await typeIntoComposer('/new');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(rotations).toEqual([]);
+    expect(document.body.textContent ?? '').toContain('Interrupt it or wait for it to finish');
+  });
+
+  it('reuses one operation key for the same command line instead of minting a second', async () => {
+    const keys: string[] = [];
+    let attempt = 0;
+    await renderInteractive(view(0), '', {
+      command: async (input) => {
+        keys.push(input.operationKey);
+        attempt += 1;
+        // The first attempt fails at the bridge; the retry must reuse the key.
+        return attempt === 1
+          ? { ok: false as const, error: { code: 'internal', message: 'bridge hiccup' } }
+          : receipt();
+      },
+    });
+    const textarea = await typeIntoComposer('/new');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(keys).toHaveLength(2);
+    expect(keys[0]).toBe(keys[1]);
+  });
+
+  it('opens the catalog drawer for /help', async () => {
+    await renderInteractive(view(0), '', {
+      command: async () =>
+        receipt({
+          command: 'help',
+          operation: 'show-catalog',
+          oldSessionId: null,
+          newSessionId: null,
+          ui: null,
+          detail: 'Opened the catalog.',
+        }),
+    });
+    const details = container.querySelector('.command-catalog') as HTMLDetailsElement;
+    expect(details.open).toBe(false);
+    const textarea = await typeIntoComposer('/help');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(details.open).toBe(true);
   });
 });

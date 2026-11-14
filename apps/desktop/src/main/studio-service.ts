@@ -606,6 +606,20 @@ export class StudioService {
     };
   }
 
+  /**
+   * Whether a turn is in flight for exactly this project session. A new
+   * conversation refuses while this is non-null so busy work stays attached to
+   * the thread that owns it.
+   */
+  sessionBusy(projectId: string, sessionId: string): { turnId: string | null; state: string } | null {
+    const state = this.states.get(`${projectId}:${sessionId}`);
+    if (!state) return null;
+    if (!['preparing', 'running', 'interrupting', 'awaiting_approval', 'reconnecting'].includes(state.run.state)) {
+      return null;
+    }
+    return { turnId: state.run.turnId, state: state.run.state };
+  }
+
   async interrupt(projectId: string): Promise<ServiceResult<{ run: StudioRun; control: StudioControl }>> {
     const state = this.findState(projectId);
     if (!state) {

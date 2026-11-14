@@ -583,6 +583,29 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX memory_terms_query ON memory_terms(term);
     `,
   },
+  {
+    version: 8,
+    name: 'session-rotations',
+    sql: `
+      -- A new conversation is a durable local operation, not a side effect of a
+      -- keystroke. The operation key makes a retried dispatch (lost ack, two
+      -- presses, a restart) return the same new session instead of minting a
+      -- second conversation. No engine thread is created here: the runtime opens
+      -- one when the new session first submits work.
+      CREATE TABLE session_rotations (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        old_session_id TEXT NOT NULL,
+        new_session_id TEXT NOT NULL,
+        operation_key TEXT NOT NULL,
+        source TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        UNIQUE(project_id, operation_key),
+        UNIQUE(new_session_id)
+      );
+      CREATE INDEX session_rotations_project ON session_rotations(project_id, created_at);
+    `,
+  },
 ];
 
 export type MigrationReport = {

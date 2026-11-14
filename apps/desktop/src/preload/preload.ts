@@ -6,6 +6,7 @@ import { AGENT_CHANNELS } from '../shared/agents.js';
 import { BRIEFING_CHANNELS } from '../shared/briefing.js';
 import { CATALOG_CHANNELS } from '../shared/catalog.js';
 import { CHANGES_CHANNELS } from '../shared/changes.js';
+import { COMMAND_CHANNELS } from '../shared/commands.js';
 import { COST_CHANNELS, type BudgetInputView } from '../shared/cost.js';
 import { CAPABILITY_CHANNELS } from '../shared/capabilities.js';
 import { EXTENSION_CHANNELS } from '../shared/extensions.js';
@@ -103,6 +104,8 @@ const bridge = Object.freeze({
   studioPickReferences: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.references, input),
   studioExport: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
     ipcRenderer.invoke(STUDIO_CHANNELS.export, input),
+  commandDispatch: (input: { projectId: string; sessionId: string; text: string; operationKey: string }) =>
+    ipcRenderer.invoke(COMMAND_CHANNELS.dispatch, input),
   studioHistory: (input: {
     projectId: string;
     sessionId: string;

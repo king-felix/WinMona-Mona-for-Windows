@@ -578,9 +578,9 @@ export const SLASH_CATALOG: readonly SlashCommandRow[] = [
     costClass: 'none',
     sideEffects:
       'The engine documentation for this command does not state whether it changes state; treat it as consequential until read.',
-    route: 'tui-only',
+    route: 'mona',
     routeNote:
-      "Mona's own autocomplete exposes the same catalog. The engine's /help output belongs to its terminal UI.",
+      "Mona opens its own command catalog: every row comes from the engine's registry, and opening it makes no request.",
   },
   {
     name: 'hf',
@@ -961,9 +961,9 @@ export const SLASH_CATALOG: readonly SlashCommandRow[] = [
     costClass: 'none',
     sideEffects:
       'Starts a fresh engine conversation. History, drafts and usage records remain; no provider request is made until the new conversation is used.',
-    route: 'tui-only',
+    route: 'mona',
     routeNote:
-      'Mona owns conversation creation, so this row is the bridge to a qualified operation in W05. Until that dispatch exists, the text stays visible and is not sent to the model.',
+      'Mona starts the new conversation itself: the current session keeps its history, draft and usage, and the runtime opens a thread when the new conversation first sends work.',
   },
   {
     name: 'note',

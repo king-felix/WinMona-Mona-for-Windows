@@ -4,6 +4,7 @@ import type { AgentBridge } from '../shared/agents.js';
 import type { BriefingBridge } from '../shared/briefing.js';
 import type { CatalogBridge } from '../shared/catalog.js';
 import type { ChangesBridge } from '../shared/changes.js';
+import type { CommandBridge } from '../shared/commands.js';
 import type { CostBridge } from '../shared/cost.js';
 import type { CapabilityBridge } from '../shared/capabilities.js';
 import type { ExtensionBridge } from '../shared/extensions.js';
@@ -19,6 +20,7 @@ declare global {
   interface Window {
     mona: CatalogBridge &
       StudioBridge &
+      CommandBridge &
       AgentBridge &
       ProviderBridge &
       ExtensionBridge &

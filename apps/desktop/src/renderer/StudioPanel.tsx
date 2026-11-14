@@ -3,6 +3,7 @@ import { Badge, Button, EmptyState, ErrorState, Markdown, Notification, type Ton
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import type { CatalogProject, EngineView, ProjectSpend, PromptFavorite, UiStateView } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { CommandReceipt } from '../shared/commands.js';
 import {
   acceptedCommand,
   commandContext,
@@ -96,6 +97,13 @@ function timeLabel(at: string): string {
   return Number.isNaN(date.getTime()) ? '' : date.toLocaleTimeString();
 }
 
+/** A plain operation key: no user text, no path, bounded alphabet. */
+function commandKey(): string {
+  const api = globalThis.crypto as { randomUUID?: () => string } | undefined;
+  if (api?.randomUUID) return api.randomUUID().replaceAll('-', '');
+  return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+}
+
 /** Union two item lists by id (newest value wins), ordered by sequence. */
 function mergeTimeline(base: TimelineItem[], incoming: TimelineItem[]): TimelineItem[] {
   const byId = new Map<string, TimelineItem>();
@@ -147,6 +155,8 @@ export type StudioPanelProps = {
   onLocate: () => void;
   /** Called after a prompt is accepted, with the exact text that was accepted. */
   onDraftSent: (sent: { projectId: string; sessionId: string; text: string }) => void;
+  /** Called after the main process records a new conversation. */
+  onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void;
   /** Ask the shell to re-read recorded spend after a turn settles. */
   onSpendRefresh: () => void;
   /** Export the recorded conversation; returns a message for the notice line. */
@@ -183,6 +193,9 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [commandIndex, setCommandIndex] = useState(0);
   const [commandDismissed, setCommandDismissed] = useState(false);
   const [catalogQuery, setCatalogQuery] = useState('');
+  const [catalogOpen, setCatalogOpen] = useState(false);
+  /** One operation key per distinct command line, reused by a retry. */
+  const pendingCommand = useRef<{ text: string; key: string } | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const lastDelta = useRef<Map<string, number>>(new Map());
@@ -428,6 +441,64 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
                     : null;
   const canSubmit = blockedReason === null;
 
+  /**
+   * Send one command to the typed main-process surface. The operation key is
+   * bound to the exact command line: a retry after a lost acknowledgement reuses
+   * it, so the durable rotation returns the same conversation instead of a
+   * second one. Nothing here builds a shell string or calls a model.
+   */
+  const dispatchCommand = useCallback(
+    async (text: string) => {
+      if (!projectId || !sessionId) return;
+      if (pendingCommand.current?.text !== text) {
+        const key = `cmd_${commandKey()}`;
+        pendingCommand.current = { text, key };
+      }
+      const operationKey = pendingCommand.current.key;
+      let receipt: CommandReceipt;
+      try {
+        const result = await window.mona.commandDispatch({ projectId, sessionId, text, operationKey });
+        if (!result.ok) {
+          // Keep the key: a retry must land on the same operation.
+          setActionError(result.error.message);
+          return;
+        }
+        receipt = result.data;
+      } catch {
+        setActionError('The command bridge did not respond. Nothing was assumed to have run.');
+        return;
+      }
+      pendingCommand.current = null;
+      if (receipt.status === 'refused') {
+        setActionError(receipt.detail);
+        return;
+      }
+      if (receipt.operation === 'show-catalog') {
+        setCatalogOpen(true);
+        setNotice(receipt.detail);
+        return;
+      }
+      if (receipt.operation === 'new-conversation' && receipt.newSessionId) {
+        if (receipt.ui) {
+          props.onNewConversation?.({
+            oldSessionId: receipt.oldSessionId,
+            newSessionId: receipt.newSessionId,
+            ui: receipt.ui,
+          });
+        } else {
+          // The rotation is durable even when the UI state could not be written;
+          // say so instead of pretending the composer changed conversation.
+          setActionError(
+            `${receipt.detail} Mona could not update the saved session list, so the window still shows the old session.`,
+          );
+          return;
+        }
+      }
+      setNotice(receipt.detail);
+    },
+    [projectId, props, sessionId],
+  );
+
   const submit = useCallback(async () => {
     if (!projectId || !sessionId || submittingRef.current) return;
     // A command-shaped line is never silently sent to the model. This check runs
@@ -443,6 +514,10 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       return;
     }
     if (intent.kind === 'command') {
+      if (intent.row.route === 'mona') {
+        void dispatchCommand(draft);
+        return;
+      }
       const argumentNote = intent.argumentMissing ? ` It needs an argument: ${intent.row.usage}` : '';
       setActionError(
         `/${intent.row.name} is a Codewhale command.${argumentNote} ${routeSentence(intent.row)} ` +
@@ -485,7 +560,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       submittingRef.current = false;
       setSubmitting(false);
     }
-  }, [canSubmit, draft, mode, projectId, props, references, sessionId]);
+  }, [canSubmit, dispatchCommand, draft, mode, projectId, props, references, sessionId]);
 
   const interrupt = useCallback(async () => {
     if (!projectId) return;
@@ -1329,7 +1404,11 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             <p className="mona-muted">No saved prompts for this project yet.</p>
           )}
         </details>
-        <details className="command-catalog">
+        <details
+          className="command-catalog"
+          open={catalogOpen}
+          onToggle={(event) => setCatalogOpen((event.currentTarget as HTMLDetailsElement).open)}
+        >
           <summary>
             Command catalog · {SLASH_CATALOG.length} engine commands · engine {SLASH_CATALOG_PROVENANCE.engineVersion}
           </summary>

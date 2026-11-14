@@ -3,14 +3,14 @@
 **Read this first: there are two ledgers now.** The original P00–P23 sequence is complete
 (`.mona/build/state.json`, revision 83). The Windows improvement supplement W00–W25 is a separate,
 validated id space (D-0116) with its own state at `.mona/build/reviews/windows-v2/state.json`,
-written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00, W01, W02, W03 and W04**;
-they are `completed` there and `W05` is the next eligible prompt.
+written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00 through W05**;
+they are `completed` there and `W06` is the next eligible prompt.
 
 Verify before trusting this file:
 
 ```text
 node tools/build/cli.mjs validate          # original ledger: OK, 0 warnings
-node tools/build/windows-review.mjs status # review ledger: 5 completed, current W04
+node tools/build/windows-review.mjs status # review ledger: 6 completed, current W05
 npm run ci                                  # format, lint, typecheck, 591 vitest in 70 files, node --test suites, build
 ```
 
@@ -51,6 +51,14 @@ npm run ci                                  # format, lint, typecheck, 591 vites
   filtered, keyboard-operable list with descriptions, usage, cost and route badges; paths, code,
   quotes and `\/` stay literal; a recognized command, an ambiguous prefix or a missing argument is
   explained and never sent. 12 real-window steps pass (`docs/evidence/W04-slash.json`).
+
+- **W05 — typed dispatch and a real `/new`.** One strict channel carries the command text plus an
+  operation key; the main process re-parses it, refuses non-`mona` routes and arguments
+  (`/new --force`, `/new ; Remove-Item …`), refuses while busy, and performs only two operations:
+  `new-conversation` (a durable, idempotent `session_rotations` row) and `show-catalog`. Old
+  sessions keep their thread, history, usage and draft; the provider and permission profile are
+  untouched. 15 dispatch tests, 5 IPC tests, and the real window rotated
+  `ses_41455e54` → `ses_98970de6` with no runtime connected (`docs/evidence/W05-dispatch.md`).
 
 ## Open items that this session did not close
 

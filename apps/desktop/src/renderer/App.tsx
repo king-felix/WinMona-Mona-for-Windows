@@ -1333,6 +1333,19 @@ export function App(): React.JSX.Element {
                     setDraftText('');
                     void persistDraft({ projectId: sent.projectId, sessionId: sent.sessionId, text: '' });
                   }}
+                  onNewConversation={(input) => {
+                    // The main process recorded the rotation; this only follows
+                    // it. The previous session keeps its own draft and history.
+                    setUi(input.ui);
+                    setSessionId(input.newSessionId);
+                    draftRef.current = '';
+                    setDraftText('');
+                    setNotice({
+                      tone: 'neutral',
+                      title: 'New conversation',
+                      body: 'The previous session keeps its history, draft and usage. The runtime opens a thread when this conversation first sends work.',
+                    });
+                  }}
                   onSpendRefresh={() => {
                     if (selected) void loadSpend(selected.id);
                   }}

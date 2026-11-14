@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildDiagnosticPreview, exportDiagnosticBundle } from './diagnostics-bundle.js';
-import { applyMigrations } from './migrations.js';
+import { applyMigrations, MIGRATIONS } from './migrations.js';
 import { ProjectStore } from './store.js';
 
 const cleanup: Array<() => Promise<void>> = [];
@@ -114,7 +114,7 @@ describe('diagnostic bundle preview', () => {
 
     expect(preview.redacted).toBe(true);
     expect(preview.text).toContain('# Mona diagnostics (local, redacted)');
-    expect(preview.text).toContain('schema: 7');
+    expect(preview.text).toContain(`schema: ${MIGRATIONS.length}`);
     expect(preview.text).toContain('projects: 1');
     expect(preview.text).toContain('artifact root:');
     expect(preview.artifacts.missing).toEqual(['bb/missing']);
