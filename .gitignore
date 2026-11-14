@@ -10,6 +10,7 @@ mona-smoke.json
 
 # Local machine state (never committed)
 .mona/build/tmp/
+.mona/tmp/
 .mona/build/backup/
 .mona/build/history/
 .mona/build/local/

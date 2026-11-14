@@ -1,0 +1,43 @@
+{
+  "capturedUtc": "2026-11-14T21:17:25.502Z",
+  "executable": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+  "executableExists": true,
+  "folderName": "Mona Shell Probe cafÃ© ä¸­æ–‡ c1dc1098",
+  "verbs": [
+    "Open",
+    "Pin to &Quick access",
+    "Add to VLC media player's Playlist",
+    "Open Git &GUI here",
+    "Open Git Ba&sh here",
+    "Start new DS project with Mona",
+    "Play with VLC media player",
+    "",
+    "Restore previous &versions",
+    "",
+    "Retrieving libraries...",
+    "Copy &as path",
+    "",
+    "Cu&t",
+    "Copy",
+    "Create &shortcut",
+    "Delete",
+    "Rena&me",
+    "P&roperties"
+  ],
+  "verbPresent": true,
+  "invocation": {
+    "attempted": true,
+    "ok": true,
+    "process": {
+      "pid": 11772,
+      "commandLine": "\"C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe\" project open --path \"X:\\AI_projects\\Qwen3.8-27B\\cache\\temp\\mona-shell-verb-gNfOvF\\Mona Shell Probe cafAc �,-�-� c1dc1098\" --profile ds-full-access"
+    },
+    "error": null,
+    "status": 0,
+    "stdout": "invoked",
+    "stderr": ""
+  },
+  "modernMenuVisualPlacement": "not observed: requires a human right-click",
+  "trustContext": "the installed package must be registered under its declared trust state; see W22-menu-trust.md",
+  "sha256OfExecutable": "d12e313cad264d5347d1722a71299b6abf03d752e01c8a0107e054da0abd170f"
+}

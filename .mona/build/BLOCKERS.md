@@ -6,14 +6,36 @@ Acknowledging a blocker never resets its counter or clears the row.
 
 ## Open
 
+### 2026-11-14 — open human items after the W12–W25 pass
+
+Exact actions, in the order they unblock the most claims:
+
+1. **Trust the test certificate** (blocks the Windows 11 Explorer menu / MONA-027). The uninstaller
+   removed the certificate it created, so `Add-AppxPackage` now fails with `0x800B0109 – The root
+   certificate of the signature … must be trusted` (reproduced 2026-11-14, `W23-installer.json`).
+   Elevated: `node tools/install/cli.mjs trust-test-certificate`, then re-run
+   `Mona-Setup-0.1.0-x64.exe`.
+2. **Right-click a folder once** and confirm **Start new DS project with Mona** appears in the
+   Windows 11 menu (not only under "Show more options"). This is the only thing keeping W22 and
+   MONA-027 open; the shell's own verb table already invokes Mona correctly
+   (`docs/evidence/W22-shell-verb.json`).
+3. **Narrator, exact 200 % scaling, text size, contrast theme, physical IME.** The app now exposes
+   its accessibility tree to Windows (it did not before W20). Checklist with expected results:
+   `docs/evidence/W20-accessibility.md`.
+4. **Idle-memory exception.** 352.5 MiB (360.1 MiB averaged) against the 350 MiB target; 400.6 MiB
+   with a 20,000-row session. D-0111 covers 0.1.0 only. Options: `docs/evidence/W19-performance.md`.
+5. **Signing and licensing** for any distribution beyond this machine; the setup file is unsigned.
+6. **A real pending approval** (`permission_posture = "ask"` for one bounded turn) to close the
+   W06/W08 open item.
+
 ### MONA-028 — two human-only checks and one measured memory miss
 
 This is not a three-attempt blocker; it is recorded here because it needs Victor.
 
-- **Memory:** 404 MB at the start of P23, **370.5 MB** on the installed candidate on the
-  current bytes (range 370.5 to 377.1 MB across runs). **Accepted by Victor on 2026-11-12**
-  (D-0111): the 350 MB target is unchanged and still unmet, no release text claims it is met,
-  and the next evidence-led step stays unauthorized. Two rows remain in `attempts.jsonl`; the
+- **Memory:** 404 MB at the start of P23, **352.5 MiB** on the installed candidate on the current
+  bytes (360.1 MiB averaged over 60 s; 400.6 MiB with a 20,000-row session). **Accepted by Victor on
+  2026-11-12** (D-0111): the 350 MB target is unchanged and still unmet, no release text claims it is
+  met, and the next evidence-led step stays unauthorized. Two rows remain in `attempts.jsonl`; the
   third slot is unused because an explicit decision closed the item, not a fix.
 - **Screen reader:** a Narrator walkthrough is human-only (P22-ISSUE-004). The
   automated half is done and recorded: `P23-a11y-installed-2.json`, 12/12 steps on the current

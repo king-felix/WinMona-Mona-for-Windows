@@ -1,4 +1,4 @@
-import {
+﻿import {
   app,
   BrowserWindow,
   clipboard,
@@ -137,6 +137,7 @@ const changesTest = process.argv.includes('--changes-test');
 const memoryTest = process.argv.includes('--memory-probe');
 const memoryOut = process.env.MONA_MEMORY_OUT ?? path.join(process.cwd(), 'mona-memory.json');
 const memoryWorkspace = process.env.MONA_MEMORY_WORKSPACE ?? null;
+const memorySecondaryWorkspace = process.env.MONA_MEMORY_WORKSPACE_2 ?? null;
 const memoryIdleSeconds = Number.parseInt(process.env.MONA_MEMORY_IDLE_SECONDS ?? '60', 10);
 const memoryDiffPath = process.env.MONA_MEMORY_DIFF_PATH ?? 'big.txt';
 const memoryHistoryRows = Number.parseInt(process.env.MONA_MEMORY_HISTORY ?? '0', 10);
@@ -579,6 +580,14 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
   });
 
   app.whenReady().then(async () => {
+    // Windows assistive technology must be able to read the shell. Chromium only
+    // builds its accessibility tree once it believes an AT is present, and a
+    // plain UIA client query on this build saw nine stub elements instead of the
+    // real controls (W20, docs/evidence/W20-accessibility.md). Asking for the
+    // tree explicitly is what makes Narrator and UIA clients agree with what the
+    // window actually renders. The cost is a modest tree build, measured in the
+    // same evidence file, not a change to what is rendered.
+    if (process.platform === 'win32') app.setAccessibilitySupportEnabled(true);
     Menu.setApplicationMenu(null);
     session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
     session.defaultSession.setPermissionCheckHandler(() => false);
@@ -875,7 +884,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
             label: savedProfile.label,
             profile: savedProfile.profile,
             detail:
-              'Saved once in Mona’s local state. The engine applies it when a thread is created; the studio shows the observed posture from the runtime.',
+              'Saved once in Monaâ€™s local state. The engine applies it when a thread is created; the studio shows the observed posture from the runtime.',
           },
           harnessEnabled,
         });
@@ -1061,7 +1070,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         openedPath: null,
         status: 'failed',
         detail:
-          'Local project state is unavailable, so Mona cannot open a project from Explorer. See Settings → Diagnostics.',
+          'Local project state is unavailable, so Mona cannot open a project from Explorer. See Settings â†’ Diagnostics.',
         warnings: [],
         project: null,
         engine: null,
@@ -1404,6 +1413,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         window: probeWindow,
         outputPath: memoryOut,
         workspace: memoryWorkspace,
+        secondaryWorkspace: memorySecondaryWorkspace,
         idleSeconds: Number.isFinite(memoryIdleSeconds) ? memoryIdleSeconds : 60,
         openProject: async (target) => {
           if (!catalogService) return null;

@@ -1,0 +1,977 @@
+﻿{
+    "capturedUtc":  "2026-11-14T21:09:06.1125497Z",
+    "executable":  "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "extraArgument":  "",
+    "osScaling":  {
+                      "appliedDpi":  288,
+                      "scalePercent":  300,
+                      "note":  "AppliedDPI is the real Windows scaling setting; browser zoom is not this"
+                  },
+    "screens":  [
+                    {
+                        "device":  "\\\\.\\DISPLAY1",
+                        "width":  4096,
+                        "height":  2160,
+                        "primary":  true
+                    }
+                ],
+    "windowName":  "Mona",
+    "windowClass":  "Chrome_WidgetWin_1",
+    "descendantCount":  74,
+    "namedElements":  [
+                          {
+                              "type":  "Pane",
+                              "name":  "Mona",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Document",
+                              "name":  "Mona",
+                              "automationId":  "RootWebArea",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Group",
+                              "name":  "",
+                              "automationId":  "root",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Mona",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Local workbench for Codewhale",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "StatusBar",
+                              "name":  "Project context",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "No project open",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "—",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Engine not connected",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "deepseek-flash",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Full Access · DS",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "No recorded spend",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Enter Focus Mode",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  false
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Open the command palette",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Group",
+                              "name":  "Mona sections",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Search projects",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Edit",
+                              "name":  "Search projects",
+                              "automationId":  "project-search",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "CheckBox",
+                              "name":  "Show archived",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Home",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Home",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Studio",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Studio",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Work",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Work",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Agents",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Agents",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Extensions",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Extensions",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Memory",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Memory",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Changes",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Changes",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Cost",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Cost",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Capabilities",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Capabilities",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "ListItem",
+                              "name":  "Settings",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Settings",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "RECENT",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "No projects yet.",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Idle Mona makes no request",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Group",
+                              "name":  "Projects",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "HOME",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Projects",
+                              "automationId":  "home-title",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Choose a folder to begin. Browsing the catalog needs no API key and makes no request.",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Open folder…",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Create project…",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Choose a folder to begin",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Mona opens an existing folder or creates a new one. It never scans a drive to guess projects.",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Choose a folder…",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Show Inspector",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "Electron 45.3.0 · Chromium 156.0.8078.96 · Node 24.22.2 · schema 10",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  " · ",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "v",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "0.1.0",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Group",
+                              "name":  "Window scale",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Smaller scale",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Window scale 100 percent. Reset to 100 percent.",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Larger scale",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Terminal",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  false
+                          },
+                          {
+                              "type":  "Button",
+                              "name":  "Diagnostics",
+                              "automationId":  "",
+                              "focusable":  true,
+                              "enabled":  true
+                          },
+                          {
+                              "type":  "Text",
+                              "name":  "No model requests are made by this window.",
+                              "automationId":  "",
+                              "focusable":  false,
+                              "enabled":  true
+                          }
+                      ],
+    "elements":  [
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  false
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "Mona",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Document",
+                         "name":  "Mona",
+                         "automationId":  "RootWebArea",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "",
+                         "automationId":  "root",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Mona",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Local workbench for Codewhale",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "StatusBar",
+                         "name":  "Project context",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "No project open",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "—",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Engine not connected",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "deepseek-flash",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Full Access · DS",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "No recorded spend",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Enter Focus Mode",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  false
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Open the command palette",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "Mona sections",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Search projects",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Edit",
+                         "name":  "Search projects",
+                         "automationId":  "project-search",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "CheckBox",
+                         "name":  "Show archived",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "List",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Home",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Home",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Studio",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Studio",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Work",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Work",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Agents",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Agents",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Extensions",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Extensions",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Memory",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Memory",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Changes",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Changes",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Cost",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Cost",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Capabilities",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Capabilities",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "ListItem",
+                         "name":  "Settings",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Settings",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "RECENT",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "No projects yet.",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Idle Mona makes no request",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "Projects",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "HOME",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Projects",
+                         "automationId":  "home-title",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Choose a folder to begin. Browsing the catalog needs no API key and makes no request.",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Open folder…",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Create project…",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Choose a folder to begin",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Mona opens an existing folder or creates a new one. It never scans a drive to guess projects.",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Choose a folder…",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Show Inspector",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "Electron 45.3.0 · Chromium 156.0.8078.96 · Node 24.22.2 · schema 10",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  " · ",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "v",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "0.1.0",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Group",
+                         "name":  "Window scale",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Smaller scale",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Window scale 100 percent. Reset to 100 percent.",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Larger scale",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Terminal",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  false
+                     },
+                     {
+                         "type":  "Button",
+                         "name":  "Diagnostics",
+                         "automationId":  "",
+                         "focusable":  true,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Text",
+                         "name":  "No model requests are made by this window.",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     },
+                     {
+                         "type":  "Pane",
+                         "name":  "",
+                         "automationId":  "",
+                         "focusable":  false,
+                         "enabled":  true
+                     }
+                 ]
+}

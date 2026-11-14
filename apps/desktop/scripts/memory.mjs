@@ -14,8 +14,10 @@ import { fileURLToPath } from 'node:url';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(here, '..');
 const repoRoot = path.resolve(appDir, '..', '..');
-const out = process.env.MONA_MEMORY_OUT ?? path.join(repoRoot, 'docs', 'evidence', 'P23-memory.json');
-const logFile = process.env.MONA_MEMORY_LOG ?? path.join(repoRoot, 'docs', 'evidence', 'P23-memory-log.txt');
+const out = path.resolve(process.env.MONA_MEMORY_OUT ?? path.join(repoRoot, 'docs', 'evidence', 'P23-memory.json'));
+const logFile = path.resolve(
+  process.env.MONA_MEMORY_LOG ?? path.join(repoRoot, 'docs', 'evidence', 'P23-memory-log.txt'),
+);
 const label = process.env.MONA_MEMORY_LABEL ?? 'development';
 const packagedExe = process.env.MONA_MEMORY_EXE?.trim() || null;
 await mkdir(path.dirname(out), { recursive: true });
@@ -40,6 +42,11 @@ const root = await mkdtemp(path.join(tmpdir(), 'mona-p23-memory-'));
 const profile = path.join(root, 'profile');
 const workspace = path.join(root, 'memory-project');
 await mkdir(workspace, { recursive: true });
+// A second real project makes repeated project switching measurable; without it
+// the probe records that the switch scene was skipped rather than pretending.
+const secondary = path.join(root, 'memory-project-two');
+await mkdir(secondary, { recursive: true });
+await writeFile(path.join(secondary, 'two.txt'), 'two\n', 'utf8');
 await writeFile(path.join(workspace, 'one.txt'), 'one\n', 'utf8');
 await writeFile(
   path.join(workspace, 'big.txt'),
@@ -47,9 +54,9 @@ await writeFile(
   'utf8',
 );
 
-function git(args) {
+function git(args, cwd = workspace) {
   return new Promise((resolve, reject) => {
-    const child = spawn('git', ['-C', workspace, ...args], { windowsHide: true });
+    const child = spawn('git', ['-C', cwd, ...args], { windowsHide: true });
     let stderr = '';
     child.stderr.on('data', (chunk) => (stderr += chunk.toString('utf8')));
     child.on('exit', (code) => (code === 0 ? resolve() : reject(new Error(`git ${args.join(' ')}: ${stderr}`))));
@@ -60,6 +67,11 @@ await git(['config', 'user.email', 'probe@example.invalid']);
 await git(['config', 'user.name', 'Mona memory probe']);
 await git(['add', '.']);
 await git(['commit', '--quiet', '-m', 'memory probe baseline']);
+await git(['init', '--quiet'], secondary);
+await git(['config', 'user.email', 'probe@example.invalid'], secondary);
+await git(['config', 'user.name', 'Mona memory probe'], secondary);
+await git(['add', '.'], secondary);
+await git(['commit', '--quiet', '-m', 'memory probe second baseline'], secondary);
 
 const child = spawn(electronPath, packagedExe ? ['--memory-probe'] : ['.', '--memory-probe'], {
   cwd: packagedExe ? repoRoot : appDir,
@@ -67,6 +79,7 @@ const child = spawn(electronPath, packagedExe ? ['--memory-probe'] : ['.', '--me
     ...process.env,
     MONA_MEMORY_OUT: out,
     MONA_MEMORY_WORKSPACE: workspace,
+    MONA_MEMORY_WORKSPACE_2: secondary,
     MONA_MEMORY_DIFF_PATH: 'big.txt',
     MONA_MEMORY_IDLE_SECONDS: process.env.MONA_MEMORY_IDLE_SECONDS ?? '60',
     MONA_USER_DATA: profile,
@@ -97,6 +110,7 @@ await writeFile(
 );
 await rm(profile, { recursive: true, force: true, maxRetries: 3 }).catch(() => undefined);
 await rm(workspace, { recursive: true, force: true, maxRetries: 3 }).catch(() => undefined);
+await rm(secondary, { recursive: true, force: true, maxRetries: 3 }).catch(() => undefined);
 if (stderr.trim()) console.error(stderr.trim().slice(-1500));
 
 if (!existsSync(out)) {

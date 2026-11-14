@@ -1,4 +1,4 @@
-// Per-user installation, upgrade, uninstall and identity-package lifecycle.
+﻿// Per-user installation, upgrade, uninstall and identity-package lifecycle.
 //
 // Ground rules this module enforces:
 //  - per user, no elevation, no machine-wide keys;
@@ -22,7 +22,7 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import zlib from 'node:zlib';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -77,7 +77,23 @@ export function detectVersion(repoRoot, dataRoot) {
   return '0.0.0-uninstalled';
 }
 
-export function resolveLayout(env = process.env, repoRoot = path.resolve(here, '..', '..')) {
+/**
+ * Where the repository root is, from wherever this module is running.
+ *
+ * In the repository this file is `tools/install/installer.mjs`, two levels below
+ * the root. In a staged or installed payload it is copied to
+ * `<payload>/installer/installer.mjs`, one level below the payload, which is the
+ * root the installer operates on. Guessing two levels made a recipient install
+ * report version `0.0.0-uninstalled` because it looked for the app manifest one
+ * directory too high (found while qualifying the setup file, W23).
+ */
+export function defaultRepoRoot(from = here) {
+  const payloadRoot = path.resolve(from, '..');
+  if (existsSync(path.join(payloadRoot, 'resources', 'app', 'package.json'))) return payloadRoot;
+  return path.resolve(from, '..', '..');
+}
+
+export function resolveLayout(env = process.env, repoRoot = defaultRepoRoot()) {
   const localAppData = env.LOCALAPPDATA ?? path.join(env.USERPROFILE ?? process.cwd(), 'AppData', 'Local');
   const appData = env.APPDATA ?? path.join(env.USERPROFILE ?? process.cwd(), 'AppData', 'Roaming');
   const dataRoot = env.MONA_DATA_ROOT ?? path.join(localAppData, 'Mona');
@@ -314,6 +330,25 @@ export function pngSolid(width, height, [red, green, blue] = [99, 70, 223]) {
 /* ------------------------------------------------------------------------- */
 
 /**
+ * The icon embedder lives in two places depending on where this file runs: in
+ * the repository it is `tools/assets/embed-exe-icon.mjs`, and in an installed or
+ * staged payload it is copied beside the installer as
+ * `installer/assets/embed-exe-icon.mjs`. A static import bound the first layout
+ * and broke `install` from a staged payload (found while qualifying the
+ * recipient setup, W23), so it is resolved at call time instead.
+ */
+export async function loadIconEmbedder(installerDir = here) {
+  const candidates = [
+    path.join(installerDir, 'assets', 'embed-exe-icon.mjs'),
+    path.join(installerDir, '..', 'assets', 'embed-exe-icon.mjs'),
+  ];
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) return await import(pathToFileURL(candidate).href);
+  }
+  throw new Error('the executable-icon tool is missing beside the installer; run `npm run assets:icons` and re-stage.');
+}
+
+/**
  * Package images the identity manifest declares. Windows reads exactly these
  * names, so the size is part of the contract rather than a preference.
  */
@@ -431,6 +466,25 @@ export async function buildStage(layout, options = {}) {
   cpSync(layout.electronDist, stage, { recursive: true });
   renameSync(path.join(stage, 'electron.exe'), path.join(stage, 'Mona.exe'));
 
+  // 1b. The renamed runtime still carries Electron's embedded icon group, which
+  // Explorer, the taskbar and Task Manager read from the PE resource section.
+  // Replace it with the approved artwork so the packaged binary itself is
+  // Mona's, not just the window and the Start-menu tile.
+  const brandDir = findBrandAssets(layout);
+  if (!brandDir) {
+    throw new Error(
+      "brand artwork is absent. Run `npm run assets:icons`; the packaged executable will not ship Electron's icon.",
+    );
+  }
+  const exeIcon = path.join(brandDir, 'mona.ico');
+  if (!existsSync(exeIcon)) {
+    throw new Error(`brand artwork is missing mona.ico in ${brandDir}. Run \`npm run assets:icons\`.`);
+  }
+  const embedded = await (await loadIconEmbedder(here)).embedIconFile(path.join(stage, 'Mona.exe'), exeIcon);
+  if (!embedded.verification.ok) {
+    throw new Error(`Mona.exe icon did not verify: ${embedded.verification.problems.join('; ')}`);
+  }
+
   // 2. Application payload.
   const appRoot = path.join(stage, 'resources', 'app');
   mkdirSync(appRoot, { recursive: true });
@@ -480,6 +534,13 @@ export async function buildStage(layout, options = {}) {
   for (const file of ['installer.mjs', 'cli.mjs']) {
     cpSync(path.join(here, file), path.join(installerDir, file));
   }
+  // The installer rewrites the executable icon on every stage, so the tool has
+  // to travel with it; `loadIconEmbedder` prefers this copy when it exists.
+  mkdirSync(path.join(installerDir, 'assets'), { recursive: true });
+  cpSync(
+    path.join(layout.repoRoot, 'tools', 'assets', 'embed-exe-icon.mjs'),
+    path.join(installerDir, 'assets', 'embed-exe-icon.mjs'),
+  );
   cpSync(
     path.join(layout.repoRoot, 'tools', 'launch', 'context-menu.mjs'),
     path.join(installerDir, 'context-menu.mjs'),
@@ -495,6 +556,19 @@ export async function buildStage(layout, options = {}) {
     );
   }
   cpSync(brandSource, path.join(installerDir, 'assets', 'brand', 'generated'), { recursive: true });
+  // Redistribution notices travel with the payload; a recipient gets them from
+  // the same file they install from.
+  const notices = path.join(layout.repoRoot, 'THIRD_PARTY_NOTICES.md');
+  if (existsSync(notices)) cpSync(notices, path.join(stage, 'THIRD_PARTY_NOTICES.md'));
+
+  // The signed identity package travels with the payload, so a recipient can
+  // register the modern Explorer menu from the setup file alone. Without this,
+  // `install` looked only in the local artifacts folder, which is empty on a
+  // fresh machine, and the package step quietly refused (W23).
+  const packed = artifactPaths(layout).msix;
+  if (existsSync(packed)) {
+    cpSync(packed, path.join(installerDir, 'Mona.msix'));
+  }
 
   // 5. Identity package source (manifest, logos, and the COM server the
   // manifest declares). Carrying the DLL with the manifest means the package can
@@ -608,6 +682,56 @@ export function runExe(file, args, options = {}) {
 export function reg(args, run = runExe) {
   const regExe = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'reg.exe');
   return run(regExe, args);
+}
+
+export function startMenuShortcutPath(layout, env = process.env) {
+  const appData = env.APPDATA ?? path.join(env.USERPROFILE ?? process.cwd(), 'AppData', 'Roaming');
+  return path.join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Mona.lnk');
+}
+
+/**
+ * A per-user Start menu entry that names the installed executable.
+ *
+ * The packaged identity provides its own Start entry, but a recipient whose
+ * package registration is deferred (untrusted certificate) would otherwise have
+ * no Start entry at all, and the acceptance ask is "open it from Start". The
+ * shortcut is Mona-owned: one file, named Mona.lnk, removed on uninstall.
+ */
+export function installStartMenuShortcut(layout, run = runExe) {
+  const shortcut = startMenuShortcutPath(layout);
+  const exe = path.join(layout.installRoot, 'Mona.exe');
+  if (!existsSync(exe)) return { ok: false, path: shortcut, error: 'The installed executable is missing.' };
+  const script = [
+    '$ErrorActionPreference = "Stop"',
+    `$path = '${shortcut.replaceAll("'", "''")}'`,
+    `$target = '${exe.replaceAll("'", "''")}'`,
+    '$shell = New-Object -ComObject WScript.Shell',
+    '$link = $shell.CreateShortcut($path)',
+    '$link.TargetPath = $target',
+    '$link.WorkingDirectory = (Split-Path -Parent $target)',
+    '$link.IconLocation = "$target,0"',
+    '$link.Description = "Mona - local workbench for Codewhale"',
+    '$link.Save()',
+    '"saved"',
+  ].join('\n');
+  const result = run('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', script], { timeout: 60000 });
+  return {
+    ok: result.status === 0 && existsSync(shortcut),
+    path: shortcut,
+    created: existsSync(shortcut),
+    output: (result.stdout || result.stderr || '').slice(-400),
+  };
+}
+
+export function removeStartMenuShortcut(layout) {
+  const shortcut = startMenuShortcutPath(layout);
+  if (!existsSync(shortcut)) return { removed: false, path: shortcut };
+  try {
+    rmSync(shortcut, { force: true });
+    return { removed: true, path: shortcut };
+  } catch (error) {
+    return { removed: false, path: shortcut, error: String(error).slice(0, 200) };
+  }
 }
 
 export function installRegistryOps(layout) {
@@ -952,6 +1076,11 @@ export async function install(layout, options = {}) {
     identity = { ok: false, skipped: true, reason: 'Skipped by request.' };
   } else {
     const artifacts = artifactPaths(layout);
+    const packaged = path.join(stage, 'installer', 'Mona.msix');
+    if (!existsSync(artifacts.msix) && existsSync(packaged)) {
+      mkdirSync(artifacts.directory, { recursive: true });
+      cpSync(packaged, artifacts.msix);
+    }
     if (!existsSync(artifacts.msix)) {
       identity = {
         ok: false,
@@ -978,6 +1107,10 @@ export async function install(layout, options = {}) {
       };
     }
   }
+
+  // Start menu: one owned shortcut, so the app is reachable from Start even
+  // while the packaged identity is deferred by an untrusted certificate.
+  const startMenu = installStartMenuShortcut(layout);
 
   const installedExe = path.join(layout.installRoot, 'Mona.exe');
   const state = {
@@ -1008,6 +1141,7 @@ export async function install(layout, options = {}) {
     decision,
     registryFailures,
     classic,
+    startMenu,
     identity,
     checks,
   };
@@ -1084,6 +1218,7 @@ export async function uninstall(layout, options = {}) {
   const preserved = preserveSentinels(layout);
 
   const identity = runPackageAction(layout, 'remove');
+  const startMenu = removeStartMenuShortcut(layout);
   const classic = summarizeClassic(unregisterClassicMenu(layout));
   const registry = uninstallRegistryOps().map((op) => ({ key: op.key, ...reg(op.args) }));
 
@@ -1095,6 +1230,7 @@ export async function uninstall(layout, options = {}) {
   // material, logs and the install record are removed with the program.
   const artifacts = artifactPaths(layout);
   const removed = [];
+  if (startMenu.removed) removed.push(startMenu.path);
   for (const target of [path.dirname(artifacts.pfx), artifacts.logs, artifacts.state]) {
     if (existsSync(target)) {
       rmSync(target, { recursive: true, force: true, maxRetries: 5 });
@@ -1157,7 +1293,7 @@ export function removeInstallRoot(root) {
   // detached command removes the whole tree once the shell has certainly exited.
   writeFileSync(
     script,
-    ['@echo off', 'timeout /t 12 /nobreak >nul', `rmdir /s /q "${root}"`, 'del /q "%~f0"', ''].join('\r\n'),
+    ['@echo off', 'ping -n 13 127.0.0.1 >nul', `rmdir /s /q "${root}"`, 'del /q "%~f0"', ''].join('\r\n'),
     'ascii',
   );
   spawn('cmd.exe', ['/c', script], { detached: true, stdio: 'ignore', windowsHide: true }).unref();

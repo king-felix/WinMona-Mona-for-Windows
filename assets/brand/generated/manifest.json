@@ -1,6 +1,6 @@
 {
   "pipeline": "tools/assets/build-icons.mjs",
-  "pipeline_version": 1,
+  "pipeline_version": 2,
   "source": {
     "path": "assets/brand/MidnightMona.png",
     "sha256": "cebc871741323a49e556d633fbf0e656a6134bb4c6c4b839ce13a67963df41be",
@@ -52,7 +52,7 @@
     {
       "name": "mona.ico",
       "bytes": 171785,
-      "sha256": "c70638dd6bbae54cd9ec62b9bc30f0fddc90959934ab8a2c907bd5e4766cc25b"
+      "sha256": "60910cd5b8ea2f51f7fabcce1480907bf1e99cecfbd9659d1e558e6f49602f3d"
     },
     {
       "name": "Square150x150Logo.png",

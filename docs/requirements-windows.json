@@ -262,40 +262,22 @@
       "requirements": [
         "WX-11"
       ],
-      "status": "pending",
+      "status": "verifying",
       "evidence": [
         {
-          "path": "assets/brand/generated/manifest.json",
-          "sha256": "4adb7a343b71f66d22744dd9e21dd777e9028e47063f617df597fd099a66660d",
-          "kind": "generated",
-          "note": "Source hash, crop geometry and every generated size; window, tray, header and package images derive from it."
-        },
-        {
-          "path": "assets/brand/README.md",
-          "sha256": "820757efeacc7651b61a804784774d0487d94e55f79fdd96838fbbfd2a3746d9",
+          "path": "docs/evidence/W12-identity.md",
+          "sha256": "ffe919611e0e2c8c853e86132ef490d71614a48f1c70b0a594d464a9e7dee2ba",
           "kind": "document",
-          "note": "Asset provenance, display surfaces and the two known gaps (16px legibility, embedded exe icon)."
+          "note": "Artwork embedded in the packaged executable and verified on installed bytes; the ICO container was invalid and is fixed. Open: a physical high-DPI visual check of the installed icon."
         },
         {
-          "path": "tools/assets/build-icons.mjs",
-          "sha256": "4742cb6b58627ca9e9fa057f05b85302cd662adf6e11172a7441eb113ae86915",
-          "kind": "document",
-          "note": "Deterministic pipeline; --check proves committed bytes still match the source."
-        },
-        {
-          "path": "docs/evidence/brand-icons.md",
-          "sha256": "59b0e437131cc907cfa87ff97c618acedfb15b6099b6431fe811c022e483047b",
-          "kind": "document",
-          "note": "What was replaced, how it was generated, and the four recorded gaps."
-        },
-        {
-          "path": "docs/evidence/brand-icons/app-header.png",
-          "sha256": "0cb2c054ce0609355ba3bae91b9c55f9b2621cf28822a234b4d74d9b77f9f97a",
+          "path": "docs/evidence/W12-icons.json",
+          "sha256": "737aa13582b767a98afc06494c61706cca52c823c43558e2fe9b77a04e0000b7",
           "kind": "real",
-          "note": "Live Electron capture: the new mark renders in the app header at 38 px."
+          "note": "Artwork embedded in the packaged executable and verified on installed bytes; the ICO container was invalid and is fixed. Open: a physical high-DPI visual check of the installed icon."
         }
       ],
-      "notes": "Partially delivered 2026-11-14 under an explicit user request: the approved artwork now drives the window icon, tray, in-app header and the three declared package images. Still open for full W12 acceptance: installed-icon inspection at small/large sizes and high DPI, and the packaged exe still carries Electron embedded icon resources."
+      "notes": "Artwork embedded in the packaged executable and verified on installed bytes; the ICO container was invalid and is fixed. Open: a physical high-DPI visual check of the installed icon."
     },
     {
       "id": "W13",
@@ -312,9 +294,16 @@
       "requirements": [
         "WX-12"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W13-runner-contract.md",
+          "sha256": "44e9bbca1dafc3142a2aec2abf5fdc98e9fca5d4bb2b2a06708854a83b84b9d3",
+          "kind": "document",
+          "note": "Runner contract and durable state model landed as migration 10 over the existing task engine; 15 tests. Execution/import/UI are W14-W17."
+        }
+      ],
+      "notes": "Runner contract and durable state model landed as migration 10 over the existing task engine; 15 tests. Execution/import/UI are W14-W17."
     },
     {
       "id": "W14",
@@ -441,9 +430,28 @@
       "requirements": [
         "WX-15"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W19-performance.md",
+          "sha256": "2d57213f899d41dcbe9a6baf30dd3683c47a1d066962a4e3b63497d5089198f9",
+          "kind": "document",
+          "note": "Measured before/after on the installed artifact; no app-level leak found; the 350 MiB idle target is still missed and stays open."
+        },
+        {
+          "path": "docs/evidence/W19-memory-after-idle.json",
+          "sha256": "e67b27d5de972ce5e1ffa28f3b39bc167ca8b552d0a6dbd8abe8ccac8da73c36",
+          "kind": "real",
+          "note": "Measured before/after on the installed artifact; no app-level leak found; the 350 MiB idle target is still missed and stays open."
+        },
+        {
+          "path": "docs/evidence/W19-qa.json",
+          "sha256": "7e39a1bf7841c3f0d0fa4a927f299cc85ce2d3a5904490866874101ca7bd498e",
+          "kind": "real",
+          "note": "Measured before/after on the installed artifact; no app-level leak found; the 350 MiB idle target is still missed and stays open."
+        }
+      ],
+      "notes": "Measured before/after on the installed artifact; no app-level leak found; the 350 MiB idle target is still missed and stays open."
     },
     {
       "id": "W20",
@@ -460,9 +468,22 @@
       "requirements": [
         "WX-16"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W20-accessibility.md",
+          "sha256": "2e914d180771aeb26d0c51f8c1366f17018d6377f3c88afcba995a00e30ed20d",
+          "kind": "document",
+          "note": "Accessibility tree was not exposed to Windows at all; fixed and verified through UI Automation. Narrator, exact 200 % scaling, text size, contrast and IME remain human checks."
+        },
+        {
+          "path": "docs/evidence/W20-uia.json",
+          "sha256": "138d2dff59e6504c0e84bd5e1772fa00849d60d7b09ca872f49e4295c2047cac",
+          "kind": "real",
+          "note": "Accessibility tree was not exposed to Windows at all; fixed and verified through UI Automation. Narrator, exact 200 % scaling, text size, contrast and IME remain human checks."
+        }
+      ],
+      "notes": "Accessibility tree was not exposed to Windows at all; fixed and verified through UI Automation. Narrator, exact 200 % scaling, text size, contrast and IME remain human checks."
     },
     {
       "id": "W21",
@@ -481,9 +502,16 @@
       "requirements": [
         "WX-01"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W21-regression.md",
+          "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+          "kind": "document",
+          "note": "Full CI green on the settled candidate; both ledgers reconcile."
+        }
+      ],
+      "notes": "Full CI green on the settled candidate; both ledgers reconcile."
     },
     {
       "id": "W22",
@@ -500,9 +528,28 @@
       "requirements": [
         "WX-17"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "verifying",
+      "evidence": [
+        {
+          "path": "docs/evidence/W22-menu-trust.md",
+          "sha256": "a30d3d5fc628ec4e95ffbd82ad2cf18550a0756debf52154124320ecc1e75cf9",
+          "kind": "document",
+          "note": "Shell verb invocation observed; trust chain and the 0x800B0109 condition diagnosed. Open: a human right-click showing the item in the Windows 11 menu (MONA-027)."
+        },
+        {
+          "path": "docs/evidence/W22-shell-verb.json",
+          "sha256": "7b4c1b87a8919fa02bf981016fdb5264324a6fa276f0ee54410723af4c06118c",
+          "kind": "real",
+          "note": "Shell verb invocation observed; trust chain and the 0x800B0109 condition diagnosed. Open: a human right-click showing the item in the Windows 11 menu (MONA-027)."
+        },
+        {
+          "path": "docs/evidence/W22-trust.json",
+          "sha256": "d0187ed3b13eafa64cc93dadbf1242955ce1cb5137037c36b81f22cf5522930a",
+          "kind": "real",
+          "note": "Shell verb invocation observed; trust chain and the 0x800B0109 condition diagnosed. Open: a human right-click showing the item in the Windows 11 menu (MONA-027)."
+        }
+      ],
+      "notes": "Shell verb invocation observed; trust chain and the 0x800B0109 condition diagnosed. Open: a human right-click showing the item in the Windows 11 menu (MONA-027)."
     },
     {
       "id": "W23",
@@ -519,9 +566,28 @@
       "requirements": [
         "WX-18"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W23-installer.md",
+          "sha256": "7e5f211482947c531db5f5df65fd573ff9fdd0c7f2ee2115d28ea7f53b556a66",
+          "kind": "document",
+          "note": "One unsigned setup file installs/upgrades/uninstalls per user; the modern-menu package remains gated on certificate trust."
+        },
+        {
+          "path": "docs/evidence/W23-installer.json",
+          "sha256": "c1357a7b095594ae9bb6e2551c891eeafd643761dfc6e733887228790db7a6aa",
+          "kind": "real",
+          "note": "One unsigned setup file installs/upgrades/uninstalls per user; the modern-menu package remains gated on certificate trust."
+        },
+        {
+          "path": "docs/evidence/W23-setup-receipt.json",
+          "sha256": "4be79e9754cfc6b531379150950263c8094698cf781d2ab59540c052e7c26d94",
+          "kind": "real",
+          "note": "One unsigned setup file installs/upgrades/uninstalls per user; the modern-menu package remains gated on certificate trust."
+        }
+      ],
+      "notes": "One unsigned setup file installs/upgrades/uninstalls per user; the modern-menu package remains gated on certificate trust."
     },
     {
       "id": "W24",
@@ -562,9 +628,16 @@
         "WX-01",
         "WX-18"
       ],
-      "status": "pending",
-      "evidence": [],
-      "notes": ""
+      "status": "completed",
+      "evidence": [
+        {
+          "path": "docs/evidence/W25-handoff.md",
+          "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+          "kind": "document",
+          "note": "All task dispositions reconciled; docs updated to the actual product; review inbox listed."
+        }
+      ],
+      "notes": "All task dispositions reconciled; docs updated to the actual product; review inbox listed."
     }
   ],
   "requirements": [
@@ -576,12 +649,12 @@
         "W21",
         "W25"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Evidence-led adoption; durable review state",
-          "status": "pending",
+          "status": "partial",
           "evidence": []
         }
       ],
@@ -738,17 +811,30 @@
       "owning_prompts": [
         "W10"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Factual HUD, usage, costs and budgets",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -758,17 +844,30 @@
       "owning_prompts": [
         "W11"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Composition/navigation/file-context conveniences",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -778,17 +877,30 @@
       "owning_prompts": [
         "W12"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Approved icon throughout Windows distribution",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -800,17 +912,30 @@
         "W14",
         "W15"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Numbered-file import and deterministic Prompt Runner",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -862,17 +987,30 @@
         "W19",
         "W24"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Measured memory/performance with unchanged targets",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -882,17 +1020,30 @@
       "owning_prompts": [
         "W20"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Narrator, real DPI and keyboard qualification",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -902,17 +1053,30 @@
       "owning_prompts": [
         "W22"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Modern Explorer integration and trust",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     },
@@ -924,17 +1088,30 @@
         "W24",
         "W25"
       ],
-      "status": "pending",
+      "status": "partial",
       "criteria": [
         {
           "id": "outcome",
           "description": "Installable/shareable candidate and honest handoff",
-          "status": "pending",
-          "evidence": []
+          "status": "partial",
+          "evidence": [
+            {
+              "path": "docs/evidence/W21-regression.md",
+              "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+              "kind": "document",
+              "note": "Regression, economics and security evidence for the settled candidate."
+            },
+            {
+              "path": "docs/evidence/W25-handoff.md",
+              "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+              "kind": "document",
+              "note": "Reconciled dispositions and the review inbox."
+            }
+          ]
         }
       ],
       "verified_commit": null,
-      "tested_environment": null,
+      "tested_environment": "Windows 11 Pro 10.0.26200 (x64); installed candidate; Electron 45.3.0",
       "open_issue_ids": [],
       "original_requirements": []
     }

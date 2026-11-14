@@ -25,15 +25,15 @@ const source = readFileSync(SOURCE);
 const built = buildIcons(source);
 
 function icoDirectory(buffer) {
-  const count = buffer.readUInt16BE(4);
+  const count = buffer.readUInt16LE(4);
   const entries = [];
   for (let index = 0; index < count; index += 1) {
     const at = 6 + index * 16;
     entries.push({
       width: buffer[at] === 0 ? 256 : buffer[at],
       height: buffer[at + 1] === 0 ? 256 : buffer[at + 1],
-      bytes: buffer.readUInt32BE(at + 8),
-      offset: buffer.readUInt32BE(at + 12),
+      bytes: buffer.readUInt32LE(at + 8),
+      offset: buffer.readUInt32LE(at + 12),
     });
   }
   return entries;
@@ -68,7 +68,7 @@ describe('icon pipeline', () => {
 
   it('packs an ICO whose directory matches its payloads', () => {
     const ico = built.files.get('mona.ico');
-    assert.equal(ico.readUInt16BE(2), 1, 'type 1 = icon');
+    assert.equal(ico.readUInt16LE(2), 1, 'type 1 = icon');
     const entries = icoDirectory(ico);
     assert.deepEqual(
       entries.map((entry) => entry.width),
@@ -126,7 +126,7 @@ describe('icon pipeline', () => {
 
   it('refuses an empty ICO list rather than writing a header only', () => {
     const ico = encodeIco([]);
-    assert.equal(ico.readUInt16BE(4), 0);
+    assert.equal(ico.readUInt16LE(4), 0);
     assert.equal(ico.length, 6);
   });
 });

@@ -14,18 +14,22 @@ is verified, what is measured, and what is still waiting on a human decision.
 Verified on this machine (Windows 11 Pro 10.0.26200, Ryzen 7 5800X, 32 GB):
 
 - 28 of 30 product requirements **verified** against recorded evidence.
-- **MONA-028 is partial**: idle memory is 370.5–377.1 MB on the installed candidate against a
-  350 MB internal target (down from 404 MB after windowing rendered timeline rows). The deviation
-  is **accepted for 0.1.0** by decision (D-0111); the target itself is unchanged and not met. The
-  Windows screen-reader and physical 200% scaling checks still need a person.
-- **MONA-027 is registered, not yet seen**: the certificate is trusted on this reference
-  machine through the verified elevated import, the identity package registers (`Status: Ok`)
-  with both modern-menu verbs declared, and the classic menu is verified. A human right-click
-  confirming the modern entry is still outstanding, so no complete claim is made.
+- **MONA-028 is partial**: idle memory is 352.5 MiB (360.1 MiB averaged over 60 s) on the installed
+  candidate against a 350 MiB internal target, and 400.6 MiB with a 20,000-row session open. The
+  app-reducible part is a ~4 MiB renderer heap; the rest is Chromium's per-process baseline plus a
+  ~100 MiB GPU process doing software rasterisation on a GPU-less VM. The deviation is **accepted
+  for 0.1.0** by decision (D-0111); the target itself is unchanged and not met. Narrator, exact
+  200% scaling, text size, contrast themes and physical IME still need a person.
+- **MONA-027 is registered, not yet seen**: the identity package registers when the signer is
+  trusted, and both modern-menu verbs are declared. The shell's own verb table was observed
+  invoking Mona with the selected folder (`docs/evidence/W22-shell-verb.json`). A human right-click
+  confirming the item in the Windows 11 menu is still outstanding, so no complete claim is made.
+- Windows accessibility is now real: a UI Automation query used to see nine stub elements and now
+  sees the full named control tree, because the app asks Chromium to build it (`W20`).
 - Real engine turn through the installed app: 22/22 probe steps, one turn at 596 µUSD.
-- Automated gates green: 549 Vitest tests (67 files), 14 bootstrap, 12 launch, 25 install,
-  8 spike, 7 native; typecheck, lint, formatting and build all pass.
-- Installed-candidate startup: cold 427 ms, warm 732 ms; idle CPU 0.04%.
+- Automated gates green: 720 Vitest tests (77 files), 17 assets, 27 bootstrap, 12 launch, 29 install,
+  8 spike, 8 native (1 environment skip); typecheck, lint, formatting and build all pass.
+- Installed-candidate startup: cold 529 ms, warm 1,679 ms; idle CPU 0.02–0.06%.
 
 The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/release-notes-0.1.0.md),
 [docs/evidence/P23-followup.md](docs/evidence/P23-followup.md) and
@@ -40,19 +44,32 @@ The full matrix, with evidence paths, is in [docs/release-notes-0.1.0.md](docs/r
   reads or stores a provider key.
 - Node.js 22+ only to build from source or to run the build tooling.
 
-## Install from this repository
+## Install
 
-Double-click **`install-mona.cmd`** in the repository root. It runs the same per-user installer
-described below, verifies the installed build, and starts Mona. It downloads nothing, publishes
-nothing and needs no elevation.
+The file to share is a single setup executable. It installs for the current user, needs no
+administrator rights, no Node and no source checkout:
+
+```text
+Mona-Setup-0.1.0-x64.exe      (built by: node tools/install/make-setup.mjs)
+```
+
+It is **unsigned**. Windows may show a SmartScreen reputation warning, and the packaged Windows 11
+Explorer entry stays unregistered until the machine trusts the signing certificate it carries (see
+the prerequisite below). Everything else — the program, the Start menu entry, the classic
+folder and folder-background commands, and the uninstall entry — installs without that decision.
+
+From a source checkout, double-click **`install-mona.cmd`** in the repository root. It runs the
+same per-user installer, verifies the installed build, and starts Mona. It downloads nothing,
+publishes nothing and needs no elevation.
 
 The equivalent command sequence, if you prefer a terminal:
 
 ```powershell
 npm ci
 npm run build
-node tools/install/cli.mjs stage          # payload: %LOCALAPPDATA%\Mona\stage
+node tools/install/cli.mjs stage          # payload: build\install-stage
 node tools/install/cli.mjs package --test-sign
+node tools/install/make-setup.mjs         # one installable file in %LOCALAPPDATA%\Mona\artifacts
 node tools/install/cli.mjs install --smoke
 node tools/install/cli.mjs verify --smoke
 ```

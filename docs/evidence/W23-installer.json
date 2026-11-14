@@ -1,0 +1,62 @@
+{
+  "capturedUtc": "2026-11-14T21:46:48.488Z",
+  "machine": {
+    "os": "Microsoft Windows 11 Pro",
+    "build": "26200"
+  },
+  "artifact": {
+    "file": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-Setup-0.1.0-x64.exe",
+    "bytes": 179309695,
+    "sha256": "9abd2b9a21832826526780d93e83e71a4951966f8f370be6f983454ad86f4be0",
+    "receipt": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-Setup-0.1.0-x64.receipt.json",
+    "signature": "unsigned (a signing decision is a separate release gate)"
+  },
+  "payload": {
+    "stage": "build/install-stage",
+    "files": 1745,
+    "secretLikeFiles": [],
+    "notices": [
+      "LICENSE",
+      "LICENSES.chromium.html",
+      "THIRD_PARTY_NOTICES.md"
+    ],
+    "shipsIdentityPackage": true,
+    "shipsIconTool": true
+  },
+  "installed": {
+    "root": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona",
+    "exeSha256": "d12e313cad264d5347d1722a71299b6abf03d752e01c8a0107e054da0abd170f",
+    "stagedExeSha256": "d12e313cad264d5347d1722a71299b6abf03d752e01c8a0107e054da0abd170f",
+    "version": "0.1.0",
+    "startShortcut": {
+      "path": "C:\\Users\\victo\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Mona.lnk",
+      "exists": true
+    },
+    "classicMenuFolder": "present",
+    "classicMenuBackground": "present",
+    "uninstallEntry": "present"
+  },
+  "modernMenuGate": {
+    "code": "0x800B0109",
+    "message": "The root certificate of the signature in the app package or bundle must be trusted.",
+    "reproducedUtc": "2026-11-14",
+    "cause": "the local test certificate is not in LocalMachine\\TrustedPeople (the uninstaller removes the certificate it created)",
+    "remedy": "node tools/install/cli.mjs trust-test-certificate in an elevated shell, then run the setup file again",
+    "consequence": "the app, registry, classic menu, Start shortcut and checksums install; the packaged modern-menu verb does not register"
+  },
+  "lifecycle": {
+    "upgradeOverSameVersion": {
+      "ok": true,
+      "previousRoot": "…\\Programs\\Mona.old-<stamp>",
+      "decision": "proceed"
+    },
+    "uninstallFromInstalledCopy": {
+      "installRootRemoved": true,
+      "shortcutRemoved": true,
+      "registryKeysRemoved": true,
+      "projectDataRetained": true,
+      "codewhaleConfigRetained": true
+    },
+    "deferredCleanupCause": "the uninstaller runs from the install root, so removal is deferred; the scheduled batch used `timeout`, which fails without a console, and the replacement uses `ping`"
+  }
+}

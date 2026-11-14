@@ -1,0 +1,29 @@
+{
+  "capturedUtc": "2026-11-14T21:31:35.411Z",
+  "version": "0.1.0",
+  "file": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-Setup-0.1.0-x64.exe",
+  "bytes": 179172124,
+  "sha256": "cb2746ca842ef45bb6ebbc7a6a6bffa2e0bd5584e06e6f37005c91897fee4057",
+  "stub": {
+    "path": "native/setup/dist/MonaSetupStub.exe",
+    "bytes": 245760,
+    "sha256": "1a9c06f832a3066e1525175569fc0099d5c7358fc10d3116f4fdc443a06b3c5b"
+  },
+  "payload": {
+    "bytes": 178926332,
+    "sha256": "bd9cb0fdc01354c4aa719f368b7ce0da5aa992a90a47342a4c266b8eb0c8c479"
+  },
+  "installer": {
+    "entry": "Mona.exe with ELECTRON_RUN_AS_NODE=1 running installer/cli.mjs install",
+    "stage": "build/install-stage"
+  },
+  "archive": {
+    "tool": "tar.exe (bsdtar/libarchive)",
+    "format": "zip"
+  },
+  "signature": {
+    "status": "unsigned",
+    "note": "A signing decision is a separate release gate; this file is not signed and not claimed as trusted."
+  },
+  "problems": []
+}

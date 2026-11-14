@@ -636,6 +636,111 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX human_requests_pending ON human_requests(project_id, status, created_at);
     `,
   },
+  {
+    version: 10,
+    name: 'prompt-runner',
+    sql: `
+      -- A run is the frozen, authorized selection of tasks imported from one
+      -- prompt file. Its plan hash and per-task prompt hashes are what a later
+      -- result report is bound to, so a re-import or a changed file cannot be
+      -- mistaken for the work that was authorized.
+      CREATE TABLE prompt_runs (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        title TEXT NOT NULL,
+        source_path TEXT NOT NULL,
+        source_sha256 TEXT NOT NULL,
+        source_revision TEXT NOT NULL,
+        plan_revision INTEGER NOT NULL DEFAULT 1,
+        plan_sha256 TEXT NOT NULL,
+        policy_json TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'draft',
+        stop_reason TEXT,
+        created_at TEXT NOT NULL,
+        started_at TEXT,
+        ended_at TEXT,
+        updated_at TEXT NOT NULL,
+        CHECK (status IN ('draft', 'running', 'paused', 'completed', 'blocked', 'cancelled')),
+        CHECK (plan_revision >= 1)
+      );
+      CREATE INDEX prompt_runs_project ON prompt_runs(project_id, created_at);
+
+      CREATE TABLE prompt_run_transitions (
+        id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL REFERENCES prompt_runs(id) ON DELETE CASCADE,
+        from_status TEXT,
+        to_status TEXT NOT NULL,
+        reason TEXT NOT NULL,
+        actor TEXT NOT NULL,
+        at TEXT NOT NULL
+      );
+      CREATE INDEX prompt_run_transitions_run ON prompt_run_transitions(run_id, at);
+
+      -- The tasks themselves stay in the existing task engine. This table only
+      -- freezes their order and the exact prompt bytes per task for this run.
+      CREATE TABLE prompt_run_tasks (
+        run_id TEXT NOT NULL REFERENCES prompt_runs(id) ON DELETE CASCADE,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        position INTEGER NOT NULL,
+        prompt_sha256 TEXT NOT NULL,
+        PRIMARY KEY (run_id, task_id),
+        UNIQUE (run_id, position)
+      );
+
+      -- One dispatch is one submission intent. The operation key makes a retried
+      -- record idempotent; a reused key with a different identity is refused in
+      -- code. An accepted dispatch is only a transport receipt, not task success.
+      CREATE TABLE prompt_dispatches (
+        id TEXT PRIMARY KEY,
+        run_id TEXT NOT NULL REFERENCES prompt_runs(id) ON DELETE CASCADE,
+        task_id TEXT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        operation_key TEXT NOT NULL,
+        prompt_sha256 TEXT NOT NULL,
+        session_id TEXT NOT NULL,
+        thread_id TEXT,
+        turn_id TEXT,
+        status TEXT NOT NULL DEFAULT 'recorded',
+        continuation_index INTEGER NOT NULL DEFAULT 0,
+        recorded_at TEXT NOT NULL,
+        accepted_at TEXT,
+        turn_completed_at TEXT,
+        updated_at TEXT NOT NULL,
+        last_error TEXT,
+        CHECK (status IN ('recorded', 'accepted', 'turn_completed', 'reported', 'uncertain', 'failed')),
+        CHECK (continuation_index >= 0),
+        UNIQUE (run_id, operation_key),
+        UNIQUE (run_id, task_id, continuation_index)
+      );
+      CREATE INDEX prompt_dispatches_run ON prompt_dispatches(run_id, recorded_at);
+      -- One unsettled dispatch per workspace, the same boundary the task engine
+      -- holds for active tasks.
+      CREATE UNIQUE INDEX prompt_dispatches_active_per_project ON prompt_dispatches(project_id)
+        WHERE status IN ('recorded', 'accepted');
+
+      -- Every submitted report is kept, accepted or rejected, with the reason.
+      -- At most one accepted report exists per dispatch; a repair needs its own
+      -- dispatch and operation key.
+      CREATE TABLE runner_reports (
+        id TEXT PRIMARY KEY,
+        dispatch_id TEXT NOT NULL REFERENCES prompt_dispatches(id) ON DELETE CASCADE,
+        run_id TEXT NOT NULL,
+        task_id TEXT NOT NULL,
+        report_version INTEGER NOT NULL,
+        disposition TEXT NOT NULL,
+        accepted INTEGER NOT NULL CHECK (accepted IN (0, 1)),
+        rejection_reason TEXT,
+        sha256 TEXT NOT NULL,
+        bytes INTEGER NOT NULL,
+        report_json TEXT NOT NULL,
+        received_at TEXT NOT NULL,
+        submitted_by TEXT NOT NULL DEFAULT 'runner',
+        UNIQUE (dispatch_id, sha256)
+      );
+      CREATE INDEX runner_reports_run ON runner_reports(run_id, received_at);
+      CREATE UNIQUE INDEX runner_reports_accepted ON runner_reports(dispatch_id) WHERE accepted = 1;
+    `,
+  },
 ];
 
 export type MigrationReport = {

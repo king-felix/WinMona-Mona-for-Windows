@@ -24,6 +24,8 @@ export type MemoryProbeInput = {
   window: BrowserWindow | null;
   outputPath: string;
   workspace: string;
+  /** Second real project for repeated project switching; optional. */
+  secondaryWorkspace?: string | null;
   openProject: (target: string) => Promise<{ projectId: string; canonicalPath: string } | null>;
   /** Clicks a rail section the way a person does; persistence alone does not navigate. */
   showView: (projectId: string, view: string) => void;
@@ -365,6 +367,12 @@ export async function runMemoryProbe(input: MemoryProbeInput): Promise<{ ok: boo
   //    cost of doing so. It answers "what does rendering the whole history cost?"
   //    with a number instead of a guess.
   await (async () => {
+    if (historyRows === 0) {
+      // Without a planted history there is no window to expand; saying so is
+      // more honest than reporting a failed experiment that never ran.
+      step('the render-window experiment was not requested', true, 'no history workload supplied');
+      return;
+    }
     input.showView(project.projectId, 'studio');
     await evaluate(`document.querySelector('[data-testid="nav-studio"]')?.click()`);
     await waitFor(
@@ -412,6 +420,146 @@ export async function runMemoryProbe(input: MemoryProbeInput): Promise<{ ok: boo
     renderer: changesHeap,
     path: changes?.path ?? null,
   };
+
+  // D. View churn: switching views is not work. If the shell retains a panel's
+  // nodes or listeners per visit, this is where it shows up.
+  await (async () => {
+    const rounds: Array<{
+      round: number;
+      totalMb: number;
+      heapUsedMb: number | null;
+      nodes: number | null;
+      listeners: number | null;
+    }> = [];
+    for (let round = 1; round <= 5; round += 1) {
+      input.showView(project.projectId, 'changes');
+      await evaluate(`document.querySelector('[data-testid="nav-changes"]')?.click()`);
+      await waitFor(async () => await evaluate<boolean>("Boolean(document.querySelector('#changes-title'))"));
+      input.showView(project.projectId, 'studio');
+      await evaluate(`document.querySelector('[data-testid="nav-studio"]')?.click()`);
+      await waitFor(async () => await evaluate<boolean>("Boolean(document.querySelector('.timeline'))"));
+      await delay(400);
+      const snapshot = processSamples();
+      const heap = await rendererHeap(window);
+      rounds.push({
+        round,
+        totalMb: snapshot.totalMb,
+        heapUsedMb: heap.heapUsedMb,
+        nodes: heap.nodes,
+        listeners: heap.jsEventListeners,
+      });
+    }
+    const first = rounds[0];
+    const last = rounds[rounds.length - 1];
+    const growth = {
+      totalMb: first && last ? Math.round((last.totalMb - first.totalMb) * 10) / 10 : 0,
+      heapUsedMb:
+        first?.heapUsedMb !== null &&
+        first?.heapUsedMb !== undefined &&
+        last?.heapUsedMb !== null &&
+        last?.heapUsedMb !== undefined
+          ? Math.round((last.heapUsedMb - first.heapUsedMb) * 10) / 10
+          : null,
+      nodes:
+        first?.nodes !== null && last?.nodes !== null && first?.nodes !== undefined && last?.nodes !== undefined
+          ? last.nodes - first.nodes
+          : null,
+      listeners:
+        first?.listeners !== null &&
+        last?.listeners !== null &&
+        first?.listeners !== undefined &&
+        last?.listeners !== undefined
+          ? last.listeners - first.listeners
+          : null,
+    };
+    report.viewChurn = { rounds, growth };
+    step(
+      'repeated view switching does not accumulate DOM nodes or listeners',
+      growth.nodes !== null && growth.nodes <= 50 && growth.listeners !== null && growth.listeners <= 20,
+      growth,
+    );
+  })();
+
+  // E. Repeated project switching: open the second real project and alternate.
+  await (async () => {
+    if (!input.secondaryWorkspace) {
+      step('a second project is available for switching', true, 'skipped: no secondary workspace supplied');
+      return;
+    }
+    const second = await input.openProject(input.secondaryWorkspace);
+    step('a second real project opens through the catalog', second !== null, second?.canonicalPath ?? null);
+    if (!second) return;
+    const rounds: Array<{ round: number; totalMb: number; heapUsedMb: number | null; nodes: number | null }> = [];
+    for (let round = 1; round <= 4; round += 1) {
+      const target = round % 2 === 1 ? project : second;
+      const reopened = await input.openProject(target.canonicalPath);
+      if (!reopened) break;
+      input.showView(reopened.projectId, 'studio');
+      await delay(600);
+      const snapshot = processSamples();
+      const heap = await rendererHeap(window);
+      rounds.push({ round, totalMb: snapshot.totalMb, heapUsedMb: heap.heapUsedMb, nodes: heap.nodes });
+    }
+    const first = rounds[0];
+    const last = rounds[rounds.length - 1];
+    const growth = {
+      totalMb: first && last ? Math.round((last.totalMb - first.totalMb) * 10) / 10 : 0,
+      heapUsedMb:
+        first?.heapUsedMb !== null &&
+        first?.heapUsedMb !== undefined &&
+        last?.heapUsedMb !== null &&
+        last?.heapUsedMb !== undefined
+          ? Math.round((last.heapUsedMb - first.heapUsedMb) * 10) / 10
+          : null,
+    };
+    report.projectSwitching = { rounds, growth, projects: 2 };
+    step(
+      'switching between two projects repeatedly does not grow the shell unbounded',
+      rounds.length >= 3 && growth.heapUsedMb !== null && growth.heapUsedMb <= 4 && growth.totalMb <= 30,
+      growth,
+    );
+  })();
+
+  // F. Terminal drawer: a lazily loaded surface with an owned child process.
+  await (async () => {
+    input.showView(project.projectId, 'studio');
+    await evaluate(`document.querySelector('[data-testid="nav-studio"]')?.click()`);
+    const present = await evaluate<boolean>('Boolean(document.querySelector(\'[data-testid="terminal-toggle"]\'))');
+    if (!present) {
+      step('the terminal drawer is reachable from the shell', false, 'no terminal toggle rendered');
+      return;
+    }
+    const before = processSamples();
+    const beforeHeap = await rendererHeap(window);
+    await evaluate(`document.querySelector('[data-testid="terminal-toggle"]')?.click()`);
+    const opened = await waitFor(
+      async () => await evaluate<boolean>('Boolean(document.querySelector(\'[data-testid="terminal-drawer"]\'))'),
+      20_000,
+    );
+    await delay(2_000);
+    const during = processSamples();
+    const duringHeap = await rendererHeap(window);
+    await evaluate(`document.querySelector('[data-testid="terminal-toggle"]')?.click()`);
+    const closed = await waitFor(
+      async () => !(await evaluate<boolean>('Boolean(document.querySelector(\'[data-testid="terminal-drawer"]\'))')),
+      10_000,
+    );
+    await delay(1_500);
+    const after = processSamples();
+    const afterHeap = await rendererHeap(window);
+    report.terminal = {
+      opened,
+      closed,
+      before: { totalMb: before.totalMb, renderer: beforeHeap },
+      during: { totalMb: during.totalMb, renderer: duringHeap },
+      after: { totalMb: after.totalMb, renderer: afterHeap },
+    };
+    step('the terminal drawer opens, is measured, and releases its DOM on close', opened && closed, {
+      duringMb: during.totalMb,
+      afterMb: after.totalMb,
+      drawerNodesAfterClose: afterHeap.nodes,
+    });
+  })();
   report.history = idleSamples.map((entry) => ({
     atMs: entry.atMs,
     totalMb: entry.totalMb,

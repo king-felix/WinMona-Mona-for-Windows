@@ -1,0 +1,210 @@
+{
+  "capturedUtc": "2026-11-14T20:42:20.217Z",
+  "source": {
+    "path": "assets/brand/MidnightMona.png",
+    "sha256": "cebc871741323a49e556d633fbf0e656a6134bb4c6c4b839ce13a67963df41be"
+  },
+  "ico": {
+    "path": "assets/brand/generated/mona.ico",
+    "sha256": "60910cd5b8ea2f51f7fabcce1480907bf1e99cecfbd9659d1e558e6f49602f3d",
+    "bytes": 171785,
+    "container": {
+      "littleEndian": true,
+      "type": 1,
+      "count": 7
+    },
+    "sizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256
+    ]
+  },
+  "electron": {
+    "path": "node_modules/electron/dist/electron.exe",
+    "sha256": "207853646fd0553430706aee4d2ef1fac8a492cc32001dcec739598c89d8a492",
+    "bytes": 249270272
+  },
+  "staged": {
+    "path": "build/install-stage/Mona.exe",
+    "sha256": "d12e313cad264d5347d1722a71299b6abf03d752e01c8a0107e054da0abd170f",
+    "bytes": 249504256,
+    "verification": {
+      "ok": true,
+      "problems": [],
+      "entries": [
+        {
+          "width": 16,
+          "height": 16,
+          "bitDepth": 32,
+          "bytes": 975,
+          "id": 1
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "bitDepth": 32,
+          "bytes": 1891,
+          "id": 2
+        },
+        {
+          "width": 32,
+          "height": 32,
+          "bitDepth": 32,
+          "bytes": 3125,
+          "id": 3
+        },
+        {
+          "width": 48,
+          "height": 48,
+          "bitDepth": 32,
+          "bytes": 6180,
+          "id": 4
+        },
+        {
+          "width": 64,
+          "height": 64,
+          "bitDepth": 32,
+          "bytes": 10062,
+          "id": 5
+        },
+        {
+          "width": 128,
+          "height": 128,
+          "bitDepth": 32,
+          "bytes": 34055,
+          "id": 6
+        },
+        {
+          "width": 256,
+          "height": 256,
+          "bitDepth": 32,
+          "bytes": 115379,
+          "id": 7
+        }
+      ]
+    }
+  },
+  "installed": {
+    "path": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "sha256": "d12e313cad264d5347d1722a71299b6abf03d752e01c8a0107e054da0abd170f",
+    "bytes": 249504256,
+    "verification": {
+      "ok": true,
+      "problems": [],
+      "entries": [
+        {
+          "width": 16,
+          "height": 16,
+          "bitDepth": 32,
+          "bytes": 975,
+          "id": 1
+        },
+        {
+          "width": 24,
+          "height": 24,
+          "bitDepth": 32,
+          "bytes": 1891,
+          "id": 2
+        },
+        {
+          "width": 32,
+          "height": 32,
+          "bitDepth": 32,
+          "bytes": 3125,
+          "id": 3
+        },
+        {
+          "width": 48,
+          "height": 48,
+          "bitDepth": 32,
+          "bytes": 6180,
+          "id": 4
+        },
+        {
+          "width": 64,
+          "height": 64,
+          "bitDepth": 32,
+          "bytes": 10062,
+          "id": 5
+        },
+        {
+          "width": 128,
+          "height": 128,
+          "bitDepth": 32,
+          "bytes": 34055,
+          "id": 6
+        },
+        {
+          "width": 256,
+          "height": 256,
+          "bitDepth": 32,
+          "bytes": 115379,
+          "id": 7
+        }
+      ]
+    },
+    "sameBytesAsStage": true
+  },
+  "shellExtraction": {
+    "tool": "ExtractIconEx + ExtractAssociatedIcon via System.Drawing",
+    "compared": [
+      {
+        "size": 16,
+        "generated": "assets/brand/generated/mona-16.png",
+        "extracted": ".mona/tmp/shell-small-16.png",
+        "meanAbsDiff": 0,
+        "maxAbsDiff": 0
+      },
+      {
+        "size": 32,
+        "generated": "assets/brand/generated/mona-32.png",
+        "extracted": ".mona/tmp/shell-large-32.png",
+        "meanAbsDiff": 0,
+        "maxAbsDiff": 0
+      }
+    ]
+  },
+  "chromium": {
+    "tool": "Electron 45.3.0 nativeImage.createFromPath",
+    "previousCommittedIco": {
+      "decode": "empty",
+      "size": "0x0",
+      "cause": "big-endian ICO fields (type read as 256, count as 1792)"
+    },
+    "regeneratedIco": {
+      "decode": "ok",
+      "width": 256,
+      "height": 256
+    }
+  },
+  "startMenu": {
+    "name": "Mona",
+    "appId": "MonaWorkbench_beqf7zj0yys3p!Mona"
+  },
+  "uninstallEntry": {
+    "displayIcon": "C:\\Users\\victo\\AppData\\Local\\Programs\\Mona\\Mona.exe",
+    "displayName": "Mona",
+    "displayVersion": "0.1.0"
+  },
+  "packagesAssets": [
+    {
+      "file": "StoreLogo.png",
+      "sha256": "0dfc448234833b79a7e8acfe03e5295a84bb5ee8a4cfcf2440a5347f5aa789e7",
+      "bytes": 6675
+    },
+    {
+      "file": "Square44x44Logo.png",
+      "sha256": "49f2c83eba161f13ec517fc55ba04ec81706756bc64db177798769b9f5c2ed8e",
+      "bytes": 5276
+    },
+    {
+      "file": "Square150x150Logo.png",
+      "sha256": "f53e3650ef855b40918cafb3f126fad35914a7821dd1de95f8c8aa99e0c7d4ed",
+      "bytes": 44528
+    }
+  ]
+}

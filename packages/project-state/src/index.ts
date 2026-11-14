@@ -1,4 +1,4 @@
-export * from './errors.js';
+﻿export * from './errors.js';
 export * from './barrier.js';
 export * from './db.js';
 export * from './migrations.js';
@@ -18,6 +18,7 @@ export * from './briefing.js';
 export * from './redaction.js';
 export * from './memory.js';
 export * from './prompts.js';
+export * from './runner.js';
 export * from './handoff.js';
 export * from './settings.js';
 export * from './diagnostics-bundle.js';

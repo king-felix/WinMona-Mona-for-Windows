@@ -1,0 +1,23 @@
+executable: C:\Users\victo\AppData\Local\Programs\Mona\Mona.exe
+label: installed-after
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-p23-memory-fkbcqZ\memory-project
+
+
+mona: applied 10 state migration(s) to version 10
+warning: in the working copy of 'big.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'big.txt', LF will be replaced by CRLF the next time Git touches it
+C:\Users\victo\AppData\Local\Programs\Mona\resources\app\node_modules\node-pty\lib\conpty_console_list_agent.js:13
+var consoleProcessList = getConsoleProcessList(shellPid);
+                         ^
+
+Error: AttachConsole failed
+    at Object.<anonymous> (C:\Users\victo\AppData\Local\Programs\Mona\resources\app\node_modules\node-pty\lib\conpty_console_list_agent.js:13:26)
+    at Module._compile (node:internal/modules/cjs/loader:1937:14)
+    at Object..js (node:internal/modules/cjs/loader:2070:10)
+    at Module.load (node:internal/modules/cjs/loader:1658:32)
+    at Module._load (node:internal/modules/cjs/loader:1450:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:268:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.22.2

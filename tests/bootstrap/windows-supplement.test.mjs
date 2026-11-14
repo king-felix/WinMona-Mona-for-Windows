@@ -58,14 +58,35 @@ function withLedger(mutate, fn) {
   }
 }
 
-test('the committed supplement validates and exposes W00 as eligible', () => {
+test('the committed supplement validates and its eligibility stays consistent', () => {
   const validated = cli(root, ['validate']);
   assert.equal(validated.code, 0, validated.err);
 
   const status = JSON.parse(cli(root, ['status']).out);
-  assert.equal(status.windows_supplement.prompts.pending, 26);
-  assert.equal(status.windows_supplement.requirements.pending, 18);
-  assert.deepEqual(status.windows_supplement.eligible, ['W00']);
+  const supplement = status.windows_supplement;
+  // The aggregate is a property, not a snapshot: work is completed over time, so
+  // asserting the seeded all-pending counts turned a green ledger into a red test
+  // the moment W01 was finished. What must hold is that every prompt is accounted
+  // for exactly once and that eligibility only names work that can actually start.
+  const counted = Object.values(supplement.prompts).reduce((sum, value) => sum + value, 0);
+  assert.equal(counted, 26, 'all 26 W prompts are counted once');
+  const requirementCount = Object.values(supplement.requirements).reduce((sum, value) => sum + value, 0);
+  assert.equal(requirementCount, 18, 'all 18 WX requirements are counted once');
+
+  const ledger = JSON.parse(fs.readFileSync(ledgerFile, 'utf8'));
+  const byId = new Map(ledger.prompts.map((prompt) => [prompt.id, prompt]));
+  for (const id of supplement.eligible) {
+    const prompt = byId.get(id);
+    assert.ok(prompt, `${id} exists in the ledger`);
+    assert.equal(prompt.status, 'pending', `${id} is eligible only while pending`);
+    for (const prerequisite of prompt.prerequisites) {
+      assert.equal(
+        byId.get(prerequisite)?.status,
+        'completed',
+        `${id} is eligible, so ${prerequisite} must be completed`,
+      );
+    }
+  }
 });
 
 test('a supplement without its ledger is refused', () => {

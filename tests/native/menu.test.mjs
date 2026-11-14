@@ -1,4 +1,4 @@
-// Native modern-menu helper: real COM behaviour, not a mock.
+﻿// Native modern-menu helper: real COM behaviour, not a mock.
 //
 // The helper is built with the pinned Zig toolchain, so these tests skip with a
 // recorded reason when the binary is absent instead of pretending to pass.
@@ -50,7 +50,49 @@ function reg(args) {
   return run(path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'reg.exe'), args);
 }
 
-/** UTF-16LE, NUL-separated, double-NUL terminated — exactly what wmain sees. */
+/**
+ * Does this Windows install activate a CLSID registered only in
+ * HKCU\\Software\\Classes? Checked with a control component (scrrun.dll) so a
+ * failure can be attributed to the machine rather than to Mona's DLL.
+ */
+function perUserComWorks() {
+  const control = '{11111111-2222-3333-4444-555555555555}';
+  reg([
+    'add',
+    `HKCU\\Software\\Classes\\CLSID\\${control}\\InprocServer32`,
+    '/ve',
+    '/t',
+    'REG_SZ',
+    '/d',
+    `${process.env.SystemRoot ?? 'C:\\Windows'}\\System32\\scrrun.dll`,
+    '/f',
+  ]);
+  reg([
+    'add',
+    `HKCU\\Software\\Classes\\CLSID\\${control}\\InprocServer32`,
+    '/v',
+    'ThreadingModel',
+    '/t',
+    'REG_SZ',
+    '/d',
+    'Both',
+    '/f',
+  ]);
+  const result = spawnSync(
+    'powershell.exe',
+    [
+      '-NoProfile',
+      '-NonInteractive',
+      '-Command',
+      `try { [Activator]::CreateInstance([Type]::GetTypeFromCLSID([guid]'${control}')) | Out-Null; 'ok' } catch { 'failed' }`,
+    ],
+    { encoding: 'utf8', windowsHide: true },
+  );
+  reg(['delete', `HKCU\\Software\\Classes\\CLSID\\${control}`, '/f']);
+  return (result.stdout ?? '').trim() === 'ok';
+}
+
+/** UTF-16LE, NUL-separated, double-NUL terminated â€” exactly what wmain sees. */
 function readRecordedArguments(file) {
   const raw = readFileSync(file);
   const text = raw.toString('utf16le');
@@ -84,7 +126,7 @@ describe('modern Explorer menu helper', { skip }, () => {
   before(() => {
     previousExe = readInstalledExe();
     fixtureRoot = mkdtempSync(path.join(tmpdir(), 'mona-menu-'));
-    hostileFolder = path.join(fixtureRoot, "a & b (café) — 'quoted' 中文");
+    hostileFolder = path.join(fixtureRoot, "a & b (cafÃ©) â€” 'quoted' ä¸­æ–‡");
     secondFolder = path.join(fixtureRoot, 'second');
     plainFile = path.join(fixtureRoot, 'plain.txt');
     fakeInstall = path.join(fixtureRoot, 'install');
@@ -154,17 +196,68 @@ describe('modern Explorer menu helper', { skip }, () => {
     assert.equal(argv[0], fakeExe);
   });
 
-  it('activates through CoCreateInstance like a packaged COM server', () => {
+  it('activates through CoCreateInstance when the machine honours per-user COM', (t) => {
     const key = `HKCU\\Software\\Classes\\CLSID\\${CLSID}\\InprocServer32`;
     assert.equal(reg(['add', key, '/ve', '/t', 'REG_SZ', '/d', dll, '/f']).status, 0);
     assert.equal(reg(['add', key, '/v', 'ThreadingModel', '/t', 'REG_SZ', '/d', 'Apartment', '/f']).status, 0);
     const result = run(probe, ['--cocreate', '--path', hostileFolder]);
-    assert.equal(result.status, 0, result.stderr);
+    if (result.status !== 0) {
+      const report = JSON.parse(result.stdout || '{}');
+      // 0x80040154 REGDB_E_CLASSNOTREG from a registered per-user CLSID means the
+      // machine does not consult HKCU\Software\Classes for activation at all.
+      // Prove that with a control CLSID before calling it an environment limit;
+      // the packaged command is otherwise observed through the shell verb probe.
+      if (report.hr === -2147221164) {
+        const controlWorks = perUserComWorks();
+        reg(['delete', `HKCU\\Software\\Classes\\CLSID\\${CLSID}`, '/f']);
+        if (!controlWorks) {
+          t.skip(
+            'this Windows install does not activate per-user CLSID registrations (a control CLSID fails identically); observed packaged activation uses the shell verb probe instead',
+          );
+          return;
+        }
+      }
+      assert.fail(`probe activation failed: ${result.stdout}${result.stderr}`);
+    }
     const report = JSON.parse(result.stdout);
     assert.equal(report.ok, true);
     assert.equal(report.state, 'enabled');
     assert.equal(report.title, MENU_TITLE);
     assert.equal(reg(['delete', `HKCU\\Software\\Classes\\CLSID\\${CLSID}`, '/f']).status, 0);
+  });
+
+  it('launches through a junction alias without changing the selected path', async () => {
+    const junctionParent = path.join(fixtureRoot, 'alias');
+    mkdirSync(junctionParent, { recursive: true });
+    const junction = path.join(junctionParent, 'joined');
+    const made =
+      spawnSync('cmd.exe', ['/c', 'mklink', '/J', junction, hostileFolder], { windowsHide: true }).status === 0;
+    if (!made) return; // creating a junction needs a privilege this machine may withhold
+    const argvOut = path.join(fixtureRoot, 'argv-junction.bin');
+    const report = probeJson(['--path', junction, '--exe', fakeExe, '--invoke'], { MONA_ARGV_OUT: argvOut });
+    assert.equal(report.invoke_ok, true, `Invoke returned ${report.invoke_hr}`);
+    const deadline = Date.now() + 5000;
+    while (!existsSync(argvOut) && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    const argv = readRecordedArguments(argvOut);
+    assert.equal(argv[3], '--path');
+    assert.equal(path.basename(argv[4]), 'joined');
+  });
+
+  it('fails an invocation with a missing executable promptly instead of hanging', () => {
+    const started = Date.now();
+    const report = probeJson([
+      '--path',
+      hostileFolder,
+      '--exe',
+      path.join(fixtureRoot, 'missing', 'Mona.exe'),
+      '--invoke',
+    ]);
+    const elapsed = Date.now() - started;
+    assert.equal(report.invoked, true);
+    assert.equal(report.invoke_ok, false);
+    assert.ok(elapsed < 5000, `Invoke took ${elapsed} ms`);
   });
 
   it('ships a DLL small enough for a shell extension and free of network imports', () => {

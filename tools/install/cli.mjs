@@ -13,6 +13,15 @@
 //
 // Exit codes: 0 success, 1 failure, 3 deferred because Mona is running, 4 a
 // prerequisite (toolchain, payload, trust) is missing.
+
+// When this CLI is run by the shipped Mona.exe in Node mode (the setup file and
+// the installed uninstaller both do that), Electron's fs layer also looks inside
+// `resources/app.asar`. A missing file then surfaces as Electron's asar message
+// (`ENOENT, not found in …default_app.asar`) instead of the real path, which made
+// a recipient install fail with a message that named nothing useful. The
+// installer only ever touches real files, so asar support is switched off.
+if (process.versions.electron) process.noAsar = true;
+
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';

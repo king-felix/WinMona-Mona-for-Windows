@@ -1772,3 +1772,110 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Also:** `windows-review.mjs checkpoint` gained `--clear-acceptance-done`, because a wrong
   completion has to be *removable*. W06 was first recorded completed with an acceptance clause it had
   not observed; the correction verb is how the ledger was put right without hand-editing state.
+
+## D-0128 - The executable carries the approved icon, and the ICO container is little-endian
+
+- **Decision:** `tools/assets/build-icons.mjs` writes the ICO container little-endian, and a new
+  `tools/assets/embed-exe-icon.mjs` rewrites `RT_ICON`/`RT_GROUP_ICON` inside the staged `Mona.exe`
+  from `assets/brand/generated/mona.ico`. Staging fails if the embedded bytes do not verify.
+- **Why:** two defects sat under a surface that looked finished. The committed ICO was written
+  big-endian, so Windows read it as type 256 with 1792 entries and Electron's `nativeImage` returned
+  an empty image — the window/taskbar icon had been silently missing. And `Mona.exe` is the Electron
+  runtime renamed, so Explorer, Task Manager and unpinned taskbar entries still read Electron's icon
+  group; no distribution step replaced it.
+- **How:** the resource rewrite is a pure function of (exe bytes, ICO bytes). It preserves every
+  other resource byte-for-byte, keeps the resource RVA, moves `.reloc` past the grown section,
+  updates `SizeOfImage` and the data directories, and refuses a signed input rather than shipping a
+  stale signature. Re-running it is byte-identical. Verified on the installed executable with
+  Windows `ExtractIconEx` (16/32 px match the generated PNGs exactly) and by reading the resources
+  back through an independent parser.
+- **What it is not:** a physical 200 %/mixed-DPI observation, or a verdict on 16 px legibility. Those
+  remain open under W20 and the brand README.
+
+## D-0129 - The Prompt Runner is a contract over the existing task engine, not a second one
+
+- **Decision:** a run freezes an ordered selection of existing `tasks` rows and binds each later
+  dispatch to one operation key, one engine thread/turn and one bounded result report. Task
+  lifecycle, criteria, evidence and the attempt ledger stay in `tasks`/`problems`; the runner adds
+  `prompt_runs`, `prompt_run_tasks`, `prompt_dispatches` and `runner_reports` (migration 10).
+- **Why:** the queue needs durable identity for run → task → dispatch → thread → turn → report, but
+  duplicating the task state machine would create two sources of truth for status, criteria and
+  evidence. Reusing the engine and adding only the run/dispatch/report layer keeps the evidence gate
+  and the three-attempt rule in one place.
+- **The three distinctions are structural:** `markAccepted` is a transport receipt,
+  `markTurnCompleted` requires the engine's turn id, and an accepted report writes no task evidence
+  and completes nothing. A report with unknown fields, a mismatched identity/hash, a contradictory
+  disposition or a path outside the workspace (reparse points included) is rejected and recorded.
+- **What it is not:** execution, file import, the inbox or UI (W14–W17), and not a sandbox. A Full
+  Access agent can still write files; the contract bounds what a report may claim and keeps it
+  inside the workspace, but it does not prove the agent reasoned correctly.
+
+## D-0130 - W19 memory: measured, unchanged within noise, target still missed
+
+- **Decision:** the under-350-MiB initial-idle target from D-0104 stays **unmet** and the D-0111
+  exception covers 0.1.0 only. The fresh measurements do not justify a code change: the idle-only
+  pair is 353.8 -> 352.5 MiB final (362.4 -> 360.1 average), and the entire app-reducible memory is
+  a ~4 MiB renderer JS heap.
+- **Why:** the measured cost is Chromium's per-process baseline plus a ~100 MiB GPU process doing
+  software rasterisation on a VM with no GPU (`gpuCompositing: disabled_software`). View churn,
+  two-project switching, repeated diff rendering and the terminal drawer show no unbounded growth
+  (0 DOM nodes / 0 listeners / 0 MiB heap across five view rounds and four project switches).
+- **What was fixed:** the probe's render-window scene no longer reports failure when no history
+  workload was requested; an idle-only run is now a green measurement.
+- **Options left for a human decision:** accept the measured state (as D-0111 did), re-measure on
+  hardware with a working GPU, or test a feature-preserving Electron process-baseline change with
+  the same workload. Removing Chromium processes, isolation or rendering paths is not an option.
+
+## D-0131 - Windows accessibility support is enabled explicitly
+
+- **Decision:** `main.ts` calls `app.setAccessibilitySupportEnabled(true)` on Windows after
+  `app.whenReady()`, and `tools/spike/uia-tree.ps1` records the real UI Automation tree for evidence.
+- **Why:** a plain UIA query against the installed build exposed nine stub elements — Chromium had
+  not built its accessibility tree because it did not detect an assistive client. With the flag, the
+  same query exposes 74 named elements (Document, Edit, Buttons, CheckBox, status text). Narrator
+  reads through this layer, so a DOM-only pass could not have found it.
+- **Cost:** idle working set 352.5 → 358.0 MiB (average 360.1 → 368.2), renderer heap 3.0 → 3.1 MiB,
+  measured on the same 60 s workload. Recorded in `docs/evidence/W20-accessibility.md`; the W19
+  target miss is unchanged and no memory claim was improved by removing accessibility.
+- **Not claimed:** Narrator has not been run, exact 200 % scaling, mixed-DPI, text size, contrast
+  themes and physical IME composition remain human checks with expected results in the same file.
+
+## D-0132 - W22 trust and Explorer: observed through the shell, not the screen
+
+- **Decision:** the packaged Explorer command is qualified through the shell's own verb table
+  (`Shell.Application` → `Verbs()` → `DoIt()`), recorded by `tools/spike/shell-verb.mjs`. The
+  modern menu's *visual* placement stays a human check and MONA-027 stays open for it.
+- **Why:** a real invocation is stronger evidence than a screenshot of a menu that may sit under
+  "Show more options". The probe enumerated 19 verbs for a Unicode-named folder, found
+  `Start new DS project with Mona`, invoked it, and observed Mona starting with the folder as one
+  quoted argument and `--profile ds-full-access`.
+- **Trust state, stated narrowly:** self-signed `CN=Mona Development` (thumbprint `5C0AD0D7…C95`),
+  trusted in `LocalMachine\TrustedPeople` and mirrored in `CurrentUser\TrustedPeople`, absent from
+  both `Root` stores; package `Status: Ok`, `SignatureKind: Developer`, publisher equal to the
+  signature subject and manifest. This is a local test-trust decision (D-0105), not distribution
+  trust. `0x800B0109` has no current deployment event; the historical round is P23's.
+- **Defect fixed:** `npm run native:test` was red before this pass. The COM-activation test expected
+  a per-user CLSID registration to activate, and this Windows install does not honour per-user CLSID
+  activation at all — proven with a control CLSID pointing at `scrrun.dll`. The test now proves that
+  limit before skipping, and two real cases were added (junction alias, missing executable).
+- **Disclosed side effect:** the two classic menu keys were deleted temporarily during the modern-menu
+  attempt and re-registered from `tools/launch/context-menu.mjs`, with scoped removal verified.
+
+## D-0133 - One setup file, and the installer runs on the recipient's own runtime
+
+- **Decision:** recipients get one `Mona-Setup-<version>-x64.exe`: a native stub (`native/setup/setup-stub.c`,
+  built by the pinned Zig toolchain) with the staged payload appended as a ZIP plus a validated trailer.
+  It unpacks with Windows' own `tar.exe` and runs the product's existing installer through the shipped
+  `Mona.exe` in Electron's Node mode, so no Node, compiler or checkout is required.
+- **Why not a full MSIX:** a non-sparse package would relocate the app's user-data path (packaged
+  identity virtualisation) and change where a recipient's projects live. The sparse package keeps the
+  existing identity and data location; the setup file supplies the payload it points at.
+- **Three defects found and fixed while qualifying it:** the packaged installer could not load the icon
+  tool (static import of a repository-only path); Electron's asar layer turned a missing file into an
+  unreadable error and is now disabled for the installer; and uninstall-from-the-installed-copy never
+  ran its deferred `rmdir` because `timeout` needs a console (now `ping`).
+- **What is still gated:** the identity package (modern Explorer menu) needs
+  `node tools/install/cli.mjs trust-test-certificate` on the target machine — today it fails with
+  `0x800B0109`, reproduced, because the uninstaller removes the test certificate it created. The setup
+  file states that prerequisite and installs everything else.
+- **Not claimed:** the file is unsigned; a signing decision is a separate release gate.

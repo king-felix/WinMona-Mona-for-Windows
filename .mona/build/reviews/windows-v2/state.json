@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 17,
+  "revision": 25,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -16,7 +16,7 @@
     "ledger": "docs/requirements-windows.json"
   },
   "baseline_utc": "2026-11-14T16:51:28Z",
-  "current_task": "W12",
+  "current_task": "W14",
   "tasks": {
     "W00": {
       "status": "completed",
@@ -397,32 +397,67 @@
       "next_action": "W12 next eligible; W06/W08 close on one live approval observation (Needs the Human: saved posture to ask)"
     },
     "W12": {
-      "status": "pending",
+      "status": "verifying",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
+      "acceptance_done": [
+        "Approved artwork reaches the packaged binary: tools/assets/embed-exe-icon.mjs replaces RT_ICON and RT_GROUP_ICON in the staged Mona.exe with all seven ICO images; the installed executable verifies byte-identical to mona.ico and resource types 1/12/16/24 are preserved byte-for-byte",
+        "Small/large shell icons are real: Windows ExtractIconEx on the installed Mona.exe returns 16 px and 32 px bitmaps matching mona-16.png and mona-32.png exactly (mean and maximum channel difference 0), so nothing is stretched or white-matted",
+        "Shortcuts bind the intended identity: Get-StartApps reports Mona -> MonaWorkbench_beqf7zj0yys3p!Mona, the uninstall DisplayIcon is the installed Mona.exe, and package identity/publisher are unchanged across the reinstall",
+        "The ICO decoder defect is fixed and guarded: the previously committed mona.ico was big-endian and decoded as an empty Electron image; it is now little-endian, tested the way Windows reads it, and Electron nativeImage decodes it at 256 px",
+        "Upgrade keeps stable identifiers: 0.1.0 was reinstalled over the existing package registration with no rename, and the install checksums cover the rewritten executable"
+      ],
       "acceptance_open": [
         "Inspect installed icons at small/large sizes and high DPI; the packaged binary carries the correct artwork; shortcuts bind the intended executable/app identity; no stretched, white-matted or missing images."
       ],
-      "evidence": [],
-      "problems": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W12-identity.md",
+          "sha256": "ffe919611e0e2c8c853e86132ef490d71614a48f1c70b0a594d464a9e7dee2ba",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:43:37Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W12-icons.json",
+          "sha256": "737aa13582b767a98afc06494c61706cca52c823c43558e2fe9b77a04e0000b7",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:43:37Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
+      "problems": [
+        "P-W12-001"
+      ],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W13: define Prompt Runner ownership and result contracts beside the existing board/task state"
     },
     "W13": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "State/schema tests reject stale/mismatched/partial reports and distinguish acceptance, turn completion and evidence verification. Migration/backup approach preserves existing project state. No new paid orchestration layer."
+      "acceptance_done": [
+        "Migration 10 adds run, run-task, dispatch, transition and report tables with check constraints and partial unique indexes; a v9 database migrates with a verified pre-migration backup and keeps its project/task rows",
+        "State tests (15) reject stale, mismatched and partial reports: wrong run/task/dispatch/prompt identity, a second accepted report, unknown fields, contradictory ready_for_verification, needs_human without a question, blocked without a problem, human-only criteria claimed met, invented problem ids, evidence outside the workspace (including a junction), missing evidence, wrong hashes and reports over the 64 KiB cap",
+        "Acceptance, turn completion and evidence verification are distinct: markAccepted only records a transport receipt, markTurnCompleted needs the engine turn id, submitReport is accepted only after that turn completes, and an accepted report writes no task evidence and completes nothing",
+        "Durable identities and ownership: operation keys are idempotent per run, one unsettled dispatch per workspace is enforced by index and service, continuation allowance and report-repair limits are recorded and enforced, and restart reconciliation marks unsettled dispatches uncertain without retrying",
+        "No new paid orchestration layer: the module performs local SQLite reads/writes only, contains no HTTP client or model call, and starts no thread"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W13-runner-contract.md",
+          "sha256": "44e9bbca1dafc3142a2aec2abf5fdc98e9fca5d4bb2b2a06708854a83b84b9d3",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:50:03Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W19: profile the installed candidate's processes and CPU, fix measured causes, and report the 350 MiB target honestly"
     },
     "W14": {
       "status": "pending",
@@ -508,74 +543,213 @@
       "next_action": ""
     },
     "W19": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Comparable before/after measurements and relevant regression checks; no loss of features, accessibility or inference parity. Report current target pass/miss with practical remaining options. If still above target, retain the performance criterion open pending repair or an explicit release exception. CPU and long-history interaction are also measured."
+      "acceptance_done": [
+        "Comparable before/after idle measurements on the installed artifact: 353.8 -> 352.5 MiB final and 362.4 -> 360.1 MiB average across the same 60 s workload, 4 processes, renderer JS heap 3.0 MiB; CPU 0.02-0.06 percent average and under 0.25 percent max; startup cold 529 ms / warm 1679 ms on the installed artifact",
+        "Long history measured: 20,000 stored rows, 500 loaded, 120 rendered, paged query median 1 ms, frame p95 16.8 ms and typing p95 0.1 ms; expanding to 500 rendered rows costs +28.6 MiB working set, which is why the existing window stays bounded",
+        "No leak or unbounded retention found by profile: five view switches and four project switches grew DOM, listeners and JS heap by zero; the changes panel releases its nodes; the terminal drawer is a lazy chunk and releases its DOM on close (the bounded session and module chunk stay, by design)",
+        "Target reported honestly: the 350 MiB idle target is still missed (352.5 MiB final, 400.6 MiB in the QA workload); the original performance criterion remains open and no exception beyond D-0111 was invented; remaining options are recorded",
+        "No feature, accessibility or inference parity loss: the probe starts no engine turn and makes no provider request; engine memory is reported separately (303.1 MiB)"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W19-performance.md",
+          "sha256": "2d57213f899d41dcbe9a6baf30dd3683c47a1d066962a4e3b63497d5089198f9",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:05:12Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W19-memory-before.json",
+          "sha256": "b03c7d9def48fb7601fd752fffcece958a98471766c2dd0be23623e8343df2d7",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:05:12Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W19-memory-after-idle.json",
+          "sha256": "e67b27d5de972ce5e1ffa28f3b39bc167ca8b552d0a6dbd8abe8ccac8da73c36",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:05:12Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W19-memory-after.json",
+          "sha256": "a79b941d8fef44be98d97e2a3eaa61e58f2a54097b809eb7a7a4a939d8645b93",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:05:12Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W19-qa.json",
+          "sha256": "7e39a1bf7841c3f0d0fa4a927f299cc85ce2d3a5904490866874101ca7bd498e",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:05:12Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W20: run the automated accessibility/keyboard pass, then record the exact Narrator and physical-DPI checklist that needs a person"
     },
     "W20": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Required native/human observations have real evidence; otherwise retain exact unverified criteria and a short checklist with expected results. Do not claim Narrator passed from DOM attributes or physical DPI passed from emulated zoom. Fix observed defects and rerun affected paths."
+      "acceptance_done": [
+        "Automated accessibility and keyboard pass on the installed artifact: 12/12 steps (labelled composer, named controls, polite log, keyboard dialog open/trap/escape/focus return, keyboard paging, focusable diff, no overflow at 200 percent browser zoom, zero provider requests)",
+        "A real defect was found and fixed: a UIA query saw 9 stub elements because Chromium had not built its tree; app.setAccessibilitySupportEnabled(true) on Windows now exposes 74 named elements, verified by tools/spike/uia-tree.ps1 against the installed build",
+        "Real OS scaling observed: this session runs at Windows 300 percent (AppliedDPI 288, 4096x2160 display, 1365x720 logical); no browser zoom is being passed off as physical scaling and no display setting was changed",
+        "Unverified human-only criteria are retained with exact expected results: Narrator walkthrough, exact 200 percent scaling, mixed-DPI/display removal, text enlargement, contrast themes, physical IME, and the not-yet-built Prompt Runner/Needs the Human surfaces",
+        "Cost of the accessibility change measured rather than assumed: idle 352.5 to 358.0 MiB and heap 3.0 to 3.1 MiB on the same workload, recorded in W20-a11y-memory.json; no feature or inference behaviour changed"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W20-accessibility.md",
+          "sha256": "2e914d180771aeb26d0c51f8c1366f17018d6377f3c88afcba995a00e30ed20d",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:09:33Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W20-a11y-installed.json",
+          "sha256": "42f5b38cb49a0b5ec8c36b48c2235f1f0a913d7bd476818c1212f1b38d3b1963",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:09:33Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W20-uia.json",
+          "sha256": "138d2dff59e6504c0e84bd5e1772fa00849d60d7b09ca872f49e4295c2047cac",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:09:33Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W20-a11y-memory.json",
+          "sha256": "862f58b005af4a156d90a19a29e4039a68e1a92597867c5da60f416c5abb3545",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:09:33Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W22: diagnose the modern Explorer menu and the 0x800B0109 trust event, keep the classic fallback honest, and prepare the smallest human prerequisite"
     },
     "W21": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Required checks on the actual candidate pass or remain explicit release blockers. No claimed Windows-native result is supported only by a foreign host/mock. Original and enhancement ledgers agree about completed, stale, partial and blocked work."
+      "acceptance_done": [
+        "Required checks on the actual candidate pass: npm run ci green (720 vitest in 77 files, node --test suites 17/27/12/29/8), native:test 8 pass 1 skip with a proven environment reason, check:build green (90 preload channels, no engine route in the renderer)",
+        "No claimed Windows-native result rests on a foreign host or mock: the a11y, QA, memory and shell-verb probes ran against the installed artifact built from this source, and each records the executable and bytes it exercised",
+        "Original and enhancement ledgers agree: both validate with zero warnings/errors after the three stale W12 evidence hashes were re-recorded at their new bytes with corrected notes; W12 stays verifying and WX-11 partial until the human high-DPI check",
+        "Security boundaries re-checked for the new code: report path containment (absolute, traversal, NUL, junction escape), size caps, strict report schema, no network imports in the icon tool or Explorer helper, and unchanged IPC/renderer/Markdown suites",
+        "Zero-inference and route preservation: no UI path added here performs inference, probes report 0 provider requests, and config.toml/settings.toml were not written by this change set"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W21-regression.md",
+          "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:29:42Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W23: give a recipient one identifiable installable file with lifecycle evidence, and state the trust prerequisite plainly"
     },
     "W22": {
-      "status": "pending",
+      "status": "verifying",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
+      "acceptance_done": [
+        "Packaged/shell invocation observed under the declared trust state: the shell verb table for a Unicode-named folder contains the Mona verb, invoking it starts Mona with the folder as one quoted argument and --profile ds-full-access, and the classic keys register/unregister with scoped removal (unrelated shell keys unchanged)",
+        "Trust diagnosed on real bytes: self-signed CN=Mona Development cert (thumbprint 5C0AD0D7...C95), LocalMachine+CurrentUser TrustedPeople yes, both Root stores no, msix signature Valid, package Status Ok / SignatureKind Developer / publisher equal to signer and manifest; no current 0x800B0109 deployment event",
+        "Test trust is not production distribution and no trust change was made in this pass; Developer Mode is not presented as a fix and no root store was touched",
+        "A real pre-existing defect was fixed: npm run native:test was red because per-user CLSID activation fails on this Windows install; a control CLSID proves the environment limit and the test now skips with that reason, with new junction-alias and missing-executable cases (8 pass, 1 skip, 0 fail)",
+        "Installer/uninstaller remove only their own registration: unregister deletes exactly the two Mona keys and register restores the exact command, icon, MonaOwned, NeverDefault and MultiSelectModel values"
+      ],
       "acceptance_open": [
         "Modern-menu invocation is observed under the declared trust state. Test trust is not production distribution. Failed trust/registration remains MONA-027 blocked; classic success does not close it. Installer/uninstaller remove only their own registration."
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W22-menu-trust.md",
+          "sha256": "a30d3d5fc628ec4e95ffbd82ad2cf18550a0756debf52154124320ecc1e75cf9",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:22:37Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W22-shell-verb.json",
+          "sha256": "7b4c1b87a8919fa02bf981016fdb5264324a6fa276f0ee54410723af4c06118c",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:22:37Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W22-trust.json",
+          "sha256": "d0187ed3b13eafa64cc93dadbf1242955ce1cb5137037c36b81f22cf5522930a",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:22:37Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W21: run the full regression set on the settled candidate and reconcile both ledgers"
     },
     "W23": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Local/test candidate has a demonstrable recipient installation path and lifecycle evidence on its actual bytes. W22 signing/trust or licensing gaps remain explicit release gates; do not call an untrusted package frictionless friend-ready distribution. Installer work can complete without pretending those external decisions are made."
+      "acceptance_done": [
+        "One clearly identified installable entry file exists and was exercised on its bytes: Mona-Setup-0.1.0-x64.exe (179,309,695 bytes) installs per user with no Node, compiler or checkout, verifying 1,745 payload files and leaving no secrets in the payload (scan found none); LICENSE, LICENSES.chromium.html and THIRD_PARTY_NOTICES.md ship inside it",
+        "Recipient lifecycle observed: fresh install (exit 0), upgrade over the same version preserving the previous tree, uninstall from the installed copy removing the install root, Start shortcut and both registry keys while retaining project data and the Codewhale configuration, then reinstall",
+        "Three real defects were found and fixed by this qualification: the packaged installer could not load its icon tool, Electron's asar layer produced an unreadable error (process.noAsar now set), and the deferred uninstall cleanup never ran because \timeout needs a console",
+        "Start menu and Explorer reachability are real without the package: a Mona.lnk shortcut is created and removed by the installer, and the classic folder and folder-background verbs verify with the exact label, icon and command",
+        "W22 trust gaps remain explicit release gates rather than being papered over: the identity package is refused with 0x800B0109 because the test certificate is not trusted, the setup file reports that prerequisite, and it is not described as a friend-ready or signed distribution"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W23-installer.md",
+          "sha256": "7e5f211482947c531db5f5df65fd573ff9fdd0c7f2ee2115d28ea7f53b556a66",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:47:11Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W23-installer.json",
+          "sha256": "c1357a7b095594ae9bb6e2551c891eeafd643761dfc6e733887228790db7a6aa",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:47:11Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W23-setup-receipt.json",
+          "sha256": "4be79e9754cfc6b531379150950263c8094698cf781d2ab59540c052e7c26d94",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:47:11Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W25: reconcile every W00-W24 disposition, update the docs to the actual product, and give the human a short ordered review inbox"
     },
     "W24": {
       "status": "pending",
@@ -593,18 +767,44 @@
       "next_action": ""
     },
     "W25": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Every task accounted for; docs match behavior; no falsely green requirement; no leaked secrets; the next session can resume without rediscovering context. A closure prompt may finish with an accurate blocked-task report; it does not mark the blocked tasks complete."
+      "acceptance_done": [
+        "Every W00-W24 disposition is accounted for: 13 completed, W12 and W22 verifying with their exact open human observation, 11 pending with their prompts untouched; the supplement ledger and the review state agree after validation of both",
+        "Documentation matches behaviour: README install section, status counts, memory figures, test counts and the accessibility/Explorer claims were updated to what was measured; HANDOFF.md and BLOCKERS.md carry the ordered Needs the Human inbox; DECISIONS.md records D-0128 to D-0133",
+        "No falsely green requirement: supplemental requirements for memory, accessibility, Explorer trust and distribution remain partial with evidence, and the 350 MiB target, modern-menu placement, narrator/DPI and signing are all stated as open",
+        "No leaked secrets: the payload scan found no key, certificate, transcript or database file, and the setup artifact is described as unsigned rather than trusted",
+        "The next session can resume without rediscovering context: current revision, engine pin, the exact installable file and its hash, the remaining decisions and the next eligible prompts are recorded"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W25-handoff.md",
+          "sha256": "2b2858eaaa287952536e582dbcd2abe151aa9b4ab0920bbcd9883b9be5a903aa",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:48:43Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W23-installer.json",
+          "sha256": "c1357a7b095594ae9bb6e2551c891eeafd643761dfc6e733887228790db7a6aa",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:48:43Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        },
+        {
+          "path": "docs/evidence/W21-regression.md",
+          "sha256": "ec90dfb0096f26353e77e23d69178647bbc1311a1a0e95df8672c2ee99b2a07a",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T21:48:43Z",
+          "commit": "960e00c61b3400b68094d90a3f82e4b537d6748c"
+        }
+      ],
       "problems": [],
       "original_requirements": [],
-      "next_action": ""
+      "next_action": "W14: parse numbered prompt files into an inert, previewable plan over the W13 run contract"
     }
   }
 }

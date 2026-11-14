@@ -1,0 +1,56 @@
+{
+  "capturedUtc": "2026-11-14T21:21:19.721Z",
+  "package": {
+    "file": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-0.1.0-x64.msix",
+    "bytes": 127928,
+    "sha256": "9f6b1cb3c81ecac3f3b2ccef7a2e78dfda4ef5c10a534896759e7879acb27ace",
+    "signatureStatus": "",
+    "signer": ""
+  },
+  "certificate": {
+    "file": "C:\\Users\\victo\\AppData\\Local\\Mona\\artifacts\\Mona-test-signing-0.1.0.cer",
+    "subject": "CN=Mona Development",
+    "issuer": "CN=Mona Development",
+    "selfSigned": true,
+    "thumbprint": "5C0AD0D7281A1B994DF4BB13B8B354E69BB74C95",
+    "notAfter": "2027-11-12T10:32:49.0000000-07:00",
+    "privateKeyPresent": false,
+    "stores": {
+      "Cert:\\LocalMachine\\TrustedPeople": true,
+      "Cert:\\LocalMachine\\Root": false,
+      "Cert:\\CurrentUser\\TrustedPeople": true,
+      "Cert:\\CurrentUser\\Root": false
+    },
+    "distributionClaim": "self-signed development certificate. Trusting it on this machine is a local test-trust decision (D-0105); it is not a recipient or production distribution."
+  },
+  "registration": {
+    "packageFullName": "MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p",
+    "packageStatus": "Ok",
+    "signatureKind": "Developer",
+    "publisher": "CN=Mona Development",
+    "installLocation": "C:\\Program Files\\WindowsApps\\MonaWorkbench_0.1.0.0_x64__beqf7zj0yys3p",
+    "publisherMatchesManifest": true,
+    "manifestPublishesCsnMonaDevelopment": true
+  },
+  "registryKeys": {
+    "install": 6,
+    "uninstall": 9,
+    "classicFolder": 8,
+    "classicBackground": 8
+  },
+  "trustEventScan": {
+    "logs": [
+      "Microsoft-Windows-AppXDeploymentServer/Operational",
+      "Microsoft-Windows-AppXDeployment/Operational"
+    ],
+    "maxEventsPerLog": 500,
+    "matchesFor800B0109": 0,
+    "interpretation": "0x800B0109 (TRUST_E_NOSIGNATURE / untrusted signer) is the signature-verification failure that blocked registration before the test certificate was trusted. With the certificate in LocalMachine\\TrustedPeople there is no current event; the historical failure is documented in docs/evidence/P23-elevated-round.md."
+  },
+  "modernMenu": {
+    "shellVerbEnumerated": true,
+    "evidence": "docs/evidence/W22-shell-verb.json",
+    "visualPlacementObserved": false,
+    "reason": "the modern menu's visual placement needs a human right-click; automated UI Automation capture of the shell menu window returned an opaque #32768 pane with no child items on this machine"
+  }
+}

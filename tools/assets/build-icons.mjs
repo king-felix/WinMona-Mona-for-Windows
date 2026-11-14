@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Deterministic icon pipeline for the Mona brand artwork.
  *
  * Input : assets/brand/MidnightMona.png (the preserved source, never modified)
@@ -268,12 +268,19 @@ export function encodePng(image) {
  * Windows Vista and later, and Chromium's ICO decoder (used by Electron for
  * nativeImage), both accept PNG-compressed entries. Keeping one encoding means
  * the small sizes are byte-identical to the standalone PNGs.
+ *
+ * The ICO container is little-endian throughout. That is not a detail to guess
+ * at: the first version of this function wrote big-endian fields, which Windows
+ * reads as type 256 with 1792 directory entries, so the packaged executable and
+ * the shell could not load the mark at all. `tests/assets` now reads the
+ * directory the way Windows does, and `tools/assets/embed-exe-icon.mjs` rejects
+ * an ICO whose container is not LE.
  */
 export function encodeIco(entries) {
   const header = Buffer.alloc(6);
-  header.writeUInt16BE(0, 0);
-  header.writeUInt16BE(1, 2);
-  header.writeUInt16BE(entries.length, 4);
+  header.writeUInt16LE(0, 0);
+  header.writeUInt16LE(1, 2);
+  header.writeUInt16LE(entries.length, 4);
   const directory = Buffer.alloc(entries.length * 16);
   let payloadOffset = 6 + directory.length;
   entries.forEach((entry, index) => {
@@ -282,10 +289,10 @@ export function encodeIco(entries) {
     directory[at + 1] = entry.size >= 256 ? 0 : entry.size;
     directory[at + 2] = 0;
     directory[at + 3] = 0;
-    directory.writeUInt16BE(1, at + 4);
-    directory.writeUInt16BE(32, at + 6);
-    directory.writeUInt32BE(entry.png.length, at + 8);
-    directory.writeUInt32BE(payloadOffset, at + 12);
+    directory.writeUInt16LE(1, at + 4);
+    directory.writeUInt16LE(32, at + 6);
+    directory.writeUInt32LE(entry.png.length, at + 8);
+    directory.writeUInt32LE(payloadOffset, at + 12);
     payloadOffset += entry.png.length;
   });
   return Buffer.concat([header, directory, ...entries.map((entry) => entry.png)]);
@@ -319,7 +326,7 @@ export function buildIcons(sourceBuffer) {
   files.set('mona.ico', encodeIco(icoEntries));
   const manifest = {
     pipeline: 'tools/assets/build-icons.mjs',
-    pipeline_version: 1,
+    pipeline_version: 2,
     source: {
       path: 'assets/brand/MidnightMona.png',
       sha256: sha256(sourceBuffer),
