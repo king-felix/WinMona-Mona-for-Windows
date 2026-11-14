@@ -3,18 +3,18 @@
 **Read this first: there are two ledgers now.** The original P00–P23 sequence is complete
 (`.mona/build/state.json`, revision 83). The Windows improvement supplement W00–W25 is a separate,
 validated id space (D-0116) with its own state at `.mona/build/reviews/windows-v2/state.json`,
-written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00, W01 and W02**;
-they are `completed` there and `W03` is the next eligible prompt.
+written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00, W01, W02 and W03**;
+they are `completed` there and `W04` is the next eligible prompt.
 
 Verify before trusting this file:
 
 ```text
 node tools/build/cli.mjs validate          # original ledger: OK, 0 warnings
-node tools/build/windows-review.mjs status # review ledger: 3 completed, current W03
+node tools/build/windows-review.mjs status # review ledger: 4 completed, current W03
 npm run ci                                  # format, lint, typecheck, 591 vitest in 70 files, node --test suites, build
 ```
 
-## The three Windows prompts completed this session
+## The four Windows prompts completed this session
 
 - **W00 — baseline.** HEAD `c1c91387`, engine `codewhale 0.10.2 (ff466b2ed0bf)`, Windows 11 Pro
   10.0.26200, installed candidate 1 695 files with `Status: Ok`. Each suspected Mac parallel was
@@ -34,13 +34,22 @@ npm run ci                                  # format, lint, typecheck, 591 vites
   and spaced destinations, existing files, unwritable destinations and cancel; the renderer cannot
   choose the path (strict IPC schema).
 
+- **W03 — history and stream identity.** Stored history is a windowed read: the studio opens on the
+  newest 500 rows of a thread, holds at most 2 000 in renderer state, renders 120, pages older rows
+  by `beforeSeq`, searches stored text locally, and exports every row in bounded chunks. Prepending
+  an older page keeps the reader's scroll anchor; follow-scroll stops when the reader scrolls away.
+  Deltas are keyed by thread/turn/item, an id-less stream is adopted by its completion instead of
+  duplicating the card, late frames are counted and dropped, and a stream that resumes past missing
+  frames closes the answer as `interrupted`. Every push carries its thread, so Plan and Work cannot
+  merge. A real Windows window holding 10 000 stored rows opened at seq 9881-10000 with
+  `hasOlder: true` (`docs/evidence/W03-history.json`).
+
 ## Open items that this session did not close
 
 1. **Project import still has no product surface.** `importProject` is correct and tested but no
    channel, dialog or menu calls it. Importing a project file is not something a person can do.
-2. **Conversation history beyond 500 rows is unreachable.** `listTimelineItems` orders `seq ASC`,
-   so the studio loads the *oldest* 500 stored rows and the export writes that same prefix
-   (`itemBound: 500`). This is W03's contract and the next task.
+2. **Conversation history beyond 500 rows is unreachable.** Closed by W03: the initial window is the
+   newest page, older rows are paged by cursor, stored text is searchable, and export walks every row.
 3. **A physical IME composition is a human check.** Chromium cannot be driven into composing state
    from the main process; the composer probe records that limitation itself.
 4. Human/signing gates are unchanged: the modern Explorer menu has never been seen by a person

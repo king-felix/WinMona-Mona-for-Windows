@@ -1,0 +1,14 @@
+cold: 
+cold: mona: applied 7 state migration(s) to version 7
+cold: fatal: not a git repository (or any of the parent directories): .git
+cold: fatal: not a git repository (or any of the parent directories): .git
+cold: fatal: not a git repository (or any of the parent directories): .git
+cold: fatal: not a git repository (or any of the parent directories): .git
+cold: mona-qa: ok
+warm: 
+warm: fatal: not a git repository (or any of the parent directories): .git
+warm: fatal: not a git repository (or any of the parent directories): .git
+warm: fatal: not a git repository (or any of the parent directories): .git
+warm: fatal: not a git repository (or any of the parent directories): .git
+warm: mona-qa: ok
+

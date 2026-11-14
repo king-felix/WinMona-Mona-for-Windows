@@ -34,8 +34,8 @@ export type ConversationExportInput = {
   items: readonly TimelineItem[];
   exportedAt: string;
   appVersion: string;
-  /** The window Mona reads per session; recorded so the export is not mistaken for everything. */
-  itemBound: number;
+  /** Every stored row for this thread is exported; the count is recorded so it is checkable. */
+  totalStored: number;
 };
 
 export function renderConversationMarkdown(input: ConversationExportInput): string {
@@ -53,7 +53,7 @@ export function renderConversationMarkdown(input: ConversationExportInput): stri
   );
   lines.push(`- Exported: ${input.exportedAt} by Mona ${input.appVersion}`);
   lines.push(
-    `- Items: ${input.items.length} recorded (the newest ${input.itemBound} per session are read; ${truncated} item(s) were cut by Mona's per-item size bound)`,
+    `- Items: ${input.items.length} recorded (all ${input.totalStored} stored item(s) for this thread are written; ${truncated} item(s) were cut by Mona's per-item size bound)`,
   );
   lines.push('');
   lines.push(

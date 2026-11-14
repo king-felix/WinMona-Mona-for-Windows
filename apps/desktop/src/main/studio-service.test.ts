@@ -222,6 +222,7 @@ async function harness(
   label: string,
   options: {
     maxItemChars?: number;
+    flushIntervalMs?: number;
     attention?: (event: StudioAttentionEvent) => void;
     saveFile?: (input: { title: string; defaultName: string; extensions: string[] }) => Promise<string | null>;
     appVersion?: () => string;
@@ -249,7 +250,7 @@ async function harness(
     engine,
     emit: (event) => events.push(event),
     maxItemChars: options.maxItemChars ?? 64 * 1024,
-    flushIntervalMs: 0,
+    flushIntervalMs: options.flushIntervalMs ?? 0,
     ...(options.attention ? { attention: options.attention } : {}),
     ...(options.saveFile ? { saveFile: options.saveFile } : {}),
     ...(options.appVersion ? { appVersion: options.appVersion } : {}),
@@ -988,4 +989,289 @@ describe('conversation export', () => {
     if (!result.ok) expect(result.error.message).toContain('could not be written');
     expect(existsSync(target)).toBe(false);
   });
+});
+
+describe('stored history and stream identity', () => {
+  const LONG_THREAD = `thr_${'c'.repeat(32)}`;
+
+  async function seedHistory(h: Harness, count: number, label = 'entry'): Promise<void> {
+    const profile = {
+      threadId: LONG_THREAD,
+      workspace: h.project.path,
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      mode: 'agent',
+      permissionPosture: 'full_access',
+      allowShell: true,
+      trustMode: true,
+      autoApprove: true,
+      observedAt: '2026-11-12T00:00:00.000Z',
+    };
+    await h.store.putStudioThread({
+      id: LONG_THREAD,
+      projectId: h.project.id,
+      engineThreadId: LONG_THREAD,
+      workspace: h.project.path,
+      sessionId: 'ses_fixture',
+      mode: 'agent',
+      profileJson: JSON.stringify(profile),
+    });
+    await h.store.write((tx) => {
+      const insert = tx.db.prepare(
+        `INSERT INTO timeline_items(id, project_id, thread_id, turn_id, seq, kind, title, body, status, truncated, created_at, updated_at)
+         VALUES (?, ?, ?, NULL, ?, ?, ?, ?, ?, 0, ?, ?)`,
+      );
+      for (let index = 0; index < count; index += 1) {
+        const seq = index + 1;
+        const at = new Date(Date.UTC(2026, 0, 1) + seq * 1000).toISOString();
+        insert.run(
+          `tl_${LONG_THREAD}_${seq}`,
+          h.project.id,
+          LONG_THREAD,
+          seq,
+          'assistant',
+          `Item ${seq}`,
+          `${label}-${String(seq).padStart(4, '0')}`,
+          'completed',
+          at,
+          at,
+        );
+      }
+    });
+  }
+
+  it('opens at the newest stored rows and pages back with no provider call', async () => {
+    const h = await harness('history-window');
+    await seedHistory(h, 1_200);
+
+    const first = await h.view();
+    expect(first.items).toHaveLength(500);
+    expect(first.items[0]?.seq).toBe(701);
+    expect(first.items[first.items.length - 1]?.seq).toBe(1_200);
+    expect(first.history).toMatchObject({
+      total: 1_200,
+      oldestSeq: 701,
+      newestSeq: 1_200,
+      hasOlder: true,
+      hasNewer: false,
+    });
+
+    const older = await h.service.history({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      beforeSeq: 701,
+      limit: 500,
+    });
+    expect(older.ok).toBe(true);
+    if (older.ok) {
+      expect(older.data.items[0]?.seq).toBe(201);
+      expect(older.data.items[older.data.items.length - 1]?.seq).toBe(700);
+      expect(older.data.window.hasOlder).toBe(true);
+      expect(older.data.window.hasNewer).toBe(true);
+    }
+
+    const oldest = await h.service.history({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      beforeSeq: 201,
+      limit: 500,
+    });
+    expect(oldest.ok).toBe(true);
+    if (oldest.ok) {
+      expect(oldest.data.items[0]?.seq).toBe(1);
+      expect(oldest.data.window.hasOlder).toBe(false);
+    }
+
+    const around = await h.service.history({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      aroundSeq: 500,
+      limit: 100,
+    });
+    expect(around.ok).toBe(true);
+    if (around.ok) expect(around.data.items.some((item) => item.seq === 500)).toBe(true);
+
+    // Paging is local-only.
+    expect(h.adapter.submissions).toHaveLength(0);
+    expect(h.adapter.threadCalls).toHaveLength(0);
+  });
+
+  it('finds old content by search and reports the honest total', async () => {
+    const h = await harness('history-search');
+    await seedHistory(h, 1_200);
+
+    const found = await h.service.searchHistory({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      query: 'entry-0117',
+    });
+    expect(found.ok).toBe(true);
+    if (found.ok) {
+      expect(found.data.total).toBe(1);
+      expect(found.data.items[0]?.seq).toBe(117);
+    }
+
+    const none = await h.service.searchHistory({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      query: 'not recorded anywhere',
+    });
+    expect(none.ok).toBe(true);
+    if (none.ok) expect(none.data.total).toBe(0);
+    expect(h.adapter.submissions).toHaveLength(0);
+  });
+
+  it('exports every stored row rather than the loaded window', async () => {
+    const directory = await tempDir('export-history');
+    const target = path.join(directory, 'conversation.md');
+    const h = await harness('export-history', { saveFile: async () => target });
+    await seedHistory(h, 1_200);
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.items).toBe(1_200);
+    const text = readFileSync(target, 'utf8');
+    expect(text).toContain('entry-0001');
+    expect(text).toContain('entry-1200');
+    expect(text).toContain('all 1200 stored item(s)');
+    expect(existsSync(target)).toBe(true);
+  });
+
+  it('keeps one answer card when a heartbeat sits between id-less deltas', async () => {
+    const h = await harness('heartbeat');
+    await h.submit('Stream slowly');
+    const thread = h.threadId();
+
+    h.adapter.pushEvent(engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    h.adapter.pushEvent(engineEvent('item.delta', 3, thread, 'turn_1', { delta: 'ALPHA' }, null));
+    h.adapter.pushEvent(engineEvent('turn.lifecycle', 4, thread, 'turn_1', { phase: 'heartbeat' }));
+    h.adapter.pushEvent(engineEvent('item.delta', 5, thread, 'turn_1', { delta: ' BETA' }, null));
+    h.adapter.pushEvent(
+      engineEvent('turn.completed', 6, thread, 'turn_1', {
+        turn: { id: 'turn_1', thread_id: thread, status: 'completed' },
+      }),
+    );
+
+    const settled = await h.waitFor((current) => current.run.state === 'idle');
+    const assistant = settled.items.filter((item) => item.kind === 'assistant');
+    expect(assistant).toHaveLength(1);
+    expect(assistant[0]?.body).toBe('ALPHA BETA');
+    expect(assistant[0]?.status).toBe('completed');
+  });
+
+  it('reconciles an id-less stream with its final message instead of duplicating the card', async () => {
+    const h = await harness('reconcile');
+    await h.submit('Answer once');
+    const thread = h.threadId();
+
+    h.adapter.pushEvent(engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    h.adapter.pushEvent(engineEvent('item.delta', 3, thread, 'turn_1', { delta: 'MONA_' }, null));
+    h.adapter.pushEvent(engineEvent('item.delta', 4, thread, 'turn_1', { delta: 'OK' }, null));
+    h.adapter.pushEvent(
+      engineEvent(
+        'item.completed',
+        5,
+        thread,
+        'turn_1',
+        { item: { id: 'item_agent', kind: 'agent_message', status: 'completed', detail: 'MONA_OK' } },
+        'item_agent',
+      ),
+    );
+    h.adapter.pushEvent(
+      engineEvent('turn.completed', 6, thread, 'turn_1', {
+        turn: { id: 'turn_1', thread_id: thread, status: 'completed' },
+      }),
+    );
+
+    const settled = await h.waitFor((current) => current.run.state === 'idle');
+    const assistant = settled.items.filter((item) => item.kind === 'assistant');
+    expect(assistant).toHaveLength(1);
+    expect(assistant[0]?.body).toBe('MONA_OK');
+    expect(assistant[0]?.status).toBe('completed');
+    expect(settled.items.filter((item) => item.kind === 'outcome')).toHaveLength(1);
+  });
+
+  it('records a late delta as late instead of appending it to a finished answer', async () => {
+    const h = await harness('late-delta');
+    await h.submit('Answer once');
+    const thread = h.threadId();
+
+    h.adapter.pushEvent(engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    h.adapter.pushEvent(engineEvent('item.delta', 3, thread, 'turn_1', { delta: 'DONE' }, 'item_agent'));
+    h.adapter.pushEvent(
+      engineEvent(
+        'item.completed',
+        4,
+        thread,
+        'turn_1',
+        { item: { id: 'item_agent', kind: 'agent_message', status: 'completed', detail: 'DONE' } },
+        'item_agent',
+      ),
+    );
+    h.adapter.pushEvent(engineEvent('item.delta', 5, thread, 'turn_1', { delta: ' LATE' }, 'item_agent'));
+
+    const settled = await h.waitFor((current) => current.diagnostics.some((line) => line.includes('late delta')));
+    const assistant = settled.items.filter((item) => item.kind === 'assistant');
+    expect(assistant).toHaveLength(1);
+    expect(assistant[0]?.body).toBe('DONE');
+    expect(assistant[0]?.status).toBe('completed');
+  });
+
+  it('ignores a frame that claims another thread', async () => {
+    const h = await harness('thread-mismatch');
+    await h.submit('Answer once');
+    const thread = h.threadId();
+    const other = `thr_${'d'.repeat(32)}`;
+
+    h.adapter.pushEvent(engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    h.adapter.pushEvent(engineEvent('item.delta', 3, other, 'turn_1', { delta: 'BETA' }, 'item_other'));
+
+    const seen = await h.waitFor((current) => current.diagnostics.some((line) => line.includes('thread_mismatch')));
+    expect(seen.items.some((item) => item.body.includes('BETA'))).toBe(false);
+  });
+
+  it('closes a mid-stream answer as interrupted when the stream resumes past missing frames', async () => {
+    const h = await harness('gap');
+    await h.submit('Stream then drop');
+    const thread = h.threadId();
+
+    h.adapter.pushEvent(engineEvent('turn.started', 2, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    h.adapter.pushEvent(engineEvent('item.delta', 3, thread, 'turn_1', { delta: 'HALF' }, null));
+    h.adapter.pushReconnected(9);
+
+    const recovered = await h.waitFor((current) =>
+      current.items.some((item) => item.kind === 'status' && item.title === 'Event stream resumed past missing frames'),
+    );
+    const assistant = recovered.items.filter((item) => item.kind === 'assistant');
+    expect(assistant).toHaveLength(1);
+    expect(assistant[0]?.body).toBe('HALF');
+    expect(assistant[0]?.status).toBe('interrupted');
+    const notice = recovered.items.find((item) => item.title === 'Event stream resumed past missing frames');
+    expect(notice?.body).toContain('5 frame(s) were not delivered');
+  });
+
+  it('keeps a 2 100-frame turn in one row and labels the size truncation', async () => {
+    const h = await harness('long-turn', { flushIntervalMs: 60_000, maxItemChars: 5_000 });
+    await h.submit('Stream a lot');
+    const thread = h.threadId();
+
+    h.adapter.pushEvent(engineEvent('turn.started', 1, thread, 'turn_1', { turn: { id: 'turn_1' } }));
+    for (let frame = 0; frame < 2_100; frame += 1) {
+      h.adapter.pushEvent(engineEvent('item.delta', frame + 2, thread, 'turn_1', { delta: '0123456789' }, null));
+    }
+    h.adapter.pushEvent(
+      engineEvent('turn.completed', 2_102, thread, 'turn_1', {
+        turn: { id: 'turn_1', thread_id: thread, status: 'completed' },
+      }),
+    );
+
+    const streamed = await h.waitFor((current) => current.run.state === 'idle', 25_000);
+    const assistant = streamed.items.filter((item) => item.kind === 'assistant');
+    expect(assistant).toHaveLength(1);
+    expect(assistant[0]?.truncated).toBe(true);
+    expect(assistant[0]?.body).toContain('output truncated at 5,000 characters');
+    // Every frame was still accounted for: truncation is labeled, not hidden.
+    expect(streamed.diagnostics.some((line) => line.includes('sequence gap'))).toBe(false);
+  }, 30_000);
 });

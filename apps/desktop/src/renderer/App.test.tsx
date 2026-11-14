@@ -341,6 +341,7 @@ function emptyStudio(): StudioView {
     sessionId: null,
     thread: null,
     items: [],
+    history: { total: 0, oldestSeq: null, newestSeq: null, hasOlder: false, hasNewer: false },
     run: { state: 'idle', detail: 'Ready. Nothing has been sent.', turnId: null, submission: null, startedAt: null },
     control: { pauseRequested: false, queueState: 'idle', lastOutcome: null, interrupt: null, blockedProblem: null },
     pending: null,
@@ -356,6 +357,11 @@ function emptyStudio(): StudioView {
 
 function ok<T>(data: T): IpcResult<T> {
   return { ok: true, data };
+}
+
+/** The thread the shell currently shows; a push must carry its identity. */
+function threadIdFor(store: Store): string {
+  return store.studio?.thread?.threadId ?? 'thr_00000000000000000000000000000001';
 }
 
 function launchFor(target: CatalogProject, seq: number): LaunchReceipt {
@@ -1729,6 +1735,7 @@ describe('Mona shell', () => {
         handler({
           type: 'item',
           projectId: alpha.id,
+          threadId: store.studio?.thread?.threadId ?? 'thr_00000000000000000000000000000001',
           item: {
             id: 'tl_1',
             seq: 1,
@@ -1752,6 +1759,7 @@ describe('Mona shell', () => {
         handler({
           type: 'state',
           projectId: alpha.id,
+          threadId: store.studio?.thread?.threadId ?? null,
           thread: store.studio?.thread ?? null,
           run: {
             state: 'awaiting_approval',
@@ -1810,10 +1818,24 @@ describe('Mona shell', () => {
     });
     await act(async () => {
       for (const handler of store.studioHandlers ?? []) {
-        handler({ type: 'item', projectId: alpha.id, item });
-        handler({ type: 'item', projectId: alpha.id, item });
-        handler({ type: 'delta', projectId: alpha.id, itemId: 'tl_dup', text: '_OK', seq: 5 });
-        handler({ type: 'delta', projectId: alpha.id, itemId: 'tl_dup', text: '_OK', seq: 5 });
+        handler({ type: 'item', projectId: alpha.id, threadId: threadIdFor(store), item });
+        handler({ type: 'item', projectId: alpha.id, threadId: threadIdFor(store), item });
+        handler({
+          type: 'delta',
+          projectId: alpha.id,
+          threadId: threadIdFor(store),
+          itemId: 'tl_dup',
+          text: '_OK',
+          seq: 5,
+        });
+        handler({
+          type: 'delta',
+          projectId: alpha.id,
+          threadId: threadIdFor(store),
+          itemId: 'tl_dup',
+          text: '_OK',
+          seq: 5,
+        });
       }
       await new Promise((resolve) => setTimeout(resolve, 10));
     });
@@ -1842,6 +1864,7 @@ describe('Mona shell', () => {
         handler({
           type: 'state',
           projectId: alpha.id,
+          threadId: threadIdFor(store),
           thread: null,
           run: {
             state: 'idle',

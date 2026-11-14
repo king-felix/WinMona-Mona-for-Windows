@@ -204,6 +204,19 @@ export type TimelineItemRow = {
   updatedAt: string;
 };
 
+/** One ascending window of stored conversation rows plus its paging facts. */
+export type TimelinePage = {
+  items: TimelineItemRow[];
+  total: number;
+  oldestSeq: number | null;
+  newestSeq: number | null;
+  hasOlder: boolean;
+  hasNewer: boolean;
+};
+
+export const DEFAULT_TIMELINE_PAGE = 500;
+export const MAX_TIMELINE_PAGE = 2_000;
+
 /**
  * The one write path for local project state. Every mutation enters the
  * maintenance barrier and a single IMMEDIATE transaction; project-scoped writes
@@ -703,6 +716,19 @@ export class ProjectStore {
           .run(input.body, input.title, input.status, input.truncated ? 1 : 0, now, input.id);
         return 'updated';
       }
+      // A known row may settle on a later sequence (a completion frame that
+      // resolves a stream started earlier). Move it instead of inserting a
+      // second card for the same identity.
+      const sameId = tx.db.prepare('SELECT seq FROM timeline_items WHERE id = ?').get(input.id) as
+        { seq?: number } | undefined;
+      if (sameId !== undefined) {
+        tx.db
+          .prepare(
+            'UPDATE timeline_items SET seq = ?, body = ?, title = ?, status = ?, truncated = ?, updated_at = ? WHERE id = ?',
+          )
+          .run(input.seq, input.body, input.title, input.status, input.truncated ? 1 : 0, now, input.id);
+        return 'updated';
+      }
       tx.db
         .prepare(
           `INSERT INTO timeline_items(id, project_id, thread_id, turn_id, seq, kind, title, body, status, truncated, created_at, updated_at)
@@ -726,6 +752,10 @@ export class ProjectStore {
     });
   }
 
+  /**
+   * The oldest rows for a thread, ascending. Kept for callers that want a
+   * prefix (probes, fixtures); the studio pages from the newest row instead.
+   */
   async listTimelineItems(threadId: string, limit = 500): Promise<TimelineItemRow[]> {
     const bounded = Math.max(1, Math.min(2000, Math.trunc(limit)));
     return await this.read((db) => {
@@ -734,6 +764,114 @@ export class ProjectStore {
         .all(threadId, bounded) as TimelineRecord[];
       return rows.map(toTimelineItem);
     });
+  }
+
+  /**
+   * One window of stored history, ascending, with the facts a caller needs to
+   * page further. Without a cursor the window is the newest rows, so an initial
+   * load never hides recent work behind an old prefix.
+   */
+  async timelinePage(
+    threadId: string,
+    options: {
+      beforeSeq?: number | null;
+      aroundSeq?: number | null;
+      afterSeq?: number | null;
+      limit?: number;
+    } = {},
+  ): Promise<TimelinePage> {
+    const limit = Math.max(1, Math.min(MAX_TIMELINE_PAGE, Math.trunc(options.limit ?? DEFAULT_TIMELINE_PAGE)));
+    return await this.read((db) => {
+      const total = countThreadItems(db, threadId);
+      let rows: TimelineRecord[];
+      if (typeof options.aroundSeq === 'number') {
+        const center = Math.trunc(options.aroundSeq);
+        const newerCount = Math.floor(limit / 2);
+        const older = db
+          .prepare('SELECT * FROM timeline_items WHERE thread_id = ? AND seq <= ? ORDER BY seq DESC LIMIT ?')
+          .all(threadId, center, limit - newerCount) as TimelineRecord[];
+        const newer = db
+          .prepare('SELECT * FROM timeline_items WHERE thread_id = ? AND seq > ? ORDER BY seq ASC LIMIT ?')
+          .all(threadId, center, newerCount) as TimelineRecord[];
+        rows = [...older.reverse(), ...newer];
+      } else if (typeof options.beforeSeq === 'number') {
+        rows = (
+          db
+            .prepare('SELECT * FROM timeline_items WHERE thread_id = ? AND seq < ? ORDER BY seq DESC LIMIT ?')
+            .all(threadId, Math.trunc(options.beforeSeq), limit) as TimelineRecord[]
+        ).reverse();
+      } else if (typeof options.afterSeq === 'number') {
+        rows = db
+          .prepare('SELECT * FROM timeline_items WHERE thread_id = ? AND seq > ? ORDER BY seq ASC LIMIT ?')
+          .all(threadId, Math.trunc(options.afterSeq), limit) as TimelineRecord[];
+      } else {
+        rows = (
+          db
+            .prepare('SELECT * FROM timeline_items WHERE thread_id = ? ORDER BY seq DESC LIMIT ?')
+            .all(threadId, limit) as TimelineRecord[]
+        ).reverse();
+      }
+      const items = rows.map(toTimelineItem);
+      const oldest = items[0]?.seq ?? null;
+      const newest = items[items.length - 1]?.seq ?? null;
+      return {
+        items,
+        total,
+        oldestSeq: oldest,
+        newestSeq: newest,
+        hasOlder: oldest !== null && threadHasSeq(db, threadId, 'older', oldest),
+        hasNewer: newest !== null && threadHasSeq(db, threadId, 'newer', newest),
+      };
+    });
+  }
+
+  /**
+   * Case-insensitive substring search across the stored conversation. It reads
+   * only local rows, so older content stays reachable after a window has been
+   * released from memory.
+   */
+  async searchTimelineItems(
+    threadId: string,
+    query: string,
+    limit = 50,
+  ): Promise<{ matches: TimelineItemRow[]; total: number }> {
+    const term = query.trim().slice(0, 200);
+    if (!term) return { matches: [], total: 0 };
+    const bounded = Math.max(1, Math.min(200, Math.trunc(limit)));
+    const escaped = term.replace(/[\\%_]/g, (character) => `\\${character}`);
+    const pattern = `%${escaped}%`;
+    return await this.read((db) => {
+      const where = "thread_id = ? AND (title LIKE ? ESCAPE '\\' OR body LIKE ? ESCAPE '\\')";
+      const totalRow = db
+        .prepare(`SELECT COUNT(*) AS count FROM timeline_items WHERE ${where}`)
+        .get(threadId, pattern, pattern) as { count?: number } | undefined;
+      const rows = db
+        .prepare(`SELECT * FROM timeline_items WHERE ${where} ORDER BY seq DESC LIMIT ?`)
+        .all(threadId, pattern, pattern, bounded) as TimelineRecord[];
+      return { matches: rows.map(toTimelineItem), total: Number(totalRow?.count ?? 0) };
+    });
+  }
+
+  async countTimelineItems(threadId: string): Promise<number> {
+    return await this.read((db) => countThreadItems(db, threadId));
+  }
+
+  /**
+   * Every stored row for a thread, oldest first, in bounded chunks. Export uses
+   * this so a conversation larger than one window is still written whole.
+   */
+  async *iterateTimelineItems(threadId: string, pageSize = 500): AsyncGenerator<TimelineItemRow[]> {
+    const chunk = Math.max(1, Math.min(MAX_TIMELINE_PAGE, Math.trunc(pageSize)));
+    // Sequences are positive, so starting after 0 walks the thread from its first
+    // row without ever holding more than one chunk.
+    let cursor = 0;
+    for (;;) {
+      const page: TimelinePage = await this.timelinePage(threadId, { limit: chunk, afterSeq: cursor });
+      if (page.items.length === 0) return;
+      yield page.items;
+      if (!page.hasNewer) return;
+      cursor = page.newestSeq ?? cursor;
+    }
   }
 
   async recordTurn(input: { threadId: string; engineTurnId: string; status: string }): Promise<void> {
@@ -835,6 +973,21 @@ function toTimelineItem(row: TimelineRecord): TimelineItemRow {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
+}
+
+function countThreadItems(db: DatabaseSync, threadId: string): number {
+  const row = db.prepare('SELECT COUNT(*) AS count FROM timeline_items WHERE thread_id = ?').get(threadId) as
+    { count?: number } | undefined;
+  return Number(row?.count ?? 0);
+}
+
+/** Whether any stored row sits beyond the window edge, in the given direction. */
+function threadHasSeq(db: DatabaseSync, threadId: string, direction: 'older' | 'newer', seq: number): boolean {
+  const sql =
+    direction === 'older'
+      ? 'SELECT 1 AS present FROM timeline_items WHERE thread_id = ? AND seq < ? LIMIT 1'
+      : 'SELECT 1 AS present FROM timeline_items WHERE thread_id = ? AND seq > ? LIMIT 1';
+  return db.prepare(sql).get(threadId, seq) !== undefined;
 }
 
 function writeMarkerFile(identity: PathIdentity, id: string, label: string, createdAt: string): void {

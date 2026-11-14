@@ -35,6 +35,14 @@ function harness(options: { trusted?: boolean; service?: boolean } = {}) {
       calls.push(`references:${projectId}`);
       return { ok: true as const, data: { paths: [] } };
     },
+    history: async (input: { beforeSeq?: number; aroundSeq?: number; limit?: number }) => {
+      calls.push(`history:${input.beforeSeq ?? '-'}:${input.aroundSeq ?? '-'}:${input.limit ?? '-'}`);
+      return { ok: true as const, data: { items: [], window: {} } };
+    },
+    searchHistory: async (input: { query: string }) => {
+      calls.push(`search:${input.query}`);
+      return { ok: true as const, data: { query: input.query, items: [], total: 0 } };
+    },
   } as unknown as StudioService;
 
   const channels = registerStudioIpc({
@@ -129,5 +137,38 @@ describe('studio IPC surface', () => {
     });
     await h.invoke(STUDIO_CHANNELS.interrupt, { projectId: 'prj_1' });
     expect(h.calls).toEqual(['view:prj_1:ses_1:plan', 'submit:prj_1:plan:1', 'interrupt:prj_1']);
+  });
+
+  it('paces stored-history reads through validated cursors only', async () => {
+    const h = harness();
+    await h.invoke(STUDIO_CHANNELS.history, { projectId: 'prj_1', sessionId: 'ses_1', beforeSeq: 701, limit: 500 });
+    await h.invoke(STUDIO_CHANNELS.history, { projectId: 'prj_1', sessionId: 'ses_1', aroundSeq: 42 });
+    await h.invoke(STUDIO_CHANNELS.search, { projectId: 'prj_1', sessionId: 'ses_1', query: 'MONA_OK' });
+    expect(h.calls).toEqual(['history:701:-:500', 'history:-:42:-', 'search:MONA_OK']);
+  });
+
+  it('refuses an oversized page instead of reading the whole log', async () => {
+    const h = harness();
+    const result = await h.invoke(STUDIO_CHANNELS.history, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      beforeSeq: 10,
+      limit: 50_000,
+    });
+    expect(result).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+    expect(h.calls).toEqual([]);
+  });
+
+  it('refuses a negative cursor or an empty search query', async () => {
+    const h = harness();
+    const negative = await h.invoke(STUDIO_CHANNELS.history, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      beforeSeq: -1,
+    });
+    expect(negative).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+    const empty = await h.invoke(STUDIO_CHANNELS.search, { projectId: 'prj_1', sessionId: 'ses_1', query: '' });
+    expect(empty).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+    expect(h.calls).toEqual([]);
   });
 });

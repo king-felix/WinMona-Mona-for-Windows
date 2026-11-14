@@ -22,6 +22,24 @@ const SubmitRequest = z
     references: z.array(z.string().min(1).max(512)).max(50),
   })
   .strict();
+const HistoryRequest = z
+  .object({
+    projectId: z.string().min(1).max(80),
+    sessionId: z.string().min(1).max(120),
+    mode: z.enum(['agent', 'plan']).optional(),
+    beforeSeq: z.number().int().nonnegative().optional(),
+    aroundSeq: z.number().int().nonnegative().optional(),
+    limit: z.number().int().min(1).max(2_000).optional(),
+  })
+  .strict();
+const SearchRequest = z
+  .object({
+    projectId: z.string().min(1).max(80),
+    sessionId: z.string().min(1).max(120),
+    mode: z.enum(['agent', 'plan']).optional(),
+    query: z.string().min(1).max(200),
+  })
+  .strict();
 
 type Handler = (payload: unknown, service: StudioService) => IpcResult<unknown> | Promise<IpcResult<unknown>>;
 
@@ -90,6 +108,21 @@ export function registerStudioIpc(deps: {
   register(STUDIO_CHANNELS.export, StudioRequest, (payload, service) => {
     const input = payload as { projectId: string; sessionId: string; mode?: 'agent' | 'plan' };
     return service.exportConversation(input);
+  });
+  register(STUDIO_CHANNELS.history, HistoryRequest, (payload, service) => {
+    const input = payload as {
+      projectId: string;
+      sessionId: string;
+      mode?: 'agent' | 'plan';
+      beforeSeq?: number;
+      aroundSeq?: number;
+      limit?: number;
+    };
+    return service.history(input);
+  });
+  register(STUDIO_CHANNELS.search, SearchRequest, (payload, service) => {
+    const input = payload as { projectId: string; sessionId: string; mode?: 'agent' | 'plan'; query: string };
+    return service.searchHistory(input);
   });
 
   return channels;

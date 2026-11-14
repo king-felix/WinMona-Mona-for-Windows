@@ -3,7 +3,16 @@ import { Badge, Button, EmptyState, ErrorState, Markdown, Notification, type Ton
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import type { CatalogProject, EngineView, ProjectSpend, PromptFavorite, UiStateView } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
-import type { StudioMode, StudioRun, StudioView as StudioState, TimelineItem, TimelineKind } from '../shared/studio.js';
+import type {
+  StudioEvent,
+  StudioHistoryWindow,
+  StudioMode,
+  StudioRun,
+  StudioSearchResult,
+  StudioView as StudioState,
+  TimelineItem,
+  TimelineKind,
+} from '../shared/studio.js';
 
 const PREVIEW_CHARS = 2_000;
 const TOOL_PREVIEW_CHARS = 1_500;
@@ -14,6 +23,14 @@ const TOOL_PREVIEW_CHARS = 1_500;
  * the live DOM released ~23 MB of working set (P23-memory-dev.json).
  */
 const TIMELINE_RENDER_PAGE = 120;
+/**
+ * Rows held in renderer state. History is paged from the store, so this bounds
+ * memory without capping what is reachable: the window is a view over a thread
+ * that may hold tens of thousands of rows.
+ */
+const LOADED_ITEM_LIMIT = 2_000;
+const HISTORY_PAGE = 500;
+const FINAL_STATUSES = new Set(['completed', 'interrupted', 'failed', 'cancelled']);
 
 const KIND_LABEL: Record<TimelineKind, string> = {
   user: 'You',
@@ -68,6 +85,23 @@ function repoLabel(project: CatalogProject): string {
 function timeLabel(at: string): string {
   const date = new Date(at);
   return Number.isNaN(date.getTime()) ? '' : date.toLocaleTimeString();
+}
+
+/** Union two item lists by id (newest value wins), ordered by sequence. */
+function mergeTimeline(base: TimelineItem[], incoming: TimelineItem[]): TimelineItem[] {
+  const byId = new Map<string, TimelineItem>();
+  for (const item of base) byId.set(item.id, item);
+  for (const item of incoming) byId.set(item.id, item);
+  return [...byId.values()].sort((a, b) => a.seq - b.seq);
+}
+
+/**
+ * Keeps renderer state bounded. The dropped end is the one opposite the change:
+ * loading older rows drops the newest tail, and live rows drop the oldest head.
+ */
+function boundTimeline(items: TimelineItem[], keep: 'oldest' | 'newest'): TimelineItem[] {
+  if (items.length <= LOADED_ITEM_LIMIT) return items;
+  return keep === 'oldest' ? items.slice(0, LOADED_ITEM_LIMIT) : items.slice(items.length - LOADED_ITEM_LIMIT);
 }
 
 function connectionTone(engine: EngineView | null, project: CatalogProject | null): Tone {
@@ -128,16 +162,48 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [renderPage, setRenderPage] = useState(1);
   const [notice, setNotice] = useState<string | null>(null);
   const [favoriteLabel, setFavoriteLabel] = useState('');
+  const [history, setHistory] = useState<StudioHistoryWindow | null>(null);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<StudioSearchResult | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [highlightSeq, setHighlightSeq] = useState<number | null>(null);
+  const [unread, setUnread] = useState(0);
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const lastDelta = useRef<Map<string, number>>(new Map());
+  /**
+   * Follow-scroll is per conversation and per reader: it is on until the reader
+   * scrolls away from the newest row. It is not persisted, and it never pulls a
+   * reader back while they are reading older history.
+   */
+  const followScroll = useRef(true);
+  /** Set while older rows are being prepended: the reader's place is the anchor. */
+  const prependInFlight = useRef(false);
+  const threadIdRef = useRef<string | null>(null);
+  const highlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const projectId = project?.id ?? null;
   const session = projectId ? ui?.projects[projectId]?.sessions.find((item) => item.sessionId === sessionId) : null;
 
-  // A new session, project or mode starts at the newest page again.
+  // A new session, project, or mode is a different conversation: paging,
+  // search, unread and follow-scroll all start over.
   useEffect(() => {
     setRenderPage(1);
+    setSearchResults(null);
+    setSearchQuery('');
+    setUnread(0);
+    setHighlightSeq(null);
+    lastDelta.current.clear();
+    followScroll.current = true;
   }, [projectId, sessionId, mode]);
+
+  useEffect(
+    () => () => {
+      if (highlightTimer.current) clearTimeout(highlightTimer.current);
+    },
+    [],
+  );
 
   const unwrap = useCallback(
     async <T,>(promise: Promise<{ ok: true; data: T } | { ok: false; error: { message: string } }>, title: string) => {
@@ -176,6 +242,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   useEffect(() => {
     if (!projectId || !sessionId) {
       setStudio(null);
+      setHistory(null);
       return;
     }
     let alive = true;
@@ -183,8 +250,14 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       const result = await window.mona.studioGet({ projectId, sessionId, mode });
       if (!alive) return;
       if (result.ok) {
+        threadIdRef.current = result.data.thread?.threadId ?? null;
         setStudio(result.data);
+        setHistory(result.data.history ?? null);
         setLoadError(null);
+        setHistoryError(null);
+        // A fresh load starts at the newest row, so following is safe again.
+        followScroll.current = true;
+        setUnread(0);
       } else {
         setLoadError(result.error.message);
       }
@@ -197,9 +270,14 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   // One subscription to main-process pushes for the selected project.
   useEffect(() => {
     if (!projectId) return;
-    const unsubscribe = window.mona.onStudioEvent((event) => {
+    const fromThisThread = (threadId: string | null): boolean =>
+      threadIdRef.current === null || threadId === threadIdRef.current;
+    const unsubscribe = window.mona.onStudioEvent((event: StudioEvent) => {
       if (event.projectId !== projectId) return;
       if (event.type === 'item') {
+        // A mode switch keeps one runtime alive for both threads; a row from the
+        // other thread must never appear in this conversation.
+        if (!fromThisThread(event.threadId)) return;
         setStudio((current) => (current ? { ...current, items: applyItem(current.items, event.item) } : current));
         if (event.item.kind === 'user') {
           setPendingPrompt((pending) => (pending && event.item.body.includes(pending) ? null : pending));
@@ -207,6 +285,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         return;
       }
       if (event.type === 'delta') {
+        if (!fromThisThread(event.threadId)) return;
         const seen = lastDelta.current.get(event.itemId) ?? 0;
         if (event.seq <= seen) return;
         lastDelta.current.set(event.itemId, event.seq);
@@ -214,6 +293,8 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           if (!current) return current;
           const existing = current.items.find((item) => item.id === event.itemId);
           if (!existing) return current;
+          // A finished card is final even if a late frame arrives.
+          if (FINAL_STATUSES.has(existing.status ?? '')) return current;
           return {
             ...current,
             items: applyItem(current.items, {
@@ -231,6 +312,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         );
         return;
       }
+      if (!fromThisThread(event.threadId)) return;
       setStudio((current) =>
         current
           ? { ...current, run: event.run, control: event.control, pending: event.pending, thread: event.thread }
@@ -239,6 +321,30 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     });
     return unsubscribe;
   }, [applyItem, projectId]);
+
+  // Follow only while the reader is at the newest row. Otherwise the new text is
+  // counted as unread and a deliberate control brings them back.
+  const itemCount = studio?.items.length ?? 0;
+  const newestBodyLength = studio?.items[studio.items.length - 1]?.body.length ?? 0;
+  const lastItemCount = useRef(0);
+  useEffect(() => {
+    const node = timelineRef.current;
+    const added = Math.max(0, itemCount - lastItemCount.current);
+    lastItemCount.current = itemCount;
+    if (!node) return;
+    if (prependInFlight.current) {
+      // Prepending older rows is not new activity at the bottom; the anchor
+      // restore in loadEarlier keeps the reader where they were reading.
+      prependInFlight.current = false;
+      return;
+    }
+    if (followScroll.current) {
+      node.scrollTop = node.scrollHeight;
+      setUnread(0);
+    } else if (added > 0) {
+      setUnread((count) => count + added);
+    }
+  }, [itemCount, newestBodyLength]);
 
   // Refresh the recorded spend once a turn settles.
   const previousState = useRef<StudioRun['state'] | null>(null);
@@ -318,6 +424,121 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     setStudio((current) => (current ? { ...current, run: result.data.run, control: result.data.control } : current));
   }, [projectId]);
 
+  /**
+   * One page back through stored history. The reader's position is preserved by
+   * measuring the scroll box before and after the prepend, and the newest tail
+   * is released if the window would grow past its bound.
+   */
+  const loadEarlier = useCallback(async () => {
+    if (!projectId || !sessionId || loadingOlder) return;
+    const oldest = history?.oldestSeq ?? null;
+    if (oldest === null || !history?.hasOlder) return;
+    const node = timelineRef.current;
+    const anchor = node ? { height: node.scrollHeight, top: node.scrollTop } : null;
+    setLoadingOlder(true);
+    setHistoryError(null);
+    try {
+      const result = await window.mona.studioHistory({
+        projectId,
+        sessionId,
+        mode,
+        beforeSeq: oldest,
+        limit: HISTORY_PAGE,
+      });
+      if (!result.ok) {
+        setHistoryError(result.error.message);
+        return;
+      }
+      const page = result.data;
+      prependInFlight.current = true;
+      setStudio((current) => {
+        if (!current) return current;
+        const merged = mergeTimeline(current.items, page.items);
+        const bounded = boundTimeline(merged, 'oldest');
+        return { ...current, items: bounded };
+      });
+      // If the bound released newest rows, they are still stored and reachable
+      // with Jump to newest; say so instead of pretending the window is whole.
+      const trimmed = (studio?.items.length ?? 0) + page.items.length > LOADED_ITEM_LIMIT;
+      setHistory({ ...page.window, hasNewer: page.window.hasNewer || trimmed });
+      requestAnimationFrame(() => {
+        const target = timelineRef.current;
+        if (target && anchor) target.scrollTop = anchor.top + (target.scrollHeight - anchor.height);
+      });
+    } finally {
+      setLoadingOlder(false);
+    }
+  }, [history, loadingOlder, mode, projectId, sessionId, studio?.items.length]);
+
+  /** Reload the newest stored window; nothing is inferred and no model is called. */
+  const jumpToNewest = useCallback(async () => {
+    if (!projectId || !sessionId) return;
+    setHistoryError(null);
+    const result = await window.mona.studioGet({ projectId, sessionId, mode });
+    if (!result.ok) {
+      setHistoryError(result.error.message);
+      return;
+    }
+    threadIdRef.current = result.data.thread?.threadId ?? null;
+    setStudio(result.data);
+    setHistory(result.data.history ?? null);
+    setRenderPage(1);
+    followScroll.current = true;
+    setUnread(0);
+    requestAnimationFrame(() => {
+      const node = timelineRef.current;
+      if (node) node.scrollTop = node.scrollHeight;
+    });
+  }, [mode, projectId, sessionId]);
+
+  const runSearch = useCallback(async () => {
+    const query = searchQuery.trim();
+    if (!projectId || !sessionId || !query) return;
+    setSearching(true);
+    try {
+      const result = await window.mona.studioSearchHistory({ projectId, sessionId, mode, query });
+      if (!result.ok) {
+        setHistoryError(result.error.message);
+        return;
+      }
+      setSearchResults(result.data);
+    } finally {
+      setSearching(false);
+    }
+  }, [mode, projectId, searchQuery, sessionId]);
+
+  /** Load the stored window around a search hit and bring that row into view. */
+  const jumpToSeq = useCallback(
+    async (seq: number) => {
+      if (!projectId || !sessionId) return;
+      setHistoryError(null);
+      const result = await window.mona.studioHistory({
+        projectId,
+        sessionId,
+        mode,
+        aroundSeq: seq,
+        limit: HISTORY_PAGE,
+      });
+      if (!result.ok) {
+        setHistoryError(result.error.message);
+        return;
+      }
+      setStudio((current) => (current ? { ...current, items: result.data.items } : current));
+      setHistory(result.data.window);
+      setRenderPage(1);
+      followScroll.current = false;
+      setHighlightSeq(seq);
+      if (highlightTimer.current) clearTimeout(highlightTimer.current);
+      highlightTimer.current = setTimeout(() => setHighlightSeq(null), 4_000);
+      requestAnimationFrame(() => {
+        const node = timelineRef.current?.querySelector<HTMLElement>(`[data-seq="${seq}"]`);
+        node?.scrollIntoView({ block: 'center' });
+        node?.focus?.();
+      });
+    },
+    [mode, projectId, sessionId],
+  );
+
   const pause = useCallback(async () => {
     if (!projectId) return;
     const result = await window.mona.studioPause({ projectId });
@@ -355,11 +576,14 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   }, []);
 
   const items = studio?.items ?? [];
-  // The newest page of rows is rendered; older loaded items stay in state and one
-  // click away, so nothing recorded becomes unreachable.
+  // Only a page of rows is rendered at once. Older *loaded* rows are one click
+  // away, and rows outside the loaded window are one request away, so nothing
+  // stored becomes unreachable while the DOM and state stay bounded.
   const renderLimit = TIMELINE_RENDER_PAGE * renderPage;
   const hiddenCount = Math.max(0, items.length - renderLimit);
   const visibleItems = hiddenCount > 0 ? items.slice(items.length - renderLimit) : items;
+  const hasOlder = history?.hasOlder ?? false;
+  const totalStored = history?.total ?? items.length;
   const pending = studio?.pending ?? null;
   const blockedProblem = studio?.control.blockedProblem ?? null;
   const thread = studio?.thread ?? null;
@@ -606,6 +830,71 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         </div>
       ) : null}
 
+      <div className="timeline-tools">
+        <div className="mona-row">
+          <label className="mona-field-label" htmlFor="timeline-search">
+            Search this conversation
+          </label>
+          <input
+            id="timeline-search"
+            className="mona-input"
+            value={searchQuery}
+            maxLength={200}
+            placeholder="Text recorded in this thread"
+            onChange={(event) => setSearchQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter') return;
+              event.preventDefault();
+              void runSearch();
+            }}
+          />
+          <Button
+            size="sm"
+            onClick={() => void runSearch()}
+            disabled={searching || !searchQuery.trim()}
+            data-testid="history-search"
+          >
+            {searching ? 'Searching…' : 'Search'}
+          </Button>
+          <span className="mona-muted" data-testid="history-window">
+            {totalStored.toLocaleString()} stored · {items.length.toLocaleString()} loaded
+          </span>
+        </div>
+        {searchResults ? (
+          <div className="mona-muted" data-testid="history-results">
+            {searchResults.total === 0 ? (
+              <p>
+                No stored item in this thread contains “{searchResults.query}”. Nothing is searched on a remote service.
+              </p>
+            ) : (
+              <>
+                <p>
+                  {searchResults.total.toLocaleString()} stored match(es) for “{searchResults.query}”. Opening one loads
+                  the stored rows around it; it does not run anything.
+                </p>
+                <ul className="brief-list">
+                  {searchResults.items.map((hit) => (
+                    <li key={hit.id}>
+                      <Button size="sm" onClick={() => void jumpToSeq(hit.seq)} data-testid={`history-hit-${hit.seq}`}>
+                        #{hit.seq} · {KIND_LABEL[hit.kind]} · {hit.title}
+                      </Button>
+                      <p className="mona-muted mona-truncate">{hit.body.slice(0, 160)}</p>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <Button size="sm" onClick={() => setSearchResults(null)}>
+              Clear results
+            </Button>
+          </div>
+        ) : null}
+        {historyError ? (
+          <Notification tone="critical" title="History could not be read">
+            {historyError}
+          </Notification>
+        ) : null}
+      </div>
       <div
         className="timeline"
         ref={timelineRef}
@@ -613,6 +902,13 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         role="log"
         aria-label="Turn timeline"
         aria-live="polite"
+        onScroll={() => {
+          const node = timelineRef.current;
+          if (!node) return;
+          const atBottom = node.scrollHeight - node.scrollTop - node.clientHeight < 48;
+          followScroll.current = atBottom;
+          if (atBottom) setUnread(0);
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -630,10 +926,22 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             }
           />
         ) : null}
+        {hasOlder ? (
+          <div className="timeline-earlier" data-testid="timeline-older">
+            <Button size="sm" onClick={() => void loadEarlier()} disabled={loadingOlder}>
+              {loadingOlder ? 'Loading earlier items…' : 'Load earlier stored items'}
+            </Button>
+            <span className="mona-muted">Older rows are stored locally. Loading them makes no model call.</span>
+          </div>
+        ) : items.length > 0 ? (
+          <p className="mona-muted" data-testid="timeline-beginning">
+            Beginning of the stored conversation.
+          </p>
+        ) : null}
         {hiddenCount > 0 ? (
           <div className="timeline-earlier" data-testid="timeline-earlier">
             <Button size="sm" onClick={() => setRenderPage((value) => value + 1)}>
-              Show {Math.min(hiddenCount, TIMELINE_RENDER_PAGE)} earlier item(s)
+              Show {Math.min(hiddenCount, TIMELINE_RENDER_PAGE)} earlier loaded item(s)
             </Button>
             <span className="mona-muted">
               Showing the newest {visibleItems.length} of {items.length} loaded items. Older items are recorded and one
@@ -646,6 +954,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             key={item.id}
             item={item}
             expanded={expanded.has(item.id)}
+            highlighted={highlightSeq === item.seq}
             onExpand={() =>
               setExpanded((current) => {
                 const next = new Set(current);
@@ -669,6 +978,18 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           </article>
         ) : null}
       </div>
+      {unread > 0 || (history?.hasNewer ?? false) ? (
+        <div className="mona-row" data-testid="timeline-jump">
+          <Button size="sm" variant="primary" onClick={() => void jumpToNewest()}>
+            Jump to newest
+          </Button>
+          <span className="mona-muted">
+            {unread > 0
+              ? `${unread} new event(s) arrived while you were reading. The view did not move.`
+              : 'Newer stored rows are outside the loaded window.'}
+          </span>
+        </div>
+      ) : null}
 
       <div className="composer">
         <div className="composer-head">
@@ -882,12 +1203,14 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
 function TimelineEntry({
   item,
   expanded,
+  highlighted,
   onExpand,
   onCopy,
   onInterrupt,
 }: {
   item: TimelineItem;
   expanded: boolean;
+  highlighted?: boolean;
   onExpand: () => void;
   onCopy: (text: string) => void;
   onInterrupt: () => void;
@@ -897,7 +1220,12 @@ function TimelineEntry({
   const shown = long && !expanded ? item.body.slice(0, limit) : item.body;
   const tone = KIND_TONE[item.kind];
   return (
-    <article className={`timeline-item kind-${item.kind}`} data-testid={`timeline-${item.kind}`}>
+    <article
+      className={`timeline-item kind-${item.kind}${highlighted ? ' highlighted' : ''}`}
+      data-testid={`timeline-${item.kind}`}
+      data-seq={item.seq}
+      tabIndex={highlighted ? -1 : undefined}
+    >
       <div className="timeline-head">
         <Badge tone={tone}>{KIND_LABEL[item.kind]}</Badge>
         <span className="timeline-title">{item.title}</span>

@@ -1610,3 +1610,30 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   never depend on `windows-review.mjs`; it is excluded from the product path the same way the P00
   bootstrap CLI is.
 
+
+## D-0121 - History is a windowed read over the whole thread, and stream identity is per item
+
+- **Decision:** the studio reads stored history through `ProjectStore.timelinePage` with explicit
+  `beforeSeq` / `aroundSeq` / `afterSeq` cursors and a computed `hasOlder` / `hasNewer` / `total`.
+  The first load is the newest window (500 rows), the renderer holds at most 2 000 rows and renders
+  120, and "older" is a store read rather than a re-label of one raw-event prefix. Export walks every
+  row through `iterateTimelineItems` in bounded chunks. Search is a local
+  `LIKE ... ESCAPE` read over the thread with wildcards matched literally.
+- **Why:** the previous fixed `ORDER BY seq ASC LIMIT 500` read the *oldest* rows, so beyond 500
+  stored rows the newest history was unreachable and export published a prefix as the conversation.
+  Widening the constant would only move the cliff; S02 requires paging by a stable cursor.
+- **Stream identity:** deltas are keyed by `(thread, turn, engine item id)`. An id-less delta binds
+  to that turn's single open anonymous stream; a completion may adopt that row (same id and
+  sequence, final text) but only when exactly one anonymous stream is open. A frame after its card
+  closed is counted as late and dropped. A skipped sequence is recorded as a diagnostic; when the
+  stream *resumes past* undelivered frames, open answers are closed as `interrupted` and a status row
+  names the loss. Adoption is refused rather than guessing when the evidence is ambiguous.
+- **Why the gap rule is narrow:** a skipped sequence alone does not mean lost text — the runtime
+  filters frames such as heartbeats — so splitting on any gap would corrupt the common case. Only an
+  explicit resume-past-loss signal claims an interruption.
+- **Cross-thread:** every projected row and push carries its thread. The service refuses an envelope
+  whose thread differs from its subscription, and the renderer ignores foreign-thread pushes; a
+  thread switch detaches the old subscription and resets the cursor. Without this, one runtime
+  serving Plan and Work could merge two conversations in one view.
+- **Constrains:** the renderer window is a view, not the source of truth; anything dropped from it
+  stays reachable through paging or search, and the UI says how many rows are stored versus loaded.

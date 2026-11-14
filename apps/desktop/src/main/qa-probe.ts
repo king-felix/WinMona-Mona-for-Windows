@@ -242,7 +242,7 @@ export async function runQaProbe(input: QaProbeInput): Promise<{ ok: boolean; st
   const firstSession = input.sessionId(project.projectId);
   if (firstSession) {
     const startedSeed = now();
-    seeded += plantHistory(firstSession, 'work');
+    seeded += plantHistory(firstSession, 'agent');
     seeded += plantHistory(firstSession, 'plan');
     report.seedMs = now() - startedSeed;
   }
@@ -267,7 +267,7 @@ export async function runQaProbe(input: QaProbeInput): Promise<{ ok: boolean; st
   const reloadedSession = input.sessionId(project.projectId);
   report.reloadedSession = reloadedSession;
   if (database && reloadedSession && reloadedSession !== firstSession) {
-    seeded += plantHistory(reloadedSession, 'work');
+    seeded += plantHistory(reloadedSession, 'agent');
     seeded += plantHistory(reloadedSession, 'plan');
     input.reload();
     await waitFor(
@@ -278,6 +278,43 @@ export async function runQaProbe(input: QaProbeInput): Promise<{ ok: boolean; st
     );
   }
   report.seeded = seeded;
+  // Read the window the studio actually opened before any synthetic push, so
+  // "the newest rows are shown" is observed from the rendered DOM. Rendering
+  // starts after the store read, so wait for the first rows rather than the
+  // container.
+  await waitFor(
+    async () =>
+      (await window.webContents.executeJavaScript("document.querySelectorAll('.timeline-item').length > 0", true)) ===
+      true,
+    20000,
+    'the seeded history rows',
+  );
+  const initialWindow = (await window.webContents.executeJavaScript(
+    `(() => {
+      const items = [...document.querySelectorAll('.timeline-item')];
+      const seqs = items.map((node) => Number(node.getAttribute('data-seq') || 0)).filter((value) => value > 0);
+      return {
+        rendered: items.length,
+        oldestSeq: seqs.length ? Math.min(...seqs) : null,
+        newestSeq: seqs.length ? Math.max(...seqs) : null,
+        hasOlder: Boolean(document.querySelector('[data-testid="timeline-older"]')),
+        label: document.querySelector('[data-testid="history-window"]')?.textContent ?? null,
+      };
+    })()`,
+    true,
+  )) as {
+    rendered: number;
+    oldestSeq: number | null;
+    newestSeq: number | null;
+    hasOlder: boolean;
+    label: string | null;
+  };
+  report.initialWindow = initialWindow;
+  step(
+    'the studio opened at the newest stored rows and offers the older ones',
+    (initialWindow.newestSeq ?? 0) >= eventCount && initialWindow.hasOlder === true && initialWindow.rendered > 0,
+    initialWindow,
+  );
   if (database && threadId) {
     const query = database.prepare('SELECT * FROM timeline_items WHERE thread_id = ? ORDER BY seq DESC LIMIT 500');
     for (let run = 0; run < 5; run += 1) {

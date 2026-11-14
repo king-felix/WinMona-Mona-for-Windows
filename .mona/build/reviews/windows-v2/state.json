@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 5,
+  "revision": 6,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -108,19 +108,36 @@
       "next_action": "W03: fix timeline ordering and paging so stored history beyond 500 rows is reachable"
     },
     "W03": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W01",
         "W02"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
+      "acceptance_done": [
         "Fixtures include >10,000 stored events, >2,000 frames in one turn, interleaved threads/items, heartbeat between deltas, duplicate replay and genuine gaps. Old content remains reachable; no ALPHA/BETA cross-thread merge; no duplicated completed card; scrolling while reading is not hijacked. Paging makes no provider calls."
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W03-history.md",
+          "sha256": "649dc59eb7833d7211b204a7e798823c7540956ee4bce887fbe8f96b6732252b",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T18:28:55Z",
+          "commit": "0e14c1ed15f527187a9440af58ea00330e83acbc"
+        },
+        {
+          "path": "docs/evidence/W03-history.json",
+          "sha256": "f3e83eb290f8e0f3336ca6eaa246408d54ff54a0e16e879a89b2b3a58ce44cb5",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T18:28:55Z",
+          "commit": "0e14c1ed15f527187a9440af58ea00330e83acbc"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-007"
+      ],
+      "next_action": "W04: inventory the pinned engine's slash commands and build the descriptive autocomplete catalog"
     },
     "W04": {
       "status": "pending",

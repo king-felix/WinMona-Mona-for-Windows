@@ -13,6 +13,8 @@ export const STUDIO_CHANNELS = {
   resume: 'mona:studio-resume',
   references: 'mona:studio-pick-references',
   export: 'mona:studio-export',
+  history: 'mona:studio-history',
+  search: 'mona:studio-search',
   event: 'mona:studio-event',
 } as const;
 
@@ -83,11 +85,43 @@ export type StudioControl = {
 
 export type StudioCapability = { status: 'supported' | 'unsupported'; reason: string | null };
 
+/**
+ * Paging facts for the loaded window. The renderer never has to guess whether
+ * older stored rows exist: the store was asked.
+ */
+export type StudioHistoryWindow = {
+  total: number;
+  oldestSeq: number | null;
+  newestSeq: number | null;
+  hasOlder: boolean;
+  hasNewer: boolean;
+};
+
+/** A cursor request over stored history. All values are bounded by the service. */
+export type StudioHistoryQuery = {
+  projectId: string;
+  sessionId: string;
+  mode?: StudioMode;
+  /** Return rows strictly older than this sequence number. */
+  beforeSeq?: number;
+  /** Return a window centred on this sequence number. */
+  aroundSeq?: number;
+  limit?: number;
+};
+
+export type StudioHistoryPage = {
+  items: TimelineItem[];
+  window: StudioHistoryWindow;
+};
+
+export type StudioSearchResult = { query: string; items: TimelineItem[]; total: number };
+
 export type StudioView = {
   projectId: string | null;
   sessionId: string | null;
   thread: StudioProfile | null;
   items: TimelineItem[];
+  history: StudioHistoryWindow;
   run: StudioRun;
   control: StudioControl;
   pending: StudioPending | null;
@@ -118,11 +152,12 @@ export type StudioSubmission = {
  * everything else is a complete item or complete state value.
  */
 export type StudioEvent =
-  | { type: 'item'; projectId: string; item: TimelineItem }
-  | { type: 'delta'; projectId: string; itemId: string; text: string; seq: number }
+  | { type: 'item'; projectId: string; threadId: string; item: TimelineItem }
+  | { type: 'delta'; projectId: string; threadId: string; itemId: string; text: string; seq: number }
   | {
       type: 'state';
       projectId: string;
+      threadId: string | null;
       thread: StudioProfile | null;
       run: StudioRun;
       control: StudioControl;
@@ -161,6 +196,15 @@ export type StudioBridge = {
   studioResume(input: { projectId: string }): Promise<IpcResult<{ run: StudioRun; control: StudioControl }>>;
   studioPickReferences(input: { projectId: string }): Promise<IpcResult<StudioReferencePick>>;
   studioExport(input: { projectId: string; sessionId: string; mode?: StudioMode }): Promise<IpcResult<StudioExport>>;
+  /** One cursor page of stored history. Reading history makes no model call. */
+  studioHistory(input: StudioHistoryQuery): Promise<IpcResult<StudioHistoryPage>>;
+  /** Case-insensitive search over the stored conversation for this thread. */
+  studioSearchHistory(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+    query: string;
+  }): Promise<IpcResult<StudioSearchResult>>;
   /** Subscribes to main-process studio pushes; returns an unsubscribe function. */
   onStudioEvent(handler: (event: StudioEvent) => void): () => void;
 };

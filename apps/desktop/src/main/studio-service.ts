@@ -11,7 +11,7 @@ import {
   type ParsedEngineEvent,
   type UsageEvidence,
 } from '@mona/contracts';
-import type { CostLedger, ProjectStore, StudioThreadRow, TimelineItemRow } from '@mona/project-state';
+import type { CostLedger, ProjectStore, StudioThreadRow, TimelineItemRow, TimelinePage } from '@mona/project-state';
 import { z } from 'zod';
 import { conversationFileName, renderConversationMarkdown } from './conversation-export.js';
 import type { EngineSummary } from './engine-host.js';
@@ -19,10 +19,13 @@ import type {
   StudioControl,
   StudioEvent,
   StudioExport,
+  StudioHistoryPage,
+  StudioHistoryWindow,
   StudioMode,
   StudioPending,
   StudioProfile,
   StudioRun,
+  StudioSearchResult,
   StudioSubmission,
   StudioView,
   TimelineItem,
@@ -78,7 +81,24 @@ const MAX_REFERENCE_CHARS = 512;
 const MAX_DIAGNOSTICS = 200;
 const MAX_DIAGNOSTIC_CHARS = 400;
 const LOCAL_SEQ_START = 10_000_000_000;
+/** Rows returned for one stored-history window (initial load and each page). */
+export const HISTORY_PAGE = 500;
+/** Hard ceiling on a requested page, so a renderer cannot ask for a whole log. */
+export const HISTORY_MAX_PAGE = 2_000;
+const HISTORY_SEARCH_LIMIT = 100;
 const HUMAN_INPUT_TOOLS = new Set(['request_user_input']);
+/** Statuses that mean a card will not grow again. */
+const FINAL_ITEM_STATUSES = new Set(['completed', 'interrupted', 'failed', 'cancelled']);
+/** Statuses that still accept streamed text. */
+const STREAM_OPEN_STATUSES = new Set(['streaming', 'in_progress']);
+const EMPTY_TIMELINE_PAGE: TimelinePage = {
+  items: [],
+  total: 0,
+  oldestSeq: null,
+  newestSeq: null,
+  hasOlder: false,
+  hasNewer: false,
+};
 
 const ItemPayload = z
   .object({
@@ -147,6 +167,8 @@ const UsageShape = z
 type ItemCacheEntry = {
   item: TimelineItem;
   engineItemId: string;
+  /** The thread this row belongs to: events never re-home across threads. */
+  threadId: string;
   lastFlush: number;
 };
 
@@ -159,6 +181,8 @@ type ProjectState = {
   queue: WorkQueue;
   controller: AbortController | null;
   subscription: Promise<void> | null;
+  /** The thread the live subscription belongs to, so a mode switch rebinds. */
+  subscriptionThreadId: string | null;
   lastSeq: number;
   localSeq: number;
   run: StudioRun;
@@ -169,7 +193,16 @@ type ProjectState = {
   turnUsage: Map<string, z.infer<typeof UsageShape>>;
   changedPaths: Map<string, string[]>;
   items: Map<string, ItemCacheEntry>;
+  /** `${threadId}:${engineItemId}` -> timeline item id, so threads never merge. */
   byEngineItem: Map<string, string>;
+  /** turn key -> the row receiving deltas the runtime sent without an item id. */
+  streamByTurn: Map<string, string>;
+  /** `threadId:engineItemId` values whose item already reported completion. */
+  completedEngineItems: Set<string>;
+  /** Turn keys whose anonymous stream was already settled by a completion. */
+  completedStreamTurns: Set<string>;
+  lateDeltas: number;
+  gaps: number;
 };
 
 function emptyRun(): StudioRun {
@@ -234,17 +267,83 @@ export class StudioService {
           warning = `This session is bound to a runtime for ${profile.workspace}, not this project.`;
           state.profile = null;
         } else {
-          state.threadId = threadRow.id;
-          state.lastSeq = Math.max(state.lastSeq, threadRow.lastSeq);
+          this.bindThread(state, threadRow.id, threadRow.lastSeq);
           // A bound thread with a live runtime gets a stream: events that arrived
           // while the window was closed are replayed from the stored cursor.
           this.maybeSubscribe(state, project.canonicalPath);
         }
       }
-      const items = threadRow ? (await this.store.listTimelineItems(threadRow.id, 500)).map(toTimelineItem) : [];
-      return { ok: true, data: this.renderView(state, items, warning) };
+      const page = threadRow
+        ? await this.store.timelinePage(threadRow.id, { limit: HISTORY_PAGE })
+        : EMPTY_TIMELINE_PAGE;
+      return {
+        ok: true,
+        data: this.renderView(state, page.items.map(toTimelineItem), windowOf(page), warning),
+      };
     } catch (error) {
       return { ok: false, error: errorResult('internal', 'The studio state could not be read.', true, slice(error)) };
+    }
+  }
+
+  /**
+   * One stored-history window by cursor. The studio's first load is the newest
+   * window; older pages are fetched from here, so history is not capped at the
+   * number of rows a single read returned. No model is involved.
+   */
+  async history(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+    beforeSeq?: number;
+    aroundSeq?: number;
+    limit?: number;
+  }): Promise<ServiceResult<StudioHistoryPage>> {
+    try {
+      const threadRow = await this.store.studioThreadForSession(input.projectId, input.sessionId, input.mode);
+      if (!threadRow) {
+        return { ok: false, error: errorResult('not_found', 'This session has no stored conversation yet.') };
+      }
+      const limit = boundPageLimit(input.limit);
+      const page = await this.store.timelinePage(threadRow.id, {
+        limit,
+        ...(typeof input.beforeSeq === 'number' ? { beforeSeq: Math.trunc(input.beforeSeq) } : {}),
+        ...(typeof input.aroundSeq === 'number' ? { aroundSeq: Math.trunc(input.aroundSeq) } : {}),
+      });
+      return { ok: true, data: { items: page.items.map(toTimelineItem), window: windowOf(page) } };
+    } catch (error) {
+      return { ok: false, error: errorResult('internal', 'Stored history could not be read.', true, slice(error)) };
+    }
+  }
+
+  /**
+   * Search the stored conversation for this thread. Older content stays
+   * reachable after its window has been released from memory, and a result is
+   * only a sequence number the UI can page to.
+   */
+  async searchHistory(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+    query: string;
+  }): Promise<ServiceResult<StudioSearchResult>> {
+    try {
+      const query = typeof input.query === 'string' ? input.query.trim() : '';
+      if (!query) return { ok: true, data: { query, items: [], total: 0 } };
+      if (query.length > 200) {
+        return { ok: false, error: errorResult('invalid_request', 'Search for at most 200 characters.') };
+      }
+      const threadRow = await this.store.studioThreadForSession(input.projectId, input.sessionId, input.mode);
+      if (!threadRow) return { ok: true, data: { query, items: [], total: 0 } };
+      const found = await this.store.searchTimelineItems(threadRow.id, query, HISTORY_SEARCH_LIMIT);
+      return {
+        ok: true,
+        data: { query, items: found.matches.map(toTimelineItem), total: found.total },
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: errorResult('internal', 'The stored conversation could not be searched.', true, slice(error)),
+      };
     }
   }
 
@@ -650,7 +749,16 @@ export class StudioService {
       };
     }
     const threadRow = await this.store.studioThreadForSession(input.projectId, input.sessionId, input.mode);
-    const items = threadRow ? (await this.store.listTimelineItems(threadRow.id, 500)).map(toTimelineItem) : [];
+    // The whole stored conversation is exported, page by page, so a session
+    // larger than one window is not silently published as a shorter one.
+    const items: TimelineItem[] = [];
+    let stored = 0;
+    if (threadRow) {
+      for await (const rows of this.store.iterateTimelineItems(threadRow.id, HISTORY_PAGE)) {
+        stored += rows.length;
+        items.push(...rows.map(toTimelineItem));
+      }
+    }
     if (items.length === 0) {
       return {
         ok: false,
@@ -693,7 +801,7 @@ export class StudioService {
       items,
       exportedAt: at.toISOString(),
       appVersion: this.appVersion?.() ?? 'version unknown',
-      itemBound: 500,
+      totalStored: stored,
     });
     // Write through a temporary name so an interrupted export never leaves a
     // half file where a complete one used to be.
@@ -730,6 +838,7 @@ export class StudioService {
       state.controller?.abort();
       state.controller = null;
       state.subscription = null;
+      state.subscriptionThreadId = null;
       state.run = {
         ...state.run,
         state: 'failed',
@@ -737,6 +846,11 @@ export class StudioService {
       };
       state.pending = null;
       this.diagnostic(state, 'engine stopped; active turn outcome unknown');
+      // Text that was still arriving is not a finished answer: close the cards
+      // so a reload cannot show them as complete.
+      if (state.threadId) {
+        void this.interruptOpenStreams(state, state.threadId, `the engine stopped: ${detail}`).catch(() => undefined);
+      }
       this.pushState(state);
     }
   }
@@ -747,6 +861,7 @@ export class StudioService {
       state.controller?.abort();
       state.controller = null;
       state.subscription = null;
+      state.subscriptionThreadId = null;
     }
   }
 
@@ -769,6 +884,7 @@ export class StudioService {
       queue: new WorkQueue({ now: this.now }),
       controller: null,
       subscription: null,
+      subscriptionThreadId: null,
       lastSeq: 0,
       localSeq: LOCAL_SEQ_START,
       run: emptyRun(),
@@ -780,6 +896,11 @@ export class StudioService {
       changedPaths: new Map(),
       items: new Map(),
       byEngineItem: new Map(),
+      streamByTurn: new Map(),
+      completedEngineItems: new Set(),
+      completedStreamTurns: new Set(),
+      lateDeltas: 0,
+      gaps: 0,
     };
     this.states.set(key, created);
     return created;
@@ -790,8 +911,34 @@ export class StudioService {
     return matches[matches.length - 1] ?? null;
   }
 
+  private bindThread(state: ProjectState, threadId: string, lastSeq: number): void {
+    if (state.threadId !== threadId) {
+      // A different engine thread owns a different cursor and different item
+      // identities. Nothing from the previous thread may carry over.
+      state.threadId = threadId;
+      state.lastSeq = lastSeq;
+      state.streamByTurn.clear();
+      this.detachSubscription(state);
+      return;
+    }
+    state.lastSeq = Math.max(state.lastSeq, lastSeq);
+  }
+
+  private detachSubscription(state: ProjectState): void {
+    state.controller?.abort();
+    state.controller = null;
+    state.subscription = null;
+    state.subscriptionThreadId = null;
+  }
+
   private maybeSubscribe(state: ProjectState, projectPath: string, adapter?: EngineAdapter): void {
-    if (state.subscription || state.controller || !state.threadId) return;
+    if (!state.threadId) return;
+    if (state.controller && state.subscriptionThreadId !== state.threadId) {
+      // The user switched thread (Plan/Work or another session); the old stream
+      // must not keep delivering another thread's events.
+      this.detachSubscription(state);
+    }
+    if (state.subscription || state.controller) return;
     const summary = this.engine.summary();
     if (summary.state !== 'connected' || summary.workspace !== projectPath) return;
     const live = adapter ?? this.engine.adapter();
@@ -799,6 +946,7 @@ export class StudioService {
     const threadId = state.threadId;
     const controller = new AbortController();
     state.controller = controller;
+    state.subscriptionThreadId = threadId;
     state.subscription = (async () => {
       try {
         for await (const event of live.subscribe({
@@ -834,13 +982,35 @@ export class StudioService {
       case 'event':
         await this.handleEngineEvent(state, threadId, event.event, event.seq);
         return;
-      case 'reconnected':
+      case 'reconnected': {
         this.diagnostic(state, `reconnected at seq ${event.sinceSeq} (attempt ${event.attempt})`);
+        // The subscription resumes from its own last delivered frame. If that is
+        // beyond what this process saw, frames were genuinely lost: an answer
+        // that was mid-stream is closed as interrupted instead of completed.
+        if (event.sinceSeq > state.lastSeq + 1) {
+          const skipped = event.sinceSeq - state.lastSeq - 1;
+          state.gaps += skipped;
+          await this.interruptOpenStreams(
+            state,
+            threadId,
+            `the stream resumed at seq ${event.sinceSeq} after ${skipped} undelivered frame(s)`,
+          );
+          await this.pushItem(state, threadId, {
+            seq: this.nextLocalSeq(state),
+            turnId: state.run.turnId,
+            kind: 'status',
+            title: 'Event stream resumed past missing frames',
+            body: `The runtime resumed the stream at sequence ${event.sinceSeq}. ${skipped} frame(s) were not delivered to Mona, so any answer that was mid-stream is marked interrupted rather than completed. Nothing was retried.`,
+            status: 'interrupted',
+            truncated: false,
+          });
+        }
         if (state.run.state === 'reconnecting') {
           state.run = { ...state.run, state: 'running', detail: 'Reconnected to the runtime event stream.' };
           this.pushState(state);
         }
         return;
+      }
       case 'stream_end':
         this.diagnostic(
           state,
@@ -856,14 +1026,20 @@ export class StudioService {
         }
         return;
       case 'diagnostic':
-        await this.handleDiagnostic(state, event.failure.code, event.failure.message, event.failure.detail);
+        await this.handleDiagnostic(state, threadId, event.failure.code, event.failure.message, event.failure.detail);
         return;
       default:
         return;
     }
   }
 
-  private async handleDiagnostic(state: ProjectState, code: string, message: string, detail?: string): Promise<void> {
+  private async handleDiagnostic(
+    state: ProjectState,
+    threadId: string,
+    code: string,
+    message: string,
+    detail?: string,
+  ): Promise<void> {
     this.diagnostic(state, `${code}: ${message}${detail ? ` — ${detail}` : ''}`);
     if (code === 'transport_failed' || code === 'stream_closed') {
       if (state.run.state === 'running' || state.run.state === 'interrupting') {
@@ -877,7 +1053,7 @@ export class StudioService {
       return;
     }
     if (code === 'oversize_event') {
-      await this.pushItem(state, {
+      await this.pushItem(state, threadId, {
         seq: this.nextLocalSeq(state),
         turnId: state.run.turnId,
         kind: 'error',
@@ -889,7 +1065,7 @@ export class StudioService {
       return;
     }
     // Schema drift and thread mismatches are surfaced, never swallowed.
-    await this.pushItem(state, {
+    await this.pushItem(state, threadId, {
       seq: this.nextLocalSeq(state),
       turnId: state.run.turnId,
       kind: 'error',
@@ -907,6 +1083,20 @@ export class StudioService {
     seq: number,
   ): Promise<void> {
     const envelope = parsed.envelope;
+    // The subscription and the envelope must agree on the thread. A mismatch is
+    // a runtime defect; its payload is never projected into this thread.
+    if (envelope.threadId !== threadId) {
+      this.diagnostic(state, `event for another thread at seq ${seq} ignored (thread_mismatch)`);
+      return;
+    }
+    // A skipped sequence number is recorded as a fact, never silently treated as
+    // lost text: the runtime may filter frames (heartbeats, internal status) and
+    // arriving seqs stay contiguous for content Mona renders.
+    if (state.lastSeq > 0 && seq > state.lastSeq + 1) {
+      const missed = seq - state.lastSeq - 1;
+      state.gaps += missed;
+      this.diagnostic(state, `sequence gap ${state.lastSeq} → ${seq} (${missed} frame(s) not delivered)`);
+    }
     state.lastSeq = Math.max(state.lastSeq, seq);
     await this.store.touchThread(threadId, state.lastSeq);
 
@@ -951,7 +1141,7 @@ export class StudioService {
           detail:
             'The runtime paused for an approval. Mona does not send approval decisions in this build; use Interrupt now to stop waiting.',
         };
-        await this.pushItem(state, {
+        await this.pushItem(state, threadId, {
           seq,
           turnId: envelope.turnId,
           kind: 'approval',
@@ -1011,7 +1201,7 @@ export class StudioService {
           turnId: started.success ? started.data.turn.id : state.run.turnId,
           detail: 'The runtime accepted the turn and started work.',
         };
-        await this.pushItem(state, {
+        await this.pushItem(state, threadId, {
           seq,
           turnId,
           kind: 'status',
@@ -1069,7 +1259,7 @@ export class StudioService {
         state: 'awaiting_approval',
         detail: 'The runtime is waiting for an approval Mona cannot answer. Use Interrupt now to stop waiting.',
       };
-      await this.pushItem(state, {
+      await this.pushItem(state, threadId, {
         seq,
         turnId,
         kind: 'approval',
@@ -1080,7 +1270,6 @@ export class StudioService {
       });
       this.pushState(state);
     }
-    void threadId;
   }
 
   private async projectItem(
@@ -1122,7 +1311,8 @@ export class StudioService {
       }
     }
 
-    const existingId = state.byEngineItem.get(item.id) ?? null;
+    const engineKey = engineItemKey(threadId, item.id);
+    const existingId = state.byEngineItem.get(engineKey) ?? null;
     let kind: TimelineKind = 'status';
     let title = `Item · ${item.kind}`;
     let body = item.detail ?? item.summary ?? '';
@@ -1141,30 +1331,31 @@ export class StudioService {
       title = `Result · ${toolName ?? 'tool'}`;
     }
     const bounded = this.bound(body);
-    const itemId = existingId ?? `tl_${threadId}_${seq}`;
+    // A completion for an answer whose deltas arrived without an item id adopts
+    // that row instead of adding a second card for the same text. Adoption is
+    // refused when the open stream is ambiguous: two answers are never merged.
+    const adoptedId =
+      !existingId && completed && kind === 'assistant' ? this.adoptableStream(state, threadId, turnId) : null;
+    const itemId = existingId ?? adoptedId ?? `tl_${threadId}_${seq}`;
     const prior = state.items.get(itemId);
     const timeline: TimelineItem = {
       id: itemId,
+      // An adopted row keeps the sequence where its text began; the card must
+      // stay where the reader saw it start, not jump to the completion frame.
       seq: prior?.item.seq ?? seq,
-      turnId,
+      turnId: turnId ?? prior?.item.turnId ?? null,
       kind,
       title,
       body: bounded.text,
       status: completed ? (item.status ?? 'completed') : (item.status ?? 'in_progress'),
-      truncated: bounded.truncated,
+      truncated: bounded.truncated || (prior?.item.truncated ?? false),
       at: this.now().toISOString(),
     };
-    if (!existingId) state.byEngineItem.set(item.id, itemId);
-    state.items.set(itemId, {
-      item: timeline,
-      engineItemId: item.id,
-      lastFlush: this.now().getTime(),
-    });
-    await this.store.putTimelineItem({
+    const outcome = await this.store.putTimelineItem({
       id: timeline.id,
       projectId: state.projectId,
       threadId,
-      turnId,
+      turnId: timeline.turnId,
       seq: timeline.seq,
       kind,
       title,
@@ -1172,9 +1363,58 @@ export class StudioService {
       status: timeline.status,
       truncated: timeline.truncated,
     });
-    this.emit({ type: 'item', projectId: state.projectId, item: timeline });
+    if (outcome === 'duplicate') {
+      // Another row already owns this sequence number: a replayed event is not a
+      // second event, and it must not replace that row's identity.
+      this.diagnostic(state, `replayed ${item.kind} at seq ${seq} ignored (sequence already recorded)`);
+      return;
+    }
+    state.byEngineItem.set(engineKey, itemId);
+    state.items.set(itemId, {
+      item: timeline,
+      engineItemId: item.id,
+      threadId,
+      lastFlush: this.now().getTime(),
+    });
+    if (completed) {
+      state.completedEngineItems.add(engineKey);
+      if (kind === 'assistant') state.completedStreamTurns.add(streamKey(threadId, turnId));
+      this.releaseStream(state, threadId, turnId, itemId);
+    }
+    this.emit({ type: 'item', projectId: state.projectId, threadId, item: timeline });
     if (bounded.truncated) {
       this.diagnostic(state, `timeline item ${timeline.id} truncated at ${this.maxItemChars} characters`);
+    }
+  }
+
+  /**
+   * The one open anonymous stream for this turn, if exactly one exists. Deltas
+   * the runtime sent without an item id leave a row with no engine identity; a
+   * later completion may take that row over. Anything ambiguous returns null.
+   */
+  private adoptableStream(state: ProjectState, threadId: string, turnId: string | null): string | null {
+    const candidates = new Set<string>();
+    if (turnId) {
+      const scoped = state.streamByTurn.get(streamKey(threadId, turnId));
+      if (scoped) candidates.add(scoped);
+    }
+    for (const [key, itemId] of state.streamByTurn) {
+      if (key.startsWith(`${threadId}:`)) candidates.add(itemId);
+    }
+    const open = [...candidates].filter((id) => {
+      const entry = state.items.get(id);
+      return entry !== undefined && entry.threadId === threadId && entry.item.status === 'streaming';
+    });
+    return open.length === 1 ? (open[0] ?? null) : null;
+  }
+
+  private releaseStream(state: ProjectState, threadId: string, turnId: string | null, itemId: string): void {
+    if (turnId) {
+      const key = streamKey(threadId, turnId);
+      if (state.streamByTurn.get(key) === itemId) state.streamByTurn.delete(key);
+    }
+    for (const [key, value] of state.streamByTurn) {
+      if (key.startsWith(`${threadId}:`) && value === itemId) state.streamByTurn.delete(key);
     }
   }
 
@@ -1187,8 +1427,34 @@ export class StudioService {
     turnId: string | null,
   ): Promise<void> {
     if (!delta) return;
-    const knownId = engineItemId ? state.byEngineItem.get(engineItemId) : undefined;
-    const itemId = knownId ?? `tl_${threadId}_${seq}`;
+    const engineKey = engineItemId ? engineItemKey(threadId, engineItemId) : null;
+    if (engineKey && state.completedEngineItems.has(engineKey)) {
+      this.lateDelta(state, `item ${engineItemId}`, seq);
+      return;
+    }
+    let itemId = engineKey ? state.byEngineItem.get(engineKey) : undefined;
+    if (!itemId) {
+      // An anonymous stream belongs to one turn. Binding it here keeps a
+      // heartbeat or a filtered frame from starting a second answer card.
+      const key = streamKey(threadId, turnId);
+      if (!engineKey && state.completedStreamTurns.has(key)) {
+        // This turn's id-less answer already finished; an id-less frame now is
+        // late, and a new card would be invented text.
+        this.lateDelta(state, `turn ${turnId ?? '(untagged)'}`, seq);
+        return;
+      }
+      const candidate = turnId ? state.streamByTurn.get(key) : undefined;
+      const entry = candidate ? state.items.get(candidate) : undefined;
+      const anonymousOpen =
+        candidate !== undefined &&
+        entry !== undefined &&
+        entry.threadId === threadId &&
+        entry.item.status === 'streaming' &&
+        entry.engineItemId === candidate;
+      itemId = anonymousOpen && candidate !== undefined ? candidate : `tl_${threadId}_${seq}`;
+      if (turnId) state.streamByTurn.set(streamKey(threadId, turnId), itemId);
+      if (engineKey) state.byEngineItem.set(engineKey, itemId);
+    }
     const existing = state.items.get(itemId);
     if (!existing) {
       const bounded = this.bound(delta);
@@ -1206,9 +1472,9 @@ export class StudioService {
       state.items.set(itemId, {
         item,
         engineItemId: engineItemId ?? itemId,
+        threadId,
         lastFlush: this.now().getTime(),
       });
-      if (engineItemId) state.byEngineItem.set(engineItemId, itemId);
       await this.store.putTimelineItem({
         id: item.id,
         projectId: state.projectId,
@@ -1221,12 +1487,19 @@ export class StudioService {
         status: item.status,
         truncated: item.truncated,
       });
-      this.emit({ type: 'delta', projectId: state.projectId, itemId, text: delta, seq });
+      this.emit({ type: 'delta', projectId: state.projectId, threadId, itemId, text: delta, seq });
+      return;
+    }
+    if (FINAL_ITEM_STATUSES.has(existing.item.status ?? '')) {
+      // Text that arrives after its own card was closed is recorded as a late
+      // frame, never appended into a finished answer.
+      this.lateDelta(state, `item ${existing.item.id}`, seq);
       return;
     }
     const bounded = this.bound(existing.item.body + delta);
     existing.item = {
       ...existing.item,
+      turnId: existing.item.turnId ?? turnId,
       body: bounded.text,
       truncated: existing.item.truncated || bounded.truncated,
       status: 'streaming',
@@ -1247,7 +1520,45 @@ export class StudioService {
         truncated: existing.item.truncated,
       });
     }
-    this.emit({ type: 'delta', projectId: state.projectId, itemId, text: delta, seq });
+    this.emit({ type: 'delta', projectId: state.projectId, threadId, itemId, text: delta, seq });
+  }
+
+  private lateDelta(state: ProjectState, what: string, seq: number): void {
+    state.lateDeltas += 1;
+    this.diagnostic(
+      state,
+      `late delta at seq ${seq} for ${what} ignored (${state.lateDeltas} late frame(s) this session)`,
+    );
+  }
+
+  /**
+   * Closes every answer still marked streaming for one thread. Used when the
+   * stream demonstrably lost frames or the runtime stopped: the text shown stays
+   * as it was, and the card is labeled interrupted rather than completed.
+   */
+  private async interruptOpenStreams(state: ProjectState, threadId: string, reason: string): Promise<number> {
+    let closed = 0;
+    for (const entry of state.items.values()) {
+      if (entry.threadId !== threadId) continue;
+      if (!STREAM_OPEN_STATUSES.has(entry.item.status ?? '')) continue;
+      entry.item = { ...entry.item, status: 'interrupted' };
+      closed += 1;
+      await this.store.putTimelineItem({
+        id: entry.item.id,
+        projectId: state.projectId,
+        threadId,
+        turnId: entry.item.turnId,
+        seq: entry.item.seq,
+        kind: entry.item.kind,
+        title: entry.item.title,
+        body: entry.item.body,
+        status: entry.item.status,
+        truncated: entry.item.truncated,
+      });
+      this.emit({ type: 'item', projectId: state.projectId, threadId, item: entry.item });
+    }
+    if (closed > 0) this.diagnostic(state, `closed ${closed} open item(s): ${reason}`);
+    return closed;
   }
 
   private async completeTurn(
@@ -1271,7 +1582,12 @@ export class StudioService {
     for (const key of turnKeys) state.settledTurns.add(key);
 
     for (const entry of state.items.values()) {
-      if (entry.item.turnId && turnKeys.has(entry.item.turnId) && entry.item.status === 'streaming') {
+      if (
+        entry.threadId === threadId &&
+        entry.item.turnId &&
+        turnKeys.has(entry.item.turnId) &&
+        entry.item.status === 'streaming'
+      ) {
         entry.item = { ...entry.item, status: 'completed' };
         await this.store.putTimelineItem({
           id: entry.item.id,
@@ -1285,7 +1601,12 @@ export class StudioService {
           status: entry.item.status,
           truncated: entry.item.truncated,
         });
-        this.emit({ type: 'item', projectId: state.projectId, item: entry.item });
+        // The card is closed: any frame that arrives after this is late, not
+        // text to append to a finished answer.
+        state.completedEngineItems.add(engineItemKey(threadId, entry.engineItemId));
+        state.completedStreamTurns.add(streamKey(threadId, entry.item.turnId));
+        this.releaseStream(state, threadId, entry.item.turnId, entry.item.id);
+        this.emit({ type: 'item', projectId: state.projectId, threadId, item: entry.item });
       }
     }
 
@@ -1315,7 +1636,7 @@ export class StudioService {
     ]
       .filter((line): line is string => typeof line === 'string' && line.length > 0)
       .join('\n');
-    await this.pushItem(state, {
+    await this.pushItem(state, threadId, {
       seq,
       turnId: turn.id,
       kind: 'outcome',
@@ -1429,8 +1750,13 @@ export class StudioService {
     };
   }
 
-  private async pushItem(state: ProjectState, input: Omit<TimelineItem, 'id' | 'at'> & { id?: string }): Promise<void> {
-    const threadId = state.threadId;
+  private async pushItem(
+    state: ProjectState,
+    threadId: string | null,
+    input: Omit<TimelineItem, 'id' | 'at'> & { id?: string },
+  ): Promise<void> {
+    // The event's own thread, not "whatever thread the user is looking at": a
+    // mode switch must never re-home another thread's rows.
     if (!threadId) return;
     const bounded = this.bound(input.body);
     const item: TimelineItem = {
@@ -1447,6 +1773,7 @@ export class StudioService {
     state.items.set(item.id, {
       item,
       engineItemId: item.id,
+      threadId,
       lastFlush: this.now().getTime(),
     });
     await this.store.putTimelineItem({
@@ -1461,7 +1788,7 @@ export class StudioService {
       status: item.status,
       truncated: item.truncated,
     });
-    this.emit({ type: 'item', projectId: state.projectId, item });
+    this.emit({ type: 'item', projectId: state.projectId, threadId, item });
   }
 
   private nextLocalSeq(state: ProjectState): number {
@@ -1521,6 +1848,7 @@ export class StudioService {
     this.emit({
       type: 'state',
       projectId: state.projectId,
+      threadId: state.threadId,
       thread: state.profile ? { ...state.profile } : null,
       run: { ...state.run },
       control: this.controlFor(state),
@@ -1528,12 +1856,18 @@ export class StudioService {
     });
   }
 
-  private renderView(state: ProjectState, items: TimelineItem[], warning: string | null): StudioView {
+  private renderView(
+    state: ProjectState,
+    items: TimelineItem[],
+    history: StudioHistoryWindow,
+    warning: string | null,
+  ): StudioView {
     return {
       projectId: state.projectId,
       sessionId: state.sessionId,
       thread: state.profile ? { ...state.profile } : null,
       items,
+      history,
       run: { ...state.run },
       control: this.controlFor(state),
       pending: state.pending ? { ...state.pending } : null,
@@ -1625,6 +1959,30 @@ export function composePrompt(text: string, references: string[]): string {
   if (references.length === 0) return text;
   const lines = references.map((reference) => `- ${reference}`).join('\n');
   return `${text}\n\nFiles referenced by this request:\n${lines}`;
+}
+
+/** Engine item identity is per thread; two threads may reuse an item id. */
+function engineItemKey(threadId: string, engineItemId: string): string {
+  return `${threadId}:${engineItemId}`;
+}
+
+function streamKey(threadId: string, turnId: string | null): string {
+  return `${threadId}:${turnId ?? 'untagged'}`;
+}
+
+function windowOf(page: TimelinePage): StudioHistoryWindow {
+  return {
+    total: page.total,
+    oldestSeq: page.oldestSeq,
+    newestSeq: page.newestSeq,
+    hasOlder: page.hasOlder,
+    hasNewer: page.hasNewer,
+  };
+}
+
+function boundPageLimit(limit: number | undefined): number {
+  if (typeof limit !== 'number' || !Number.isFinite(limit)) return HISTORY_PAGE;
+  return Math.max(1, Math.min(HISTORY_MAX_PAGE, Math.trunc(limit)));
 }
 
 function formatToolInput(rawInput: string | undefined, detail: string | undefined): string {

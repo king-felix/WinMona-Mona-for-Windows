@@ -37,7 +37,7 @@ const base = {
   thread,
   exportedAt: '2026-11-12T18:05:00.000Z',
   appVersion: '0.1.0',
-  itemBound: 500,
+  totalStored: 2,
 };
 
 describe('conversation export', () => {

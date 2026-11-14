@@ -103,6 +103,16 @@ const bridge = Object.freeze({
   studioPickReferences: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.references, input),
   studioExport: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
     ipcRenderer.invoke(STUDIO_CHANNELS.export, input),
+  studioHistory: (input: {
+    projectId: string;
+    sessionId: string;
+    mode?: 'agent' | 'plan';
+    beforeSeq?: number;
+    aroundSeq?: number;
+    limit?: number;
+  }) => ipcRenderer.invoke(STUDIO_CHANNELS.history, input),
+  studioSearchHistory: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan'; query: string }) =>
+    ipcRenderer.invoke(STUDIO_CHANNELS.search, input),
   changesView: (input: { projectId: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.view, input),
   changesDiff: (input: { projectId: string; path: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.diff, input),
   changesCapture: (input: { projectId: string; label?: string }) => ipcRenderer.invoke(CHANGES_CHANNELS.capture, input),
