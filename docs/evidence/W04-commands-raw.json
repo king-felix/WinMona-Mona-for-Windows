@@ -1,0 +1,2359 @@
+{
+  "schema": 1,
+  "captured_at": "2026-11-14T18:31:47Z",
+  "engine": {
+    "product": "Codewhale",
+    "version": "0.10.2",
+    "commit": "ff466b2ed0bf",
+    "version_line": "codewhale 0.10.2 (ff466b2ed0bf)",
+    "executable": "C:\\Users\\victo\\AppData\\Local\\Microsoft\\WinGet\\Links\\codewhale.exe",
+    "binary_sha256": "578280bec8d6e0ee9cfe97ee29de817535689f4078d8afd47384ff1941b1ee6c",
+    "binary_bytes": 134734336
+  },
+  "route": {
+    "method": "GET",
+    "path": "/v1/commands",
+    "bind": "127.0.0.1",
+    "auth": "ephemeral bearer token, not recorded"
+  },
+  "method": "installed engine started with `app-server --http` on a loopback port in a throwaway CODEWHALE_HOME; one read of /v1/commands; server process tree stopped afterwards",
+  "command_count": 109,
+  "commands": [
+    {
+      "name": "anchor",
+      "aliases": [
+        "maodian"
+      ],
+      "summary": "Pin a fact that stays when Codewhale makes room",
+      "usage": "/anchor <text> | /anchor list | /anchor remove <n>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "advisor",
+      "aliases": [
+        "watchers",
+        "watch"
+      ],
+      "summary": "Toggle the background advisor for this session",
+      "usage": "/advisor [on|off|status]",
+      "subcommands": [
+        "on",
+        "off",
+        "status"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "help",
+      "aliases": [
+        "?",
+        "bangzhu",
+        "帮助"
+      ],
+      "summary": "Commands, skills, and keys",
+      "usage": "/help [command]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "clear",
+      "aliases": [
+        "qingping"
+      ],
+      "summary": "Clear conversation history",
+      "usage": "/clear",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "copy",
+      "aliases": [],
+      "summary": "Copy the last completed assistant response to the clipboard",
+      "usage": "/copy",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "exit",
+      "aliases": [
+        "quit",
+        "q",
+        "tuichu"
+      ],
+      "summary": "Quit",
+      "usage": "/exit",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "model",
+      "aliases": [
+        "moxing",
+        "route"
+      ],
+      "summary": "Switch or show the current model",
+      "usage": "/model [name|refresh|router]",
+      "subcommands": [
+        "refresh",
+        "router"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "router",
+      "aliases": [],
+      "summary": "Set up the per-turn router for Auto model routing",
+      "usage": "/router [jev|fast|off|custom|save]",
+      "subcommands": [
+        "jev",
+        "fast",
+        "off",
+        "custom",
+        "save"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "models",
+      "aliases": [
+        "moxingliebiao"
+      ],
+      "summary": "List live model IDs from the active API",
+      "usage": "/models",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "modeldb",
+      "aliases": [
+        "model-reference",
+        "modelref"
+      ],
+      "summary": "Browse the bundled model database",
+      "usage": "/modeldb",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "provider",
+      "aliases": [],
+      "summary": "Switch provider or model",
+      "usage": "/provider [setup [name]|name [model]]",
+      "subcommands": [
+        "setup"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "queue",
+      "aliases": [
+        "queued"
+      ],
+      "summary": "See or edit queued messages",
+      "usage": "/queue [list|send <n>|edit <n>|drop <n>|clear]",
+      "subcommands": [
+        "list",
+        "send",
+        "edit",
+        "drop",
+        "clear"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "stash",
+      "aliases": [
+        "park"
+      ],
+      "summary": "Park or restore a composer draft",
+      "usage": "/stash [list|pop|clear]",
+      "subcommands": [
+        "list",
+        "pop",
+        "clear"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "hooks",
+      "aliases": [
+        "hook",
+        "gouzi"
+      ],
+      "summary": "Manage lifecycle hooks in Extensions",
+      "usage": "/hooks [list|events|edit|review|approve <digest>|revoke]",
+      "subcommands": [
+        "list",
+        "events",
+        "edit",
+        "review",
+        "approve",
+        "revoke"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "subagents",
+      "aliases": [
+        "agents",
+        "zhinengti"
+      ],
+      "summary": "Shortcut for /fleet workers: this session's agents",
+      "usage": "/subagents [list]",
+      "subcommands": [
+        "list"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "compatibility",
+      "hidden": false
+    },
+    {
+      "name": "fleet",
+      "aliases": [],
+      "summary": "Inspect and set up your Fleet and its agents",
+      "usage": "/fleet [members|setup|teams|workers|help]",
+      "subcommands": [
+        "members",
+        "setup",
+        "teams",
+        "workers",
+        "help"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "lane",
+      "aliases": [
+        "lanes"
+      ],
+      "summary": "Watch and control durable Lanes",
+      "usage": "/lane [list|status <lane-id>|interrupt <lane-id>|restart <lane-id>|resume <lane-id>]",
+      "subcommands": [
+        "list",
+        "status",
+        "interrupt",
+        "restart",
+        "resume"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": true
+    },
+    {
+      "name": "workflow",
+      "aliases": [
+        "wf"
+      ],
+      "summary": "Run a repeatable, ordered workflow",
+      "usage": "/workflow [objective|confirm|run <path>|status [run_id]|cancel [run_id]|settings]",
+      "subcommands": [
+        "objective",
+        "confirm",
+        "run",
+        "status",
+        "cancel",
+        "settings"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "workflows",
+      "aliases": [],
+      "summary": "List or cancel workflow runs here",
+      "usage": "/workflows",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "auto",
+      "aliases": [],
+      "summary": "Work with Auto-Review — skip a goal or workflow",
+      "usage": "/auto",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "hotbar",
+      "aliases": [
+        "hotkeys"
+      ],
+      "summary": "Set up the Hotbar",
+      "usage": "/hotbar",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "setup",
+      "aliases": [],
+      "summary": "Set up providers and preferences",
+      "usage": "/setup [fleet|provider|runtime|constitution|status|hotbar|tools|remote|persistence]",
+      "subcommands": [
+        "fleet",
+        "provider",
+        "runtime",
+        "constitution",
+        "status",
+        "hotbar",
+        "tools",
+        "remote",
+        "persistence"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "constitution",
+      "aliases": [
+        "law"
+      ],
+      "summary": "See and amend your constitution",
+      "usage": "/constitution [status|preview|base|suggestions|ratify <id>|migrate|rollback|bundled|edit|review|repair|repo|explain|posture|help]",
+      "subcommands": [
+        "status",
+        "preview",
+        "base",
+        "suggestions",
+        "ratify",
+        "migrate",
+        "rollback",
+        "bundled",
+        "edit",
+        "review",
+        "repair",
+        "repo",
+        "explain",
+        "posture",
+        "help"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "agent",
+      "aliases": [
+        "daili"
+      ],
+      "summary": "Open a persistent agent session",
+      "usage": "/agent [N] <task>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "links",
+      "aliases": [
+        "dashboard",
+        "api",
+        "lianjie"
+      ],
+      "summary": "Show Codewhale, community, and provider links",
+      "usage": "/links",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "transcript",
+      "aliases": [],
+      "summary": "Open the live transcript overlay",
+      "usage": "/transcript",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "turn",
+      "aliases": [
+        "turns"
+      ],
+      "summary": "Open the whole-turn inspector",
+      "usage": "/turn inspect",
+      "subcommands": [
+        "inspect"
+      ],
+      "takes_arguments": true,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "feedback",
+      "aliases": [],
+      "summary": "Draft and review local issue reports",
+      "usage": "/feedback [bug [focus]|review <id>|edit <id> <change>|feature|security]",
+      "subcommands": [
+        "bug",
+        "review",
+        "edit",
+        "feature",
+        "security"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "hf",
+      "aliases": [
+        "huggingface"
+      ],
+      "summary": "Inspect Hugging Face MCP setup and concepts",
+      "usage": "/hf [mcp <status|setup>|concepts]",
+      "subcommands": [
+        "mcp",
+        "concepts"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "home",
+      "aliases": [
+        "zhuye",
+        "shouye"
+      ],
+      "summary": "Open home without leaving the current conversation",
+      "usage": "/home",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "overview",
+      "aliases": [
+        "stats"
+      ],
+      "summary": "Show the home dashboard",
+      "usage": "/overview",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "workspace",
+      "aliases": [
+        "cwd"
+      ],
+      "summary": "Show or switch the workspace; worktrees opens the manager",
+      "usage": "/workspace [path|worktrees]",
+      "subcommands": [
+        "worktrees"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "profile",
+      "aliases": [
+        "dangan"
+      ],
+      "summary": "Switch to a named config profile",
+      "usage": "/profile <name>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "rlm",
+      "aliases": [
+        "recursive",
+        "digui"
+      ],
+      "summary": "Open a persistent RLM context for a file or text",
+      "usage": "/rlm [N] <file_or_text>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "translate",
+      "aliases": [
+        "translation",
+        "transale"
+      ],
+      "summary": "Toggle output translation",
+      "usage": "/translate",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "voice",
+      "aliases": [
+        "yuyin",
+        "语音"
+      ],
+      "summary": "Dictate into the composer",
+      "usage": "/voice",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "effort",
+      "aliases": [
+        "thinking",
+        "reasoning",
+        "reason"
+      ],
+      "summary": "Set reasoning effort (also /thinking)",
+      "usage": "/effort [<none|minimal|low|medium|high|xhigh|ultra|max|auto|off>]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "voicesend",
+      "aliases": [
+        "voice-send",
+        "yuyinsend",
+        "语音发送"
+      ],
+      "summary": "Toggle voice auto-send: say \"send it\" to submit",
+      "usage": "/voicesend",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "voicecontrol",
+      "aliases": [
+        "voice-control",
+        "yuyincontrol",
+        "语音控制"
+      ],
+      "summary": "Toggle voice control: dictation that knows your draft",
+      "usage": "/voicecontrol",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "pin",
+      "aliases": [
+        "mini",
+        "window-pin"
+      ],
+      "summary": "Pin this window on top",
+      "usage": "/pin",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "rename",
+      "aliases": [
+        "gaiming",
+        "chongmingming"
+      ],
+      "summary": "Rename this session",
+      "usage": "/rename <new title>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "title",
+      "aliases": [
+        "tabtitle",
+        "window-title"
+      ],
+      "summary": "Set the tab and window title shown in the terminal",
+      "usage": "/title [new title|off]",
+      "subcommands": [
+        "new",
+        "off"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "color",
+      "aliases": [
+        "colour"
+      ],
+      "summary": "Set this chat's composer box color",
+      "usage": "/color [red|orange|amber|green|cyan|blue|purple|pink|off]",
+      "subcommands": [
+        "red",
+        "orange",
+        "amber",
+        "green",
+        "cyan",
+        "blue",
+        "purple",
+        "pink",
+        "off"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "save",
+      "aliases": [],
+      "summary": "Save this session to a file",
+      "usage": "/save [path]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "fork",
+      "aliases": [
+        "f"
+      ],
+      "summary": "Fork the active conversation into a sibling session",
+      "usage": "/fork [session_id|picker]",
+      "subcommands": [
+        "picker"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "new",
+      "aliases": [],
+      "summary": "Start a fresh session",
+      "usage": "/new [--force]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "sessions",
+      "aliases": [],
+      "summary": "Open session history; archive and prune manage old ones",
+      "usage": "/sessions [show|open <id>|archive <id>|unarchive <id>|prune <days>]",
+      "subcommands": [
+        "show",
+        "open",
+        "archive",
+        "unarchive",
+        "prune"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "load",
+      "aliases": [
+        "jiazai"
+      ],
+      "summary": "Load a session from file",
+      "usage": "/load [path]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "resume",
+      "aliases": [
+        "r"
+      ],
+      "summary": "Resume a session, or import a session JSON file",
+      "usage": "/resume [session_id|path/to/export.json]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "tree",
+      "aliases": [],
+      "summary": "Show session history as a tree (leaf = active branch)",
+      "usage": "/tree [interactive]",
+      "subcommands": [
+        "interactive"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "branch",
+      "aliases": [],
+      "summary": "Point the branch at an entry without rewriting history",
+      "usage": "/branch <entry_id>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "compact",
+      "aliases": [
+        "yasuo"
+      ],
+      "summary": "Shrink the context to free space",
+      "usage": "/compact [focus]",
+      "subcommands": [
+        "focus"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "purge",
+      "aliases": [
+        "qingchu"
+      ],
+      "summary": "Let the agent prune or offload history to free context",
+      "usage": "/purge",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "relay",
+      "aliases": [
+        "batonpass",
+        "接力"
+      ],
+      "summary": "Create a session relay for a fresh thread",
+      "usage": "/relay [focus]",
+      "subcommands": [
+        "focus"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "rc",
+      "aliases": [
+        "remote-control"
+      ],
+      "summary": "Resume this exact session from your Codewhale web account",
+      "usage": "/rc [status|link|open|stop]",
+      "subcommands": [
+        "status",
+        "link",
+        "open",
+        "stop"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "remote-env",
+      "aliases": [],
+      "summary": "Open new hosted Work from a GitHub or CNB branch tip",
+      "usage": "/remote-env [open]",
+      "subcommands": [
+        "open"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "export",
+      "aliases": [
+        "daochu"
+      ],
+      "summary": "Copy a safe export, or write it to a file",
+      "usage": "/export [clipboard|file [--force] <path>|turn [clipboard|file [--force] <path>]]",
+      "subcommands": [
+        "clipboard",
+        "file",
+        "turn"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "structcopy",
+      "aliases": [],
+      "summary": "Copy one session object as redacted JSON; not a model tool",
+      "usage": "/structcopy <turn <n>|tool <call-id>|plan|workflow <run-id>> [stdout]",
+      "subcommands": [
+        "turn",
+        "tool",
+        "plan",
+        "workflow"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "config",
+      "aliases": [],
+      "summary": "Inspect and change settings — raw keys under advanced detail",
+      "usage": "/config [ask-rules|status|<key> [value]]",
+      "subcommands": [
+        "ask-rules",
+        "status"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "import-claude",
+      "aliases": [
+        "import_claude"
+      ],
+      "summary": "Plan a reviewable import of Claude Code settings and servers",
+      "usage": "/import-claude [--apply]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "permissions",
+      "aliases": [
+        "permission-rules",
+        "permission_rules"
+      ],
+      "summary": "List and safely remove permission rules",
+      "usage": "/permissions [list|remove <rule-number> [--confirm <token>]]",
+      "subcommands": [
+        "list",
+        "remove"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "login",
+      "aliases": [],
+      "summary": "Sign in to Codewhale or store provider keys",
+      "usage": "/login [status|account|key]",
+      "subcommands": [
+        "status",
+        "account"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "connect",
+      "aliases": [],
+      "summary": "Connect a plugin provider with browser sign-in",
+      "usage": "/connect [<provider>]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "disconnect",
+      "aliases": [],
+      "summary": "Remove a plugin provider's local sign-in",
+      "usage": "/disconnect <provider>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "auth",
+      "aliases": [],
+      "summary": "Manage provider sign-in",
+      "usage": "/auth xai-device|chatgpt|chatgpt-revoke|claude|claude-revoke|orcarouter|orcarouter-revoke",
+      "subcommands": [
+        "xai-device",
+        "chatgpt",
+        "chatgpt-revoke",
+        "claude",
+        "claude-revoke",
+        "orcarouter",
+        "orcarouter-revoke"
+      ],
+      "takes_arguments": true,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "workbar",
+      "aliases": [
+        "rail",
+        "sidebar"
+      ],
+      "summary": "Place the workbar (bottom/top/left/right/off)",
+      "usage": "/workbar [bottom|top|left|right|off|tasks|agents|context|pinned] [--save]",
+      "subcommands": [
+        "bottom",
+        "top",
+        "left",
+        "right",
+        "off",
+        "tasks",
+        "agents",
+        "context",
+        "pinned"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "pet",
+      "aliases": [],
+      "summary": "Use the animated pet as your main Codewhale view",
+      "usage": "/pet [on|off|inspect|status|appearance|style [smooth|pixel]|language [auto|en|zh-Hans|zh-Hant|ja]|window|source|export|sound [on|off]|avatar [whale|cove|braille|pixels|particles|whale-girl|key]|action [name|live]|view [name|live]]",
+      "subcommands": [
+        "on",
+        "off",
+        "inspect",
+        "status",
+        "appearance",
+        "style",
+        "language",
+        "window",
+        "source",
+        "export",
+        "sound",
+        "avatar",
+        "action",
+        "view"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "settings",
+      "aliases": [],
+      "summary": "Open settings",
+      "usage": "/settings [text]",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "status",
+      "aliases": [],
+      "summary": "Show session status",
+      "usage": "/status",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "statusline",
+      "aliases": [],
+      "summary": "Choose footer items",
+      "usage": "/statusline",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "mode",
+      "aliases": [
+        "jihua",
+        "zidong"
+      ],
+      "summary": "Switch permissions or open the mode picker",
+      "usage": "/mode [work|plan|operate|1|2|3]",
+      "subcommands": [
+        "work",
+        "plan",
+        "operate",
+        "1",
+        "2",
+        "3"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "fullscreen",
+      "aliases": [],
+      "summary": "Fill the whole terminal (alternate screen)",
+      "usage": "/fullscreen",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "inline",
+      "aliases": [],
+      "summary": "Stay inline, keeping the terminal's scrollback",
+      "usage": "/inline",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "theme",
+      "aliases": [],
+      "summary": "Pick a theme",
+      "usage": "/theme [name|underwater|custom:<name>|schema|path]",
+      "subcommands": [
+        "underwater",
+        "custom",
+        "schema"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "verbose",
+      "aliases": [],
+      "summary": "Toggle live thinking in the transcript",
+      "usage": "/verbose [on|off]",
+      "subcommands": [
+        "on",
+        "off"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "trust",
+      "aliases": [
+        "xinren"
+      ],
+      "summary": "Change file trust for this session; --save also persists trust for project skills, commands, hooks, MCP servers, and context",
+      "usage": "/trust [on|off [--save]|add <path>|remove <path>|list]",
+      "subcommands": [
+        "on",
+        "off",
+        "add",
+        "remove",
+        "list"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "logout",
+      "aliases": [],
+      "summary": "Sign out and return to setup",
+      "usage": "/logout",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "tokens",
+      "aliases": [],
+      "summary": "Show token usage",
+      "usage": "/tokens",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "cost",
+      "aliases": [],
+      "summary": "Show session cost breakdown",
+      "usage": "/cost",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "receipts",
+      "aliases": [
+        "receipt"
+      ],
+      "summary": "Show what this session did: files, commands, approvals",
+      "usage": "/receipts [json] [<turn>]",
+      "subcommands": [
+        "json"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "balance",
+      "aliases": [],
+      "summary": "Check your provider account balance",
+      "usage": "/balance",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "cache",
+      "aliases": [],
+      "summary": "Show cache hit/miss stats for recent turns",
+      "usage": "/cache [count|inspect|stats|zones|warmup]",
+      "subcommands": [
+        "count",
+        "inspect",
+        "stats",
+        "zones",
+        "warmup"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "preview-request",
+      "aliases": [
+        "dryrun",
+        "preview_request"
+      ],
+      "summary": "Preview the next request (redacted) without sending it",
+      "usage": "/preview-request [json] [--prompt <text>]",
+      "subcommands": [
+        "json"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "tools",
+      "aliases": [
+        "tool-studio"
+      ],
+      "summary": "Inspect the latest prepared tool request (read-only)",
+      "usage": "/tools [text|json]",
+      "subcommands": [
+        "json"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "change",
+      "aliases": [],
+      "summary": "Show what's new",
+      "usage": "/change [version]",
+      "subcommands": [
+        "version"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "system",
+      "aliases": [
+        "xitong"
+      ],
+      "summary": "Show the system prompt",
+      "usage": "/system",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "context",
+      "aliases": [
+        "ctx"
+      ],
+      "summary": "Open the context inspector",
+      "usage": "/context [report|json|prompt-json|summary]",
+      "subcommands": [
+        "report",
+        "json",
+        "prompt-json",
+        "summary"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "edit",
+      "aliases": [],
+      "summary": "Edit and resend your last message",
+      "usage": "/edit",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "diff",
+      "aliases": [],
+      "summary": "Show changes since this session started",
+      "usage": "/diff",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "undo",
+      "aliases": [],
+      "summary": "Undo your last request and its file changes",
+      "usage": "/undo [force]",
+      "subcommands": [
+        "force"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "retry",
+      "aliases": [
+        "chongshi"
+      ],
+      "summary": "Retry the last request",
+      "usage": "/retry",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "init",
+      "aliases": [],
+      "summary": "Generate AGENTS.md for this project",
+      "usage": "/init",
+      "subcommands": [],
+      "takes_arguments": false,
+      "requires_argument": false,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": false,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "lsp",
+      "aliases": [],
+      "summary": "Toggle LSP diagnostics",
+      "usage": "/lsp [on|off|status]",
+      "subcommands": [
+        "on",
+        "off",
+        "status"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "share",
+      "aliases": [],
+      "summary": "Share this session as a web URL",
+      "usage": "/share [confirm]",
+      "subcommands": [
+        "confirm"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "goal",
+      "aliases": [],
+      "summary": "Work toward one objective across turns",
+      "usage": "/goal [objective|status|pause|resume|done|blocked|clear] [budget: N]",
+      "subcommands": [
+        "objective",
+        "status",
+        "pause",
+        "resume",
+        "done",
+        "blocked",
+        "clear"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "skills",
+      "aliases": [
+        "jinengliebiao"
+      ],
+      "summary": "List local skills or browse the curated registry",
+      "usage": "/skills [manage|--remote|sync|inspect|suggest <task>|<prefix>]  (bare opens Extensions)",
+      "subcommands": [
+        "manage",
+        "sync",
+        "inspect",
+        "suggest"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "skill",
+      "aliases": [
+        "jineng"
+      ],
+      "summary": "Use, install, or trust a skill",
+      "usage": "/skill <name|install <spec>|update <name>|uninstall <name>|trust <name>>",
+      "subcommands": [
+        "install",
+        "update",
+        "uninstall",
+        "trust"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "review",
+      "aliases": [
+        "shencha"
+      ],
+      "summary": "Run a structured code review on a file, diff, or PR",
+      "usage": "/review <target>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "restore",
+      "aliases": [],
+      "summary": "Roll the workspace back to a turn snapshot",
+      "usage": "/restore [N|list [N]]",
+      "subcommands": [
+        "list"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "note",
+      "aliases": [],
+      "summary": "Jot, list, edit, or drop workspace notes",
+      "usage": "/note [add|list|show|edit|remove|clear|path]",
+      "subcommands": [
+        "add",
+        "list",
+        "show",
+        "edit",
+        "remove",
+        "clear"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "memory",
+      "aliases": [],
+      "summary": "Inspect or manage persistent structured user memory",
+      "usage": "/memory [status|path|search|get|remember|import|export|reindex|clear|help]",
+      "subcommands": [
+        "status",
+        "search",
+        "get",
+        "remember",
+        "import",
+        "export",
+        "reindex",
+        "clear",
+        "help"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "plugin",
+      "aliases": [
+        "plugins",
+        "extensions"
+      ],
+      "summary": "Manage trusted plugin bundles (legacy tools stay separate)",
+      "usage": "/plugin [list|show|suggest|validate|export|install|import|update|uninstall|trust|enable|disable|revoke|reload|doctor|tools|marketplace|dismissals]",
+      "subcommands": [
+        "list",
+        "show",
+        "suggest",
+        "validate",
+        "export",
+        "install",
+        "import",
+        "update",
+        "uninstall",
+        "trust",
+        "enable",
+        "disable",
+        "revoke",
+        "reload",
+        "doctor",
+        "tools",
+        "marketplace",
+        "dismissals"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "attach",
+      "aliases": [
+        "image",
+        "media",
+        "fujian"
+      ],
+      "summary": "Attach media (@path for text files or folders)",
+      "usage": "/attach <path>",
+      "subcommands": [],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": true,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": false,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "automation",
+      "aliases": [
+        "automations",
+        "scheduled"
+      ],
+      "summary": "Manage scheduled automations; list opens the manager",
+      "usage": "/automation [list|show <id>|print <id>|pause <id>|resume <id>|delete <id> [--confirm <token>]|run <id>]",
+      "subcommands": [
+        "list",
+        "show",
+        "print",
+        "pause",
+        "resume",
+        "delete",
+        "run"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "task",
+      "aliases": [
+        "tasks"
+      ],
+      "summary": "Manage background tasks",
+      "usage": "/task [add <prompt>|list|digest|show <id>|cancel <id>]",
+      "subcommands": [
+        "add",
+        "list",
+        "digest",
+        "show",
+        "cancel"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "jobs",
+      "aliases": [
+        "job",
+        "zuoye"
+      ],
+      "summary": "Manage background shell jobs",
+      "usage": "/jobs [list|show <id>|poll <id>|wait <id>|stdin <id> <input>|cancel <id|all>]",
+      "subcommands": [
+        "list",
+        "show",
+        "poll",
+        "wait",
+        "stdin",
+        "cancel"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "mcp",
+      "aliases": [
+        "mcps"
+      ],
+      "summary": "Open or manage MCP servers; init adds one, doctor checks it",
+      "usage": "/mcp [init|import|import approve <name>|import decline <name>|recommendations|add recommended <id>|add stdio <name> <command> [args...]|add http <name> <url>|enable <name>|disable <name>|remove <name>|retry <name>|doctor|validate|restart|reload]",
+      "subcommands": [
+        "init",
+        "import",
+        "recommendations",
+        "add",
+        "enable",
+        "disable",
+        "remove",
+        "retry",
+        "doctor",
+        "validate",
+        "restart",
+        "reload"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    },
+    {
+      "name": "network",
+      "aliases": [],
+      "summary": "Manage network allow/deny rules",
+      "usage": "/network [list|allow <host>|deny <host>|remove <host>|default <allow|deny|prompt>]",
+      "subcommands": [
+        "list",
+        "allow",
+        "deny",
+        "remove",
+        "default"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": false,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "advanced",
+      "hidden": false
+    },
+    {
+      "name": "update",
+      "aliases": [
+        "upgrade"
+      ],
+      "summary": "Check for and install a new Codewhale release",
+      "usage": "/update [check|install]",
+      "subcommands": [
+        "check",
+        "install"
+      ],
+      "takes_arguments": true,
+      "requires_argument": true,
+      "requires_required_argument": false,
+      "composer_wants_trailing_space": true,
+      "palette_runs_directly": true,
+      "show_in_empty_discovery": true,
+      "kind": "builtin",
+      "binding": "host",
+      "discovery": "primary",
+      "hidden": false
+    }
+  ]
+}

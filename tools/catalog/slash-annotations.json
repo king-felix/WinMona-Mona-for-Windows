@@ -1,0 +1,188 @@
+{
+  "schema": 1,
+  "note": "Curated classification of the pinned engine's slash-command registry. Every row captured from GET /v1/commands must appear in exactly one group or in `commands`. tools/build/slash-catalog.mjs refuses an unannotated row, an annotation naming a command the engine does not have, and an alias that collides.",
+  "defaults": {
+    "costClass": "unknown",
+    "route": "tui-only",
+    "sideEffects": "The engine documentation for this command does not state whether it changes state; treat it as consequential until read.",
+    "routeNote": "The pinned engine implements this command in its own terminal UI. Mona describes it here and does not run it; the terminal drawer is where the engine's own help applies."
+  },
+  "groups": [
+    {
+      "label": "model work",
+      "costClass": "model",
+      "sideEffects": "Sends a provider request: it spends tokens on the configured route. Some variants also change files (review, init, edit, restore-like undo).",
+      "commands": [
+        "compact",
+        "purge",
+        "review",
+        "init",
+        "retry",
+        "edit",
+        "agent",
+        "rlm",
+        "goal",
+        "relay",
+        "task",
+        "workflow",
+        "advisor",
+        "feedback"
+      ]
+    },
+    {
+      "label": "declared cost unknown",
+      "costClass": "unknown",
+      "sideEffects": "May send a provider request depending on its arguments or an external service's response; the registry summary does not settle it, so Mona does not claim zero cost.",
+      "commands": [
+        "cache",
+        "translate",
+        "voice",
+        "voicesend",
+        "voicecontrol",
+        "share",
+        "rc",
+        "remote-env",
+        "fleet",
+        "lane",
+        "subagents",
+        "automation",
+        "skill",
+        "skills",
+        "mcp",
+        "plugin",
+        "hooks",
+        "hf",
+        "setup",
+        "update",
+        "login",
+        "connect",
+        "disconnect",
+        "auth",
+        "logout",
+        "balance",
+        "models",
+        "constitution",
+        "queue",
+        "stash",
+        "memory"
+      ]
+    },
+    {
+      "label": "local read",
+      "costClass": "none",
+      "sideEffects": "Reads local session or engine state. No provider request and no file change.",
+      "commands": [
+        "help",
+        "copy",
+        "modeldb",
+        "links",
+        "overview",
+        "transcript",
+        "turn",
+        "home",
+        "status",
+        "tokens",
+        "receipts",
+        "tools",
+        "change",
+        "system",
+        "context",
+        "diff",
+        "sessions",
+        "tree",
+        "statusline",
+        "preview-request",
+        "structcopy",
+        "import-claude",
+        "cost",
+        "workflows"
+      ]
+    },
+    {
+      "label": "session or configuration change",
+      "costClass": "none",
+      "sideEffects": "Changes session, window, or Codewhale configuration state. No provider request is made by the command itself.",
+      "commands": [
+        "model",
+        "router",
+        "provider",
+        "profile",
+        "config",
+        "trust",
+        "network",
+        "permissions",
+        "mode",
+        "effort",
+        "verbose",
+        "auto",
+        "lsp",
+        "workbar",
+        "hotbar",
+        "theme",
+        "color",
+        "pet",
+        "title",
+        "rename",
+        "pin",
+        "settings",
+        "fullscreen",
+        "inline",
+        "clear",
+        "new",
+        "fork",
+        "resume",
+        "load",
+        "branch",
+        "save",
+        "export",
+        "attach",
+        "note",
+        "workspace",
+        "jobs",
+        "anchor",
+        "exit"
+      ]
+    },
+    {
+      "label": "workspace rollback",
+      "costClass": "none",
+      "sideEffects": "Changes files in the workspace: it rolls the working tree back to a recorded point. No provider request is made by the command itself.",
+      "commands": ["undo", "restore"]
+    }
+  ],
+  "commands": {
+    "compact": {
+      "routeNote": "Compaction is a provider request over this thread's context. Mona does not run it from the composer; it is handled by the terminal drawer or a later qualified route."
+    },
+    "new": {
+      "costClass": "none",
+      "sideEffects": "Starts a fresh engine conversation. History, drafts and usage records remain; no provider request is made until the new conversation is used.",
+      "routeNote": "Mona owns conversation creation, so this row is the bridge to a qualified operation in W05. Until that dispatch exists, the text stays visible and is not sent to the model."
+    },
+    "help": {
+      "costClass": "none",
+      "routeNote": "Mona's own autocomplete exposes the same catalog. The engine's /help output belongs to its terminal UI."
+    },
+    "exit": {
+      "costClass": "none",
+      "routeNote": "Quitting the engine's terminal UI is not Mona's close action. Mona's own quit flow is the window's; this row explains the engine's spelling only."
+    },
+    "fullscreen": {
+      "routeNote": "The engine's alternate terminal screen is not the desktop window's fullscreen state; W06 owns the native window operation."
+    },
+    "inline": {
+      "routeNote": "The engine's inline/scrollback mode is a terminal concern; it has no desktop-window equivalent."
+    },
+    "settings": {
+      "routeNote": "Mona has its own Settings section; the engine's settings surface stays available in the terminal drawer."
+    },
+    "theme": {
+      "routeNote": "Mona applies its own appearance settings; the engine's theme applies to its terminal UI."
+    },
+    "attach": {
+      "costClass": "none",
+      "sideEffects": "Adds a media or file reference to the engine session. It does not send a request by itself.",
+      "routeNote": "Mona's own file references are project-relative text; the engine's media attachment is a different, terminal-side mechanism."
+    }
+  }
+}

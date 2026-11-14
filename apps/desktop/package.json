@@ -28,6 +28,7 @@
     "a11y": "node scripts/a11y.mjs",
     "appearance": "node scripts/appearance.mjs",
     "composer": "node scripts/composer.mjs",
+    "slash": "node scripts/slash.mjs",
     "surfaces": "node scripts/surfaces.mjs"
   },
   "dependencies": {

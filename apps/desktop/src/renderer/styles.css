@@ -1754,3 +1754,89 @@ body {
   outline-offset: 2px;
   background: var(--surface-raised, var(--surface));
 }
+
+/* --- W04: descriptive slash-command autocomplete --- */
+
+.command-list {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.command-list-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+}
+
+.command-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.command-row {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.command-row:last-child {
+  border-bottom: 0;
+}
+
+.command-row.selected {
+  background: var(--info-soft);
+  box-shadow: inset 3px 0 0 var(--focus);
+}
+
+.command-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.command-name {
+  font-weight: 600;
+}
+
+.command-aliases {
+  font-size: 0.85em;
+}
+
+.command-summary {
+  margin: 0;
+}
+
+.command-usage {
+  margin: 0;
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
+}
+
+.command-catalog {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2);
+}
+
+.command-catalog-list {
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.command-catalog-row {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}

@@ -1,8 +1,9 @@
 // @vitest-environment happy-dom
-import { act } from 'react';
+import { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CatalogProject } from '../shared/catalog.js';
+import type { CatalogProject, EngineView } from '../shared/catalog.js';
+import type { AppInfo } from '../shared/ipc.js';
 import type { StudioView } from '../shared/studio.js';
 import { StudioPanel } from './StudioPanel.js';
 
@@ -96,6 +97,20 @@ const studioHandlers: EventHandler[] = [];
 function installBridge(next: StudioView, overrides: BridgeOverrides = {}): void {
   (window as unknown as { mona: unknown }).mona = {
     studioGet: vi.fn(async () => ({ ok: true as const, data: next })),
+    studioSubmit: vi.fn(async () => ({
+      ok: true as const,
+      data: {
+        submissionId: 'sub_test',
+        threadId: 'thr_current',
+        turnId: 'turn_test',
+        state: 'accepted',
+        replayed: false,
+        reconciliation: { required: false },
+        prompt: 'sent',
+        thread: null,
+        run: { state: 'running', detail: 'accepted', turnId: 'turn_test', submission: null, startedAt: null },
+      },
+    })),
     studioHistory: vi.fn(
       overrides.history ??
         (async () => ({
@@ -122,6 +137,7 @@ function installBridge(next: StudioView, overrides: BridgeOverrides = {}): void 
 }
 
 beforeEach(() => {
+  (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
   studioHandlers.length = 0;
   container = document.createElement('div');
   document.body.append(container);
@@ -399,5 +415,244 @@ describe('StudioPanel stored history', () => {
     await render(view(5, { history: { total: 5, oldestSeq: 1, newestSeq: 5, hasOlder: false, hasNewer: false } }));
     expect(container.querySelector('[data-testid="timeline-beginning"]')).not.toBeNull();
     expect(container.querySelector('[data-testid="timeline-older"]')).toBeNull();
+  });
+});
+
+const connectedEngine: EngineView = {
+  state: 'connected',
+  detail: 'Owned runtime is ready.',
+  workspace: project.canonicalPath,
+  pid: 42,
+  endpoint: 'http://127.0.0.1:7801',
+  compatibility: 'qualified',
+};
+
+const liveInfo = {
+  localState: { available: true, schemaVersion: 1, detail: 'Local state is open.' },
+  permission: { label: 'Full Access' },
+  credentials: { detail: 'Codewhale manages credentials.' },
+} as unknown as AppInfo;
+
+function Interactive({ initialDraft = '' }: { initialDraft?: string }): React.JSX.Element {
+  const [draft, setDraftValue] = useState(initialDraft);
+  return (
+    <StudioPanel
+      info={liveInfo}
+      project={project}
+      engine={connectedEngine}
+      spend={null}
+      draft={draft}
+      sessionId="ses_1"
+      ui={null}
+      busy={null}
+      onDraft={setDraftValue}
+      onOpenFolder={() => undefined}
+      onStart={() => undefined}
+      onStop={() => undefined}
+      onNewSession={() => undefined}
+      onLocate={() => undefined}
+      onDraftSent={() => undefined}
+      onSpendRefresh={() => undefined}
+    />
+  );
+}
+
+async function renderInteractive(next: StudioView, initialDraft = ''): Promise<void> {
+  installBridge(next);
+  await act(async () => {
+    root.render(<Interactive initialDraft={initialDraft} />);
+  });
+  await act(async () => {
+    await Promise.resolve();
+  });
+}
+
+async function typeIntoComposer(value: string): Promise<HTMLTextAreaElement> {
+  const textarea = container.querySelector('#draft') as HTMLTextAreaElement;
+  const setter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
+  await act(async () => {
+    setter?.call(textarea, value);
+    textarea.setSelectionRange(value.length, value.length);
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  return textarea;
+}
+
+async function press(textarea: HTMLTextAreaElement, key: string, options: KeyboardEventInit = {}): Promise<boolean> {
+  let prevented = false;
+  await act(async () => {
+    const event = new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true, ...options });
+    textarea.dispatchEvent(event);
+    prevented = event.defaultPrevented;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  });
+  return prevented;
+}
+
+function submitCalls(): number {
+  return (window.mona.studioSubmit as unknown as { mock?: { calls: unknown[] } }).mock?.calls.length ?? 0;
+}
+
+describe('StudioPanel slash commands', () => {
+  it('lists the engine catalogue with descriptions when a slash starts a line', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('/');
+    const list = container.querySelector('[data-testid="slash-command-list"]');
+    expect(list).not.toBeNull();
+    const first = list?.querySelector('.command-row');
+    expect(first?.textContent).toContain('/');
+    expect(first?.textContent).toContain('terminal only');
+    expect(first?.textContent).toMatch(/no request|provider request|cost unknown/);
+    expect(container.querySelector('[data-testid="slash-command-count"]')?.textContent).toMatch(/commands\. ↑↓ choose/);
+
+    await typeIntoComposer('/model');
+    const model = container.querySelector('[data-testid="slash-command-model"]');
+    expect(model?.textContent).toContain('/model');
+    expect(model?.textContent).toContain('Switch or show the current model');
+  });
+
+  it('filters locally and offers an honest empty state', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('/zz');
+    expect(container.querySelector('[data-testid="slash-command-count"]')?.textContent).toContain('No command matches');
+  });
+
+  it('fills the highlighted command with Tab', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/models');
+    expect(container.querySelector('[data-testid="slash-command-models"]')).not.toBeNull();
+    await press(textarea, 'Tab');
+    const next = container.querySelector('#draft') as HTMLTextAreaElement;
+    expect(next.value).toBe('/models');
+    expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
+  });
+
+  it('closes on Escape without touching the draft or interrupting work', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/mo');
+    const prevented = await press(textarea, 'Escape');
+    expect(prevented).toBe(true);
+    expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
+    expect((container.querySelector('#draft') as HTMLTextAreaElement).value).toBe('/mo');
+    expect(submitCalls()).toBe(0);
+  });
+
+  it('keeps plain Enter a newline while the list is open', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/mo');
+    const prevented = await press(textarea, 'Enter');
+    expect(prevented).toBe(false);
+    expect(submitCalls()).toBe(0);
+    expect(container.querySelector('[data-testid="slash-command-list"]')).not.toBeNull();
+  });
+
+  it('fills a command on pointer selection', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('/cost');
+    const option = container.querySelector('[data-testid="slash-command-cost"]') as HTMLElement | null;
+    expect(option).not.toBeNull();
+    await act(async () => {
+      option?.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect((container.querySelector('#draft') as HTMLTextAreaElement).value).toBe('/cost');
+  });
+
+  it('refuses to send a recognized command and says what is left to do', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/new');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(submitCalls()).toBe(0);
+    const text = document.body.textContent ?? '';
+    expect(text.includes('/new is a Codewhale command')).toBe(true);
+    expect(text.includes('Start it with \\/ to send it to the model as ordinary text')).toBe(true);
+  });
+
+  it('refuses an ambiguous prefix instead of executing a different command', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/mod');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(submitCalls()).toBe(0);
+    const text = document.body.textContent ?? '';
+    expect(text.includes('“/mod” is not a command. It could be: /mode, /model, /modeldb, /models')).toBe(true);
+  });
+
+  it('names the missing argument for a command that requires one', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/review');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(submitCalls()).toBe(0);
+    expect((document.body.textContent ?? '').includes('It needs an argument: /review <target>')).toBe(true);
+  });
+
+  it('sends ordinary prose, paths and pasted code as text', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('Please review C:\\work\\mona and /usr/bin/env');
+    expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(submitCalls()).toBe(1);
+  });
+
+  it('sends an escaped command literally and says the backslash was an escape', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('\\/new');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    expect(submitCalls()).toBe(1);
+    const call = (window.mona.studioSubmit as unknown as { mock: { calls: Array<[{ text: string }]> } }).mock
+      .calls[0]?.[0];
+    expect(call?.text).toBe('/new');
+    expect((document.body.textContent ?? '').includes('the runtime received the command text literally')).toBe(true);
+  });
+
+  it('shows the whole catalog with cost class and route, including hidden rows', async () => {
+    await renderInteractive(view(0));
+    const catalog = container.querySelector('.command-catalog');
+    expect(catalog?.textContent).toContain('109 engine commands');
+    expect(container.querySelector('[data-testid="catalog-new"]')?.textContent).toContain('/new');
+    expect(container.querySelector('[data-testid="catalog-compact"]')?.textContent).toContain('provider request');
+    expect(container.querySelector('[data-testid="catalog-status"]')?.textContent).toContain('terminal only');
+  });
+});
+
+describe('StudioPanel slash command semantics', () => {
+  it('exposes a listbox to assistive technology without stealing plain Enter', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('/model');
+    const textarea = container.querySelector('#draft') as HTMLTextAreaElement;
+    expect(textarea.getAttribute('role')).toBe('combobox');
+    expect(textarea.getAttribute('aria-autocomplete')).toBe('list');
+    expect(textarea.getAttribute('aria-expanded')).toBe('true');
+    expect(textarea.getAttribute('aria-controls')).toBe('slash-command-list');
+    expect(textarea.getAttribute('aria-activedescendant')).toBe('slash-command-model');
+    const list = container.querySelector('#slash-command-list');
+    expect(list?.getAttribute('role')).toBe('listbox');
+    const options = list?.querySelectorAll('[role="option"]') ?? [];
+    expect(options.length).toBeGreaterThan(0);
+    expect(options[0]?.getAttribute('aria-selected')).toBe('true');
+    expect(container.querySelector('[data-testid="slash-command-count"]')?.getAttribute('aria-live')).toBe('polite');
+  });
+
+  it('replaces the whole token when the caret sits in the middle', async () => {
+    await renderInteractive(view(0));
+    const textarea = await typeIntoComposer('/models tail');
+    await act(async () => {
+      textarea.setSelectionRange(3, 3);
+      textarea.dispatchEvent(new Event('select', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    });
+    await press(textarea, 'Tab');
+    expect((container.querySelector('#draft') as HTMLTextAreaElement).value).toBe('/models tail');
+  });
+
+  it('does not open the list inside a fenced code block line that is indented', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('    /new');
+    expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
+  });
+
+  it('does not open on a second line that is a Windows path', async () => {
+    await renderInteractive(view(0));
+    await typeIntoComposer('Look here:\nC:\\work\\mona');
+    expect(container.querySelector('[data-testid="slash-command-list"]')).toBeNull();
   });
 });

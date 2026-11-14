@@ -3,6 +3,15 @@ import { Badge, Button, EmptyState, ErrorState, Markdown, Notification, type Ton
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
 import type { CatalogProject, EngineView, ProjectSpend, PromptFavorite, UiStateView } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import {
+  acceptedCommand,
+  commandContext,
+  filterCommands,
+  interpretCommandInput,
+  routeSentence,
+  type SlashCommandRow,
+} from '../shared/slash.js';
+import { SLASH_CATALOG, SLASH_CATALOG_PROVENANCE } from '../shared/slash-catalog.js';
 import type {
   StudioEvent,
   StudioHistoryWindow,
@@ -170,6 +179,10 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [searching, setSearching] = useState(false);
   const [highlightSeq, setHighlightSeq] = useState<number | null>(null);
   const [unread, setUnread] = useState(0);
+  const [caret, setCaret] = useState(0);
+  const [commandIndex, setCommandIndex] = useState(0);
+  const [commandDismissed, setCommandDismissed] = useState(false);
+  const [catalogQuery, setCatalogQuery] = useState('');
   const timelineRef = useRef<HTMLDivElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const lastDelta = useRef<Map<string, number>>(new Map());
@@ -194,6 +207,8 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     setSearchQuery('');
     setUnread(0);
     setHighlightSeq(null);
+    setCommandDismissed(false);
+    setCommandIndex(0);
     lastDelta.current.clear();
     followScroll.current = true;
   }, [projectId, sessionId, mode]);
@@ -203,6 +218,38 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       if (highlightTimer.current) clearTimeout(highlightTimer.current);
     },
     [],
+  );
+
+  // The autocomplete is a local filter over the shipped catalog. It opens only
+  // in a command position and never calls the engine or a model.
+  const commandAt = useMemo(() => commandContext(draft, caret), [caret, draft]);
+  const commandListOpen = commandAt !== null && !commandDismissed;
+  const commandCandidates = useMemo(
+    () => (commandListOpen ? filterCommands(SLASH_CATALOG, commandAt?.query ?? '') : []),
+    [commandAt, commandListOpen],
+  );
+  const commandSelectedIndex =
+    commandCandidates.length === 0 ? -1 : Math.min(commandIndex, commandCandidates.length - 1);
+  const commandSelected: SlashCommandRow | null = commandCandidates[commandSelectedIndex] ?? null;
+
+  const acceptCommand = useCallback(
+    (row: SlashCommandRow) => {
+      if (!commandAt) return;
+      const insertion = acceptedCommand(row);
+      const next = `${draft.slice(0, commandAt.from)}${insertion}${draft.slice(commandAt.to)}`;
+      const nextCaret = commandAt.from + insertion.length;
+      props.onDraft(next);
+      setCaret(nextCaret);
+      setCommandIndex(0);
+      setCommandDismissed(true);
+      requestAnimationFrame(() => {
+        const node = composerRef.current;
+        if (!node) return;
+        node.focus();
+        node.setSelectionRange(nextCaret, nextCaret);
+      });
+    },
+    [commandAt, draft, props],
   );
 
   const unwrap = useCallback(
@@ -382,17 +429,39 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const canSubmit = blockedReason === null;
 
   const submit = useCallback(async () => {
-    if (!projectId || !sessionId || !canSubmit || submittingRef.current) return;
+    if (!projectId || !sessionId || submittingRef.current) return;
+    // A command-shaped line is never silently sent to the model. This check runs
+    // before the connection gate: a person who typed a command gets the
+    // explanation whether or not a runtime is connected.
+    const intent = interpretCommandInput(draft, SLASH_CATALOG);
+    if (intent.kind === 'ambiguous') {
+      setActionError(
+        `“/${intent.token}” is not a command. It could be: ${intent.candidates
+          .map((name) => `/${name}`)
+          .join(', ')}. Pick one with Tab, or start the line with \\/ to send it as text.`,
+      );
+      return;
+    }
+    if (intent.kind === 'command') {
+      const argumentNote = intent.argumentMissing ? ` It needs an argument: ${intent.row.usage}` : '';
+      setActionError(
+        `/${intent.row.name} is a Codewhale command.${argumentNote} ${routeSentence(intent.row)} ` +
+          `This line was not sent. Start it with \\/ to send it to the model as ordinary text.`,
+      );
+      return;
+    }
+    const sendText = intent.unescaped ?? draft;
+    if (!canSubmit) return;
     submittingRef.current = true;
     setSubmitting(true);
     setActionError(null);
     const sent = { projectId, sessionId, text: draft };
-    setPendingPrompt(sent.text);
+    setPendingPrompt(sendText);
     try {
       const result = await window.mona.studioSubmit({
         projectId,
         sessionId,
-        text: sent.text,
+        text: sendText,
         mode,
         references,
       });
@@ -407,7 +476,11 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           ? []
           : current,
       );
-      setNotice(null);
+      setNotice(
+        intent.unescaped === null
+          ? null
+          : 'The leading backslash was an escape; the runtime received the command text literally.',
+      );
     } finally {
       submittingRef.current = false;
       setSubmitting(false);
@@ -1036,10 +1109,49 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           ref={composerRef}
           className="mona-input composer-input"
           value={draft}
-          placeholder="Describe the task. Submitting sends this prompt to the configured provider."
-          onChange={(event) => props.onDraft(event.target.value)}
+          placeholder="Describe the task. Typing / lists Codewhale commands; Ctrl+Enter sends."
+          onChange={(event) => {
+            props.onDraft(event.target.value);
+            setCaret(event.target.selectionStart);
+            setCommandDismissed(false);
+            setCommandIndex(0);
+          }}
+          onSelect={(event) => setCaret(event.currentTarget.selectionStart)}
+          onClick={(event) => setCaret(event.currentTarget.selectionStart)}
           rows={2}
+          role="combobox"
+          aria-label={`Prompt for ${project.label}`}
+          aria-autocomplete="list"
+          aria-expanded={commandListOpen}
+          aria-controls="slash-command-list"
+          aria-activedescendant={
+            commandListOpen && commandSelected ? `slash-command-${commandSelected.name}` : undefined
+          }
           onKeyDown={(event) => {
+            if (commandListOpen) {
+              if (event.key === 'Escape') {
+                // Escape closes the list. It never interrupts work and never
+                // clears the draft.
+                event.preventDefault();
+                event.stopPropagation();
+                setCommandDismissed(true);
+                return;
+              }
+              if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                if (commandCandidates.length > 0) {
+                  event.preventDefault();
+                  const delta = event.key === 'ArrowDown' ? 1 : -1;
+                  setCommandIndex((current) => (current + delta + commandCandidates.length) % commandCandidates.length);
+                }
+                return;
+              }
+              if (event.key === 'Tab' && commandSelected) {
+                // Tab accepts the highlighted command; plain Enter stays a newline.
+                event.preventDefault();
+                acceptCommand(commandSelected);
+                return;
+              }
+            }
             if (event.key !== 'Enter' || !(event.ctrlKey || event.metaKey)) return;
             // An IME composition owns Enter: sending here would submit a
             // half-composed prompt. keyCode 229 covers older Windows IME paths
@@ -1051,6 +1163,55 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             void submit();
           }}
         />
+        {commandListOpen ? (
+          <div className="command-list" data-testid="slash-command-list">
+            <div className="command-list-head">
+              <span className="mona-muted" aria-live="polite" data-testid="slash-command-count">
+                {commandCandidates.length === 0
+                  ? `No command matches “${commandAt?.query ?? ''}”. Esc closes this list; Ctrl+Enter explains.`
+                  : `${commandCandidates.length} of ${SLASH_CATALOG.length} commands. ↑↓ choose · Tab fills · Esc closes`}
+              </span>
+            </div>
+            <ul id="slash-command-list" role="listbox" aria-label="Codewhale slash commands">
+              {commandCandidates.map((row, index) => (
+                <li
+                  key={row.name}
+                  id={`slash-command-${row.name}`}
+                  role="option"
+                  aria-selected={index === commandSelectedIndex}
+                  className={index === commandSelectedIndex ? 'command-row selected' : 'command-row'}
+                  data-testid={`slash-command-${row.name}`}
+                  onMouseDown={(event) => {
+                    // mousedown, not click: the textarea must not lose the draft.
+                    event.preventDefault();
+                    acceptCommand(row);
+                  }}
+                >
+                  <div className="command-row-head">
+                    <span className="mona-mono command-name">/{row.name}</span>
+                    {row.aliases.length > 0 ? (
+                      <span className="mona-muted command-aliases">
+                        {row.aliases.map((alias) => `/${alias}`).join(' · ')}
+                      </span>
+                    ) : null}
+                    <Badge
+                      tone={row.costClass === 'model' ? 'attention' : row.costClass === 'none' ? 'neutral' : 'info'}
+                    >
+                      {row.costClass === 'model'
+                        ? 'provider request'
+                        : row.costClass === 'none'
+                          ? 'no request'
+                          : 'cost unknown'}
+                    </Badge>
+                    <Badge tone="neutral">{row.route === 'mona' ? 'Mona route' : 'terminal only'}</Badge>
+                  </div>
+                  <p className="command-summary">{row.summary}</p>
+                  <p className="mona-muted command-usage mona-mono">{row.usage}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
         {references.length > 0 ? (
           <ul className="chip-row" aria-label="File references">
             {references.map((reference) => (
@@ -1084,7 +1245,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
               Attach file (unsupported)
             </Button>
             <span className="mona-muted">
-              {session?.text ? 'Draft saved locally' : 'No saved draft text'} · Ctrl+Enter sends
+              {session?.text ? 'Draft saved locally' : 'No saved draft text'} · Ctrl+Enter sends · / lists commands
             </span>
           </div>
         </div>
@@ -1167,6 +1328,51 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           ) : (
             <p className="mona-muted">No saved prompts for this project yet.</p>
           )}
+        </details>
+        <details className="command-catalog">
+          <summary>
+            Command catalog · {SLASH_CATALOG.length} engine commands · engine {SLASH_CATALOG_PROVENANCE.engineVersion}
+          </summary>
+          <p className="mona-muted">
+            Captured from the installed engine’s own registry ({SLASH_CATALOG_PROVENANCE.source},{' '}
+            {SLASH_CATALOG_PROVENANCE.capturedAt}). Each row says what it costs and whether Mona can run it here.
+            Nothing on this list is generated by a model, and reading it makes no request.
+          </p>
+          <input
+            className="mona-input"
+            value={catalogQuery}
+            maxLength={80}
+            aria-label="Filter the command catalog"
+            placeholder="Filter by name, alias or description"
+            onChange={(event) => setCatalogQuery(event.target.value)}
+          />
+          <ul className="brief-list command-catalog-list" aria-label="Codewhale command catalog">
+            {(catalogQuery.trim() ? filterCommands(SLASH_CATALOG, catalogQuery, 150) : SLASH_CATALOG).map((row) => (
+              <li key={row.name} className="command-catalog-row" data-testid={`catalog-${row.name}`}>
+                <div className="command-row-head">
+                  <span className="mona-mono command-name">/{row.name}</span>
+                  {row.aliases.length > 0 ? (
+                    <span className="mona-muted command-aliases">
+                      {row.aliases.map((alias) => `/${alias}`).join(' · ')}
+                    </span>
+                  ) : null}
+                  <Badge tone={row.costClass === 'model' ? 'attention' : row.costClass === 'none' ? 'neutral' : 'info'}>
+                    {row.costClass === 'model'
+                      ? 'provider request'
+                      : row.costClass === 'none'
+                        ? 'no request'
+                        : 'cost unknown'}
+                  </Badge>
+                  <Badge tone="neutral">{row.route === 'mona' ? 'Mona route' : 'terminal only'}</Badge>
+                  {row.hidden ? <Badge tone="neutral">hidden in engine palette</Badge> : null}
+                </div>
+                <p className="command-summary">{row.summary}</p>
+                <p className="mona-muted command-usage mona-mono">{row.usage}</p>
+                <p className="mona-muted">{row.sideEffects}</p>
+                <p className="mona-muted">{routeSentence(row)}</p>
+              </li>
+            ))}
+          </ul>
         </details>
         <p className="mona-muted">
           {blockedReason ??

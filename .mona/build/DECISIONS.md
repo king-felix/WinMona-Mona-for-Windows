@@ -1637,3 +1637,31 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   serving Plan and Work could merge two conversations in one view.
 - **Constrains:** the renderer window is a view, not the source of truth; anything dropped from it
   stays reachable through paging or search, and the UI says how many rows are stored versus loaded.
+
+## D-0122 - The slash catalog is the engine's own registry plus a curated classification
+
+- **Decision:** `tools/build/slash-catalog.mjs capture` reads the installed engine's
+  `GET /v1/commands` once in a throwaway `CODEWHALE_HOME` (usage reporting off, no credentials, no
+  provider call) and records engine version, commit, binary SHA-256 and route. `build` merges that
+  capture with `tools/catalog/slash-annotations.json` into
+  `apps/desktop/src/shared/slash-catalog.ts`; `check` fails when the shipped file is stale.
+- **Why:** S03 requires a versioned catalog from the real registry, with provenance and no invented
+  rows. The engine already publishes name, aliases, summary, usage, subcommands, hidden and
+  discovery; guessing any of those would be fabrication, and reading them at product runtime would
+  add a startup request Mona's economics forbid.
+- **Mechanism, so coverage is not prose:** the generator refuses an unannotated registry row, an
+  annotation naming a command the engine does not have, a name annotated twice, and an alias that
+  collides with a command name or another alias. `slash-catalog.test.ts` reconciles the shipped file
+  with the raw capture in both directions (names, aliases, summary, usage, subcommands, hidden,
+  discovery, provenance).
+- **Cost class is explicit.** `model` means the command sends a provider request; `none` means it
+  does not; `unknown` means the registry summary does not settle it and Mona does not claim zero. A
+  `model` row must say "provider request" in its side-effect note, enforced by test.
+- **Routes are honest stage by stage.** Every row is `tui-only` in W04 because no typed operation
+  exists yet; W05 flips the rows it can actually dispatch and the route note changes with them.
+- **Command position is narrow on purpose.** Only `/` at column 0, only while the caret is in the
+  first token, only with command characters. Paths (`/usr/bin/env`, `C:\…`, UNC), indented code,
+  quoted examples and an escaped `\/` stay ordinary text, so autocomplete never rewrites prose.
+- **Nothing command-shaped is sent silently.** A recognized command, an ambiguous prefix and a
+  missing required argument each produce an explanation; the explicit ways to send text are an
+  unknown word, prose, or a leading `\/` (whose escape is removed and reported).

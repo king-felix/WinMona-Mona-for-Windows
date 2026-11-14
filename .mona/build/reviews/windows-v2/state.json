@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 6,
+  "revision": 7,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -140,18 +140,42 @@
       "next_action": "W04: inventory the pinned engine's slash commands and build the descriptive autocomplete catalog"
     },
     "W04": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
+      "acceptance_done": [
         "A coverage fixture reconciles every pinned registry row and alias; no unexplained omission or invented route. Test keyboard/IME, cursor replacement, multiline paste, literal text, Narrator semantics and large scaling. Filtering/help makes zero inference calls."
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W04-slash.md",
+          "sha256": "cca3f162d650f4a9a892b8cddf304f5240c7b1bf0e37e6a422dce1200f05edce",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T18:55:34Z",
+          "commit": "1cb2dbd32f6ef024a479321ee55e5fc7f22fcd45"
+        },
+        {
+          "path": "docs/evidence/W04-slash.json",
+          "sha256": "35a129f962c11f315e2f812768c26cf21f9ad7b5486db64f81ea41e8005039d8",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T18:55:34Z",
+          "commit": "1cb2dbd32f6ef024a479321ee55e5fc7f22fcd45"
+        },
+        {
+          "path": "docs/evidence/W04-commands-raw.json",
+          "sha256": "d921495b3dfd0965b5108b7c717c3539f3d8080d894df92664ae7057db525d80",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T18:55:34Z",
+          "commit": "1cb2dbd32f6ef024a479321ee55e5fc7f22fcd45"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-007"
+      ],
+      "next_action": "W05: dispatch qualified commands through typed IPC and implement /new as a real fresh conversation"
     },
     "W05": {
       "status": "pending",

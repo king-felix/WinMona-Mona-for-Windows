@@ -3,18 +3,18 @@
 **Read this first: there are two ledgers now.** The original P00–P23 sequence is complete
 (`.mona/build/state.json`, revision 83). The Windows improvement supplement W00–W25 is a separate,
 validated id space (D-0116) with its own state at `.mona/build/reviews/windows-v2/state.json`,
-written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00, W01, W02 and W03**;
-they are `completed` there and `W04` is the next eligible prompt.
+written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00, W01, W02, W03 and W04**;
+they are `completed` there and `W05` is the next eligible prompt.
 
 Verify before trusting this file:
 
 ```text
 node tools/build/cli.mjs validate          # original ledger: OK, 0 warnings
-node tools/build/windows-review.mjs status # review ledger: 4 completed, current W03
+node tools/build/windows-review.mjs status # review ledger: 5 completed, current W04
 npm run ci                                  # format, lint, typecheck, 591 vitest in 70 files, node --test suites, build
 ```
 
-## The four Windows prompts completed this session
+## The Windows prompts completed this session
 
 - **W00 — baseline.** HEAD `c1c91387`, engine `codewhale 0.10.2 (ff466b2ed0bf)`, Windows 11 Pro
   10.0.26200, installed candidate 1 695 files with `Status: Ok`. Each suspected Mac parallel was
@@ -43,6 +43,14 @@ npm run ci                                  # format, lint, typecheck, 591 vites
   frames closes the answer as `interrupted`. Every push carries its thread, so Plan and Work cannot
   merge. A real Windows window holding 10 000 stored rows opened at seq 9881-10000 with
   `hasOlder: true` (`docs/evidence/W03-history.json`).
+
+- **W04 — command catalog and autocomplete.** The catalog is the pinned engine's own registry
+  (`GET /v1/commands`, 109 commands, 97 aliases, captured with engine version/commit/binary hash)
+  plus a curated cost/side-effect/route classification; a coverage fixture reconciles both
+  directions and the generator refuses gaps. Typing `/` at a command position opens a locally
+  filtered, keyboard-operable list with descriptions, usage, cost and route badges; paths, code,
+  quotes and `\/` stay literal; a recognized command, an ambiguous prefix or a missing argument is
+  explained and never sent. 12 real-window steps pass (`docs/evidence/W04-slash.json`).
 
 ## Open items that this session did not close
 
