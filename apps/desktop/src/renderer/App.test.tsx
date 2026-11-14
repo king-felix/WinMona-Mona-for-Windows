@@ -965,6 +965,7 @@ async function render(): Promise<{ root: ReturnType<typeof createRoot>; containe
   const container = document.getElementById('root');
   if (!container) throw new Error('missing root');
   const root = createRoot(container);
+  mounted.push(() => root.unmount());
   await act(async () => {
     root.render(<App />);
     await new Promise((resolve) => setTimeout(resolve, 10));
@@ -1011,7 +1012,19 @@ beforeEach(() => {
   window.history.replaceState({}, '', '/');
 });
 
-afterEach(() => {
+/** Mounted trees, so a test that fails mid-way cannot keep timers that write into
+ * the next test's bridge. */
+const mounted: Array<() => void> = [];
+
+afterEach(async () => {
+  while (mounted.length > 0) {
+    try {
+      const unmount = mounted.pop();
+      await act(async () => unmount?.());
+    } catch {
+      /* the tree was already unmounted by the test itself */
+    }
+  }
   document.documentElement.removeAttribute('data-theme');
 });
 
@@ -1305,6 +1318,310 @@ describe('Mona shell', () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
     });
     expect(document.querySelector<HTMLTextAreaElement>('#draft')?.value).toBe('alpha draft');
+    await act(async () => root.unmount());
+  });
+
+  it('clears only the accepted prompt and keeps text typed while it was in flight', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: emptyStudio(),
+    };
+    const mona = bridgeFor(store);
+    const realSubmit = mona.studioSubmit;
+    let release: (() => void) | null = null;
+    (mona as unknown as Record<string, unknown>).studioSubmit = async (input: Parameters<typeof realSubmit>[0]) => {
+      await new Promise<void>((resolve) => {
+        release = resolve;
+      });
+      return realSubmit(input);
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = mona;
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'First prompt');
+    await act(async () => {
+      exactButton('Submit').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    // The runtime has not answered yet; the renderer already shows the prompt it
+    // is waiting on and has not recorded an accepted submission.
+    expect(document.body.textContent).toContain('Sending…');
+    expect(store.submitted ?? []).toHaveLength(0);
+
+    // This text is newer than the revision that was accepted and must survive
+    // the acknowledgement.
+    await typeInto(draft, 'Second thoughts');
+    await act(async () => {
+      release?.();
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    expect(store.submitted).toEqual([{ text: 'First prompt', mode: 'agent', references: [] }]);
+    expect(document.querySelector<HTMLTextAreaElement>('#draft')?.value).toBe('Second thoughts');
+    await act(async () => root.unmount());
+  });
+
+  it('keeps the draft when the runtime rejects the submission', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: emptyStudio(),
+    };
+    const mona = bridgeFor(store);
+    (mona as unknown as Record<string, unknown>).studioSubmit = async () => ({
+      ok: false,
+      error: {
+        code: 'engine_unavailable',
+        message: 'The engine is not connected. Connect it for this project before submitting work.',
+        retryable: false,
+      },
+    });
+    (window as unknown as { mona: Window['mona'] }).mona = mona;
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'do not lose this');
+    await act(async () => {
+      exactButton('Submit').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector<HTMLTextAreaElement>('#draft')?.value).toBe('do not lose this');
+    expect(document.body.textContent).not.toContain('Sending…');
+    expect(document.body.textContent).toContain('The engine is not connected');
+    await act(async () => root.unmount());
+  });
+
+  it('drops a late project selection instead of overwriting the newer one', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const beta = project('prj_beta', 'beta');
+    const store: Store = { projects: [alpha, beta], ui: emptyUi(), engine: engine(), spends: {} };
+    const mona = bridgeFor(store);
+    const realSelect = mona.selectProject;
+    let releaseAlpha: (() => void) | null = null;
+    (mona as unknown as Record<string, unknown>).selectProject = async (projectId: string | null) => {
+      if (projectId === alpha.id) {
+        await new Promise<void>((resolve) => {
+          releaseAlpha = resolve;
+        });
+      }
+      return realSelect(projectId);
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = mona;
+    const { root } = await render();
+
+    const recent = (label: string): HTMLElement | undefined =>
+      Array.from(document.querySelectorAll('.rail-recent')).find((node) => node.textContent?.trim().endsWith(label)) as
+        HTMLElement | undefined;
+
+    await act(async () => {
+      recent('alpha')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    });
+    // alpha's selection is still in flight; choose beta, which answers at once.
+    await act(async () => {
+      recent('beta')?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="context-project"]')?.textContent).toContain('beta');
+
+    await act(async () => {
+      releaseAlpha?.();
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    expect(document.querySelector('[data-testid="context-project"]')?.textContent).toContain('beta');
+    await act(async () => root.unmount());
+  });
+
+  it('submits once on Ctrl+Enter and never during an IME composition or a key repeat', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: emptyStudio(),
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'Ctrl enter prompt');
+
+    const press = async (init: KeyboardEventInit): Promise<void> => {
+      await act(async () => {
+        draft.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', ctrlKey: true, bubbles: true, ...init }));
+        await new Promise((resolve) => setTimeout(resolve, 10));
+      });
+    };
+
+    await press({ repeat: true });
+    expect(store.submitted ?? []).toHaveLength(0);
+    await press({ isComposing: true });
+    expect(store.submitted ?? []).toHaveLength(0);
+    await press({});
+    expect(store.submitted).toEqual([{ text: 'Ctrl enter prompt', mode: 'agent', references: [] }]);
+    await act(async () => root.unmount());
+  });
+
+  it('saves the pending draft before New session switches away from it', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: emptyStudio(),
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor(store);
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'keep this draft');
+    // The 350 ms debounce has not fired yet; New session must flush it first.
+    await act(async () => {
+      exactButton('New session').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 30));
+    });
+    const sessions = store.ui.projects[alpha.id]?.sessions ?? [];
+    const original = sessions.find((session) => session.sessionId === `ses_${alpha.id}`);
+    expect(original?.text).toBe('keep this draft');
+    expect(store.ui.projects[alpha.id]?.currentSessionId).toBe(`ses_new_${alpha.id}`);
+    expect(document.querySelector<HTMLTextAreaElement>('#draft')?.value).toBe('');
+    await act(async () => root.unmount());
+  });
+
+  it('restores the saved section after a restart instead of falling back to Studio', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const ui = emptyUi();
+    ui.currentProjectId = alpha.id;
+    ui.projects[alpha.id] = {
+      view: 'memory',
+      layout: 'standard',
+      currentSessionId: `ses_${alpha.id}`,
+      sessions: [],
+      favorites: [],
+      lastOpenedAt: '2026-11-12T00:00:00.000Z',
+      lastSeenAt: null,
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = bridgeFor({
+      projects: [alpha],
+      ui,
+      engine: engine(),
+      spends: {},
+    });
+    const { root } = await render();
+    // The registry is the single source of truth: a section survives a relaunch.
+    expect(document.querySelector('#memory-search-title')).not.toBeNull();
+    expect(document.querySelector('[data-testid="context-project"]')?.textContent).toContain('alpha');
+    await act(async () => root.unmount());
+  });
+
+  it('keeps two draft saves in order so a late older save cannot win', async () => {
+    const alpha = project('prj_alpha', 'alpha');
+    const store: Store = {
+      projects: [alpha],
+      ui: emptyUi(),
+      engine: engine({
+        state: 'connected',
+        detail: 'Owned runtime started.',
+        workspace: alpha.canonicalPath,
+        pid: 4321,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+      }),
+      spends: {},
+      studio: emptyStudio(),
+    };
+    const mona = bridgeFor(store);
+    const realSave = mona.saveDraft;
+    const calls: string[] = [];
+    let releaseFirst: (() => void) | null = null;
+    (mona as unknown as Record<string, unknown>).saveDraft = async (input: Parameters<typeof realSave>[0]) => {
+      calls.push(input.text);
+      if (calls.length === 1) {
+        await new Promise<void>((resolve) => {
+          releaseFirst = resolve;
+        });
+      }
+      return realSave(input);
+    };
+    (window as unknown as { mona: Window['mona'] }).mona = mona;
+    const { root } = await render();
+    await act(async () => {
+      exactButton('Open').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    });
+    const draft = document.querySelector<HTMLTextAreaElement>('#draft');
+    if (!draft) throw new Error('draft missing');
+    await typeInto(draft, 'A');
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 420));
+    });
+    await typeInto(draft, 'AB');
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 420));
+    });
+    // The first save is still in flight, so the newer one has not been sent yet.
+    expect(calls).toEqual(['A']);
+    await act(async () => {
+      releaseFirst?.();
+      await new Promise((resolve) => setTimeout(resolve, 60));
+    });
+    expect(calls).toEqual(['A', 'AB']);
+    const sessions = store.ui.projects[alpha.id]?.sessions ?? [];
+    expect(sessions.find((session) => session.sessionId === `ses_${alpha.id}`)?.text).toBe('AB');
     await act(async () => root.unmount());
   });
 

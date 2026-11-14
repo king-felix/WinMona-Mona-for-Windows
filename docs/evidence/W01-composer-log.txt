@@ -1,0 +1,14 @@
+executable: X:\AI_projects\Mona\node_modules\electron\dist\electron.exe
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-w01-composer-MNcxWI\composer-project
+
+
+PASS a real project opens through the catalog :: "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w01-composer-mncxwi\\composer-project"
+PASS the real composer is on screen
+PASS typing reaches the composer :: {"beforeEnter":"line one"}
+PASS plain Enter inserts a newline instead of sending :: {"afterEnter":"line one\n"}
+PASS the draft is in place before the shortcut :: {"beforeCtrl":"ctrl enter prompt"}
+PASS Ctrl+Enter does not insert a newline :: {"afterCtrl":"ctrl enter prompt"}
+PASS Ctrl+Enter did not send anything without a connected runtime :: {"runState":"Ready","reason":null}
+PASS an IME composition Enter is not consumed as a send
+PASS a held Ctrl+Enter is still one shortcut, not several
+mona: applied 7 state migration(s) to version 7

@@ -40,6 +40,7 @@
     "mona:status": "node tools/install/cli.mjs status",
     "qa": "npm run qa -w @mona/desktop",
     "appearance": "npm run appearance -w @mona/desktop",
+    "composer": "npm run composer -w @mona/desktop",
     "surfaces": "npm run surfaces -w @mona/desktop",
     "assets:icons": "node tools/assets/build-icons.mjs",
     "assets:check": "node tools/assets/build-icons.mjs --check",

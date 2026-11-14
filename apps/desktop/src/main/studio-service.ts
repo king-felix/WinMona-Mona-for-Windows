@@ -4,6 +4,7 @@ import path from 'node:path';
 import { WorkQueue, redact, type AdapterStreamEvent, type EngineAdapter } from '@mona/adapter';
 import {
   errorResult,
+  newOperationKey,
   ThreadId,
   type EffectiveProfile,
   type ErrorResult,
@@ -330,21 +331,39 @@ export class StudioService {
         ),
       };
     }
+    // Claim the dispatch slot in the same tick as the guard above. The budget
+    // evaluation and the thread lookup below await, so a second invoke arriving
+    // while they are in flight would otherwise pass the same guard and send the
+    // prompt twice. `preparing` is already a refused run state, so the claim is
+    // visible to the UI and to the next caller immediately.
+    const previousRun = state.run;
+    state.run = {
+      state: 'preparing',
+      detail: 'Checking the budget and preparing the engine thread. No prompt has been sent yet.',
+      turnId: null,
+      submission: null,
+      startedAt: null,
+    };
+    this.pushState(state);
+    const release = (error: ErrorResult): ServiceResult<StudioSubmission> => {
+      state.run = previousRun;
+      this.pushState(state);
+      return { ok: false, error };
+    };
+
     if (state.queue.snapshot().blocked) {
       const blocked = state.queue.snapshot().blocked;
-      return {
-        ok: false,
-        error: errorResult(
+      return release(
+        errorResult(
           'invalid_request',
           `Dispatch is blocked by problem ${blocked?.problemId ?? 'unknown'}. Record new evidence or a Victor decision first.`,
         ),
-      };
+      );
     }
     if (state.queue.snapshot().pauseRequested) {
-      return {
-        ok: false,
-        error: errorResult('invalid_request', 'The queue is paused after the last task. Resume to send new work.'),
-      };
+      return release(
+        errorResult('invalid_request', 'The queue is paused after the last task. Resume to send new work.'),
+      );
     }
     if (this.costs) {
       const budget = await this.costs.evaluateBudget({ projectId: input.projectId, sessionId: input.sessionId });
@@ -353,29 +372,19 @@ export class StudioService {
           .filter((decision) => decision.action === 'block_next_dispatch')
           .map((decision) => decision.detail)
           .join('; ');
-        return {
-          ok: false,
-          error: errorResult(
+        return release(
+          errorResult(
             'invalid_request',
             'The configured cost budget stops the next dispatch. In-flight work is not interrupted.',
             false,
             detail || undefined,
           ),
-        };
+        );
       }
       if (budget.action === 'warn') {
         this.diagnostic(state, `budget warning: ${budget.decisions.map((decision) => decision.detail).join('; ')}`);
       }
     }
-
-    state.run = {
-      state: 'preparing',
-      detail: 'Preparing the engine thread. No prompt has been sent yet.',
-      turnId: null,
-      submission: null,
-      startedAt: null,
-    };
-    this.pushState(state);
 
     let threadRow = await this.store.studioThreadForSession(input.projectId, input.sessionId, mode);
     let profile = threadRow ? parseProfile(threadRow) : null;
@@ -424,6 +433,10 @@ export class StudioService {
     const submitted = await adapter.submitTurn({
       threadId,
       prompt,
+      // One key per accepted user action. The adapter journals it before the POST,
+      // so an uncertain outcome reconciles against this exact key rather than
+      // minting a fresh one and risking a second paid turn.
+      operationKey: newOperationKey('turn'),
       allowShell: true,
       trustMode: true,
       autoApprove: true,

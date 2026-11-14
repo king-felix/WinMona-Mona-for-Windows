@@ -174,6 +174,17 @@ export function App(): React.JSX.Element {
     draft: '',
   });
   const savingDrafts = useRef<Map<string, string>>(new Map());
+  // One in-flight save per project:session, so a late older save cannot land on
+  // top of a newer one.
+  const draftChains = useRef<Map<string, Promise<boolean>>>(new Map());
+  // Selection and draft writes are asynchronous. A generation counter makes a
+  // late reply for an earlier selection a no-op instead of a silent overwrite of
+  // the project, session and draft the person is looking at now.
+  const navGeneration = useRef(0);
+  // The live composer text, readable from callbacks that were created before the
+  // keystroke without re-binding them.
+  const draftRef = useRef('');
+  draftRef.current = draftText;
   const harness = harnessRequest();
 
   const unwrap = useCallback(async <T,>(promise: Promise<IpcResult<T>>, title = 'Action failed'): Promise<T | null> => {
@@ -194,9 +205,42 @@ export function App(): React.JSX.Element {
     return result;
   }, [unwrap]);
 
+  /**
+   * Every draft write goes through here so two saves for one session cannot
+   * arrive out of order. Without the chain an older save that resolves late
+   * would overwrite the newer text in the store, and the newer text would be
+   * labelled saved when it no longer is.
+   */
+  const persistDraft = useCallback(
+    (input: { projectId: string; sessionId: string; text: string }): Promise<boolean> => {
+      const key = `${input.projectId}:${input.sessionId}`;
+      const previous = draftChains.current.get(key) ?? Promise.resolve(true);
+      const next = previous
+        .catch(() => false)
+        .then(async () => {
+          const generation = navGeneration.current;
+          const result = await window.mona.saveDraft(input);
+          if (!result.ok) {
+            // A draft that did not save is a real loss risk; say so instead of dropping it.
+            setNotice({ tone: 'critical', title: 'Draft not saved', body: result.error.message });
+            return false;
+          }
+          savingDrafts.current.set(key, input.text);
+          // A reply for a project the person has already left must not restore that
+          // project's UI snapshot over the current one.
+          if (generation === navGeneration.current) setUi(result.data);
+          return true;
+        });
+      draftChains.current.set(key, next);
+      return next;
+    },
+    [],
+  );
+
   const loadSpend = useCallback(
-    async (projectId: string) => {
+    async (projectId: string, generation?: number) => {
       const result = await unwrap(window.mona.projectSpend(projectId), 'Cost unavailable');
+      if (generation !== undefined && generation !== navGeneration.current) return;
       setSpend(result);
     },
     [unwrap],
@@ -208,8 +252,9 @@ export function App(): React.JSX.Element {
     return result;
   }, [unwrap]);
 
-  const loadBriefing = useCallback(async (projectId: string, markSeen = true) => {
+  const loadBriefing = useCallback(async (projectId: string, markSeen = true, generation?: number) => {
     const result = await window.mona.briefingGet({ projectId, markSeen });
+    if (generation !== undefined && generation !== navGeneration.current) return;
     if (result.ok) {
       setBriefing(result.data);
       setBriefingError(null);
@@ -240,11 +285,15 @@ export function App(): React.JSX.Element {
 
   const activateProject = useCallback(
     async (project: CatalogProject, persistDraftFor: { projectId: string; sessionId: string; text: string } | null) => {
+      const generation = (navGeneration.current += 1);
       if (persistDraftFor && persistDraftFor.sessionId) {
-        await window.mona.saveDraft(persistDraftFor);
+        await persistDraft(persistDraftFor);
+        if (generation !== navGeneration.current) return;
       }
       const result = await unwrap(window.mona.selectProject(project.id), 'Could not open that project');
       if (!result) return;
+      // A later click has already claimed the shell; this reply is history.
+      if (generation !== navGeneration.current) return;
       setSelected(result.project);
       setUi(result.ui);
       setEngine(result.engine);
@@ -255,10 +304,10 @@ export function App(): React.JSX.Element {
       setDraftText(next.text);
       setSpend(null);
       setFocusedEvidence(null);
-      void loadSpend(project.id);
-      void loadBriefing(project.id);
+      void loadSpend(project.id, generation);
+      void loadBriefing(project.id, true, generation);
     },
-    [loadBriefing, loadSpend, unwrap],
+    [loadBriefing, loadSpend, persistDraft, unwrap],
   );
 
   // Initial load: app info, catalog, persisted UI state and the selected project.
@@ -462,22 +511,23 @@ export function App(): React.JSX.Element {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
-  const flushDraft = useCallback(async () => {
-    if (!selected || !sessionId) return;
+  const flushDraft = useCallback(async (): Promise<boolean> => {
+    if (!selected || !sessionId) return true;
     const key = `${selected.id}:${sessionId}`;
-    if (savingDrafts.current.get(key) === draftText) return;
-    const result = await window.mona.saveDraft({ projectId: selected.id, sessionId, text: draftText });
-    if (result.ok) {
-      savingDrafts.current.set(key, draftText);
-      setUi(result.data);
-    }
-  }, [draftText, selected, sessionId]);
+    // Read the live text rather than the render's snapshot: a flush triggered by
+    // the debounce must save the newest keystroke, not the one that armed it.
+    const text = draftRef.current;
+    if (savingDrafts.current.get(key) === text) return true;
+    return persistDraft({ projectId: selected.id, sessionId, text });
+  }, [persistDraft, selected, sessionId]);
 
   useEffect(() => {
     if (!selected || !sessionId) return;
     const timer = setTimeout(() => void flushDraft(), 350);
     return () => clearTimeout(timer);
-  }, [flushDraft, selected, sessionId]);
+    // `draftText` re-arms the debounce on every keystroke; `flushDraft` itself
+    // reads the live text through a ref.
+  }, [draftText, flushDraft, selected, sessionId]);
 
   const openFolder = useCallback(async () => {
     const picked = await unwrap(window.mona.pickFolder('open'), 'Folder picker unavailable');
@@ -624,13 +674,19 @@ export function App(): React.JSX.Element {
 
   const newSession = useCallback(async () => {
     if (!selected) return;
+    const generation = navGeneration.current;
+    // The pending draft belongs to the session being left; save it before the
+    // switch instead of dropping the last few hundred milliseconds of typing.
+    await flushDraft();
+    if (generation !== navGeneration.current) return;
     const result = await unwrap(window.mona.newSession(selected.id), 'Could not start a new session');
     if (!result) return;
+    if (generation !== navGeneration.current) return;
     setUi(result);
     const next = draftFor(result, selected.id);
     setSessionId(next.sessionId);
     setDraftText(next.text);
-  }, [selected, unwrap]);
+  }, [flushDraft, selected, unwrap]);
 
   const changeScreen = useCallback(
     async (next: ProjectView) => {
@@ -1267,10 +1323,15 @@ export function App(): React.JSX.Element {
                       ? `Exported ${result.data.items} item(s) to ${result.data.path} (${result.data.bytes} bytes).`
                       : result.data.note;
                   }}
-                  onDraftSent={() => {
+                  onDraftSent={(sent) => {
+                    // Clear only the revision the runtime accepted. Text typed
+                    // while the prompt was in flight, or in another project,
+                    // belongs to the person and stays in the composer.
+                    if (!selected || sent.projectId !== selected.id || sent.sessionId !== sessionId) return;
+                    if (draftRef.current !== sent.text) return;
+                    draftRef.current = '';
                     setDraftText('');
-                    if (selected && sessionId)
-                      void window.mona.saveDraft({ projectId: selected.id, sessionId, text: '' });
+                    void persistDraft({ projectId: sent.projectId, sessionId: sent.sessionId, text: '' });
                   }}
                   onSpendRefresh={() => {
                     if (selected) void loadSpend(selected.id);

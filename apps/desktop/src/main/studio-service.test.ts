@@ -54,7 +54,7 @@ type FakeToolInput = Record<string, unknown>;
 
 class FakeAdapter {
   readonly threadCalls: Array<{ mode: string; workspace: string }> = [];
-  readonly submissions: Array<{ threadId: string; prompt: string }> = [];
+  readonly submissions: Array<{ threadId: string; prompt: string; operationKey: string | null }> = [];
   readonly interrupts: Array<{ threadId: string; turnId: string }> = [];
   private readonly queue: Array<
     | { kind: 'event'; seq: number; event: ParsedEngineEvent }
@@ -97,9 +97,13 @@ class FakeAdapter {
     };
   }
 
-  async submitTurn(input: { threadId: string; prompt: string }) {
+  async submitTurn(input: { threadId: string; prompt: string; operationKey?: string }) {
     this.turnCounter += 1;
-    this.submissions.push({ threadId: input.threadId, prompt: input.prompt });
+    this.submissions.push({
+      threadId: input.threadId,
+      prompt: input.prompt,
+      operationKey: input.operationKey ?? null,
+    });
     return {
       ok: true as const,
       value: {
@@ -751,6 +755,62 @@ describe('cost and dispatch boundary', () => {
     if (!blocked.ok) expect(blocked.error.message).toContain('budget');
     expect(adapter.threadCalls).toHaveLength(0);
     expect(adapter.submissions).toHaveLength(0);
+  });
+
+  it('accepts exactly one dispatch when two submits overlap', async () => {
+    const store = await openStore('dispatch-once');
+    const project = await makeProject(store, 'dispatch-once');
+    const adapter = new FakeAdapter(project.path);
+    const ledger = new CostLedger(store, { now: () => new Date('2026-11-12T12:00:00.000Z') });
+    const service = new StudioService({
+      store,
+      engine: {
+        summary: () => ({
+          state: 'connected',
+          detail: 'fake runtime connected',
+          workspace: project.path,
+          pid: 1,
+          endpoint: 'http://127.0.0.1:7801',
+          compatibility: 'qualified',
+          descriptors: [],
+        }),
+        adapter: () => adapter as unknown as EngineAdapter,
+      },
+      emit: () => undefined,
+      // The budget check is an await between the run-state guard and the claim.
+      // That gap is exactly where a second click used to slip through.
+      costs: ledger,
+      flushIntervalMs: 0,
+    });
+    cleanup.push(async () => service.close());
+    await service.view(project.id, 'ses_once');
+
+    const [first, second] = await Promise.all([
+      service.submit({
+        projectId: project.id,
+        sessionId: 'ses_once',
+        text: 'run it once',
+        mode: 'agent',
+        references: [],
+      }),
+      service.submit({
+        projectId: project.id,
+        sessionId: 'ses_once',
+        text: 'run it once',
+        mode: 'agent',
+        references: [],
+      }),
+    ]);
+
+    expect([first.ok, second.ok].filter(Boolean)).toHaveLength(1);
+    const refused = first.ok ? second : first;
+    if (refused.ok) throw new Error('expected one refusal');
+    expect(refused.error.message).toContain('already');
+    expect(adapter.submissions).toHaveLength(1);
+    expect(adapter.threadCalls).toHaveLength(1);
+    // The accepted turn carries a journal key, so an uncertain outcome reconciles
+    // against this dispatch instead of being minted again on a retry.
+    expect(adapter.submissions[0]?.operationKey).toMatch(/^turn-[0-9a-f]{32}$/);
   });
 
   it('reports a native-owned pause as partial instead of claiming it stopped', async () => {

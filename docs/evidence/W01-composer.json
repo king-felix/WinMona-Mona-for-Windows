@@ -1,0 +1,71 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true,
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w01-composer-mncxwi\\composer-project"
+    },
+    {
+      "name": "the real composer is on screen",
+      "ok": true
+    },
+    {
+      "name": "typing reaches the composer",
+      "ok": true,
+      "detail": {
+        "beforeEnter": "line one"
+      }
+    },
+    {
+      "name": "plain Enter inserts a newline instead of sending",
+      "ok": true,
+      "detail": {
+        "afterEnter": "line one\n"
+      }
+    },
+    {
+      "name": "the draft is in place before the shortcut",
+      "ok": true,
+      "detail": {
+        "beforeCtrl": "ctrl enter prompt"
+      }
+    },
+    {
+      "name": "Ctrl+Enter does not insert a newline",
+      "ok": true,
+      "detail": {
+        "afterCtrl": "ctrl enter prompt"
+      }
+    },
+    {
+      "name": "Ctrl+Enter did not send anything without a connected runtime",
+      "ok": true,
+      "detail": {
+        "runState": "Ready",
+        "reason": null
+      }
+    },
+    {
+      "name": "an IME composition Enter is not consumed as a send",
+      "ok": true
+    },
+    {
+      "name": "a held Ctrl+Enter is still one shortcut, not several",
+      "ok": true
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w01\\composer-plain-enter.png",
+      "label": "composer-plain-enter"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w01\\composer-ctrl-enter.png",
+      "label": "composer-ctrl-enter"
+    }
+  ],
+  "capturedAt": "2026-11-14T17:12:54.631Z",
+  "providerRequests": 0,
+  "limitation": "Physical IME composition is a human check: Chromium cannot be driven into composing state from the main process. Ctrl+Enter and plain Enter were pressed through Electron sendInputEvent in a real window."
+}

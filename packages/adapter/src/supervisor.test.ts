@@ -363,7 +363,10 @@ describe('RuntimeSupervisor', () => {
       port,
       token: 'restart-test-token-0123456789',
       command: { executable: process.execPath, args: [fakeRuntime, '--port', String(port)] },
-      env: { FAKE_CRASH_MS: '2500' },
+      // The crash must happen after readiness. Measured on the reference machine,
+      // node spawn plus the first successful health probe takes ~2.9 s, so a
+      // 2.5 s timer crashed the runtime before the supervisor could ever be ready.
+      env: { FAKE_CRASH_MS: '6000' },
       restart: { maxRestarts: 2, baseDelayMs: 50, windowMs: 60_000 },
       onEvent: (event) => events.push(event),
     });

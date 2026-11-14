@@ -102,8 +102,8 @@ export type StudioPanelProps = {
   onStop: () => void;
   onNewSession: () => void;
   onLocate: () => void;
-  /** Called after a prompt is accepted: the draft has been sent, not lost. */
-  onDraftSent: () => void;
+  /** Called after a prompt is accepted, with the exact text that was accepted. */
+  onDraftSent: (sent: { projectId: string; sessionId: string; text: string }) => void;
   /** Ask the shell to re-read recorded spend after a turn settles. */
   onSpendRefresh: () => void;
   /** Export the recorded conversation; returns a message for the notice line. */
@@ -118,6 +118,9 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // State updates are asynchronous; a same-tick second press would still see
+  // `submitting === false`. This ref is the renderer's single-flight latch.
+  const submittingRef = useRef(false);
   const [pendingPrompt, setPendingPrompt] = useState<string | null>(null);
   const [references, setReferences] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -273,21 +276,36 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const canSubmit = blockedReason === null;
 
   const submit = useCallback(async () => {
-    if (!projectId || !sessionId || !canSubmit) return;
+    if (!projectId || !sessionId || !canSubmit || submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setActionError(null);
-    const text = draft;
-    setPendingPrompt(text);
-    const result = await window.mona.studioSubmit({ projectId, sessionId, text, mode, references });
-    setSubmitting(false);
-    if (!result.ok) {
-      setPendingPrompt(null);
-      setActionError(result.error.message);
-      return;
+    const sent = { projectId, sessionId, text: draft };
+    setPendingPrompt(sent.text);
+    try {
+      const result = await window.mona.studioSubmit({
+        projectId,
+        sessionId,
+        text: sent.text,
+        mode,
+        references,
+      });
+      if (!result.ok) {
+        setPendingPrompt(null);
+        setActionError(result.error.message);
+        return;
+      }
+      props.onDraftSent(sent);
+      setReferences((current) =>
+        current.length === references.length && current.every((item, index) => item === references[index])
+          ? []
+          : current,
+      );
+      setNotice(null);
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
-    props.onDraftSent();
-    setReferences([]);
-    setNotice(null);
   }, [canSubmit, draft, mode, projectId, props, references, sessionId]);
 
   const interrupt = useCallback(async () => {
@@ -701,10 +719,15 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           onChange={(event) => props.onDraft(event.target.value)}
           rows={2}
           onKeyDown={(event) => {
-            if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
-              event.preventDefault();
-              void submit();
-            }
+            if (event.key !== 'Enter' || !(event.ctrlKey || event.metaKey)) return;
+            // An IME composition owns Enter: sending here would submit a
+            // half-composed prompt. keyCode 229 covers older Windows IME paths
+            // that never set isComposing.
+            if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
+            event.preventDefault();
+            // Holding the shortcut is one intention, not several.
+            if (event.repeat) return;
+            void submit();
           }}
         />
         {references.length > 0 ? (

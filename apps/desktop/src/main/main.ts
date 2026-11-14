@@ -64,6 +64,7 @@ import { runChangesProbe } from './changes-probe.js';
 import { runMemoryProbe } from './memory-probe.js';
 import { runA11yProbe } from './a11y-probe.js';
 import { runAppearanceProbe } from './appearance-probe.js';
+import { runComposerProbe } from './composer-probe.js';
 import { runSurfacesProbe } from './surfaces-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
@@ -146,6 +147,11 @@ const appearanceTest = process.argv.includes('--appearance-probe');
 const appearanceOut = process.env.MONA_APPEARANCE_OUT ?? path.join(process.cwd(), 'mona-appearance.json');
 const appearanceWorkspace = process.env.MONA_APPEARANCE_WORKSPACE ?? null;
 const appearanceShots = process.env.MONA_APPEARANCE_SHOTS ?? path.join(process.cwd(), 'mona-appearance-shots');
+// W01 composer probe: Enter/Ctrl+Enter pressed through Electron's input path.
+const composerTest = process.argv.includes('--composer-probe');
+const composerOut = process.env.MONA_COMPOSER_OUT ?? path.join(process.cwd(), 'mona-composer.json');
+const composerWorkspace = process.env.MONA_COMPOSER_WORKSPACE ?? null;
+const composerShots = process.env.MONA_COMPOSER_SHOTS ?? path.join(process.cwd(), 'mona-composer-shots');
 // P25 surfaces probe: the Cost lens and the Work board, driven against real rows.
 const surfacesTest = process.argv.includes('--surfaces-probe');
 const surfacesOut = process.env.MONA_SURFACES_OUT ?? path.join(process.cwd(), 'mona-surfaces.json');
@@ -168,6 +174,7 @@ if (
   terminalTest ||
   changesTest ||
   appearanceTest ||
+  composerTest ||
   surfacesTest
 )
   app.disableHardwareAcceleration();
@@ -1038,6 +1045,32 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         })
         .catch((error: unknown) => {
           fs.writeFileSync(appearanceOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+    }
+
+    if (composerTest && composerWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runComposerProbe({
+        window: probeWindow,
+        outputPath: composerOut,
+        shotsDirectory: composerShots,
+        workspace: composerWorkspace,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+      })
+        .then((result) => {
+          fs.mkdirSync(path.dirname(composerOut), { recursive: true });
+          fs.writeFileSync(composerOut, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(composerOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
     }
