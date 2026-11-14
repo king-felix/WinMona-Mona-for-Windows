@@ -7,6 +7,16 @@ passes because it checks schema, hashes, graph and evidence — not whether the 
 history. The next session must reconcile the ledger to P25 with a `checkpoint` at the correct
 `--expected-revision` before treating P23 as the resume point.
 
+**Standing authorization (D-0118, 2026-11-14).** Commit coherent verified work locally and push
+it to `origin main` as the closing step of any turn that changed files. Do not ask again for that
+approval. The grant is narrow (commit + push only, no publishing/releases/tags/force-push/
+visibility/credentials) and is gated on `validate` passing, because **the remote is public and a
+push publishes immediately**. `AGENTS.md` was amended to match; the old "Local commits only; there
+is no Mona remote" rule is superseded.
+
+**Last pushed commit:** `a1a4430` - Windows supplement registry plus the approved Mona artwork,
+verified against `git ls-remote origin refs/heads/main`.
+
 **New pending queue (2026-11-14):** the Windows improvement supplement is registered in
 `docs/requirements-windows.json` — **26 prompts W00–W25, 18 requirements WX-01–WX-18, all
 pending**, with `W00` the only eligible one. It is a separate, validated id space (D-0116); it

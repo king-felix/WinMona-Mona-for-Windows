@@ -48,8 +48,25 @@ npm run lint                        # ESLint flat config
   Record command, result, timestamp, version/commit and artifact path/hash.
 - **No secrets.** Never commit keys, tokens, credential paths or private
   transcripts. `.mona/build` is shareable and redacted.
-- **No unrequested publication.** No public repo, package, release, purchase or
-  certificate. Local commits only; there is no Mona remote.
+- **Commit and push standing authorization (D-0118, granted 2026-11-14).** Victor
+  authorized, in advance and for all future turns: commit coherent verified work
+  locally, then push it to `origin` (`https://github.com/king-felix/
+  WinMona-Mona-for-Windows`, branch `main`). Do not stop to ask for that approval
+  again at the end of a turn that introduced changes. Do it, then report the
+  commit SHA and the push result with verification.
+  **This grant is narrow.** It covers `git add` of your own coherent change set,
+  `git commit`, and `git push origin main`. It does **not** authorize: publishing
+  packages or releases, creating or renaming repositories, changing repository
+  visibility, force-pushing or rewriting published history, tags, purchases,
+  certificates, credential or endpoint changes, or committing anything that
+  fails `.mona/build` validation or its secret scan. Those still need an explicit
+  request in the current turn.
+- **Pushes publish immediately.** The remote repository is **public**. A push is
+  publication to the world, not an internal save. Before every push confirm:
+  `node tools/build/cli.mjs validate` passes (including the secret scan), no
+  credentials or private transcripts are staged, and `.gitignore` still excludes
+  `.env*`, keys, `secrets.json` and local `.mona/build` state. If validation
+  fails, fix it or stop and say so; never push a red tree to satisfy this rule.
 - **Scope discipline.** One numbered prompt per session unless Victor queues
   more. Do not drift into later prompts or Later-scope features.
 
@@ -71,7 +88,11 @@ Checkpoint after a meaningful boundary, a new blocker, a test milestone, and
 before handing off. A checkpoint must use `--expected-revision` so a stale writer
 cannot overwrite newer state. Then update `HANDOFF.md`, the requirement ledger
 (`docs/requirements.json`, via `cli.mjs evidence`), and any decision records.
-Commit locally once the prompt's work is coherent and verified.
+Commit locally once the prompt's work is coherent and verified, then push it to
+`origin main` under the standing authorization above (D-0118) — do not wait to be
+asked at the end of a turn that changed files. Commit and push are separate
+steps: a green `validate` gates the push, and a failed push is reported as
+failed rather than described as published.
 
 Prompt statuses are exactly `pending | running | verifying | completed | blocked |
 interrupted | skipped`; requirement statuses are `pending | partial | verified |

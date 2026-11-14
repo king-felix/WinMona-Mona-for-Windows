@@ -1542,3 +1542,35 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
 - **Verified by:** `tests/assets/icon-pipeline.test.mjs` (11 cases: sizes, ICO directory vs payload,
   transparent corners, byte stability, `--check`), `tests/install/installer.test.mjs` package
   artwork cases, and the desktop build emitting `mona-mark-*.png` into the renderer.
+
+## D-0118 - Standing authorization: commit and push without asking, every turn
+
+- **Decision (Victor, 2026-11-14):** from this point forward, an agent that changed files is
+  pre-authorized to commit them locally and push to `origin`
+  (`https://github.com/king-felix/WinMona-Mona-for-Windows`, branch `main`) as the closing step of
+  the turn, without requesting approval again. The previous rule - "No unrequested publication.
+  Local commits only; there is no Mona remote" - is superseded on the commit/push axis and amended
+  in `AGENTS.md` rather than left to contradict practice.
+- **Why:** the approval request at the end of each turn was pure latency. The repository, the
+  branch and the credentials were already settled, the work had already been reviewed by the
+  gates, and a standing instruction covers the repeated decision. Leaving the old rule in place
+  would have made project law and actual practice disagree, which is worse than either.
+- **Scope of the grant, stated so it cannot be widened by implication:** it covers `git add` of
+  the agent's own coherent change set, `git commit`, and `git push origin main`. It does **not**
+  cover publishing packages or releases, creating or renaming repositories, changing visibility,
+  force-pushing or rewriting published history, tags, purchases, certificates, or credential and
+  endpoint changes. Those still require an explicit request in the turn that performs them.
+- **The material consequence, recorded because it is easy to forget:** the remote is **public**.
+  A push publishes immediately and is not reversible in practice once mirrored. So the grant is
+  conditioned on evidence, not on enthusiasm - `node tools/build/cli.mjs validate` (with its secret
+  scan) must pass, no credentials or private transcripts may be staged, and `.gitignore` must keep
+  excluding `.env*`, keys, `secrets.json` and local `.mona/build` state. A red validation result
+  stops the push and is reported as a stop; it is never worked around to satisfy the standing
+  authorization.
+- **Constrains:** the end-of-turn report now states the commit SHA and the push result as facts,
+  with the remote ref checked after pushing. "Pushed" is only claimed when `git ls-remote` agrees
+  with local `HEAD`; a failed or rejected push is reported as failed.
+- **First exercise:** commit `a1a4430` (Windows supplement registry + approved icon artwork) was
+  pushed to `origin/main` under this grant, verified by matching `git ls-remote origin
+  refs/heads/main` against local `HEAD`.
+
