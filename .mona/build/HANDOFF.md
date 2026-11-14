@@ -3,14 +3,15 @@
 **Read this first: there are two ledgers now.** The original P00–P23 sequence is complete
 (`.mona/build/state.json`, revision 83). The Windows improvement supplement W00–W25 is a separate,
 validated id space (D-0116) with its own state at `.mona/build/reviews/windows-v2/state.json`,
-written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00 through W05**;
-they are `completed` there and `W06` is the next eligible prompt.
+written by `tools/build/windows-review.mjs` (D-0120). This session executed **W00 through W05** and implemented **W06**, which is `verifying`: one
+observation (Focus/fullscreen transitions during a live streaming turn) needs a paid turn this
+session was not authorized to start. `W08` is the next eligible prompt; `W07` depends on W06.
 
 Verify before trusting this file:
 
 ```text
 node tools/build/cli.mjs validate          # original ledger: OK, 0 warnings
-node tools/build/windows-review.mjs status # review ledger: 6 completed, current W05
+node tools/build/windows-review.mjs status # review ledger: 6 completed, W06 verifying
 npm run ci                                  # format, lint, typecheck, 591 vitest in 70 files, node --test suites, build
 ```
 
@@ -59,6 +60,15 @@ npm run ci                                  # format, lint, typecheck, 591 vites
   sessions keep their thread, history, usage and draft; the provider and permission profile are
   untouched. 15 dispatch tests, 5 IPC tests, and the real window rotated
   `ses_41455e54` → `ses_98970de6` with no runtime connected (`docs/evidence/W05-dispatch.md`).
+
+- **W06 — Focus Studio and native fullscreen (verifying).** Fullscreen is the window's own state
+  through a narrow IPC boundary (observed `isFullScreen()`, pushed native transitions, F11 owned by
+  the main process, never persisted). Focus hides the topbar and rail with CSS, fills the content
+  area, and keeps Exit focus, Full screen, Interrupt, permission, model and elapsed time in the
+  Studio control strip. The transcript is the flexible row with a 45 vh floor; the composer resizes
+  by drag or arrow keys (72-360 px, saved per project). 15 real-window steps pass, including a
+  native fullscreen round trip with the draft, caret and scroll row preserved
+  (`docs/evidence/W06-focus.json`). **Open:** the same transitions during a live streaming turn.
 
 ## Open items that this session did not close
 

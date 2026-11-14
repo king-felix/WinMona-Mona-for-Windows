@@ -1694,3 +1694,28 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   profile test proves a dispatch leaves the saved settings untouched.
 - **What W17 inherits:** `rotateSession` plus the `new-conversation` operation is the shared,
   idempotent primitive Prompt Runner will use, with both identities in the receipt.
+
+## D-0124 - The window owns fullscreen; Focus owns the layout; the reader keeps their row
+
+- **Decision:** fullscreen is a main-process operation exposed through one narrow channel
+  (`mona:window-state` / `mona:window-set-fullscreen` / `mona:window-event`). The renderer sends a
+  boolean, the main process calls `setFullScreen` only when the state differs, and the observed
+  `isFullScreen()`/`isMaximized()`/bounds are what the UI reads back. Native transitions are pushed.
+  Fullscreen is never persisted.
+- **Why:** S03 requires the desktop shell's actual fullscreen operation with observed native state,
+  kept distinct from maximize, and no duplicate renderer/menu toggles. There is no application menu,
+  so F11 is claimed once in `webContents.before-input-event` (unmodified F11 only); the renderer has
+  no F11 handler to double-fire.
+- **Focus Studio is CSS, not a remount:** the topbar and rail are hidden with `display: none`, the
+  shell becomes a full-height single column, and the Studio's own control strip carries Exit focus,
+  Full screen, Interrupt now, permission, model and elapsed time. Nothing is unmounted, so the
+  composer node, its caret and the transcript scroll survive by construction.
+- **The transcript is the flexible row** with a 45 vh floor; the panel scrolls only as a last resort.
+  The composer has a keyboard-and-pointer resize handle (72-360 px) persisted per project in
+  `localStorage`. Focus changes never force fullscreen and never resize the composer.
+- **Scroll anchor:** the first probe run showed the browser clamping the transcript to the top when
+  Focus changed the shell height (top row 322 -> 281, then a 12 px transcript). The panel now records
+  the stored row at the top of the viewport (`data-seq`) before the transition and re-applies it over
+  several frames. This is recorded because it was a real defect the probe caught, not a preference.
+- **Escape order:** catalog drawer, then the composer's own list, then leaving Focus; never Interrupt,
+  never clearing the draft.

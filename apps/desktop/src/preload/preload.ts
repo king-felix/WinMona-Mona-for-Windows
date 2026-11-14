@@ -16,6 +16,7 @@ import { PROVIDER_CHANNELS } from '../shared/provider.js';
 import { STUDIO_CHANNELS, type StudioEvent } from '../shared/studio.js';
 import { TASK_CHANNELS, type TaskCreateView } from '../shared/tasks.js';
 import { TERMINAL_CHANNELS, type TerminalEvent } from '../shared/terminal.js';
+import { WINDOW_CHANNELS, type WindowState } from '../shared/window.js';
 
 /**
  * The entire renderer-facing surface. Named methods only: no generic invoke, no
@@ -87,6 +88,16 @@ const bridge = Object.freeze({
     ipcRenderer.on(APPEARANCE_CHANNELS.event, listener);
     return () => {
       ipcRenderer.removeListener(APPEARANCE_CHANNELS.event, listener);
+    };
+  },
+  windowStateGet: () => ipcRenderer.invoke(WINDOW_CHANNELS.get, {}),
+  windowSetFullScreen: (input: { fullScreen: boolean }) => ipcRenderer.invoke(WINDOW_CHANNELS.setFullScreen, input),
+  /** The native window reports its own fullscreen and maximize transitions. */
+  onWindowState: (handler: (state: WindowState) => void) => {
+    const listener = (_event: unknown, payload: WindowState): void => handler(payload);
+    ipcRenderer.on(WINDOW_CHANNELS.event, listener);
+    return () => {
+      ipcRenderer.removeListener(WINDOW_CHANNELS.event, listener);
     };
   },
   studioGet: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>

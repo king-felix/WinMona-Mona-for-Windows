@@ -104,6 +104,48 @@ function commandKey(): string {
   return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
 }
 
+const COMPOSER_MIN = 72;
+const COMPOSER_MAX = 360;
+const COMPOSER_DEFAULT = 96;
+
+function clampComposer(value: number): number {
+  if (!Number.isFinite(value)) return COMPOSER_DEFAULT;
+  return Math.max(COMPOSER_MIN, Math.min(COMPOSER_MAX, Math.round(value)));
+}
+
+/**
+ * Composer height is a local preference, not a task: it survives a relaunch
+ * through localStorage and is scoped to the project. Full screen is deliberately
+ * not stored anywhere.
+ */
+function readComposerHeight(projectId: string | null): number {
+  if (!projectId) return COMPOSER_DEFAULT;
+  try {
+    const raw = globalThis.localStorage?.getItem(`mona.composer.${projectId}`);
+    return raw ? clampComposer(Number(raw)) : COMPOSER_DEFAULT;
+  } catch {
+    return COMPOSER_DEFAULT;
+  }
+}
+
+function writeComposerHeight(projectId: string | null, value: number): void {
+  if (!projectId) return;
+  try {
+    globalThis.localStorage?.setItem(`mona.composer.${projectId}`, String(clampComposer(value)));
+  } catch {
+    // A read-only profile loses the preference; it is not an error worth a card.
+  }
+}
+
+function elapsedLabel(startedAt: string | null, nowMs: number): string | null {
+  if (!startedAt) return null;
+  const started = Date.parse(startedAt);
+  if (Number.isNaN(started)) return null;
+  const seconds = Math.max(0, Math.floor((nowMs - started) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  return minutes > 0 ? `${minutes}m ${String(seconds % 60).padStart(2, '0')}s` : `${seconds}s`;
+}
+
 /** Union two item lists by id (newest value wins), ordered by sequence. */
 function mergeTimeline(base: TimelineItem[], incoming: TimelineItem[]): TimelineItem[] {
   const byId = new Map<string, TimelineItem>();
@@ -157,6 +199,12 @@ export type StudioPanelProps = {
   onDraftSent: (sent: { projectId: string; sessionId: string; text: string }) => void;
   /** Called after the main process records a new conversation. */
   onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void;
+  /** Focus Studio: the conversation fills the window with its own controls. */
+  focusMode?: boolean;
+  onToggleFocus?: () => void;
+  /** The desktop window's observed fullscreen state, not a renderer flag. */
+  fullScreen?: boolean;
+  onToggleFullScreen?: () => void;
   /** Ask the shell to re-read recorded spend after a turn settles. */
   onSpendRefresh: () => void;
   /** Export the recorded conversation; returns a message for the notice line. */
@@ -194,6 +242,8 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const [commandDismissed, setCommandDismissed] = useState(false);
   const [catalogQuery, setCatalogQuery] = useState('');
   const [catalogOpen, setCatalogOpen] = useState(false);
+  const [composerHeight, setComposerHeight] = useState<number>(() => readComposerHeight(project?.id ?? null));
+  const [clock, setClock] = useState(() => Date.now());
   /** One operation key per distinct command line, reused by a retry. */
   const pendingCommand = useRef<{ text: string; key: string } | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
@@ -209,6 +259,24 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const prependInFlight = useRef(false);
   const threadIdRef = useRef<string | null>(null);
   const highlightTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Scroll offset captured before a Focus transition, restored after layout. */
+  const restoreScroll = useRef<number | null>(null);
+  /** The stored row at the top of the viewport when Focus was toggled. */
+  const restoreAnchor = useRef<number | null>(null);
+  /** Remember where the reader was, by row, before the shell changes height. */
+  const captureTimelineAnchor = useCallback(() => {
+    const node = timelineRef.current;
+    restoreScroll.current = node?.scrollTop ?? null;
+    if (!node) {
+      restoreAnchor.current = null;
+      return;
+    }
+    const top = node.getBoundingClientRect().top;
+    const first = [...node.querySelectorAll<HTMLElement>('[data-seq]')].find(
+      (item) => item.getBoundingClientRect().bottom > top + 1,
+    );
+    restoreAnchor.current = first ? Number(first.getAttribute('data-seq')) : null;
+  }, []);
   const projectId = project?.id ?? null;
   const session = projectId ? ui?.projects[projectId]?.sessions.find((item) => item.sessionId === sessionId) : null;
 
@@ -226,12 +294,57 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     followScroll.current = true;
   }, [projectId, sessionId, mode]);
 
+  // The composer height belongs to the project, not the conversation: a new
+  // session keeps the size the person chose.
+  useEffect(() => {
+    setComposerHeight(readComposerHeight(projectId));
+  }, [projectId]);
+
   useEffect(
     () => () => {
       if (highlightTimer.current) clearTimeout(highlightTimer.current);
     },
     [],
   );
+
+  // Leaving or entering Focus changes the shell's height, which can make the
+  // browser clamp the timeline's scroll offset. The reader's anchor (the stored
+  // row at the top of the viewport) is restored, so they keep their place.
+  useEffect(() => {
+    const anchor = restoreAnchor.current;
+    const offset = restoreScroll.current;
+    if (anchor === null && offset === null) return;
+    const apply = (): void => {
+      const node = timelineRef.current;
+      if (!node) return;
+      if (anchor !== null) {
+        const target = node.querySelector<HTMLElement>(`[data-seq="${anchor}"]`);
+        if (target) {
+          target.scrollIntoView({ block: 'start' });
+          return;
+        }
+      }
+      if (offset !== null) node.scrollTop = offset;
+    };
+    apply();
+    // The layout can settle over several frames (class change, flex reflow,
+    // scrollbar appearance), so the anchor is re-applied rather than assumed.
+    let attempts = 0;
+    const timer = setInterval(() => {
+      apply();
+      attempts += 1;
+      if (attempts >= 10) {
+        clearInterval(timer);
+        restoreAnchor.current = null;
+        restoreScroll.current = null;
+      }
+    }, 40);
+    const first = requestAnimationFrame(apply);
+    return () => {
+      cancelAnimationFrame(first);
+      clearInterval(timer);
+    };
+  }, [props.focusMode]);
 
   // The autocomplete is a local filter over the shipped catalog. It opens only
   // in a command position and never calls the engine or a model.
@@ -263,6 +376,42 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       });
     },
     [commandAt, draft, props],
+  );
+
+  /** Pointer drag on the composer handle. The timeline takes what is left. */
+  const startComposerResize = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      const startY = event.clientY;
+      const startHeight = composerHeight;
+      const move = (pointer: PointerEvent): void => {
+        setComposerHeight(clampComposer(startHeight - (pointer.clientY - startY)));
+      };
+      const finish = (): void => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', finish);
+        setComposerHeight((value) => {
+          writeComposerHeight(project?.id ?? null, value);
+          return value;
+        });
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', finish);
+    },
+    [composerHeight, project?.id],
+  );
+
+  /** Keyboard equivalent of the drag: 24 px per press, clamped and persisted. */
+  const resizeComposerBy = useCallback(
+    (delta: number) => {
+      setComposerHeight((value) => {
+        const next = clampComposer(value + delta);
+        writeComposerHeight(project?.id ?? null, next);
+        return next;
+      });
+    },
+    [project?.id],
   );
 
   const unwrap = useCallback(
@@ -418,8 +567,40 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
 
   const connectedHere = engine?.state === 'connected' && project?.canonicalPath === engine.workspace;
   const run = studio?.run ?? null;
+
+  // Elapsed time is derived from the recorded start, never invented.
+  const activeSince = run?.startedAt ?? null;
+  useEffect(() => {
+    if (!activeSince) return;
+    setClock(Date.now());
+    const timer = setInterval(() => setClock(Date.now()), 1_000);
+    return () => clearInterval(timer);
+  }, [activeSince]);
+
+  // Escape priority: the open drawer first, then Focus, never Interrupt and
+  // never the draft. The composer keeps its own Escape handling (list, focus).
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape' || event.defaultPrevented || event.repeat) return;
+      if (catalogOpen) {
+        setCatalogOpen(false);
+        return;
+      }
+      const target = event.target as HTMLElement | null;
+      const typing = target?.tagName === 'TEXTAREA' || target?.tagName === 'INPUT';
+      if (typing) return;
+      if (props.focusMode && props.onToggleFocus) {
+        event.preventDefault();
+        captureTimelineAnchor();
+        props.onToggleFocus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [catalogOpen, captureTimelineAnchor, props]);
   const running = run !== null && ['preparing', 'running', 'interrupting', 'awaiting_approval'].includes(run.state);
   const paused = studio?.control.pauseRequested ?? false;
+  const elapsed = elapsedLabel(run?.startedAt ?? null, clock);
   const blockedReason = !project
     ? 'Choose a project first.'
     : !project.folderExists
@@ -857,6 +1038,11 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
             <p className="mona-muted" data-testid="studio-run-detail" aria-live="polite">
               {run?.detail ?? 'Nothing has been sent for this session.'}
             </p>
+            {elapsed ? (
+              <p className="mona-muted" data-testid="studio-elapsed">
+                Elapsed {elapsed}
+              </p>
+            ) : null}
           </div>
         </div>
         <div className="control-mode" role="group" aria-label="Engine mode">
@@ -891,6 +1077,31 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           ) : null}
         </div>
         <div className="control-actions">
+          {props.onToggleFocus ? (
+            <Button
+              size="sm"
+              onClick={() => {
+                captureTimelineAnchor();
+                props.onToggleFocus?.();
+              }}
+              aria-pressed={props.focusMode === true}
+              data-testid="studio-focus-toggle"
+              title="Focus Studio fills the window with this conversation and its controls. Escape leaves it."
+            >
+              {props.focusMode ? 'Exit focus' : 'Focus'}
+            </Button>
+          ) : null}
+          {props.onToggleFullScreen ? (
+            <Button
+              size="sm"
+              onClick={props.onToggleFullScreen}
+              aria-pressed={props.fullScreen === true}
+              data-testid="studio-fullscreen-toggle"
+              title="Full screen is the desktop window's own state (F11). It is separate from Focus and not remembered on relaunch."
+            >
+              {props.fullScreen ? 'Exit full screen' : 'Full screen'}
+            </Button>
+          ) : null}
           {paused ? (
             <Button size="sm" onClick={() => void resume()} disabled={busy !== null}>
               Resume queue
@@ -1058,10 +1269,12 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           if (atBottom) setUnread(0);
         }}
         onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            event.preventDefault();
-            composerRef.current?.focus();
-          }
+          if (event.key !== 'Escape') return;
+          // In Focus, Escape belongs to the shell: it leaves Focus rather than
+          // moving focus into the composer. Outside Focus it returns the caret.
+          if (props.focusMode) return;
+          event.preventDefault();
+          composerRef.current?.focus();
         }}
       >
         {items.length === 0 && !pendingPrompt ? (
@@ -1139,6 +1352,29 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         </div>
       ) : null}
 
+      <div
+        className="composer-resize"
+        role="separator"
+        aria-orientation="horizontal"
+        aria-label="Resize the composer"
+        aria-valuemin={COMPOSER_MIN}
+        aria-valuemax={COMPOSER_MAX}
+        aria-valuenow={composerHeight}
+        tabIndex={0}
+        data-testid="composer-resize"
+        title="Drag or use the arrow keys to resize the composer. The timeline keeps the remaining space."
+        onPointerDown={startComposerResize}
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            resizeComposerBy(24);
+          } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            resizeComposerBy(-24);
+          }
+        }}
+      />
+
       <div className="composer">
         <div className="composer-head">
           <label className="mona-field-label" htmlFor="draft">
@@ -1184,6 +1420,7 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           ref={composerRef}
           className="mona-input composer-input"
           value={draft}
+          style={{ height: `${composerHeight}px` }}
           placeholder="Describe the task. Typing / lists Codewhale commands; Ctrl+Enter sends."
           onChange={(event) => {
             props.onDraft(event.target.value);

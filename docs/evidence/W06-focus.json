@@ -1,0 +1,145 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "a real project opens through the catalog",
+      "ok": true,
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w06-focus-htqanv\\focus-project"
+    },
+    {
+      "name": "the real composer is on screen",
+      "ok": true
+    },
+    {
+      "name": "a stored conversation is on screen for the scroll test",
+      "ok": true,
+      "detail": {
+        "seeded": 400
+      }
+    },
+    {
+      "name": "the window starts normal, not full screen",
+      "ok": true,
+      "detail": {
+        "fullScreen": false,
+        "maximized": false,
+        "focused": true,
+        "width": 1280,
+        "height": 688,
+        "normalWidth": 1280,
+        "normalHeight": 688,
+        "focus": false
+      }
+    },
+    {
+      "name": "Focus fills the window and keeps exit, context and interrupt",
+      "ok": true,
+      "detail": {
+        "topbarHidden": true,
+        "railHidden": true,
+        "interruptVisible": true,
+        "exitVisible": true,
+        "draft": "keep this draft while the window changes",
+        "caret": 9,
+        "scrollTop": 5730.33349609375,
+        "topSeq": 322
+      }
+    },
+    {
+      "name": "Focus keeps the draft, the caret and the scroll anchor",
+      "ok": true,
+      "detail": {
+        "draft": "keep this draft while the window changes",
+        "caret": 9,
+        "topSeq": 322,
+        "expectedTopSeq": 322,
+        "scrollTop": 5730.33349609375,
+        "expectedScrollTop": 5775
+      }
+    },
+    {
+      "name": "the native window reports full screen",
+      "ok": true
+    },
+    {
+      "name": "full screen keeps the draft, caret, scroll anchor and Focus",
+      "ok": true,
+      "detail": {
+        "draft": "keep this draft while the window changes",
+        "caret": 9,
+        "scrollTop": 5730.33349609375,
+        "tagged": "anchor",
+        "clientHeight": 336,
+        "scrollHeight": 16499,
+        "topSeq": 322,
+        "focus": true
+      }
+    },
+    {
+      "name": "F11 leaves full screen exactly once",
+      "ok": true
+    },
+    {
+      "name": "F11 re-enters full screen",
+      "ok": true
+    },
+    {
+      "name": "an open drawer survives leaving full screen",
+      "ok": true,
+      "detail": {
+        "drawerOpened": true,
+        "drawerBefore": true,
+        "drawerAfter": true
+      }
+    },
+    {
+      "name": "minimize and restore keep the window usable",
+      "ok": true,
+      "detail": {
+        "minimized": true,
+        "restored": true
+      }
+    },
+    {
+      "name": "Escape in the composer does not leave Focus",
+      "ok": true
+    },
+    {
+      "name": "Escape from the page leaves Focus",
+      "ok": true,
+      "detail": {
+        "focus": false,
+        "focusedElement": "timeline"
+      }
+    },
+    {
+      "name": "the window is not left in full screen, and the draft survived every transition",
+      "ok": true,
+      "detail": {
+        "fullScreen": false,
+        "draft": "keep this draft while the window changes"
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06\\focus-01-normal.png",
+      "label": "focus-01-normal"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06\\focus-02-focus.png",
+      "label": "focus-02-focus"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06\\focus-03-fullscreen.png",
+      "label": "focus-03-fullscreen"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06\\focus-04-exited.png",
+      "label": "focus-04-exited"
+    }
+  ],
+  "capturedAt": "2026-11-14T19:29:15.610Z",
+  "providerRequests": 0,
+  "limitation": "No runtime was started, so these transitions were not exercised during a live streaming turn; that needs a paid turn and is recorded as such. The window state is the main process's own isFullScreen() reading."
+}

@@ -26,6 +26,7 @@ import { StudioService, type StudioAttentionEvent } from './studio-service.js';
 import { registerStudioIpc } from './studio-ipc.js';
 import { CommandService } from './command-service.js';
 import { registerCommandIpc } from './command-ipc.js';
+import { attachWindowState, registerWindowIpc } from './window-state.js';
 import { ChangesService } from './changes-service.js';
 import { registerChangesIpc } from './changes-ipc.js';
 import { registerCostIpc } from './cost-ipc.js';
@@ -68,6 +69,7 @@ import { runA11yProbe } from './a11y-probe.js';
 import { runAppearanceProbe } from './appearance-probe.js';
 import { runComposerProbe } from './composer-probe.js';
 import { runSlashProbe } from './slash-probe.js';
+import { runFocusProbe } from './focus-probe.js';
 import { runSurfacesProbe } from './surfaces-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
@@ -161,6 +163,11 @@ const slashTest = process.argv.includes('--slash-probe');
 const slashOut = process.env.MONA_SLASH_OUT ?? path.join(process.cwd(), 'mona-slash.json');
 const slashWorkspace = process.env.MONA_SLASH_WORKSPACE ?? null;
 const slashShots = process.env.MONA_SLASH_SHOTS ?? path.join(process.cwd(), 'mona-slash-shots');
+// W06 Focus and fullscreen probe: real window transitions, no runtime.
+const focusTest = process.argv.includes('--focus-probe');
+const focusOut = process.env.MONA_FOCUS_OUT ?? path.join(process.cwd(), 'mona-focus.json');
+const focusWorkspace = process.env.MONA_FOCUS_WORKSPACE ?? null;
+const focusShots = process.env.MONA_FOCUS_SHOTS ?? path.join(process.cwd(), 'mona-focus-shots');
 // P25 surfaces probe: the Cost lens and the Work board, driven against real rows.
 const surfacesTest = process.argv.includes('--surfaces-probe');
 const surfacesOut = process.env.MONA_SURFACES_OUT ?? path.join(process.cwd(), 'mona-surfaces.json');
@@ -185,6 +192,7 @@ if (
   appearanceTest ||
   composerTest ||
   slashTest ||
+  focusTest ||
   surfacesTest
 )
   app.disableHardwareAcceleration();
@@ -888,6 +896,11 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
       isTrustedSender: trustedSender,
       service: () => commandService,
     });
+    registerWindowIpc({
+      handle: (channel, listener) => ipcMain.handle(channel, listener),
+      isTrustedSender: trustedSender,
+      window: () => mainWindow,
+    });
     registerChangesIpc({
       handle: (channel, listener) => ipcMain.handle(channel, listener),
       isTrustedSender: trustedSender,
@@ -1122,6 +1135,43 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
         })
         .catch((error: unknown) => {
           fs.writeFileSync(slashOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+    }
+
+    if (focusTest && focusWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runFocusProbe({
+        window: probeWindow,
+        outputPath: focusOut,
+        shotsDirectory: focusShots,
+        workspace: focusWorkspace,
+        openProject: async (target) => {
+          if (!catalogService) return null;
+          const opened = await catalogService.open(target);
+          if (!opened.ok) return null;
+          return { projectId: opened.data.project.id, canonicalPath: opened.data.project.canonicalPath };
+        },
+        database: () => localState?.store.database ?? null,
+        sessionId: (projectId) => {
+          if (!uiStateStore) return null;
+          const state = uiStateStore.view();
+          const existing = state.projects[projectId]?.currentSessionId ?? null;
+          if (existing) return existing;
+          return uiStateStore.newSession(projectId).projects[projectId]?.currentSessionId ?? null;
+        },
+        reload: () => {
+          if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.reload();
+        },
+      })
+        .then((result) => {
+          fs.mkdirSync(path.dirname(focusOut), { recursive: true });
+          fs.writeFileSync(focusOut, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(focusOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
     }
@@ -1717,6 +1767,8 @@ function createMainWindow(): BrowserWindow {
     event.preventDefault();
     stepZoom(direction);
   });
+  const detachWindowState = attachWindowState(window);
+  window.once('closed', () => detachWindowState());
   window.once('ready-to-show', () => {
     if (!smokeTest) window.show();
   });

@@ -944,7 +944,10 @@ body {
 
 .composer-input {
   min-height: 56px;
-  height: 56px;
+  /* The height comes from the resize handle, so the composer can grow within a
+     cap instead of being pinned to one row count. */
+  height: auto;
+  resize: none;
 }
 
 .composer-foot > .mona-row {
@@ -1207,16 +1210,77 @@ body {
   padding: var(--space-2) 0;
 }
 
-.focus-mode .workspace {
-  grid-template-columns: minmax(0, 1fr);
+/* --- W06: Focus Studio fills the application content area --- */
+
+/* The shell gives its whole height to the conversation; the topbar and the
+   section rail are hidden, and the Studio's own control strip carries the exit,
+   the fullscreen toggle, the interrupt control and the context facts. */
+.focus-mode {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.focus-mode .topbar,
+.focus-mode .rail {
+  display: none;
 }
 
 .focus-mode .layout {
-  grid-template-columns: 168px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  padding: 0;
+  gap: 0;
+}
+
+.focus-mode .workspace,
+.focus-mode .workspace.inspector-collapsed {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  height: 100%;
+  min-height: 0;
+  gap: 0;
 }
 
 .focus-mode .studio-region {
-  padding-right: var(--space-4);
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.focus-mode .studio-panel {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  /* The panel itself is the last-resort scroller: the timeline keeps a readable
+     minimum and the composer is never able to push it off screen. */
+  overflow: auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.focus-mode .studio-panel > .timeline {
+  flex: 1 1 0;
+  /* The conversation keeps the majority of the window; the composer can grow to
+     its cap and the panel scrolls only if everything still does not fit. */
+  min-height: 45vh;
+  max-height: none;
+}
+
+/* --- W06: a resizable composer with a minimum useful height --- */
+
+.composer-resize {
+  height: 10px;
+  cursor: row-resize;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(to bottom, transparent 3px, var(--border) 3px, var(--border) 5px, transparent 5px);
+  touch-action: none;
+}
+
+.composer-resize:hover,
+.composer-resize:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
 [data-density='compact'] .panel {

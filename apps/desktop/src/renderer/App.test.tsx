@@ -333,6 +333,17 @@ type Store = {
   extensionActions?: string[];
   capabilities?: CapabilityExplorerView;
   capabilityActions?: string[];
+  windowState?: {
+    fullScreen: boolean;
+    maximized: boolean;
+    focused: boolean;
+    width: number;
+    height: number;
+    normalWidth: number;
+    normalHeight: number;
+  };
+  fullScreenCalls?: boolean[];
+  windowHandlers?: Array<(state: unknown) => void>;
 };
 
 function emptyStudio(): StudioView {
@@ -880,6 +891,37 @@ function bridgeFor(store: Store): Window['mona'] {
       return ok(store.appearance);
     },
     onAppearance: () => () => undefined,
+    windowStateGet: async () =>
+      ok({
+        fullScreen: store.windowState?.fullScreen ?? false,
+        maximized: store.windowState?.maximized ?? false,
+        focused: true,
+        width: 1280,
+        height: 800,
+        normalWidth: 1280,
+        normalHeight: 800,
+      }),
+    windowSetFullScreen: async ({ fullScreen }: { fullScreen: boolean }) => {
+      store.windowState = {
+        fullScreen,
+        maximized: store.windowState?.maximized ?? false,
+        focused: true,
+        width: 1280,
+        height: 800,
+        normalWidth: 1280,
+        normalHeight: 800,
+      };
+      store.fullScreenCalls = [...(store.fullScreenCalls ?? []), fullScreen];
+      return ok(store.windowState);
+    },
+    onWindowState: (handler: (state: unknown) => void) => {
+      const list = (store.windowHandlers ??= []);
+      list.push(handler);
+      return () => {
+        const index = list.indexOf(handler);
+        if (index >= 0) list.splice(index, 1);
+      };
+    },
     costLens: async ({ projectId }: { projectId: string }) => ok(store.cost ?? emptyCost(projectId)),
     costSetBudget: async (input: { projectId: string; scope: string; limitMicros: number }) => {
       const base = store.cost ?? emptyCost(input.projectId);

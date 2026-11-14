@@ -29,6 +29,7 @@
     "appearance": "node scripts/appearance.mjs",
     "composer": "node scripts/composer.mjs",
     "slash": "node scripts/slash.mjs",
+    "focus": "node scripts/focus.mjs",
     "surfaces": "node scripts/surfaces.mjs"
   },
   "dependencies": {

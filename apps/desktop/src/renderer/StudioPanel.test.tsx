@@ -1,4 +1,4 @@
-// @vitest-environment happy-dom
+﻿// @vitest-environment happy-dom
 import { act, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -459,9 +459,17 @@ const liveInfo = {
 function Interactive({
   initialDraft = '',
   onNewConversation = () => undefined,
+  focusMode = false,
+  onToggleFocus = () => undefined,
+  fullScreen = false,
+  onToggleFullScreen = () => undefined,
 }: {
   initialDraft?: string;
   onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void;
+  focusMode?: boolean;
+  onToggleFocus?: () => void;
+  fullScreen?: boolean;
+  onToggleFullScreen?: () => void;
 }): React.JSX.Element {
   const [draft, setDraftValue] = useState(initialDraft);
   return (
@@ -482,6 +490,10 @@ function Interactive({
       onLocate={() => undefined}
       onDraftSent={() => undefined}
       onNewConversation={onNewConversation}
+      focusMode={focusMode}
+      onToggleFocus={onToggleFocus}
+      fullScreen={fullScreen}
+      onToggleFullScreen={onToggleFullScreen}
       onSpendRefresh={() => undefined}
     />
   );
@@ -492,10 +504,25 @@ async function renderInteractive(
   initialDraft = '',
   overrides: BridgeOverrides = {},
   onNewConversation?: (input: { oldSessionId: string | null; newSessionId: string; ui: UiStateView }) => void,
+  chrome: {
+    focusMode?: boolean;
+    onToggleFocus?: () => void;
+    fullScreen?: boolean;
+    onToggleFullScreen?: () => void;
+  } = {},
 ): Promise<void> {
   installBridge(next, overrides);
   await act(async () => {
-    root.render(<Interactive initialDraft={initialDraft} onNewConversation={onNewConversation ?? (() => undefined)} />);
+    root.render(
+      <Interactive
+        initialDraft={initialDraft}
+        onNewConversation={onNewConversation ?? (() => undefined)}
+        {...(chrome.focusMode === undefined ? {} : { focusMode: chrome.focusMode })}
+        {...(chrome.onToggleFocus === undefined ? {} : { onToggleFocus: chrome.onToggleFocus })}
+        {...(chrome.fullScreen === undefined ? {} : { fullScreen: chrome.fullScreen })}
+        {...(chrome.onToggleFullScreen === undefined ? {} : { onToggleFullScreen: chrome.onToggleFullScreen })}
+      />,
+    );
   });
   await act(async () => {
     await Promise.resolve();
@@ -816,5 +843,134 @@ describe('StudioPanel command dispatch', () => {
     const textarea = await typeIntoComposer('/help');
     await press(textarea, 'Enter', { ctrlKey: true });
     expect(details.open).toBe(true);
+  });
+});
+
+describe('StudioPanel Focus and full screen', () => {
+  it("reflects the window's observed fullscreen state and asks the shell to change it", async () => {
+    const calls: string[] = [];
+    await renderInteractive(view(0), '', {}, undefined, {
+      focusMode: false,
+      fullScreen: true,
+      onToggleFocus: () => calls.push('focus'),
+      onToggleFullScreen: () => calls.push('fullscreen'),
+    });
+    const focusButton = container.querySelector('[data-testid="studio-focus-toggle"]') as HTMLButtonElement;
+    const fullButton = container.querySelector('[data-testid="studio-fullscreen-toggle"]') as HTMLButtonElement;
+    expect(focusButton.textContent).toBe('Focus');
+    expect(focusButton.getAttribute('aria-pressed')).toBe('false');
+    expect(fullButton.textContent).toBe('Exit full screen');
+    expect(fullButton.getAttribute('aria-pressed')).toBe('true');
+
+    await act(async () => {
+      focusButton.click();
+      fullButton.click();
+    });
+    expect(calls).toEqual(['focus', 'fullscreen']);
+  });
+
+  it('offers the exit in focus mode and reports the elapsed time from the record', async () => {
+    const base = view(0);
+    const startedAt = new Date(Date.now() - 65_000).toISOString();
+    await renderInteractive(
+      {
+        ...base,
+        run: { ...base.run, state: 'running', detail: 'Working', startedAt, turnId: 'turn_1' },
+      },
+      '',
+      {},
+      undefined,
+      { focusMode: true },
+    );
+    expect((container.querySelector('[data-testid="studio-focus-toggle"]') as HTMLElement).textContent).toBe(
+      'Exit focus',
+    );
+    const elapsed = container.querySelector('[data-testid="studio-elapsed"]')?.textContent ?? '';
+    expect(elapsed).toMatch(/Elapsed 1m 0\d/);
+  });
+
+  it('resizes the composer from the keyboard, clamped and remembered', async () => {
+    await renderInteractive(view(0));
+    const handle = container.querySelector('[data-testid="composer-resize"]') as HTMLElement;
+    const textarea = container.querySelector('#draft') as HTMLTextAreaElement;
+    const initial = Number.parseFloat(textarea.style.height);
+    expect(initial).toBeGreaterThan(0);
+
+    await act(async () => {
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }));
+    });
+    const taller = Number.parseFloat((container.querySelector('#draft') as HTMLTextAreaElement).style.height);
+    expect(taller).toBe(initial + 24);
+    expect(localStorage.getItem('mona.composer.prj_a')).toBe(String(taller));
+
+    for (let press_ = 0; press_ < 20; press_ += 1) {
+      await act(async () => {
+        handle.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }));
+      });
+    }
+    const shortest = Number.parseFloat((container.querySelector('#draft') as HTMLTextAreaElement).style.height);
+    expect(shortest).toBe(72);
+    expect(handle.getAttribute('aria-valuenow')).toBe('72');
+  });
+
+  it('closes the catalog with Escape before it would leave Focus', async () => {
+    const exits: number[] = [];
+    await renderInteractive(
+      view(0),
+      '',
+      {
+        command: async () => ({
+          ok: true as const,
+          data: {
+            projectId: 'prj_a',
+            command: 'help',
+            via: 'name',
+            status: 'done',
+            code: 'ok',
+            detail: 'Opened the catalog.',
+            at: '2026-11-12T00:00:00.000Z',
+            operation: 'show-catalog',
+            oldSessionId: null,
+            newSessionId: null,
+            threadCreated: false,
+            providerRequest: false,
+            replayed: false,
+            ui: null,
+          },
+        }),
+      },
+      undefined,
+      { focusMode: true, onToggleFocus: () => exits.push(1) },
+    );
+    const textarea = await typeIntoComposer('/help');
+    await press(textarea, 'Enter', { ctrlKey: true });
+    const details = container.querySelector('.command-catalog') as HTMLDetailsElement;
+    expect(details.open).toBe(true);
+
+    await act(async () => {
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(details.open).toBe(false);
+    expect(exits).toEqual([]);
+  });
+
+  it('leaves Focus on Escape from the page but not while typing in the composer', async () => {
+    const exits: number[] = [];
+    await renderInteractive(view(0), '', {}, undefined, {
+      focusMode: true,
+      onToggleFocus: () => exits.push(1),
+    });
+    const textarea = container.querySelector('#draft') as HTMLTextAreaElement;
+    await act(async () => {
+      textarea.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(exits).toEqual([]);
+    await act(async () => {
+      document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    });
+    expect(exits).toEqual([1]);
   });
 });

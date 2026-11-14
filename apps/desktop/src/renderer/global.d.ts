@@ -15,6 +15,7 @@ import type { ProviderBridge } from '../shared/provider.js';
 import type { StudioBridge } from '../shared/studio.js';
 import type { TaskBridge } from '../shared/tasks.js';
 import type { TerminalBridge } from '../shared/terminal.js';
+import type { WindowBridge } from '../shared/window.js';
 
 declare global {
   interface Window {
@@ -33,7 +34,8 @@ declare global {
       MemoryBridge &
       ChangesBridge &
       CostBridge &
-      TaskBridge & {
+      TaskBridge &
+      WindowBridge & {
         getAppInfo(): Promise<IpcResult<AppInfo>>;
       };
   }

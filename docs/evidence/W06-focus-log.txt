@@ -1,0 +1,35 @@
+executable: X:\AI_projects\Mona\node_modules\electron\dist\electron.exe
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-w06-focus-HtQanV\focus-project
+
+
+PASS a real project opens through the catalog :: "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w06-focus-htqanv\\focus-project"
+PASS the real composer is on screen
+PASS a stored conversation is on screen for the scroll test :: {"seeded":400}
+PASS the window starts normal, not full screen :: {"fullScreen":false,"maximized":false,"focused":true,"width":1280,"height":688,"normalWidth":1280,"normalHeight":688,"focus":false}
+PASS Focus fills the window and keeps exit, context and interrupt :: {"topbarHidden":true,"railHidden":true,"interruptVisible":true,"exitVisible":true,"draft":"keep this draft while the window changes","caret":9,"scrollTop":5730.33349609375,"topSeq":322}
+PASS Focus keeps the draft, the caret and the scroll anchor :: {"draft":"keep this draft while the window changes","caret":9,"topSeq":322,"expectedTopSeq":322,"scrollTop":5730.33349609375,"expectedScrollTop":5775}
+PASS the native window reports full screen
+PASS full screen keeps the draft, caret, scroll anchor and Focus :: {"draft":"keep this draft while the window changes","caret":9,"scrollTop":5730.33349609375,"tagged":"anchor","clientHeight":336,"scrollHeight":16499,"topSeq":322,"focus":true}
+PASS F11 leaves full screen exactly once
+PASS F11 re-enters full screen
+PASS an open drawer survives leaving full screen :: {"drawerOpened":true,"drawerBefore":true,"drawerAfter":true}
+PASS minimize and restore keep the window usable :: {"minimized":true,"restored":true}
+PASS Escape in the composer does not leave Focus
+PASS Escape from the page leaves Focus :: {"focus":false,"focusedElement":"timeline"}
+PASS the window is not left in full screen, and the draft survived every transition :: {"fullScreen":false,"draft":"keep this draft while the window changes"}
+mona: applied 8 state migration(s) to version 8
+X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13
+var consoleProcessList = getConsoleProcessList(shellPid);
+                         ^
+
+Error: AttachConsole failed
+    at Object.<anonymous> (X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13:26)
+    at Module._compile (node:internal/modules/cjs/loader:1937:14)
+    at Object..js (node:internal/modules/cjs/loader:2070:10)
+    at Module.load (node:internal/modules/cjs/loader:1658:32)
+    at Module._load (node:internal/modules/cjs/loader:1450:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:268:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.22.2

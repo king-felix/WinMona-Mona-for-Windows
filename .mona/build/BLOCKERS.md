@@ -34,6 +34,7 @@ This is not a three-attempt blocker; it is recorded here because it needs Victor
 | Human click on the modern menu | P21/P22 acceptance | package registered and the menu is now offered; no human has confirmed seeing or clicking the entry | right-click a folder and a folder background and confirm **Start new DS project with Mona** in the Windows 11 menu; record the result in `P23-human-checklist.md` |
 | Narrator walkthrough | P22/P23 acceptance | not performed; no automated claim is made | with Narrator on, open Mona, tab Home -> Studio -> composer, send nothing, confirm every control announces a name and state |
 | 200% scaling on a physical display | P22/P23 acceptance | automated 200% zoom captured; physical display not tested | set Windows scaling to 200% and confirm the composer and control strip stay reachable without horizontal scrolling |
+| W06 live-turn observation | W06 acceptance | Focus and fullscreen transitions verified in a real window while typing, scrolled back and with a drawer open; the streaming and answering-input variants need one paid turn, which this session was not authorized to start | authorize one bounded prompt on the configured route, then repeat the Focus probe with a live turn and record the result on W06 |
 | Release candidate decision | 0.1.0 handoff | candidate rebuilt after the packaging guard (`Mona-0.1.0-x64.msix` sha256 `5a7a6455…44ee`), installed, verified and documented; not published | accept the candidate as 0.1.0, or schedule the memory profile and the human checks first |
 
 ## Resolved

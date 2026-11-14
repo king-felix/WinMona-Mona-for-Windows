@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 9,
+  "revision": 10,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -16,7 +16,7 @@
     "ledger": "docs/requirements-windows.json"
   },
   "baseline_utc": "2026-11-14T16:51:28Z",
-  "current_task": "W03",
+  "current_task": "W06",
   "tasks": {
     "W00": {
       "status": "completed",
@@ -211,7 +211,7 @@
       "next_action": "W06: Focus Studio and real Windows fullscreen through the native window boundary"
     },
     "W06": {
-      "status": "pending",
+      "status": "verifying",
       "prerequisites": [
         "W01",
         "W03"
@@ -220,10 +220,27 @@
       "acceptance_open": [
         "Actual Windows tests enter/leave while streaming, typing, scrolled back, answering input and opening drawers. No remounted engine or new inference; draft/caret/scroll survives. Alt+Tab, F11/menu exit, minimize/restore and close/quit remain usable. Narrow and 200% layouts keep essential controls reachable."
       ],
-      "evidence": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W06-focus.md",
+          "sha256": "65dd656806779e7e39d8d572debc44d14b236e85f43fba5eeaddd97df5c0c8c7",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T19:29:37Z",
+          "commit": "d3a6b4b6641c2cff19125f3df972ebaf54af4a0c"
+        },
+        {
+          "path": "docs/evidence/W06-focus.json",
+          "sha256": "bdeb8447f82361df611b10e3fb3270a8d9424fa474c4d901d2e4e579671cc24b",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T19:29:37Z",
+          "commit": "d3a6b4b6641c2cff19125f3df972ebaf54af4a0c"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-007"
+      ],
+      "next_action": "Repeat the real-window Focus/fullscreen transitions during a live paid turn (authorization needed), then complete W06 and start W07"
     },
     "W07": {
       "status": "pending",

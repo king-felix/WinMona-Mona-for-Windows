@@ -42,6 +42,7 @@ import type {
   UiStateView,
 } from '../shared/catalog.js';
 import type { AppInfo } from '../shared/ipc.js';
+import type { WindowState } from '../shared/window.js';
 import type { CapabilityExplorerView } from '@mona/contracts';
 import type { LaunchReceipt } from '../shared/launch.js';
 
@@ -144,6 +145,7 @@ export function App(): React.JSX.Element {
   const [createName, setCreateName] = useState('');
   const [loaded, setLoaded] = useState(false);
   const [focusToken, setFocusToken] = useState(0);
+  const [windowState, setWindowState] = useState<WindowState | null>(null);
   const [briefing, setBriefing] = useState<BriefingView | null>(null);
   const [briefingError, setBriefingError] = useState<string | null>(null);
   const [capabilities, setCapabilities] = useState<CapabilityExplorerView | null>(null);
@@ -716,6 +718,33 @@ export function App(): React.JSX.Element {
       });
     }
   }, [layout, selected]);
+
+  // Full screen is the desktop window's state: read it back, never assume it.
+  useEffect(() => {
+    let alive = true;
+    void window.mona.windowStateGet().then((result) => {
+      if (alive && result.ok) setWindowState(result.data);
+    });
+    const unsubscribe = window.mona.onWindowState((state) => setWindowState(state));
+    return () => {
+      alive = false;
+      unsubscribe();
+    };
+  }, []);
+
+  const toggleFullScreen = useCallback(() => {
+    void window.mona.windowSetFullScreen({ fullScreen: !(windowState?.fullScreen ?? false) }).then((result) => {
+      if (result.ok) {
+        setWindowState(result.data);
+        return;
+      }
+      setNotice({
+        tone: 'critical',
+        title: 'Full screen did not change',
+        body: result.error.message,
+      });
+    });
+  }, [windowState?.fullScreen]);
 
   const saveAttention = useCallback(async (patch: Parameters<typeof window.mona.attentionSet>[0]) => {
     const result = await window.mona.attentionSet(patch);
@@ -1295,6 +1324,10 @@ export function App(): React.JSX.Element {
                   ui={ui}
                   busy={busy}
                   focusToken={focusToken}
+                  focusMode={focusMode}
+                  onToggleFocus={() => void toggleFocus()}
+                  fullScreen={windowState?.fullScreen ?? false}
+                  onToggleFullScreen={toggleFullScreen}
                   identity={selected ? projectIdentity(selected) : null}
                   favorites={selected ? (ui?.projects[selected.id]?.favorites ?? []) : []}
                   onSaveFavorite={(label, text) => {
