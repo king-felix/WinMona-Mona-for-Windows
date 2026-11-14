@@ -72,6 +72,39 @@ function schemaVersionOf(db: DatabaseSync): number {
   return typeof row?.version === 'number' ? row.version : 0;
 }
 
+/** Schema version of a database file, read without opening it for writing. */
+export function schemaVersionOfFile(file: string): number {
+  const db = new DatabaseSync(file, { readOnly: true });
+  try {
+    return schemaVersionOf(db);
+  } finally {
+    db.close();
+  }
+}
+
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Windows can briefly refuse a rename while a scanner or another handle lets go.
+ * A few short retries turn that into a slower restore instead of a failed one;
+ * the last error still propagates, so a real lock is still reported as a lock.
+ */
+async function renameWithRetry(from: string, to: string, attempts = 5): Promise<void> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      renameSync(from, to);
+      return;
+    } catch (error) {
+      lastError = error;
+      const code = (error as NodeJS.ErrnoException).code ?? '';
+      if (!['EPERM', 'EACCES', 'EBUSY'].includes(code)) throw error;
+      await delay(40 * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
 function removeStagedSidecars(staged: string): void {
   for (const suffix of ['-wal', '-shm'] as const) rmSync(`${staged}${suffix}`, { force: true });
 }
@@ -127,6 +160,18 @@ export async function restoreBackup(store: ProjectStore, options: RestoreOptions
     if (integrity !== 'ok') {
       throw stateError('corrupt_state', 'backup failed verification; the live database was not touched', integrity);
     }
+    // A backup written by a newer build carries migrations this build does not
+    // have. Restoring it would leave rows the code cannot read, so it is refused
+    // before anything is closed or replaced.
+    const liveSchema = schemaVersionOf(store.database);
+    const backupSchema = schemaVersionOfFile(options.backupFile);
+    if (backupSchema > liveSchema) {
+      throw stateError(
+        'schema_drift',
+        `backup schema version ${backupSchema} is newer than this build's ${liveSchema}; the live database was not touched`,
+        'Restore this backup with the build that wrote it.',
+      );
+    }
     const live = store.file;
     const stamp = (options.now ?? (() => new Date()))().toISOString().replace(/[:.]/g, '-');
     mkdirSync(options.recoveryDirectory, { recursive: true });
@@ -162,9 +207,20 @@ export async function restoreBackup(store: ProjectStore, options: RestoreOptions
         if (existsSync(sidecar)) rmSync(sidecar, { force: true });
       }
       options.hooks?.beforeReplace?.();
-      renameSync(staged, live);
+      await renameWithRetry(staged, live);
       removeStagedSidecars(staged);
-      store.reopen();
+      try {
+        store.reopen();
+      } catch (error) {
+        // The replacement is already in place. Saying "restore failed" would hide
+        // which database is live now, so this reports the real state and keeps the
+        // parked copy's path for recovery.
+        throw stateError(
+          'corrupt_state',
+          'the verified backup replaced the live database but could not be reopened',
+          `${String(error)}; the previous database is parked at ${parked}`,
+        );
+      }
     } catch (error) {
       removeStaged(staged);
       try {

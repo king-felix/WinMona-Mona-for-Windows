@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 4,
+  "revision": 5,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -16,7 +16,7 @@
     "ledger": "docs/requirements-windows.json"
   },
   "baseline_utc": "2026-11-14T16:51:28Z",
-  "current_task": "W02",
+  "current_task": "W03",
   "tasks": {
     "W00": {
       "status": "completed",
@@ -78,18 +78,34 @@
       "next_action": "W02: replacement-import cleanup, maintenance coverage, native export dialog"
     },
     "W02": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Replacement import/export tests cover associated-row cleanup and unrelated-data preservation; fault injection preserves usable prior state or a recoverable checkpoint; all writers participate in maintenance; dialog cancellation leaves state intact; no model calls from import/export UI."
+      "acceptance_done": [
+        "Replacement import/export tests cover associated-row cleanup and unrelated-data preservation",
+        "Fault injection preserves a usable prior state or a recoverable checkpoint (pre-import verified backup; restore refuses newer schema)",
+        "All product writers participate in maintenance; proven at the service boundary",
+        "Dialog cancellation leaves state intact and only the native dialog chooses the path",
+        "No model calls from import or export"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W02-state.md",
+          "sha256": "acea309a39a9e6cd3af78efeb6a6e2b740d6e5e03eb5b10d9908fb3b231e4f09",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T17:26:22Z",
+          "commit": "a01ccb0fba7a9a880c52e25002f6e612d0728ec6"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-005",
+        "MONA-007",
+        "MONA-025"
+      ],
+      "next_action": "W03: fix timeline ordering and paging so stored history beyond 500 rows is reachable"
     },
     "W03": {
       "status": "pending",

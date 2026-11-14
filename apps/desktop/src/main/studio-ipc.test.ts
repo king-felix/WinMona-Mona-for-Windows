@@ -106,6 +106,17 @@ describe('studio IPC surface', () => {
     expect(result).toMatchObject({ ok: false, error: { code: 'internal' } });
   });
 
+  it('refuses a renderer-chosen export path: only the native save dialog picks it', async () => {
+    const h = harness();
+    const result = await h.invoke(STUDIO_CHANNELS.export, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      path: 'C:\\Windows\\System32\\drivers\\etc\\hosts',
+    });
+    expect(result).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+    expect(h.calls).toEqual([]);
+  });
+
   it('passes a validated request through with its mode', async () => {
     const h = harness();
     await h.invoke(STUDIO_CHANNELS.get, { projectId: 'prj_1', sessionId: 'ses_1', mode: 'plan' });

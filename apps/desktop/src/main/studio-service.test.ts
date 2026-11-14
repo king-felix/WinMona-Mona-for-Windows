@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -936,5 +936,56 @@ describe('conversation export', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.message).toContain('nothing to export');
     expect(existsSync(path.join(directory, 'empty.md'))).toBe(false);
+  });
+
+  it('writes a Unicode destination with spaces and reports the bytes it wrote', async () => {
+    const directory = await tempDir('export-unicode');
+    const folder = path.join(directory, 'Mona gespräche — café');
+    await mkdir(folder, { recursive: true });
+    const target = path.join(folder, 'Konversation ünicode.md');
+    const h = await harness('export-unicode', { saveFile: async () => target });
+    await runOneTurn(h, 'Say MONA_OK', 'MONA_OK');
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.data.saved).toBe(true);
+      expect(result.data.path).toBe(target);
+      expect(result.data.bytes).toBe(Buffer.byteLength(readFileSync(target, 'utf8'), 'utf8'));
+      expect(result.data.sha256).toMatch(/^[0-9a-f]{64}$/);
+    }
+    expect(readFileSync(target, 'utf8')).toContain('MONA_OK');
+  });
+
+  it('replaces an existing export atomically instead of appending or half-writing', async () => {
+    const directory = await tempDir('export-existing');
+    const target = path.join(directory, 'existing.md');
+    writeFileSync(target, 'older export text', 'utf8');
+    const h = await harness('export-existing', { saveFile: async () => target });
+    await runOneTurn(h, 'Say MONA_OK', 'MONA_OK');
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(true);
+    const text = readFileSync(target, 'utf8');
+    expect(text).not.toContain('older export text');
+    expect(text).toContain('Say MONA_OK');
+    // No temporary sibling survived the rename.
+    const leftovers = readdirSync(directory).filter((name) => name.endsWith('.tmp'));
+    expect(leftovers).toEqual([]);
+  });
+
+  it('reports a destination it cannot write instead of claiming an export', async () => {
+    const directory = await tempDir('export-denied');
+    // A path whose parent does not exist is the cheap, portable stand-in for a
+    // read-only or unavailable destination; the assertion is that the writer
+    // fails closed and leaves no partial file.
+    const target = path.join(directory, 'missing-parent', 'conversation.md');
+    const h = await harness('export-denied', { saveFile: async () => target });
+    await runOneTurn(h, 'Say MONA_OK', 'MONA_OK');
+
+    const result = await h.service.exportConversation({ projectId: h.project.id, sessionId: 'ses_fixture' });
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.error.message).toContain('could not be written');
+    expect(existsSync(target)).toBe(false);
   });
 });

@@ -13,6 +13,7 @@ export type StateErrorCode =
   | 'disk_full'
   | 'migration_failed'
   | 'migration_mismatch'
+  | 'schema_drift'
   | 'corrupt_state'
   | 'unsafe_location'
   | 'alias_conflict'

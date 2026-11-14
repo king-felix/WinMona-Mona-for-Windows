@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { z } from 'zod';
+import { createBackup } from './backup.js';
 import { stateError } from './errors.js';
 import type { ProjectStore } from './store.js';
 
@@ -278,6 +279,12 @@ export async function exportProject(store: ProjectStore, projectId: string, file
 export type ImportOptions = {
   /** Accept an export whose revision is older than the stored project. */
   allowOlderRevision?: boolean;
+  /**
+   * Directory for a pre-import snapshot. When given, a verified backup of the
+   * whole database is written before anything is replaced, so a deliberate
+   * replacement is still reversible. The import itself is atomic either way.
+   */
+  backupDirectory?: string;
 };
 
 export type ImportResult = {
@@ -285,6 +292,86 @@ export type ImportResult = {
   importedRevision: number;
   replacedExisting: boolean;
   tasksImported: number;
+  /** Rows removed for this project before the document was applied, by table. */
+  replacedRows: Record<string, number>;
+  /** Verified pre-import snapshot, when the caller asked for one. */
+  backupFile: string | null;
+};
+
+/**
+ * Every table whose rows belong to one project. A project export carries only the
+ * project, its tasks and its decisions, so a replacement must clear the rest of
+ * the project's Mona-owned state explicitly: `projects` is upserted rather than
+ * deleted, which means `ON DELETE CASCADE` never fires and leaving these rows
+ * behind would silently attach one install's conversations, spend and attempts
+ * to another install's task graph.
+ *
+ * Deliberately absent: `rate_cards`, `settings_versions`, `schema_migrations` and
+ * `store_meta` are global, and engine-side history lives outside this database.
+ */
+const PROJECT_OWNED_TABLES = [
+  'task_evidence',
+  'task_acceptance',
+  'task_requirements',
+  'task_steps',
+  'task_transitions',
+  'task_dependencies',
+  'change_baselines',
+  'test_receipts',
+  'problem_transitions',
+  'problems',
+  'attempts',
+  'usage_records',
+  'timeline_items',
+  'event_cursors',
+  'turns',
+  'submissions',
+  'budget_events',
+  'budget_reservations',
+  'budgets',
+  'memory_terms',
+  'memory_documents',
+  'artifacts',
+  'requirement_evidence',
+  'restore_receipts',
+  'capability_snapshots',
+  'runtime_bindings',
+  'threads',
+  'tasks',
+  'decisions',
+] as const;
+
+/** SQL predicate selecting the rows of one table that belong to a project. */
+const PROJECT_SCOPE: Record<(typeof PROJECT_OWNED_TABLES)[number], string> = {
+  task_evidence: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  task_acceptance: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  task_requirements: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  task_steps: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  task_transitions: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  task_dependencies: 'task_id IN (SELECT id FROM tasks WHERE project_id = ?)',
+  change_baselines: 'project_id = ?',
+  test_receipts: 'project_id = ?',
+  problem_transitions: 'problem_id IN (SELECT id FROM problems WHERE project_id = ?)',
+  problems: 'project_id = ?',
+  attempts: 'project_id = ?',
+  usage_records: 'project_id = ?',
+  timeline_items: 'project_id = ?',
+  event_cursors: 'thread_id IN (SELECT id FROM threads WHERE project_id = ?)',
+  turns: 'thread_id IN (SELECT id FROM threads WHERE project_id = ?)',
+  submissions: 'project_id = ?',
+  budget_events: 'budget_id IN (SELECT id FROM budgets WHERE project_id = ?)',
+  budget_reservations: 'budget_id IN (SELECT id FROM budgets WHERE project_id = ?)',
+  budgets: 'project_id = ?',
+  memory_terms: 'doc_id IN (SELECT doc_id FROM memory_documents WHERE project_id = ?)',
+  memory_documents: 'project_id = ?',
+  artifacts: 'project_id = ?',
+  requirement_evidence: 'project_id = ?',
+  restore_receipts: 'project_id = ?',
+  capability_snapshots: 'project_id = ?',
+  runtime_bindings: 'project_id = ?',
+  threads: 'project_id = ?',
+  tasks: 'project_id = ?',
+  decisions: 'project_id = ?',
 };
 
 /**
@@ -314,6 +401,16 @@ export async function importProject(
     throw stateError('digest_mismatch', 'export digest does not match its contents');
   }
   validateImport(document);
+
+  // The snapshot is taken before the transaction opens, because a snapshot needs
+  // the maintenance barrier that the write below already holds. It is a recovery
+  // point for a deliberate replacement, not a claim that the write can fail
+  // half-way: the write itself is one transaction.
+  const existingProject = await store.getProject(document.project.id);
+  const backup =
+    options.backupDirectory && existingProject
+      ? await createBackup(store, { directory: options.backupDirectory, label: 'pre-import' })
+      : null;
 
   return await store.write((tx) => {
     const existing = tx.db.prepare('SELECT * FROM projects WHERE id = ?').get(document.project.id) as
@@ -363,27 +460,17 @@ export async function importProject(
         document.project.updated_at,
       );
 
-    // Child tables are deleted before tasks; foreign keys would cascade, but the
-    // explicit order keeps a replace deterministic.
-    tx.db
-      .prepare('DELETE FROM task_evidence WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db
-      .prepare('DELETE FROM task_acceptance WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db
-      .prepare('DELETE FROM task_requirements WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db
-      .prepare('DELETE FROM task_steps WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db
-      .prepare('DELETE FROM task_transitions WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db
-      .prepare('DELETE FROM task_dependencies WHERE task_id IN (SELECT id FROM tasks WHERE project_id = ?)')
-      .run(document.project.id);
-    tx.db.prepare('DELETE FROM tasks WHERE project_id = ?').run(document.project.id);
+    // Child tables are deleted before their parents, so a replace is deterministic
+    // even where a cascade would also have applied.
+    const replacedRows: Record<string, number> = {};
+    for (const table of PROJECT_OWNED_TABLES) {
+      if (table === 'tasks' || table === 'decisions') continue;
+      const scope = PROJECT_SCOPE[table];
+      const result = tx.db.prepare(`DELETE FROM ${table} WHERE ${scope}`).run(document.project.id);
+      if (Number(result.changes) > 0) replacedRows[table] = Number(result.changes);
+    }
+    const tasksRemoved = tx.db.prepare('DELETE FROM tasks WHERE project_id = ?').run(document.project.id);
+    if (Number(tasksRemoved.changes) > 0) replacedRows.tasks = Number(tasksRemoved.changes);
     for (const task of document.tasks) {
       const status = task.status === 'running' || task.status === 'verifying' ? 'interrupted' : task.status;
       tx.db
@@ -480,7 +567,8 @@ export async function importProject(
         .prepare('INSERT INTO task_dependencies(task_id, depends_on) VALUES (?, ?)')
         .run(dependency.task_id, dependency.depends_on);
     }
-    tx.db.prepare('DELETE FROM decisions WHERE project_id = ?').run(document.project.id);
+    const decisionsRemoved = tx.db.prepare('DELETE FROM decisions WHERE project_id = ?').run(document.project.id);
+    if (Number(decisionsRemoved.changes) > 0) replacedRows.decisions = Number(decisionsRemoved.changes);
     for (const decision of document.decisions) {
       tx.db
         .prepare('INSERT INTO decisions(id, project_id, title, body, decided_at) VALUES (?, ?, ?, ?, ?)')
@@ -492,6 +580,8 @@ export async function importProject(
       importedRevision: document.project.revision,
       replacedExisting: existing !== undefined,
       tasksImported: document.tasks.length,
+      replacedRows,
+      backupFile: backup?.file ?? null,
     };
   });
 }
