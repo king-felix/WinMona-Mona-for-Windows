@@ -16,7 +16,8 @@
  *   node tools/build/windows-review.mjs status
  *   node tools/build/windows-review.mjs checkpoint --task W00 --status completed \
  *     --expected-revision 3 [--acceptance-done "text"]... [--acceptance-open "text"]... \
- *     [--clear-acceptance-open] [--evidence docs/evidence/W00-baseline.md]... \
+ *     [--clear-acceptance-open] [--clear-acceptance-done] \
+ *     [--evidence docs/evidence/W00-baseline.md]... \
  *     [--problem P-W00-001]... [--original-requirement MONA-001]... [--next-action "text"]
  *   node tools/build/windows-review.mjs attempt --problem P-W01-001 --task W01 \
  *     --symptom "..." --hypothesis "..." --action "..." --result "..." \
@@ -86,8 +87,7 @@ function parseArgs(argv) {
     'evidence',
     'problem',
     'original-requirement',
-  ]);
-  for (let i = 0; i < argv.length; i += 1) {
+  ]);  for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith('--')) {
       positional.push(token);
@@ -293,6 +293,9 @@ function checkpoint(root, flags) {
   const next = JSON.parse(JSON.stringify(current));
   const row = next.tasks[taskId];
   row.status = status;
+  // A recorded completion can be wrong. Correcting it removes the claim rather
+  // than appending a contradiction beside it, so it is an explicit verb.
+  if (flags['clear-acceptance-done'] === true) row.acceptance_done = [];
   for (const step of flags['acceptance-done'] ?? []) {
     row.acceptance_done.push(String(step));
     row.acceptance_open = row.acceptance_open.filter((item) => item !== String(step));
@@ -459,6 +462,7 @@ function main() {
         'usage: node tools/build/windows-review.mjs <command>',
         '  init | refresh | validate | status',
         '  checkpoint --task W00 --status completed --expected-revision N [--acceptance-done s]... [--evidence path]...',
+        '    (--clear-acceptance-done and --clear-acceptance-open correct a wrong record; both are explicit)',
         '  attempt --problem P-W01-001 --task W01 --symptom s --hypothesis h --action a --result r --material-progress yes|no',
       ].join('\n') + '\n',
     );

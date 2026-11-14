@@ -606,6 +606,36 @@ export const MIGRATIONS: readonly Migration[] = [
       CREATE INDEX session_rotations_project ON session_rotations(project_id, created_at);
     `,
   },
+  {
+    version: 9,
+    name: 'human-requests',
+    sql: `
+      -- A pending approval or clarification is durable state, not a transient
+      -- renderer flag: it must survive a window reload, a reconnect and a
+      -- restart, and a second click must find the record already answered
+      -- instead of sending the engine a second decision.
+      CREATE TABLE human_requests (
+        id TEXT PRIMARY KEY,
+        project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        thread_id TEXT NOT NULL,
+        turn_id TEXT,
+        kind TEXT NOT NULL CHECK (kind IN ('approval', 'input')),
+        engine_request_id TEXT NOT NULL,
+        tool_name TEXT,
+        question_json TEXT NOT NULL,
+        permitted_json TEXT NOT NULL,
+        status TEXT NOT NULL CHECK (status IN ('pending', 'answered', 'expired', 'canceled')),
+        claimed_at TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        answered_at TEXT,
+        answer_json TEXT,
+        acknowledgement_json TEXT,
+        UNIQUE(thread_id, engine_request_id)
+      );
+      CREATE INDEX human_requests_pending ON human_requests(project_id, status, created_at);
+    `,
+  },
 ];
 
 export type MigrationReport = {

@@ -70,6 +70,7 @@ import { runAppearanceProbe } from './appearance-probe.js';
 import { runComposerProbe } from './composer-probe.js';
 import { runSlashProbe } from './slash-probe.js';
 import { runFocusProbe } from './focus-probe.js';
+import { runFocusLiveProbe } from './focus-live-probe.js';
 import { runSurfacesProbe } from './surfaces-probe.js';
 import { ActivityRecorder, activityFile } from './install-gate.js';
 import { UiStateStore } from './ui-state.js';
@@ -168,6 +169,14 @@ const focusTest = process.argv.includes('--focus-probe');
 const focusOut = process.env.MONA_FOCUS_OUT ?? path.join(process.cwd(), 'mona-focus.json');
 const focusWorkspace = process.env.MONA_FOCUS_WORKSPACE ?? null;
 const focusShots = process.env.MONA_FOCUS_SHOTS ?? path.join(process.cwd(), 'mona-focus-shots');
+// W06 live probe: the same transitions during one bounded streaming turn.
+const focusLiveTest = process.argv.includes('--focus-live-probe');
+const focusLiveOut = process.env.MONA_FOCUS_LIVE_OUT ?? path.join(process.cwd(), 'mona-focus-live.json');
+const focusLiveWorkspace = process.env.MONA_FOCUS_LIVE_WORKSPACE ?? null;
+const focusLiveShots = process.env.MONA_FOCUS_LIVE_SHOTS ?? path.join(process.cwd(), 'mona-focus-live-shots');
+const focusLiveTask =
+  process.env.MONA_FOCUS_LIVE_TASK ??
+  'Create three files in this project: a.txt containing ALPHA, b.txt containing BETA and c.txt containing GAMMA. Then run `node check.mjs` and report whether it passed. Do not change any other file.';
 // P25 surfaces probe: the Cost lens and the Work board, driven against real rows.
 const surfacesTest = process.argv.includes('--surfaces-probe');
 const surfacesOut = process.env.MONA_SURFACES_OUT ?? path.join(process.cwd(), 'mona-surfaces.json');
@@ -193,6 +202,7 @@ if (
   composerTest ||
   slashTest ||
   focusTest ||
+  focusLiveTest ||
   surfacesTest
 )
   app.disableHardwareAcceleration();
@@ -1137,6 +1147,37 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
           fs.writeFileSync(slashOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
           app.exit(1);
         });
+    }
+
+    if (focusLiveTest && focusLiveWorkspace && mainWindow) {
+      const probeWindow = mainWindow;
+      void runFocusLiveProbe({
+        window: probeWindow,
+        rendererIndex,
+        outputPath: focusLiveOut,
+        shotsDirectory: focusLiveShots,
+        workspace: focusLiveWorkspace,
+        taskText: focusLiveTask,
+        database: () => localState?.store.database ?? null,
+        sessionId: (projectId) => {
+          if (!uiStateStore) return null;
+          const state = uiStateStore.view();
+          const existing = state.projects[projectId]?.currentSessionId ?? null;
+          if (existing) return existing;
+          return uiStateStore.newSession(projectId).projects[projectId]?.currentSessionId ?? null;
+        },
+      })
+        .then((result) => {
+          fs.mkdirSync(path.dirname(focusLiveOut), { recursive: true });
+          fs.writeFileSync(focusLiveOut, `${JSON.stringify(result, null, 2)}\n`, 'utf8');
+          if (!probeWindow.isDestroyed()) probeWindow.destroy();
+          app.exit(result.ok ? 0 : 1);
+        })
+        .catch((error: unknown) => {
+          fs.writeFileSync(focusLiveOut, JSON.stringify({ ok: false, error: String(error) }, null, 2), 'utf8');
+          app.exit(1);
+        });
+      return;
     }
 
     if (focusTest && focusWorkspace && mainWindow) {

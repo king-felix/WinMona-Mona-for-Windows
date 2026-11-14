@@ -1719,3 +1719,56 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   several frames. This is recorded because it was a real defect the probe caught, not a preference.
 - **Escape order:** catalog drawer, then the composer's own list, then leaving Focus; never Interrupt,
   never clearing the draft.
+
+## D-0125 - A pending approval is a durable record answered on the runtime's own route
+
+- **Decision:** an approval or clarification is stored in `human_requests` (migration 9) keyed by
+  `(thread_id, engine_request_id)`, projected from `approval.required` / `user_input.required` (and
+  from a `request_user_input` tool item when that is all the runtime sends), and answered by
+  `StudioService.respond` through `POST /v1/approvals/{approval_id}` or
+  `POST /v1/user-input/{thread_id}/{request_id}`. The card closes only on an acknowledgement.
+- **Why:** W08 requires a real reply channel, and the engine's own bundled client is the authority on
+  the protocol: `{ decision: "allow" | "deny", remember }`, `{ answers: [{ id, label, value }] }`,
+  events `approval.decided` / `approval.timeout` / `user_input.answered` / `user_input.canceled`. The
+  earlier contract required camelCase `approvalId`/`toolName`, so a real snake_case
+  `approval.required` failed payload parsing and was dropped as unreadable. That is fixed, and
+  `normalizeApprovalRequired` is the single decoder.
+- **Mechanism, so the guarantees are not prose:** the reply is validated against the reply schema
+  *recorded with the request*, not the renderer's copy; the right to send is claimed in SQL
+  (`status = 'pending' AND claimed_at IS NULL`) so two clicks send one decision; a failed or refused
+  send releases the claim; a runtime 404 settles the row as `expired` instead of retrying under a new
+  identity; a request belonging to another project is `not_found`; the runtime's own terminal events
+  settle the row without Mona claiming it decided anything.
+- **Display honesty:** `permission_posture: "ask"` is now its own value instead of `unknown`; a thread
+  that pauses before a side effect was being shown as an unreadable posture.
+- **What is not claimed:** no live decision has been accepted by the runtime on this machine. The
+  saved posture (`full-access` in the engine settings) caps the thread/turn flags the probe can set,
+  so a bash tool call completes without prompting. Recorded as P-W08-001 and as a Needs-the-Human
+  item; the route itself is qualified live by typed 404s from its own handler.
+
+## D-0126 - A file reference must exist inside the project it is sent with
+
+- **Decision:** `StudioService.submit` resolves every reference with `realpathSync.native` against
+  the project root after the syntactic checks, and refuses a missing path or one that escapes the
+  root through a link or junction. Accepted paths are normalised and de-duplicated.
+- **Why:** the previous check was syntactic only, so `linked\secret.txt` where `linked` is a junction
+  to another folder passed and was sent as if it were part of the project, and a deleted file was
+  listed in the prompt as if the agent could read it.
+- **What it is not:** a reference remains a *path in the prompt*. Nothing is uploaded, the capability
+  row keeps saying attachments are unsupported, and the containment check is about telling the truth
+  about context rather than about sandboxing the agent, which runs with its own posture inside the
+  project folder.
+
+## D-0127 - The renderer bundle may contain the catalog's provenance label, and the channel guard is current
+
+- **Decision:** `check-build.mjs` strips the literal `GET /v1/commands` provenance label before it
+  scans for engine routes, and its expected preload channel list was refreshed to the 90 channels the
+  build actually exposes.
+- **Why:** W04 shipped the slash catalog's provenance string into the renderer bundle, which the old
+  guard read as "renderer contains an engine API route", and W05/W06 added channels without updating
+  the list. Both failures were real: `npm run check:build` had been red since those prompts, and
+  `npm run ci` does not run it. Fixing the guard (rather than deleting the check) keeps the
+  no-engine-route rule and makes the channel drift check meaningful again.
+- **Also:** `windows-review.mjs checkpoint` gained `--clear-acceptance-done`, because a wrong
+  completion has to be *removable*. W06 was first recorded completed with an acceptance clause it had
+  not observed; the correction verb is how the ledger was put right without hand-editing state.

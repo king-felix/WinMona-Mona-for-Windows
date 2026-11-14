@@ -1,0 +1,42 @@
+executable: X:\AI_projects\Mona\node_modules\electron\dist\electron.exe
+workspace: X:\AI_Projects\Qwen3.8-27B\cache\temp\mona-w06-live-69R4VS\focus-live-project
+
+
+PASS the fixture project opens in the real catalog :: {"canonicalPath":"x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w06-live-69r4vs\\focus-live-project"}
+PASS a stored conversation exists for the scroll test :: {"seeded":300}
+PASS the shell is on the project studio :: {"title":"focus-live-project"}
+PASS the Connect engine control starts the owned runtime :: {"engine":"Engine connected"}
+PASS the bounded prompt is accepted and the turn starts :: {"state":"Preparing"}
+PASS the runtime has begun producing output for this turn :: {"firstWork":true,"runState":"running"}
+PASS the turn is live before any window change :: {"deltas":0,"runState":"running","items":3,"answerChars":0}
+PASS Focus during streaming keeps the draft, caret, scroll anchor and the live turn :: {"focus":true,"draftKept":true,"caret":[14,14],"topSeq":[216,216],"runState":"running","deltasBefore":0,"deltasAfter":1}
+PASS the live turn progressed across the Focus transition :: {"before":{"deltas":0,"items":3,"answerChars":0},"inFocus":{"deltas":1,"items":5,"answerChars":0}}
+PASS fullscreen during streaming keeps the draft, caret, anchor and the live turn :: {"fullScreen":true,"focus":true,"draftKept":true,"topSeq":[216,216],"runState":"running","deltas":1}
+PASS F11 leaves and re-enters full screen once each while the turn streams :: {"leftFull":true,"backFull":true,"runState":"running","draftKept":true}
+PASS a drawer stays open across leaving fullscreen during streaming :: {"drawerOpened":true,"drawerBefore":true,"drawerStillOpen":true,"leftFullscreen":true}
+PASS minimize and restore keep the streaming turn and the window usable :: {"minimized":true,"restored":true,"draftKept":true,"runState":"running","engineState":"Engine connected","threadId":"thr_5339fd182c6f44319513445341f3b0fd"}
+PASS the live turn reaches a terminal state :: {"runState":"idle"}
+PASS the typed draft was never sent and is still in the composer :: {"draft":"this draft was typed while the engine was streaming and must not be sent"}
+PASS the thread identity never changed across the transitions :: {"before":"thr_5339fd182c6f44319513445341f3b0fd","after":"thr_5339fd182c6f44319513445341f3b0fd"}
+PASS the timeline records the turn and its outcome :: {"kinds":["status","user","status","tool","tool","status","status","status","status","tool","assistant","outcome"],"outcome":"Status: completed\nDuration: 11.4 s\nUsage: in 974 (52,608 cached) · out 432 · reasoning 49\nCost: $0.0006 (engine-priced thread delta; provider_docs)\nChanged paths: c.txt"}
+PASS exactly one turn was recorded for this project :: {"turnCount":1,"knownCostMicros":563,"unknownCostRecords":0}
+PASS the owned runtime stops cleanly after the probe
+PASS every recorded transition happened during the running state :: {"states":["before transitions:running","focus on:running","fullscreen on:running","F11 out:running","minimize/restore:running","focus off:running"]}
+PASS runtime work arrived inside the transition windows :: {"windows":[{"window":"before transitions -> focus on","gained":true},{"window":"focus on -> fullscreen on","gained":false},{"window":"fullscreen on -> F11 out","gained":false},{"window":"F11 out -> minimize/restore","gained":true},{"window":"minimize/restore -> focus off","gained":false}],"observed":{"deltas":[0,1,1,1,4,4],"answerChars":[0,0,0,0,0,0]}}
+mona: applied 8 state migration(s) to version 8
+mona: attention run_completed suppressed (foreground)
+X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13
+var consoleProcessList = getConsoleProcessList(shellPid);
+                         ^
+
+Error: AttachConsole failed
+    at Object.<anonymous> (X:\AI_projects\Mona\node_modules\node-pty\lib\conpty_console_list_agent.js:13:26)
+    at Module._compile (node:internal/modules/cjs/loader:1937:14)
+    at Object..js (node:internal/modules/cjs/loader:2070:10)
+    at Module.load (node:internal/modules/cjs/loader:1658:32)
+    at Module._load (node:internal/modules/cjs/loader:1450:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:268:19)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+    at node:internal/main/run_main_module:33:47
+
+Node.js v24.22.2

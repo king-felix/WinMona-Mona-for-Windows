@@ -15,6 +15,8 @@ import {
 import { SLASH_CATALOG, SLASH_CATALOG_PROVENANCE } from '../shared/slash-catalog.js';
 import type {
   StudioEvent,
+  StudioPending,
+  StudioUsage,
   StudioHistoryWindow,
   StudioMode,
   StudioRun,
@@ -25,6 +27,10 @@ import type {
 } from '../shared/studio.js';
 
 const PREVIEW_CHARS = 2_000;
+/** Run states in which recorded usage can still grow. */
+const ACTIVE_RUN_STATES = new Set(['preparing', 'running', 'interrupting', 'awaiting_approval', 'reconnecting']);
+/** Run states that mean the turn settled. */
+const TERMINAL_RUN_STATES = new Set(['idle', 'failed']);
 const TOOL_PREVIEW_CHARS = 1_500;
 /**
  * Rows rendered at once. The shell still loads the newest 500 items into state;
@@ -78,6 +84,39 @@ const POSTURE_LABEL: Record<string, string> = {
   read_only: 'Read only',
   unknown: 'Unknown posture',
 };
+
+/**
+ * Session usage for the HUD. Every number is a recorded bucket; a bucket the
+ * runtime did not report stays "unknown" instead of becoming a zero, and the
+ * scope is named so the chip is not mistaken for a project or turn total.
+ */
+function formatTokens(value: number | null): string {
+  if (value === null) return 'unknown';
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k`;
+  return String(value);
+}
+
+function usageChip(usage: StudioUsage | null): { label: string; detail: string } {
+  if (!usage) {
+    return {
+      label: 'No usage recorded for this session',
+      detail: 'Reading the studio does not send a prompt, so a session with no turn has nothing to price.',
+    };
+  }
+  const priced = `$${(usage.knownMicros / 1_000_000).toFixed(4)}`;
+  // Unpriced turns are counted beside the priced total, never folded into it.
+  const cost = usage.unknownRecords > 0 ? `${priced} + ${usage.unknownRecords} unpriced` : priced;
+  const reasoning =
+    usage.tokens.reasoning === null ? '' : ` · reasoning ${formatTokens(usage.tokens.reasoning)} (inside output)`;
+  return {
+    label: `${cost} · in ${formatTokens(usage.tokens.input)} · cache ${formatTokens(usage.tokens.cacheHit)} · out ${formatTokens(usage.tokens.output)}`,
+    detail:
+      `Scope: this session (${usage.records} recorded turn(s)). Cache hit and miss are reported separately by the runtime; ` +
+      'missing values are unknown, not zero.' +
+      reasoning,
+  };
+}
 
 function formatSpend(spend: ProjectSpend | null): string {
   if (!spend || spend.turnCount === 0) return 'No recorded spend';
@@ -210,6 +249,223 @@ export type StudioPanelProps = {
   /** Export the recorded conversation; returns a message for the notice line. */
   onExport?: () => Promise<string>;
 };
+
+/**
+ * Answering a pending runtime request.
+ *
+ * The controls are addressed to the recorded request id and nothing else: the
+ * question text, options and permitted decisions come from the request the main
+ * process recorded, so a stale card cannot answer a newer question. Closing or
+ * scrolling away sends nothing; only the explicit answer control does, and it
+ * stays disabled until the runtime acknowledges.
+ */
+function HumanRequestCard(props: {
+  pending: Extract<StudioPending, { kind: 'approval' }> | Extract<StudioPending, { kind: 'input' }>;
+  capabilityReason: string | null;
+  busy: boolean;
+  error: string | null;
+  acknowledged: string | null;
+  onAnswer: (answer: {
+    decision?: 'allow' | 'deny';
+    remember?: boolean;
+    answers?: Array<{ id: string; label: string; value: string }>;
+  }) => void;
+  onInterrupt: () => void;
+  onDiagnostics: () => void;
+}): React.JSX.Element {
+  const { pending } = props;
+  const [selections, setSelections] = useState<Record<string, string[]>>({});
+  const [freeText, setFreeText] = useState<Record<string, string>>({});
+  const [problem, setProblem] = useState<string | null>(null);
+  const [remember, setRemember] = useState(false);
+
+  if (pending.kind === 'approval') {
+    return (
+      <div className="pending-card" role="alert" data-testid="studio-pending">
+        <div className="mona-row">
+          <Badge tone="attention">Approval needed</Badge>
+          <span className="mona-mono">{pending.toolName}</span>
+        </div>
+        <p>{pending.description}</p>
+        {pending.intentSummary ? (
+          <p className="mona-muted" data-testid="studio-pending-intent">
+            The model says: {pending.intentSummary}
+          </p>
+        ) : null}
+        <label className="mona-check">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(event) => setRemember(event.target.checked)}
+            data-testid="studio-pending-remember"
+          />
+          Remember this decision for this session
+        </label>
+        <div className="mona-row">
+          {pending.decisions.map((decision) => (
+            <Button
+              key={decision}
+              size="sm"
+              variant={decision === 'deny' ? 'danger' : 'primary'}
+              disabled={props.busy}
+              data-testid={`studio-answer-${decision}`}
+              onClick={() => props.onAnswer({ decision, remember })}
+            >
+              {decision === 'allow' ? 'Allow' : 'Deny'}
+            </Button>
+          ))}
+          <Button size="sm" variant="danger" onClick={props.onInterrupt}>
+            Interrupt now
+          </Button>
+          <Button size="sm" onClick={props.onDiagnostics}>
+            Show diagnostics
+          </Button>
+        </div>
+        {props.error ? (
+          <p className="mona-error" role="alert" data-testid="studio-pending-error">
+            {props.error}
+          </p>
+        ) : null}
+        {props.acknowledged ? (
+          <p className="mona-muted" data-testid="studio-pending-ack">
+            {props.acknowledged}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  const submitAnswers = (): void => {
+    const answers: Array<{ id: string; label: string; value: string }> = [];
+    for (const question of pending.questions) {
+      const chosen = selections[question.id] ?? [];
+      const other = (freeText[question.id] ?? '').trim();
+      if (chosen.length === 0 && !other) {
+        setProblem(`Choose an answer for "${question.header ?? question.question ?? question.id}".`);
+        return;
+      }
+      if (!question.multiSelect && chosen.length + (other ? 1 : 0) > 1) {
+        setProblem(`"${question.header ?? question.question ?? question.id}" accepts one answer.`);
+        return;
+      }
+      for (const label of chosen) answers.push({ id: question.id, label, value: label });
+      if (other) answers.push({ id: question.id, label: 'Other', value: other });
+    }
+    setProblem(null);
+    props.onAnswer({ answers });
+  };
+
+  return (
+    <div className="pending-card" role="alert" data-testid="studio-pending">
+      <div className="mona-row">
+        <Badge tone="attention">Input needed</Badge>
+        <span className="mona-mono">{pending.toolName}</span>
+      </div>
+      <p>{pending.description}</p>
+      {pending.questions.length > 0 ? (
+        <>
+          {pending.questions.map((question) => (
+            <fieldset key={question.id} className="pending-question" data-testid={`studio-question-${question.id}`}>
+              <legend>{question.header ?? question.question ?? question.id}</legend>
+              {question.options.map((option) => {
+                const chosen = (selections[question.id] ?? []).includes(option.label);
+                return (
+                  <label key={option.label} className="mona-check">
+                    <input
+                      type={question.multiSelect ? 'checkbox' : 'radio'}
+                      name={`question-${question.id}`}
+                      checked={chosen}
+                      disabled={props.busy}
+                      onChange={(event) => {
+                        setSelections((current) => {
+                          const existing = current[question.id] ?? [];
+                          const next = question.multiSelect
+                            ? event.target.checked
+                              ? [...existing, option.label]
+                              : existing.filter((value) => value !== option.label)
+                            : event.target.checked
+                              ? [option.label]
+                              : [];
+                          return { ...current, [question.id]: next };
+                        });
+                        if (event.target.checked) {
+                          setFreeText((current) => ({ ...current, [question.id]: '' }));
+                        }
+                      }}
+                      data-testid={`studio-option-${question.id}-${option.label}`}
+                    />
+                    {option.label}
+                    {option.description ? <span className="mona-muted"> — {option.description}</span> : null}
+                  </label>
+                );
+              })}
+              <label className="mona-field-label" htmlFor={`other-${question.id}`}>
+                Other response
+              </label>
+              <input
+                id={`other-${question.id}`}
+                className="mona-input"
+                value={freeText[question.id] ?? ''}
+                maxLength={2_000}
+                disabled={props.busy}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setFreeText((current) => ({ ...current, [question.id]: value }));
+                  if (value.trim()) setSelections((current) => ({ ...current, [question.id]: [] }));
+                }}
+                data-testid={`studio-other-${question.id}`}
+              />
+            </fieldset>
+          ))}
+          <div className="mona-row">
+            <Button
+              size="sm"
+              variant="primary"
+              disabled={props.busy}
+              data-testid="studio-answer-send"
+              onClick={submitAnswers}
+            >
+              Send answer
+            </Button>
+            <Button size="sm" variant="danger" onClick={props.onInterrupt}>
+              Interrupt now
+            </Button>
+            <Button size="sm" onClick={props.onDiagnostics}>
+              Show diagnostics
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="mona-row">
+          <p className="mona-muted">
+            {props.capabilityReason ?? 'Mona cannot shape an answer for this request in this build.'}
+          </p>
+          <Button size="sm" variant="danger" onClick={props.onInterrupt}>
+            Interrupt now
+          </Button>
+          <Button size="sm" onClick={props.onDiagnostics}>
+            Show diagnostics
+          </Button>
+        </div>
+      )}
+      {problem ? (
+        <p className="mona-error" role="alert" data-testid="studio-pending-problem">
+          {problem}
+        </p>
+      ) : null}
+      {props.error ? (
+        <p className="mona-error" role="alert" data-testid="studio-pending-error">
+          {props.error}
+        </p>
+      ) : null}
+      {props.acknowledged ? (
+        <p className="mona-muted" data-testid="studio-pending-ack">
+          {props.acknowledged}
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const { info, project, engine, spend, draft, sessionId, ui, busy } = props;
@@ -476,6 +732,16 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
     };
   }, [projectId, sessionId, mode]);
 
+  /**
+   * Re-read the recorded usage after a turn settles. Only the usage readout is
+   * merged, so the reader keeps their scroll position and rows.
+   */
+  const refreshUsage = useCallback(async () => {
+    if (!projectId || !sessionId) return;
+    const result = await window.mona.studioGet({ projectId, sessionId, mode });
+    if (result.ok) setStudio((current) => (current ? { ...current, usage: result.data.usage } : current));
+  }, [mode, projectId, sessionId]);
+
   // One subscription to main-process pushes for the selected project.
   useEffect(() => {
     if (!projectId) return;
@@ -522,14 +788,17 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
         return;
       }
       if (!fromThisThread(event.threadId)) return;
-      setStudio((current) =>
-        current
-          ? { ...current, run: event.run, control: event.control, pending: event.pending, thread: event.thread }
-          : current,
-      );
+      setStudio((current) => {
+        if (!current) return current;
+        const wasActive = ACTIVE_RUN_STATES.has(current.run.state);
+        const nowTerminal = TERMINAL_RUN_STATES.has(event.run.state);
+        // A turn that just settled has new usage rows; read them once.
+        if (wasActive && nowTerminal) void refreshUsage();
+        return { ...current, run: event.run, control: event.control, pending: event.pending, thread: event.thread };
+      });
     });
     return unsubscribe;
-  }, [applyItem, projectId]);
+  }, [applyItem, projectId, refreshUsage]);
 
   // Follow only while the reader is at the newest row. Otherwise the new text is
   // counted as unread and a deliberate control brings them back.
@@ -914,8 +1183,57 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
   const hasOlder = history?.hasOlder ?? false;
   const totalStored = history?.total ?? items.length;
   const pending = studio?.pending ?? null;
+
+  const [answering, setAnswering] = useState(false);
+  const [answerError, setAnswerError] = useState<string | null>(null);
+  const [answerAck, setAnswerAck] = useState<string | null>(null);
+
+  // A new request starts with a clean answer state; an old acknowledgement must
+  // not appear to belong to a question that arrived later.
+  useEffect(() => {
+    setAnswerError(null);
+    setAnswerAck(null);
+  }, [pending?.requestId]);
+
+  /**
+   * Send the human's answer. The renderer only proposes it: the main process
+   * re-validates against the recorded request, claims the send, and requires the
+   * runtime's acknowledgement before the card closes.
+   */
+  const answerRequest = useCallback(
+    async (answer: {
+      decision?: 'allow' | 'deny';
+      remember?: boolean;
+      answers?: Array<{ id: string; label: string; value: string }>;
+    }) => {
+      if (!projectId || !sessionId || !pending || answering) return;
+      setAnswering(true);
+      setAnswerError(null);
+      try {
+        const result = await window.mona.studioRespond({
+          projectId,
+          sessionId,
+          mode,
+          requestId: pending.requestId,
+          ...answer,
+        });
+        if (!result.ok) {
+          setAnswerError(result.error.message);
+          return;
+        }
+        setAnswerAck(result.data.detail);
+        setStudio((current) => (current ? { ...current, pending: null } : current));
+      } finally {
+        setAnswering(false);
+      }
+    },
+    [answering, mode, pending, projectId, sessionId],
+  );
+
   const blockedProblem = studio?.control.blockedProblem ?? null;
   const thread = studio?.thread ?? null;
+  const usage = studio?.usage ?? null;
+  const usageView = usageChip(usage);
 
   const permissionLabel = thread
     ? `${POSTURE_LABEL[thread.permissionPosture] ?? thread.permissionPosture}${thread.autoApprove ? ' · auto-approve' : ''}`
@@ -982,6 +1300,9 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
           <Badge tone="neutral">
             Spend · <span data-testid="studio-spend">{formatSpend(spend)}</span>
           </Badge>
+          <span className="mona-muted studio-usage" data-testid="studio-usage" title={usageView.detail}>
+            {usageView.label}
+          </span>
         </div>
       </div>
 
@@ -1163,30 +1484,18 @@ export function StudioPanel(props: StudioPanelProps): React.JSX.Element {
       ) : null}
 
       {pending ? (
-        <div className="pending-card" role="alert" data-testid="studio-pending">
-          <div className="mona-row">
-            <Badge tone="attention">{pending.kind === 'input' ? 'Input needed' : 'Approval needed'}</Badge>
-            <span className="mona-mono">{pending.toolName}</span>
-          </div>
-          <p>{pending.description}</p>
-          <p className="mona-muted">
-            {studio?.capabilities.approvalResponse.reason ??
-              'Mona cannot answer this wait in this build. Interrupt now to stop it.'}
-          </p>
-          <div className="mona-row">
-            <Button size="sm" variant="danger" onClick={() => void interrupt()}>
-              Interrupt now
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => {
-                setShowDiagnostics(true);
-              }}
-            >
-              Show diagnostics
-            </Button>
-          </div>
-        </div>
+        <HumanRequestCard
+          pending={pending}
+          capabilityReason={studio?.capabilities.approvalResponse.reason ?? null}
+          busy={answering}
+          error={answerError}
+          acknowledged={answerAck}
+          onAnswer={answerRequest}
+          onInterrupt={() => void interrupt()}
+          onDiagnostics={() => {
+            setShowDiagnostics(true);
+          }}
+        />
       ) : null}
 
       <div className="timeline-tools">

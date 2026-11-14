@@ -1,0 +1,396 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "the fixture project opens in the real catalog",
+      "ok": true,
+      "detail": {
+        "canonicalPath": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w06-live-69r4vs\\focus-live-project"
+      }
+    },
+    {
+      "name": "a stored conversation exists for the scroll test",
+      "ok": true,
+      "detail": {
+        "seeded": 300
+      }
+    },
+    {
+      "name": "the shell is on the project studio",
+      "ok": true,
+      "detail": {
+        "title": "focus-live-project"
+      }
+    },
+    {
+      "name": "the Connect engine control starts the owned runtime",
+      "ok": true,
+      "detail": {
+        "engine": "Engine connected"
+      }
+    },
+    {
+      "name": "the bounded prompt is accepted and the turn starts",
+      "ok": true,
+      "detail": {
+        "state": "Preparing"
+      }
+    },
+    {
+      "name": "the runtime has begun producing output for this turn",
+      "ok": true,
+      "detail": {
+        "firstWork": true,
+        "runState": "running"
+      }
+    },
+    {
+      "name": "the turn is live before any window change",
+      "ok": true,
+      "detail": {
+        "deltas": 0,
+        "runState": "running",
+        "items": 3,
+        "answerChars": 0
+      }
+    },
+    {
+      "name": "Focus during streaming keeps the draft, caret, scroll anchor and the live turn",
+      "ok": true,
+      "detail": {
+        "focus": true,
+        "draftKept": true,
+        "caret": [
+          14,
+          14
+        ],
+        "topSeq": [
+          216,
+          216
+        ],
+        "runState": "running",
+        "deltasBefore": 0,
+        "deltasAfter": 1
+      }
+    },
+    {
+      "name": "the live turn progressed across the Focus transition",
+      "ok": true,
+      "detail": {
+        "before": {
+          "deltas": 0,
+          "items": 3,
+          "answerChars": 0
+        },
+        "inFocus": {
+          "deltas": 1,
+          "items": 5,
+          "answerChars": 0
+        }
+      }
+    },
+    {
+      "name": "fullscreen during streaming keeps the draft, caret, anchor and the live turn",
+      "ok": true,
+      "detail": {
+        "fullScreen": true,
+        "focus": true,
+        "draftKept": true,
+        "topSeq": [
+          216,
+          216
+        ],
+        "runState": "running",
+        "deltas": 1
+      }
+    },
+    {
+      "name": "F11 leaves and re-enters full screen once each while the turn streams",
+      "ok": true,
+      "detail": {
+        "leftFull": true,
+        "backFull": true,
+        "runState": "running",
+        "draftKept": true
+      }
+    },
+    {
+      "name": "a drawer stays open across leaving fullscreen during streaming",
+      "ok": true,
+      "detail": {
+        "drawerOpened": true,
+        "drawerBefore": true,
+        "drawerStillOpen": true,
+        "leftFullscreen": true
+      }
+    },
+    {
+      "name": "minimize and restore keep the streaming turn and the window usable",
+      "ok": true,
+      "detail": {
+        "minimized": true,
+        "restored": true,
+        "draftKept": true,
+        "runState": "running",
+        "engineState": "Engine connected",
+        "threadId": "thr_5339fd182c6f44319513445341f3b0fd"
+      }
+    },
+    {
+      "name": "the live turn reaches a terminal state",
+      "ok": true,
+      "detail": {
+        "runState": "idle"
+      }
+    },
+    {
+      "name": "the typed draft was never sent and is still in the composer",
+      "ok": true,
+      "detail": {
+        "draft": "this draft was typed while the engine was streaming and must not be sent"
+      }
+    },
+    {
+      "name": "the thread identity never changed across the transitions",
+      "ok": true,
+      "detail": {
+        "before": "thr_5339fd182c6f44319513445341f3b0fd",
+        "after": "thr_5339fd182c6f44319513445341f3b0fd"
+      }
+    },
+    {
+      "name": "the timeline records the turn and its outcome",
+      "ok": true,
+      "detail": {
+        "kinds": [
+          "status",
+          "user",
+          "status",
+          "tool",
+          "tool",
+          "status",
+          "status",
+          "status",
+          "status",
+          "tool",
+          "assistant",
+          "outcome"
+        ],
+        "outcome": "Status: completed\nDuration: 11.4 s\nUsage: in 974 (52,608 cached) · out 432 · reasoning 49\nCost: $0.0006 (engine-priced thread delta; provider_docs)\nChanged paths: c.txt"
+      }
+    },
+    {
+      "name": "exactly one turn was recorded for this project",
+      "ok": true,
+      "detail": {
+        "turnCount": 1,
+        "knownCostMicros": 563,
+        "unknownCostRecords": 0
+      }
+    },
+    {
+      "name": "the owned runtime stops cleanly after the probe",
+      "ok": true
+    },
+    {
+      "name": "every recorded transition happened during the running state",
+      "ok": true,
+      "detail": {
+        "states": [
+          "before transitions:running",
+          "focus on:running",
+          "fullscreen on:running",
+          "F11 out:running",
+          "minimize/restore:running",
+          "focus off:running"
+        ]
+      }
+    },
+    {
+      "name": "runtime work arrived inside the transition windows",
+      "ok": true,
+      "detail": {
+        "windows": [
+          {
+            "window": "before transitions -> focus on",
+            "gained": true
+          },
+          {
+            "window": "focus on -> fullscreen on",
+            "gained": false
+          },
+          {
+            "window": "fullscreen on -> F11 out",
+            "gained": false
+          },
+          {
+            "window": "F11 out -> minimize/restore",
+            "gained": true
+          },
+          {
+            "window": "minimize/restore -> focus off",
+            "gained": false
+          }
+        ],
+        "observed": {
+          "deltas": [
+            0,
+            1,
+            1,
+            1,
+            4,
+            4
+          ],
+          "answerChars": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "shots": [
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06-live\\focus-live-01-streaming.png",
+      "label": "focus-live-01-streaming"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06-live\\focus-live-02-focus-streaming.png",
+      "label": "focus-live-02-focus-streaming"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06-live\\focus-live-03-fullscreen-streaming.png",
+      "label": "focus-live-03-fullscreen-streaming"
+    },
+    {
+      "file": "X:\\AI_projects\\Mona\\docs\\evidence\\shots-w06-live\\focus-live-04-complete.png",
+      "label": "focus-live-04-complete"
+    }
+  ],
+  "samples": [
+    {
+      "label": "before transitions",
+      "runState": "running",
+      "deltas": 0,
+      "items": 3,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": false,
+      "focus": false,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    },
+    {
+      "label": "focus on",
+      "runState": "running",
+      "deltas": 1,
+      "items": 5,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": false,
+      "focus": true,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    },
+    {
+      "label": "fullscreen on",
+      "runState": "running",
+      "deltas": 1,
+      "items": 5,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": true,
+      "focus": true,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    },
+    {
+      "label": "F11 out",
+      "runState": "running",
+      "deltas": 1,
+      "items": 5,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": false,
+      "focus": true,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    },
+    {
+      "label": "minimize/restore",
+      "runState": "running",
+      "deltas": 4,
+      "items": 9,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": false,
+      "focus": true,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    },
+    {
+      "label": "focus off",
+      "runState": "running",
+      "deltas": 4,
+      "items": 9,
+      "answerChars": 0,
+      "draft": "this draft was typed while the engine was streaming and must not be sent",
+      "caret": 14,
+      "topSeq": 216,
+      "fullScreen": false,
+      "focus": false,
+      "threadId": "thr_5339fd182c6f44319513445341f3b0fd",
+      "engineState": "Engine connected",
+      "alive": true
+    }
+  ],
+  "capturedAt": "2026-11-14T19:55:09.887Z",
+  "limitation": "The \"answering input\" variant needs a real pending native request; that surface is W08. This run covers streaming, typing, scrolled back and an open drawer with one bounded paid turn.",
+  "providerRequests": 1,
+  "windows": [
+    {
+      "window": "before transitions -> focus on",
+      "runState": "running",
+      "gainedWork": true
+    },
+    {
+      "window": "focus on -> fullscreen on",
+      "runState": "running",
+      "gainedWork": false
+    },
+    {
+      "window": "fullscreen on -> F11 out",
+      "runState": "running",
+      "gainedWork": false
+    },
+    {
+      "window": "F11 out -> minimize/restore",
+      "runState": "running",
+      "gainedWork": true
+    },
+    {
+      "window": "minimize/restore -> focus off",
+      "runState": "running",
+      "gainedWork": false
+    }
+  ]
+}

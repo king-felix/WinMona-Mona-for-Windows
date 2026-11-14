@@ -81,7 +81,7 @@ export const RouteEffective = z
     provider: z.string().min(1).max(200),
     model: z.string().min(1).max(300),
     mode: z.enum(['agent', 'plan']).nullable(),
-    permissionPosture: z.enum(['full_access', 'workspace_write', 'read_only', 'unknown']),
+    permissionPosture: z.enum(['full_access', 'workspace_write', 'ask', 'read_only', 'unknown']),
     observedAt: Timestamp,
   })
   .strict();

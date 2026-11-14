@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 361,
+  "revision": 362,
   "spec": {
     "file": "Mona_Project.md",
     "companion_file": "Mona_PROMPTS.md",
@@ -1848,16 +1848,16 @@
             },
             {
               "path": "docs/evidence/P25-cost-export.csv",
-              "sha256": "573e2128f3dc8b2741e6c5ff94a782685cf22530891473d3b0f4be9100792874",
+              "sha256": "8dbc796a7fdad1d67a1967cb108abfeed4670a8010bc41142d09c1c306240ee1",
               "kind": "document",
-              "recorded_utc": "2026-11-13T08:14:50Z",
-              "commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
-              "note": "CSV export reachable from the Cost lens; the written file labels every row provider-reported, locally-estimated or unknown (cost_label and unknown_reason columns). The native Save dialog is not automated; the probe supplies a destination and says so"
+              "recorded_utc": "2026-11-14T20:27:40Z",
+              "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c",
+              "note": "P25 surfaces probe re-run on W08-W11 bytes: CSV regenerated with cost_label and unknown_reason columns."
             }
           ]
         }
       ],
-      "verified_commit": "7dfd5725c6929ac72a2aa0b309b6676153a6ec28",
+      "verified_commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c",
       "tested_environment": "win32-x64 node v26.13.1",
       "open_issue_ids": []
     },

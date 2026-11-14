@@ -52,7 +52,10 @@ export const EngineCapabilities = z
   .strict();
 export type EngineCapabilities = z.infer<typeof EngineCapabilities>;
 
-export const PermissionPosture = z.enum(['full_access', 'workspace_write', 'read_only', 'unknown']);
+// 'ask' is the runtime's own posture name for a thread that pauses before a
+// side effect. It is not a synonym for workspace access, so it keeps its own
+// value instead of being folded into 'unknown'.
+export const PermissionPosture = z.enum(['full_access', 'workspace_write', 'ask', 'read_only', 'unknown']);
 export type PermissionPosture = z.infer<typeof PermissionPosture>;
 
 export const EngineMode = z.enum(['agent', 'plan']);

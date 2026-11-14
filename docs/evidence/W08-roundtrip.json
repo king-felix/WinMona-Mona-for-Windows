@@ -1,0 +1,238 @@
+{
+  "ok": false,
+  "steps": [
+    {
+      "name": "the pinned runtime answers discovery",
+      "ok": true,
+      "detail": {
+        "product": "Codewhale",
+        "version": "0.10.2",
+        "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+        "runtimeApiVersion": "1.0",
+        "baseUrl": "http://127.0.0.1:50713",
+        "pid": 5184,
+        "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-w08-rt-SJjMei",
+        "startedAt": "2026-11-14T20:11:02.526Z"
+      }
+    },
+    {
+      "name": "a thread opens with a posture that asks before running a command",
+      "ok": true,
+      "detail": {
+        "threadId": "thr_6e7740a524a0442d967ad80baf880bee",
+        "posture": "ask",
+        "autoApprove": false
+      }
+    },
+    {
+      "name": "one bounded turn is submitted",
+      "ok": true,
+      "detail": {
+        "turnId": "turn_4fcd0ecdf38d43aaa5277cdcc44d812c"
+      }
+    },
+    {
+      "name": "the runtime asked for an approval before running the command",
+      "ok": false,
+      "detail": {
+        "events": [
+          "thread.started",
+          "turn.started",
+          "item.started",
+          "item.completed",
+          "turn.lifecycle",
+          "turn.workspace_snapshot",
+          "model.tools.snapshot",
+          "item.delta",
+          "turn.provider_request",
+          "turn.usage",
+          "operation.activity_started",
+          "operation.activity_completed",
+          "turn.completed"
+        ],
+        "payload": null
+      }
+    },
+    {
+      "name": "the decision is accepted by the runtime",
+      "ok": false,
+      "detail": {
+        "reason": "the approval event carried no id"
+      }
+    },
+    {
+      "name": "the turn reaches a terminal state after the decision",
+      "ok": true,
+      "detail": {
+        "payload": {
+          "turn": {
+            "schema_version": 2,
+            "id": "turn_4fcd0ecdf38d43aaa5277cdcc44d812c",
+            "thread_id": "thr_6e7740a524a0442d967ad80baf880bee",
+            "status": "completed",
+            "input_summary": "Run this exactly once with the shell tool: node -e \"console.log(String.fromCharCode(77,79,78,65))\". Then reply with the single word DONE.",
+            "created_at": "2026-11-14T20:11:02.675216500Z",
+            "started_at": "2026-11-14T20:11:02.685363600Z",
+            "ended_at": "2026-11-14T20:11:08.581481100Z",
+            "duration_ms": 5896,
+            "usage": {
+              "input_tokens": 26056,
+              "output_tokens": 161,
+              "prompt_cache_hit_tokens": 14080,
+              "prompt_cache_miss_tokens": 11976,
+              "reasoning_tokens": 82,
+              "request_usages": [
+                {
+                  "input_tokens": 12942,
+                  "output_tokens": 158,
+                  "prompt_cache_hit_tokens": 1152,
+                  "prompt_cache_miss_tokens": 11790,
+                  "reasoning_tokens": 82
+                },
+                {
+                  "input_tokens": 13114,
+                  "output_tokens": 3,
+                  "prompt_cache_hit_tokens": 12928,
+                  "prompt_cache_miss_tokens": 186,
+                  "reasoning_tokens": 0
+                }
+              ]
+            },
+            "routing_settlement": false,
+            "effective_route_usage": {
+              "input_tokens": 26056,
+              "output_tokens": 161,
+              "prompt_cache_hit_tokens": 14080,
+              "prompt_cache_miss_tokens": 11976,
+              "reasoning_tokens": 82,
+              "request_usages": [
+                {
+                  "input_tokens": 12942,
+                  "output_tokens": 158,
+                  "prompt_cache_hit_tokens": 1152,
+                  "prompt_cache_miss_tokens": 11790,
+                  "reasoning_tokens": 82
+                },
+                {
+                  "input_tokens": 13114,
+                  "output_tokens": 3,
+                  "prompt_cache_hit_tokens": 12928,
+                  "prompt_cache_miss_tokens": 186,
+                  "reasoning_tokens": 0
+                }
+              ]
+            },
+            "permission_posture": "full_access",
+            "mode": "agent",
+            "effective_provider": "deepseek",
+            "effective_provider_id": "deepseek",
+            "effective_billing_surface": "first-party-payg",
+            "effective_endpoint_fingerprint": "812b1f7c4a8b1af438d207c4d010794296f83296c29dcd10b8b6dd22f64c79db",
+            "effective_billing_mode": "metered",
+            "effective_dispatched_at": "2026-11-14T20:11:03.867924900Z",
+            "effective_model": "deepseek-flash",
+            "modelRequestDiagnostics": {
+              "modelRequestsStarted": 2,
+              "transportRetries": 0,
+              "transparentStreamRetries": 0,
+              "streamResumes": 0,
+              "reasoningOnlyReprompts": 0,
+              "emptyStopRetries": 0
+            },
+            "operation_activity": {
+              "observed_at": "2026-11-14T20:11:06.809313300Z",
+              "active": [],
+              "last_completed": {
+                "span_id": "operation:79fb89dc971b87ed888c179bf1b2f3b4b695b7bd38979b3ac35203a7d0a34a6b",
+                "activity_kind": "executing",
+                "action_id": "exec_shell",
+                "completed_at": "2026-11-14T20:11:06.809313300Z",
+                "outcome": "succeeded"
+              },
+              "overflowed": false
+            },
+            "item_ids": [
+              "item_8f50236ccaad4f0484f1a4f7b04ebdf4",
+              "item_bad012dab1fe4f58ae55a33192b0ea54",
+              "item_60c629671f204962832b564856102bfc",
+              "item_805751d2be1b4678bbebb0edcc421d69",
+              "item_cbe5acaa554e449c88b00e32a28f12b5"
+            ],
+            "steer_count": 0,
+            "workspace": {
+              "state": "pending",
+              "pre_turn_snapshot_id": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+              "truncated": false,
+              "omitted": 0
+            },
+            "workspace_snapshots": [
+              {
+                "kind": "pre_turn",
+                "snapshot_id": "3a78842e42ca251925df7555d77a427840a0dedd",
+                "tree_id": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                "session_id": "thr_6e7740a524a0442d967ad80baf880bee"
+              },
+              {
+                "kind": "tool",
+                "snapshot_id": "8f3334ed128029d7d58bdde38b6cb01f58659c4f",
+                "tree_id": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                "session_id": "thr_6e7740a524a0442d967ad80baf880bee",
+                "tool_call_id": "d302a92d-fc84-4232-95e0-c25ea78f98ac",
+                "changed_paths": []
+              },
+              {
+                "kind": "post_tool",
+                "snapshot_id": "579d16f976aff99afd05a16549671df51d65dfc9",
+                "tree_id": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                "session_id": "thr_6e7740a524a0442d967ad80baf880bee",
+                "tool_call_id": "d302a92d-fc84-4232-95e0-c25ea78f98ac",
+                "changed_paths": []
+              },
+              {
+                "kind": "post_turn",
+                "snapshot_id": "e379fe316fa8efd62fcbf1afe997f6f8655b72cb",
+                "tree_id": "4b825dc642cb6eb9a060e54bf8d69288fbee4904",
+                "session_id": "thr_6e7740a524a0442d967ad80baf880bee",
+                "changed_paths": []
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "engine": {
+    "product": "Codewhale",
+    "version": "0.10.2",
+    "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+    "runtimeApiVersion": "1.0",
+    "baseUrl": "http://127.0.0.1:50713",
+    "pid": 5184,
+    "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-w08-rt-SJjMei",
+    "startedAt": "2026-11-14T20:11:02.526Z"
+  },
+  "threadId": "thr_6e7740a524a0442d967ad80baf880bee",
+  "turnId": "turn_4fcd0ecdf38d43aaa5277cdcc44d812c",
+  "approvalId": null,
+  "eventsObserved": [
+    "thread.started",
+    "turn.started",
+    "item.started",
+    "item.completed",
+    "turn.lifecycle",
+    "turn.workspace_snapshot",
+    "model.tools.snapshot",
+    "item.delta",
+    "turn.provider_request",
+    "turn.usage",
+    "operation.activity_started",
+    "operation.activity_completed",
+    "turn.completed"
+  ],
+  "toolsUsed": [
+    "bash"
+  ],
+  "providerRequests": 1,
+  "note": "One bounded turn on the configured route, with the workspace posture that asks before a shell command. The decision was sent through EngineAdapter.respondToApproval, the same call the studio uses.",
+  "capturedAt": "2026-11-14T20:11:08.605Z"
+}

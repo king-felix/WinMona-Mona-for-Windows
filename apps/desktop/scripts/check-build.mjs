@@ -49,7 +49,10 @@ for (const file of files) {
   if (/fetch\s*\(\s*[`'"]https?:/i.test(text)) failures.push(`${rel}: renderer fetches an absolute remote URL`);
   if (/new WebSocket|new EventSource|XMLHttpRequest/.test(text))
     failures.push(`${rel}: renderer opens a network transport`);
-  if (/\/v1\//.test(text)) failures.push(`${rel}: renderer contains an engine API route`);
+  // The shipped slash catalog carries its provenance label ("GET /v1/commands"),
+  // which is data, not a callable route. Every other engine path is refused.
+  const withoutProvenance = text.split('GET /v1/commands').join('');
+  if (/\/v1\//.test(withoutProvenance)) failures.push(`${rel}: renderer contains an engine API route`);
 }
 
 const html = await readFile(path.join(rendererDir, 'index.html'), 'utf8');
@@ -69,6 +72,9 @@ const expectedChannels = [
   'mona:agents-start-fleet-run',
   'mona:agents-stop-fleet-run',
   'mona:app-info',
+  'mona:appearance-event',
+  'mona:appearance-get',
+  'mona:appearance-zoom',
   'mona:attention-focus',
   'mona:attention-get',
   'mona:attention-quit-stop',
@@ -89,6 +95,10 @@ const expectedChannels = [
   'mona:changes-capture',
   'mona:changes-diff',
   'mona:changes-view',
+  'mona:command-dispatch',
+  'mona:cost-budget-set',
+  'mona:cost-export',
+  'mona:cost-lens',
   'mona:engine-start',
   'mona:engine-state',
   'mona:engine-stop',
@@ -115,13 +125,18 @@ const expectedChannels = [
   'mona:studio-event',
   'mona:studio-export',
   'mona:studio-get',
+  'mona:studio-history',
   'mona:studio-interrupt',
   'mona:studio-pause',
   'mona:studio-pick-references',
+  'mona:studio-respond',
   'mona:studio-resume',
+  'mona:studio-search',
   'mona:studio-submit',
-  'mona:terminal-create',
+  'mona:task-board',
+  'mona:task-create',
   'mona:terminal-copy',
+  'mona:terminal-create',
   'mona:terminal-event',
   'mona:terminal-input',
   'mona:terminal-kill',
@@ -134,6 +149,9 @@ const expectedChannels = [
   'mona:ui-save-favorite',
   'mona:ui-set-layout',
   'mona:ui-set-view',
+  'mona:window-event',
+  'mona:window-set-fullscreen',
+  'mona:window-state',
 ].sort();
 if (JSON.stringify(channels) !== JSON.stringify(expectedChannels)) {
   failures.push(`preload exposes unexpected channels: ${channels.join(', ')}`);

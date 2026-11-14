@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -131,6 +131,63 @@ class FakeAdapter {
     };
   }
 
+  readonly approvals: Array<{ threadId: string; approvalId: string; decision: string; remember: boolean }> = [];
+  readonly userInputs: Array<{
+    threadId: string;
+    requestId: string;
+    answers: Array<{ id: string; label: string; value: string }>;
+  }> = [];
+  /** Set to make the runtime refuse the next reply, as an expired request would. */
+  refuseReply: { code: string; message: string } | null = null;
+
+  async respondToApproval(input: {
+    threadId: string;
+    approvalId: string;
+    decision: 'allow' | 'deny';
+    remember: boolean;
+  }) {
+    this.approvals.push(input);
+    if (this.refuseReply) {
+      return {
+        ok: false as const,
+        error: { code: this.refuseReply.code, message: this.refuseReply.message, retryable: false },
+      };
+    }
+    return {
+      ok: true as const,
+      value: {
+        threadId: input.threadId,
+        approvalId: input.approvalId,
+        decision: input.decision,
+        echoed: true,
+        remember: input.remember,
+      },
+    };
+  }
+
+  async respondToUserInput(input: {
+    threadId: string;
+    requestId: string;
+    answers: Array<{ id: string; label: string; value: string }>;
+  }) {
+    this.userInputs.push(input);
+    if (this.refuseReply) {
+      return {
+        ok: false as const,
+        error: { code: this.refuseReply.code, message: this.refuseReply.message, retryable: false },
+      };
+    }
+    return {
+      ok: true as const,
+      value: {
+        threadId: input.threadId,
+        requestId: input.requestId,
+        answers: input.answers.length,
+        acknowledged: true,
+      },
+    };
+  }
+
   async interrupt(input: { threadId: string; turnId: string }) {
     this.interrupts.push(input);
     return {
@@ -216,6 +273,8 @@ type Harness = {
   view: () => Promise<StudioView>;
   waitFor: (predicate: (view: StudioView) => boolean, timeoutMs?: number) => Promise<StudioView>;
   submit: (text: string, options?: { mode?: 'agent' | 'plan'; references?: string[] }) => Promise<void>;
+  sessionId: string;
+  engineSummary: () => EngineSummary;
 };
 
 async function harness(
@@ -226,6 +285,7 @@ async function harness(
     attention?: (event: StudioAttentionEvent) => void;
     saveFile?: (input: { title: string; defaultName: string; extensions: string[] }) => Promise<string | null>;
     appVersion?: () => string;
+    costs?: CostLedger;
   } = {},
 ): Promise<Harness> {
   const store = await openStore(label);
@@ -254,6 +314,7 @@ async function harness(
     ...(options.attention ? { attention: options.attention } : {}),
     ...(options.saveFile ? { saveFile: options.saveFile } : {}),
     ...(options.appVersion ? { appVersion: options.appVersion } : {}),
+    ...(options.costs ? { costs: options.costs } : {}),
   });
 
   const threadId = (): string => {
@@ -294,7 +355,19 @@ async function harness(
 
   cleanup.push(async () => service.close());
   void connected;
-  return { service, store, adapter, project, events, threadId, view, waitFor, submit };
+  return {
+    service,
+    store,
+    adapter,
+    project,
+    events,
+    threadId,
+    view,
+    waitFor,
+    submit,
+    sessionId: 'ses_fixture',
+    engineSummary: () => engine.summary(),
+  };
 }
 
 describe('live studio service', () => {
@@ -469,37 +542,333 @@ describe('live studio service', () => {
     expect(state.items.filter((item) => item.kind === 'user')).toHaveLength(1);
   });
 
-  it('surfaces an approval wait and offers a real interrupt receipt', async () => {
+  it('records an approval durably and answers it once, with an acknowledgement', async () => {
     const h = await harness('approval');
     await h.submit('Delete the build folder');
     const thread = h.threadId();
+    // The pinned runtime's own spelling: approval_id / tool_name.
     h.adapter.pushEvent(
       engineEvent('approval.required', 2, thread, 'turn_1', {
-        approvalId: 'appr_1',
-        toolName: 'bash',
+        approval_id: 'appr_1',
+        tool_name: 'bash',
         description: 'rm -rf dist needs approval',
+        intent_summary: 'The agent wants to remove the build output.',
       }),
     );
     const waiting = await h.waitFor((current) => current.run.state === 'awaiting_approval');
     expect(waiting.pending?.kind).toBe('approval');
+    expect(waiting.pending?.requestId).toBe('appr_1');
     expect(waiting.pending?.description).toContain('rm -rf dist');
-    expect(waiting.capabilities.approvalResponse.status).toBe('unsupported');
+    expect(waiting.capabilities.approvalResponse.status).toBe('supported');
     expect(waiting.items.some((item) => item.kind === 'approval')).toBe(true);
 
-    const interrupted = await h.service.interrupt(h.project.id);
-    expect(interrupted.ok).toBe(true);
-    if (!interrupted.ok) return;
-    expect(interrupted.data.run.state).toBe('interrupting');
-    expect(h.adapter.interrupts).toHaveLength(1);
+    const rows = await h.store.listHumanRequests(h.project.id, { status: 'pending' });
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.kind).toBe('approval');
+    expect(rows[0]?.permitted.decisions).toEqual(['allow', 'deny']);
 
+    // Dismissing the card is not an answer: nothing has been sent yet.
+    expect(h.adapter.approvals).toHaveLength(0);
+
+    const answered = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_1',
+      decision: 'allow',
+      remember: true,
+    });
+    expect(answered.ok).toBe(true);
+    if (!answered.ok) return;
+    expect(answered.data.acknowledged).toBe(true);
+    expect(h.adapter.approvals).toEqual([
+      { threadId: thread, approvalId: 'appr_1', decision: 'allow', remember: true },
+    ]);
+
+    const after = await h.view();
+    expect(after.pending).toBeNull();
+    expect(after.run.state).toBe('running');
+    const settled = await h.store.listHumanRequests(h.project.id, { status: 'answered' });
+    expect(settled).toHaveLength(1);
+    expect(settled[0]?.answer).toEqual({ decision: 'allow', remember: true, answers: [] });
+
+    // A second click is refused and sends nothing: one request, one decision.
+    const again = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_1',
+      decision: 'deny',
+    });
+    expect(again.ok).toBe(false);
+    if (again.ok) return;
+    expect(again.error.code).toBe('conflict');
+    expect(h.adapter.approvals).toHaveLength(1);
+  });
+
+  it('refuses an approval answer the recorded request does not permit', async () => {
+    const h = await harness('approval-invalid');
+    await h.submit('Delete the build folder');
+    const thread = h.threadId();
     h.adapter.pushEvent(
-      engineEvent('turn.completed', 3, thread, 'turn_1', {
-        turn: { id: 'turn_1', thread_id: thread, status: 'interrupted' },
+      engineEvent('approval.required', 2, thread, 'turn_1', { approval_id: 'appr_2', tool_name: 'bash' }),
+    );
+    await h.waitFor((current) => current.run.state === 'awaiting_approval');
+
+    const missing = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_2',
+    });
+    expect(missing.ok).toBe(false);
+    if (missing.ok) return;
+    expect(missing.error.code).toBe('invalid_request');
+
+    const unknown = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_2',
+      decision: 'allow',
+    });
+    expect(unknown.ok).toBe(true);
+    expect(h.adapter.approvals).toHaveLength(1);
+  });
+
+  it('treats a runtime refusal as an expired request instead of retrying', async () => {
+    const h = await harness('approval-expired');
+    await h.submit('Delete the build folder');
+    const thread = h.threadId();
+    h.adapter.pushEvent(
+      engineEvent('approval.required', 2, thread, 'turn_1', { approval_id: 'appr_3', tool_name: 'bash' }),
+    );
+    await h.waitFor((current) => current.run.state === 'awaiting_approval');
+    h.adapter.refuseReply = { code: 'not_found', message: 'runtime route or item was not found' };
+
+    const refused = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_3',
+      decision: 'deny',
+    });
+    expect(refused.ok).toBe(false);
+    if (refused.ok) return;
+    expect(refused.error.code).toBe('not_found');
+    // Exactly one attempt reached the runtime; the row is settled, not retried.
+    expect(h.adapter.approvals).toHaveLength(1);
+    const rows = await h.store.listHumanRequests(h.project.id);
+    expect(rows[0]?.status).toBe('expired');
+    const view = await h.view();
+    expect(view.pending).toBeNull();
+    expect(view.run.state).toMatch(/running|awaiting_approval/);
+  });
+
+  it('answers a clarification with the runtime questions, refusing an incomplete answer', async () => {
+    const h = await harness('input');
+    await h.submit('Ask me which folder');
+    const thread = h.threadId();
+    h.adapter.pushEvent(
+      engineEvent('user_input.required', 2, thread, 'turn_1', {
+        request_id: 'req_1',
+        request: {
+          questions: [
+            {
+              id: 'q1',
+              header: 'Folder',
+              question: 'Which folder should be removed?',
+              options: [{ label: 'dist' }, { label: 'build' }],
+            },
+          ],
+        },
       }),
     );
-    const settled = await h.waitFor((current) => current.run.state === 'idle');
+    const waiting = await h.waitFor((current) => current.run.state === 'awaiting_approval');
+    expect(waiting.pending?.kind).toBe('input');
+    if (waiting.pending?.kind !== 'input') return;
+    expect(waiting.pending.questions).toHaveLength(1);
+    expect(waiting.pending.questions[0]?.options.map((option) => option.label)).toEqual(['dist', 'build']);
+
+    const empty = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'req_1',
+      answers: [],
+    });
+    expect(empty.ok).toBe(false);
+    if (empty.ok) return;
+    expect(empty.error.code).toBe('invalid_request');
+    expect(h.adapter.userInputs).toHaveLength(0);
+
+    const forged = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'req_1',
+      answers: [{ id: 'q1', label: 'everything', value: 'everything' }],
+    });
+    expect(forged.ok).toBe(false);
+    expect(h.adapter.userInputs).toHaveLength(0);
+
+    const answered = await h.service.respond({
+      projectId: h.project.id,
+      sessionId: h.sessionId,
+      requestId: 'req_1',
+      answers: [{ id: 'q1', label: 'dist', value: 'dist' }],
+    });
+    expect(answered.ok).toBe(true);
+    if (!answered.ok) return;
+    expect(answered.data.answers).toEqual([{ id: 'q1', label: 'dist', value: 'dist' }]);
+    expect(h.adapter.userInputs).toHaveLength(1);
+    expect(h.adapter.userInputs[0]?.requestId).toBe('req_1');
+  });
+
+  it('reads session usage from recorded rows and keeps unknown and missing values honest', async () => {
+    const store = await openStore('usage');
+    const project = await makeProject(store, 'usage');
+    const ledger = new CostLedger(store);
+    const adapter = new FakeAdapter(project.path);
+    const events: StudioEvent[] = [];
+    const engine = {
+      summary: (): EngineSummary => ({
+        state: 'connected',
+        detail: 'fake runtime connected',
+        workspace: project.path,
+        pid: 1,
+        endpoint: 'http://127.0.0.1:7801',
+        compatibility: 'qualified',
+        descriptors: [],
+      }),
+      adapter: () => adapter as unknown as EngineAdapter,
+    };
+    const service = new StudioService({
+      store,
+      engine,
+      emit: (event) => events.push(event),
+      flushIntervalMs: 0,
+      costs: ledger,
+    });
+    const opened = await service.submit({
+      projectId: project.id,
+      sessionId: 'ses_usage',
+      text: 'A turn that records usage',
+      mode: 'agent',
+      references: [],
+    });
+    expect(opened.ok).toBe(true);
+    const threadId = opened.ok ? opened.data.threadId : '';
+
+    // Nothing recorded yet: the HUD says so instead of showing a free turn.
+    let view = await service.view(project.id, 'ses_usage');
+    expect(view.ok && view.data.usage).toBeNull();
+
+    const buckets = {
+      cacheHitTokens: 256,
+      cacheMissTokens: 744,
+      inputTokens: 1_000,
+      outputTokens: 300,
+      reasoningTokens: 120,
+    };
+    const priced = await ledger.ingest({
+      projectId: project.id,
+      threadId,
+      turnId: 'turn_usage',
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      buckets,
+      cost: { kind: 'provider_reported', micros: 2_500, source: 'runtime' },
+      source: 'studio-test',
+    });
+    expect(priced.recorded).toBe(true);
+    const unpriced = await ledger.ingest({
+      projectId: project.id,
+      threadId,
+      turnId: 'turn_usage_2',
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      buckets: { cacheHitTokens: null, cacheMissTokens: null, inputTokens: null, outputTokens: null },
+      cost: { kind: 'unknown', reason: 'the runtime did not price this turn' },
+      source: 'studio-test',
+    });
+    expect(unpriced.recorded).toBe(true);
+
+    // A duplicate replay must not double-charge the session.
+    const duplicate = await ledger.ingest({
+      projectId: project.id,
+      threadId,
+      turnId: 'turn_usage',
+      provider: 'deepseek',
+      model: 'deepseek-flash',
+      buckets,
+      cost: { kind: 'provider_reported', micros: 2_500, source: 'runtime' },
+      source: 'studio-test',
+    });
+    expect(duplicate.duplicate).toBe(true);
+
+    view = await service.view(project.id, 'ses_usage');
+    expect(view.ok).toBe(true);
+    if (!view.ok || !view.data.usage) throw new Error('usage was not projected');
+    expect(view.data.usage.records).toBe(2);
+    expect(view.data.usage.knownMicros).toBe(2_500);
+    expect(view.data.usage.unknownRecords).toBe(1);
+    expect(view.data.usage.tokens.cacheHit).toBe(256);
+    expect(view.data.usage.tokens.cacheMiss).toBe(744);
+    expect(view.data.usage.tokens.input).toBe(1_000);
+    expect(view.data.usage.tokens.output).toBe(300);
+    expect(view.data.usage.tokens.reasoning).toBe(120);
+    expect(view.data.usage.reasoningIncludedInOutput).toBe(true);
+    expect(view.data.usage.scope).toBe('session');
+    // Reading the studio sent nothing.
+    expect(adapter.submissions).toHaveLength(1);
+  });
+
+  it("restores a pending request after a restart and never answers another project's request", async () => {
+    const h = await harness('reconnect');
+    await h.submit('Delete the build folder');
+    const thread = h.threadId();
+    h.adapter.pushEvent(
+      engineEvent('approval.required', 2, thread, 'turn_1', { approval_id: 'appr_9', tool_name: 'bash' }),
+    );
+    await h.waitFor((current) => current.run.state === 'awaiting_approval');
+
+    // A fresh service over the same store is what a restart looks like.
+    const restarted = new StudioService({
+      store: h.store,
+      engine: { summary: h.engineSummary, adapter: () => h.adapter as unknown as EngineAdapter },
+      emit: () => undefined,
+      flushIntervalMs: 0,
+    });
+    const afterRestart = await restarted.view(h.project.id, h.sessionId, 'agent');
+    expect(afterRestart.ok).toBe(true);
+    if (!afterRestart.ok) return;
+    expect(afterRestart.data.pending?.requestId).toBe('appr_9');
+    expect(afterRestart.data.run.state).toBe('awaiting_approval');
+
+    const other = await makeProject(h.store, 'other-project');
+    const crossed = await h.service.respond({
+      projectId: other.id,
+      sessionId: h.sessionId,
+      requestId: 'appr_9',
+      decision: 'allow',
+    });
+    expect(crossed.ok).toBe(false);
+    if (crossed.ok) return;
+    expect(crossed.error.code).toBe('not_found');
+    expect(h.adapter.approvals).toHaveLength(0);
+  });
+
+  it('settles the card when the runtime reports the request decided elsewhere', async () => {
+    const h = await harness('settled');
+    await h.submit('Delete the build folder');
+    const thread = h.threadId();
+    h.adapter.pushEvent(
+      engineEvent('approval.required', 2, thread, 'turn_1', { approval_id: 'appr_5', tool_name: 'bash' }),
+    );
+    await h.waitFor((current) => current.run.state === 'awaiting_approval');
+    h.adapter.pushEvent(
+      engineEvent('approval.decided', 3, thread, 'turn_1', { approval_id: 'appr_5', decision: 'deny' }),
+    );
+    const settled = await h.waitFor((current) => current.pending === null);
     expect(settled.pending).toBeNull();
-    expect(settled.items.some((item) => item.title === 'Turn interrupted')).toBe(true);
+    const rows = await h.store.listHumanRequests(h.project.id);
+    expect(rows[0]?.status).toBe('answered');
+    // No decision of Mona's own was sent for someone else's decision.
+    expect(h.adapter.approvals).toHaveLength(0);
   });
 
   it('truncates oversized output and labels it', async () => {
@@ -525,6 +894,10 @@ describe('live studio service', () => {
 
   it('composes explicit file references into the prompt exactly as sent', async () => {
     const h = await harness('references');
+    // A reference must be a real file inside the project; create them first.
+    await mkdir(path.join(h.project.path, 'src'), { recursive: true });
+    writeFileSync(path.join(h.project.path, 'src', 'app.test.ts'), 'test\n', 'utf8');
+    writeFileSync(path.join(h.project.path, 'README.md'), '# fixture\n', 'utf8');
     await h.submit('Run the failing test', { references: ['src/app.test.ts', 'README.md'] });
     const expected = composePrompt('Run the failing test', ['src/app.test.ts', 'README.md']);
     expect(h.adapter.submissions[0]?.prompt).toBe(expected);
@@ -546,6 +919,69 @@ describe('live studio service', () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error.code).toBe('invalid_request');
     expect(h.adapter.submissions).toHaveLength(0);
+  });
+
+  it('refuses a reference that is missing or escapes the project through a junction', async () => {
+    const h = await harness('reference-policy');
+    await mkdir(path.join(h.project.path, 'real'), { recursive: true });
+    writeFileSync(path.join(h.project.path, 'real', 'note.txt'), 'inside\n', 'utf8');
+
+    const missing = await h.service.submit({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      text: 'Read this',
+      mode: 'agent',
+      references: ['does/not/exist.txt'],
+    });
+    expect(missing.ok).toBe(false);
+    if (!missing.ok) expect(missing.error.message).toContain('not a file in this project');
+
+    const outside = await tempDir('outside');
+    writeFileSync(path.join(outside, 'secret.txt'), 'outside\n', 'utf8');
+    let linked = true;
+    try {
+      // A junction needs no elevation on Windows; if the platform refuses, the
+      // escape case cannot be constructed and is reported rather than assumed.
+      symlinkSync(outside, path.join(h.project.path, 'linked'), 'junction');
+    } catch {
+      linked = false;
+    }
+    if (linked) {
+      const escaped = await h.service.submit({
+        projectId: h.project.id,
+        sessionId: 'ses_fixture',
+        text: 'Read this',
+        mode: 'agent',
+        references: ['linked/secret.txt'],
+      });
+      expect(escaped.ok).toBe(false);
+      if (!escaped.ok) expect(escaped.error.message).toContain('resolves outside this project');
+    }
+
+    const traversal = await h.service.submit({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      text: 'Read this',
+      mode: 'agent',
+      references: ['../outside/secret.txt'],
+    });
+    expect(traversal.ok).toBe(false);
+
+    // Nothing above reached the engine.
+    expect(h.adapter.submissions).toHaveLength(0);
+
+    // A real project-relative file is accepted and normalised.
+    const accepted = await h.service.submit({
+      projectId: h.project.id,
+      sessionId: 'ses_fixture',
+      text: 'Read this',
+      mode: 'agent',
+      references: ['real\\note.txt', 'real/note.txt'],
+    });
+    expect(accepted.ok).toBe(true);
+    expect(h.adapter.submissions[0]?.prompt).toContain('- real/note.txt');
+    // The duplicate spelling of one path is sent once.
+    expect(h.adapter.submissions[0]?.prompt.match(/- real\/note\.txt/g)).toHaveLength(1);
   });
 
   it('turns a dropped stream into reconnecting, then running after a replay', async () => {

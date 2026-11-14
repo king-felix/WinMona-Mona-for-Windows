@@ -30,6 +30,7 @@
     "composer": "node scripts/composer.mjs",
     "slash": "node scripts/slash.mjs",
     "focus": "node scripts/focus.mjs",
+    "focus:live": "node scripts/focus-live.mjs",
     "surfaces": "node scripts/surfaces.mjs"
   },
   "dependencies": {

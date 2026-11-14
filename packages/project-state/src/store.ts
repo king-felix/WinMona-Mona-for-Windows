@@ -762,6 +762,168 @@ export class ProjectStore {
     });
   }
 
+  /**
+   * Record a pending approval/clarification. The (thread, engine request) pair is
+   * unique, so a replayed event returns the row that already exists instead of
+   * minting a second question the human would have to answer twice.
+   */
+  async recordHumanRequest(input: {
+    projectId: string;
+    threadId: string;
+    turnId: string | null;
+    kind: HumanRequestKind;
+    engineRequestId: string;
+    toolName: string | null;
+    question: HumanRequest['question'];
+    permitted?: HumanRequest['permitted'];
+  }): Promise<{ request: HumanRequest; created: boolean }> {
+    const engineRequestId = input.engineRequestId.trim();
+    if (!engineRequestId) throw stateError('invalid_request', 'a human request needs the runtime request id');
+    return await this.write((tx) => {
+      const existing = tx.db
+        .prepare('SELECT * FROM human_requests WHERE thread_id = ? AND engine_request_id = ?')
+        .get(input.threadId, engineRequestId) as HumanRequestRecord | undefined;
+      if (existing) return { request: toHumanRequest(existing), created: false };
+      const now = tx.now();
+      const row: HumanRequestRecord = {
+        id: `hr_${randomUUID()}`,
+        project_id: input.projectId,
+        thread_id: input.threadId,
+        turn_id: input.turnId,
+        kind: input.kind,
+        engine_request_id: engineRequestId,
+        tool_name: input.toolName,
+        question_json: JSON.stringify(input.question),
+        permitted_json: JSON.stringify(input.permitted ?? { decisions: ['allow', 'deny'], freeText: true }),
+        status: 'pending',
+        claimed_at: null,
+        created_at: now,
+        updated_at: now,
+        answered_at: null,
+        answer_json: null,
+        acknowledgement_json: null,
+      };
+      tx.db
+        .prepare(
+          'INSERT INTO human_requests(id, project_id, thread_id, turn_id, kind, engine_request_id, tool_name, question_json, permitted_json, status, claimed_at, created_at, updated_at, answered_at, answer_json, acknowledgement_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, NULL, NULL, NULL)',
+        )
+        .run(
+          row.id,
+          row.project_id,
+          row.thread_id,
+          row.turn_id,
+          row.kind,
+          row.engine_request_id,
+          row.tool_name,
+          row.question_json,
+          row.permitted_json,
+          row.status,
+          row.created_at,
+          row.updated_at,
+        );
+      return { request: toHumanRequest(row), created: true };
+    });
+  }
+
+  /** Pending and settled requests for a project, newest first. */
+  async listHumanRequests(
+    projectId: string,
+    options: { threadId?: string; status?: HumanRequestStatus; limit?: number } = {},
+  ): Promise<HumanRequest[]> {
+    const limit = Math.max(1, Math.min(200, Math.trunc(options.limit ?? 50)));
+    return await this.read((db) => {
+      const clauses = ['project_id = ?'];
+      const values: Array<string | number> = [projectId];
+      if (options.threadId) {
+        clauses.push('thread_id = ?');
+        values.push(options.threadId);
+      }
+      if (options.status) {
+        clauses.push('status = ?');
+        values.push(options.status);
+      }
+      values.push(limit);
+      const rows = db
+        .prepare(`SELECT * FROM human_requests WHERE ${clauses.join(' AND ')} ORDER BY created_at DESC LIMIT ?`)
+        .all(...values) as HumanRequestRecord[];
+      return rows.map((row) => toHumanRequest(row));
+    });
+  }
+
+  /**
+   * Claim the right to send one reply. A second click, a second window or a
+   * retry that arrives while the first send is in flight is refused rather than
+   * deciding the same request twice. The claim is released on failure so the
+   * human can try again; it is not released on success.
+   */
+  async claimHumanRequest(input: {
+    projectId: string;
+    threadId: string;
+    engineRequestId: string;
+  }): Promise<{ request: HumanRequest; claimed: boolean } | null> {
+    return await this.write((tx) => {
+      const row = tx.db
+        .prepare('SELECT * FROM human_requests WHERE thread_id = ? AND engine_request_id = ?')
+        .get(input.threadId, input.engineRequestId) as HumanRequestRecord | undefined;
+      if (!row) return null;
+      if (row.project_id !== input.projectId) return { request: toHumanRequest(row), claimed: false };
+      const now = tx.now();
+      const result = tx.db
+        .prepare(
+          "UPDATE human_requests SET claimed_at = ?, updated_at = ? WHERE id = ? AND status = 'pending' AND claimed_at IS NULL",
+        )
+        .run(now, now, row.id);
+      const claimed = Number(result.changes ?? 0) > 0;
+      const fresh = tx.db.prepare('SELECT * FROM human_requests WHERE id = ?').get(row.id) as HumanRequestRecord;
+      return { request: toHumanRequest(fresh), claimed };
+    });
+  }
+
+  /** Give the claim back after a refused or failed send. */
+  async releaseHumanRequest(input: { threadId: string; engineRequestId: string }): Promise<void> {
+    await this.write((tx) => {
+      tx.db
+        .prepare(
+          "UPDATE human_requests SET claimed_at = NULL, updated_at = ? WHERE thread_id = ? AND engine_request_id = ? AND status = 'pending'",
+        )
+        .run(tx.now(), input.threadId, input.engineRequestId);
+    });
+  }
+
+  /**
+   * Store the outcome of a reply (or the runtime's own terminal event). A request
+   * that is already answered is left alone: the recorded answer is history.
+   */
+  async settleHumanRequest(input: {
+    threadId: string;
+    engineRequestId: string;
+    status: 'answered' | 'expired' | 'canceled';
+    answer?: unknown;
+    acknowledgement?: unknown;
+  }): Promise<HumanRequest | null> {
+    return await this.write((tx) => {
+      const row = tx.db
+        .prepare('SELECT * FROM human_requests WHERE thread_id = ? AND engine_request_id = ?')
+        .get(input.threadId, input.engineRequestId) as HumanRequestRecord | undefined;
+      if (!row) return null;
+      if (row.status !== 'pending') return toHumanRequest(row);
+      const now = tx.now();
+      tx.db
+        .prepare(
+          'UPDATE human_requests SET status = ?, claimed_at = NULL, updated_at = ?, answered_at = ?, answer_json = ?, acknowledgement_json = ? WHERE id = ?',
+        )
+        .run(
+          input.status,
+          now,
+          input.status === 'answered' ? now : null,
+          input.answer === undefined ? null : JSON.stringify(input.answer),
+          input.acknowledgement === undefined ? null : JSON.stringify(input.acknowledgement),
+          row.id,
+        );
+      const fresh = tx.db.prepare('SELECT * FROM human_requests WHERE id = ?').get(row.id) as HumanRequestRecord;
+      return toHumanRequest(fresh);
+    });
+  }
   /** Advances the replay cursor. This is bookkeeping, not user state. */
   async touchThread(threadId: string, lastSeq: number): Promise<void> {
     await this.write((tx) => {
@@ -1030,6 +1192,95 @@ type TimelineRecord = {
   updated_at: string;
 };
 
+export type HumanRequestKind = 'approval' | 'input';
+export type HumanRequestStatus = 'pending' | 'answered' | 'expired' | 'canceled';
+
+/**
+ * A durable approval or clarification request. The engine request id is the
+ * identity that must be answered; `permitted` is the reply schema Mona will
+ * accept, recorded at the time the request arrived so a later protocol change
+ * cannot silently widen it.
+ */
+export type HumanRequest = {
+  id: string;
+  projectId: string;
+  threadId: string;
+  turnId: string | null;
+  kind: HumanRequestKind;
+  engineRequestId: string;
+  toolName: string | null;
+  question: {
+    description: string;
+    intentSummary: string | null;
+    questions: Array<{
+      id: string;
+      header: string | null;
+      question: string | null;
+      multiSelect: boolean;
+      options: Array<{ label: string; description: string | null }>;
+    }>;
+  };
+  permitted: {
+    decisions: Array<'allow' | 'deny'>;
+    freeText: boolean;
+  };
+  status: HumanRequestStatus;
+  claimedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  answeredAt: string | null;
+  answer: unknown;
+  acknowledgement: unknown;
+};
+
+type HumanRequestRecord = {
+  id: string;
+  project_id: string;
+  thread_id: string;
+  turn_id: string | null;
+  kind: HumanRequestKind;
+  engine_request_id: string;
+  tool_name: string | null;
+  question_json: string;
+  permitted_json: string;
+  status: HumanRequestStatus;
+  claimed_at: string | null;
+  created_at: string;
+  updated_at: string;
+  answered_at: string | null;
+  answer_json: string | null;
+  acknowledgement_json: string | null;
+};
+
+function toHumanRequest(row: HumanRequestRecord): HumanRequest {
+  const parse = (value: string): unknown => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  };
+  const question = parse(row.question_json) as HumanRequest['question'] | null;
+  const permitted = parse(row.permitted_json) as HumanRequest['permitted'] | null;
+  return {
+    id: row.id,
+    projectId: row.project_id,
+    threadId: row.thread_id,
+    turnId: row.turn_id,
+    kind: row.kind,
+    engineRequestId: row.engine_request_id,
+    toolName: row.tool_name,
+    question: question ?? { description: '', intentSummary: null, questions: [] },
+    permitted: permitted ?? { decisions: ['allow', 'deny'], freeText: true },
+    status: row.status,
+    claimedAt: row.claimed_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    answeredAt: row.answered_at,
+    answer: row.answer_json === null ? null : parse(row.answer_json),
+    acknowledgement: row.acknowledgement_json === null ? null : parse(row.acknowledgement_json),
+  };
+}
 type SessionRotationRecord = {
   id: string;
   project_id: string;

@@ -39,6 +39,17 @@ function harness(options: { trusted?: boolean; service?: boolean } = {}) {
       calls.push(`history:${input.beforeSeq ?? '-'}:${input.aroundSeq ?? '-'}:${input.limit ?? '-'}`);
       return { ok: true as const, data: { items: [], window: {} } };
     },
+    respond: async (input: {
+      projectId: string;
+      requestId: string;
+      decision?: string;
+      answers?: Array<{ id: string; label: string; value: string }>;
+    }) => {
+      calls.push(
+        `respond:${input.projectId}:${input.requestId}:${input.decision ?? '-'}:${input.answers?.length ?? 0}`,
+      );
+      return { ok: true as const, data: { requestId: input.requestId, status: 'answered' } };
+    },
     searchHistory: async (input: { query: string }) => {
       calls.push(`search:${input.query}`);
       return { ok: true as const, data: { query: input.query, items: [], total: 0 } };
@@ -67,6 +78,45 @@ describe('studio IPC surface', () => {
   it('registers exactly the declared channels', () => {
     const { channels } = harness();
     expect([...channels].sort()).toEqual(CHANNEL_VALUES);
+  });
+
+  it('validates a reply payload before the service sees it', async () => {
+    const h = harness();
+    const missing = await h.invoke(STUDIO_CHANNELS.respond, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      decision: 'allow',
+    });
+    expect(missing).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+
+    const forged = await h.invoke(STUDIO_CHANNELS.respond, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      requestId: 'appr_1',
+      decision: 'maybe',
+    });
+    expect(forged).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+
+    const extra = await h.invoke(STUDIO_CHANNELS.respond, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      requestId: 'appr_1',
+      decision: 'allow',
+      shell: 'rm -rf /',
+    });
+    expect(extra).toMatchObject({ ok: false, error: { code: 'invalid_request' } });
+
+    expect(h.calls).toHaveLength(0);
+
+    const accepted = await h.invoke(STUDIO_CHANNELS.respond, {
+      projectId: 'prj_1',
+      sessionId: 'ses_1',
+      requestId: 'appr_1',
+      decision: 'deny',
+      remember: true,
+    });
+    expect(accepted).toMatchObject({ ok: true });
+    expect(h.calls).toEqual(['respond:prj_1:appr_1:deny:0']);
   });
 
   it('rejects an untrusted sender before running any action', async () => {

@@ -88,6 +88,47 @@ export type UsageQuery = z.input<typeof UsageQuery>;
 export const InterruptRequest = z.object({ threadId: ThreadId, turnId: TurnId }).strict();
 export type InterruptRequest = z.input<typeof InterruptRequest>;
 
+/**
+ * Answering a pending approval. `decision` is the engine's own vocabulary; the
+ * pinned client sends `allow` and `deny`, and `remember` is a separate opt-in.
+ */
+export const ApprovalDecisionRequest = z
+  .object({
+    threadId: ThreadId,
+    approvalId: z.string().min(1).max(200),
+    decision: z.enum(['allow', 'deny']),
+    remember: z.boolean().default(false),
+  })
+  .strict();
+export type ApprovalDecisionRequest = z.input<typeof ApprovalDecisionRequest>;
+
+export type ApprovalDecisionReceipt = {
+  threadId: ThreadId;
+  approvalId: string;
+  /** The decision the runtime echoed, or the one sent when it echoed nothing. */
+  decision: 'allow' | 'deny';
+  echoed: boolean;
+  remember: boolean;
+};
+
+export const UserInputReplyRequest = z
+  .object({
+    threadId: ThreadId,
+    requestId: z.string().min(1).max(200),
+    answers: z
+      .array(z.object({ id: z.string().min(1).max(200), label: z.string().max(200), value: z.string().max(2_000) }))
+      .min(1)
+      .max(50),
+  })
+  .strict();
+export type UserInputReplyRequest = z.input<typeof UserInputReplyRequest>;
+
+export type UserInputReplyReceipt = {
+  threadId: ThreadId;
+  requestId: string;
+  answers: number;
+  acknowledged: boolean;
+};
 export const CapabilityInvocation = z
   .object({
     name: z.enum(['runtime.info', 'providers.list', 'models.list', 'skills.list', 'goals.list', 'tasks.list']),
@@ -611,6 +652,95 @@ export class EngineAdapter {
     });
   }
 
+  /**
+   * Answer a pending approval on the runtime's own route. The engine's client
+   * posts `{ decision, remember }` to `/v1/approvals/{approval_id}` and treats a
+   * 404/409 as a request that is no longer answerable, so those stay typed
+   * refusals and are never retried here.
+   */
+  async respondToApproval(input: ApprovalDecisionRequest): Promise<Result<ApprovalDecisionReceipt>> {
+    const parsed = ApprovalDecisionRequest.safeParse(input);
+    if (!parsed.success) return fail('invalid_request', 'approval decision failed validation');
+    const response = await this.transport.json('POST', `/v1/approvals/${encodeURIComponent(parsed.data.approvalId)}`, {
+      decision: parsed.data.decision,
+      remember: parsed.data.remember,
+    });
+    if (!response.ok) return response;
+    const body = response.value.json;
+    const echoed = z
+      .object({
+        approval_id: z.string().optional(),
+        approvalId: z.string().optional(),
+        thread_id: z.string().optional(),
+        decision: z.string().optional(),
+      })
+      .passthrough()
+      .safeParse(body);
+    // A runtime that answers with nothing still accepted the decision; an answer
+    // that names a different approval is not evidence this one was decided.
+    const echoedId = echoed.success ? (echoed.data.approval_id ?? echoed.data.approvalId ?? null) : null;
+    if (echoedId !== null && echoedId !== parsed.data.approvalId) {
+      return fail('thread_mismatch', 'the runtime acknowledged a different approval');
+    }
+    const echoedDecision = echoed.success ? echoed.data.decision : undefined;
+    if (echoedDecision !== undefined && echoedDecision !== parsed.data.decision) {
+      return fail('schema_drift', 'the runtime recorded a different decision than the one sent');
+    }
+    const echoedThread = echoed.success ? echoed.data.thread_id : undefined;
+    if (echoedThread !== undefined && echoedThread !== parsed.data.threadId) {
+      return fail('thread_mismatch', 'the approval was acknowledged for another thread');
+    }
+    return ok({
+      threadId: parsed.data.threadId,
+      approvalId: parsed.data.approvalId,
+      decision: parsed.data.decision,
+      echoed: echoedDecision !== undefined,
+      remember: parsed.data.remember,
+    });
+  }
+
+  /**
+   * Answer a pending clarification on `/v1/user-input/{thread_id}/{request_id}`.
+   * The engine rejects an answer for a request it no longer holds, which is the
+   * expired/duplicate case; nothing is retried with a new identity.
+   */
+  async respondToUserInput(input: UserInputReplyRequest): Promise<Result<UserInputReplyReceipt>> {
+    const parsed = UserInputReplyRequest.safeParse(input);
+    if (!parsed.success) return fail('invalid_request', 'user-input reply failed validation');
+    const response = await this.transport.json(
+      'POST',
+      `/v1/user-input/${encodeURIComponent(parsed.data.threadId)}/${encodeURIComponent(parsed.data.requestId)}`,
+      { answers: parsed.data.answers },
+    );
+    if (!response.ok) return response;
+    const body = response.value.json;
+    const echoed = z
+      .object({
+        thread_id: z.string().optional(),
+        request_id: z.string().optional(),
+        input_id: z.string().optional(),
+        accepted: z.boolean().optional(),
+      })
+      .passthrough()
+      .safeParse(body);
+    const echoedRequest = echoed.success ? (echoed.data.request_id ?? echoed.data.input_id ?? null) : null;
+    if (echoedRequest !== null && echoedRequest !== parsed.data.requestId) {
+      return fail('thread_mismatch', 'the runtime acknowledged a different request');
+    }
+    const echoedThread = echoed.success ? echoed.data.thread_id : undefined;
+    if (echoedThread !== undefined && echoedThread !== parsed.data.threadId) {
+      return fail('thread_mismatch', 'the reply was acknowledged for another thread');
+    }
+    if (echoed.success && echoed.data.accepted === false) {
+      return fail('invalid_request', 'the runtime did not accept the answer');
+    }
+    return ok({
+      threadId: parsed.data.threadId,
+      requestId: parsed.data.requestId,
+      answers: parsed.data.answers.length,
+      acknowledged: true,
+    });
+  }
   async readHistory(input: HistoryQuery): Promise<Result<HistoryPage>> {
     const parsed = HistoryQuery.safeParse(input);
     if (!parsed.success) return fail('invalid_request', 'history query failed validation');

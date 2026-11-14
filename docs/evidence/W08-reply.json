@@ -1,0 +1,84 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "the pinned runtime starts on loopback with a bearer token",
+      "ok": true,
+      "detail": {
+        "port": 63189
+      }
+    },
+    {
+      "name": "the runtime identifies itself as the pinned engine",
+      "ok": true,
+      "detail": {
+        "version": "0.10.2",
+        "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e"
+      }
+    },
+    {
+      "name": "a real thread opens without any provider request",
+      "ok": true,
+      "detail": {
+        "threadId": "thr_0a8f78e32ad94946b1e568c4d6ecc59f"
+      }
+    },
+    {
+      "name": "a clarification reply reaches POST /v1/user-input and is refused for an unknown request",
+      "ok": true,
+      "detail": {
+        "code": "not_found",
+        "detail": null
+      }
+    },
+    {
+      "name": "an approval decision reaches POST /v1/approvals and is refused for an unknown approval",
+      "ok": true,
+      "detail": {
+        "code": "not_found",
+        "detail": null
+      }
+    },
+    {
+      "name": "the approval route exists and names the approval it does not hold",
+      "ok": true,
+      "detail": {
+        "route": "/v1/approvals/mona_probe_missing_approval",
+        "status": 404,
+        "body": "{\"error\":{\"message\":\"no pending approval with id 'mona_probe_missing_approval'\",\"status\":404}}"
+      }
+    },
+    {
+      "name": "the clarification route exists and answers from its own handler",
+      "ok": true,
+      "detail": {
+        "route": "/v1/user-input/thr_0a8f78e32ad94946b1e568c4d6ecc59f/mona_probe_missing_request",
+        "status": 404,
+        "body": "{\"error\":{\"message\":\"thread 'thr_0a8f78e32ad94946b1e568c4d6ecc59f' not found\",\"status\":404}}"
+      }
+    },
+    {
+      "name": "a different method or path is refused as a route problem, not mistaken for a request problem",
+      "ok": true,
+      "detail": {
+        "route": "/v1/approvals",
+        "status": 405,
+        "body": ""
+      }
+    }
+  ],
+  "engine": {
+    "product": "Codewhale",
+    "version": "0.10.2",
+    "commit": "ff466b2ed0bfb4ae5267d4d8d0ecb562cf46956e",
+    "runtimeApiVersion": "1.0",
+    "baseUrl": "http://127.0.0.1:63189",
+    "pid": 15784,
+    "workspace": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-w08-reply-7YoXO0",
+    "startedAt": "2026-11-14T20:07:53.401Z"
+  },
+  "platform": "win32",
+  "providerRequests": 0,
+  "note": "These replies deliberately address ids the runtime does not hold. A successful decision needs a real pending approval, which the configured Full Access posture never produces; that remains unobserved and is recorded as such.",
+  "capturedAt": "2026-11-14T20:07:53.460Z"
+}

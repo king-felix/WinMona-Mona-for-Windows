@@ -115,6 +115,15 @@ const bridge = Object.freeze({
   studioPickReferences: (input: { projectId: string }) => ipcRenderer.invoke(STUDIO_CHANNELS.references, input),
   studioExport: (input: { projectId: string; sessionId: string; mode?: 'agent' | 'plan' }) =>
     ipcRenderer.invoke(STUDIO_CHANNELS.export, input),
+  studioRespond: (input: {
+    projectId: string;
+    sessionId: string;
+    mode?: 'agent' | 'plan';
+    requestId: string;
+    decision?: 'allow' | 'deny';
+    remember?: boolean;
+    answers?: Array<{ id: string; label: string; value: string }>;
+  }) => ipcRenderer.invoke(STUDIO_CHANNELS.respond, input),
   commandDispatch: (input: { projectId: string; sessionId: string; text: string; operationKey: string }) =>
     ipcRenderer.invoke(COMMAND_CHANNELS.dispatch, input),
   studioHistory: (input: {

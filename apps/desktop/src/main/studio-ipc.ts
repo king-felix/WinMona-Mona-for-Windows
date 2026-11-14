@@ -32,6 +32,29 @@ const HistoryRequest = z
     limit: z.number().int().min(1).max(2_000).optional(),
   })
   .strict();
+const RespondRequest = z
+  .object({
+    projectId: z.string().min(1).max(80),
+    sessionId: z.string().min(1).max(120),
+    mode: z.enum(['agent', 'plan']).optional(),
+    requestId: z.string().min(1).max(200),
+    decision: z.enum(['allow', 'deny']).optional(),
+    remember: z.boolean().optional(),
+    answers: z
+      .array(
+        z
+          .object({
+            id: z.string().min(1).max(200),
+            label: z.string().max(200),
+            value: z.string().max(2_000),
+          })
+          .strict(),
+      )
+      .max(50)
+      .optional(),
+  })
+  .strict();
+
 const SearchRequest = z
   .object({
     projectId: z.string().min(1).max(80),
@@ -119,6 +142,18 @@ export function registerStudioIpc(deps: {
       limit?: number;
     };
     return service.history(input);
+  });
+  register(STUDIO_CHANNELS.respond, RespondRequest, (payload, service) => {
+    const input = payload as {
+      projectId: string;
+      sessionId: string;
+      mode?: 'agent' | 'plan';
+      requestId: string;
+      decision?: 'allow' | 'deny';
+      remember?: boolean;
+      answers?: Array<{ id: string; label: string; value: string }>;
+    };
+    return service.respond(input);
   });
   register(STUDIO_CHANNELS.search, SearchRequest, (payload, service) => {
     const input = payload as { projectId: string; sessionId: string; mode?: 'agent' | 'plan'; query: string };

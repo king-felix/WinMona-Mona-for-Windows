@@ -1,4 +1,4 @@
 recorded_at,thread_id,turn_id,task_id,provider,model,cache_hit_tokens,cache_miss_tokens,input_tokens,output_tokens,reasoning_tokens,cost_micros,cost_usd,cost_label,rate_revision,unknown_reason
-"2026-11-13T08:14:01.989Z","","turn_probe_provider","tsk_2b96f089a0fe4233948aff5ba734cf5c","deepseek","deepseek-flash","","","1200","300","","2500","0.002500","provider-reported","",""
-"2026-11-13T08:14:01.992Z","","turn_probe_estimate","tsk_2b96f089a0fe4233948aff5ba734cf5c","deepseek","deepseek-flash","0","1000","","0","","1000","0.001000","locally-estimated","probe-1",""
-"2026-11-13T08:14:01.995Z","","turn_probe_unknown","","deepseek","deepseek-flash","","","","","","","","unknown (provider did not report usage)","","provider did not report usage"
+"2026-11-14T20:19:14.040Z","","turn_probe_provider","tsk_1a1779ba2c0243ac9fb40d5b95ba80e5","deepseek","deepseek-flash","","","1200","300","","2500","0.002500","provider-reported","",""
+"2026-11-14T20:19:14.044Z","","turn_probe_estimate","tsk_1a1779ba2c0243ac9fb40d5b95ba80e5","deepseek","deepseek-flash","0","1000","","0","","1000","0.001000","locally-estimated","probe-1",""
+"2026-11-14T20:19:14.047Z","","turn_probe_unknown","","deepseek","deepseek-flash","","","","","","","","unknown (provider did not report usage)","","provider did not report usage"

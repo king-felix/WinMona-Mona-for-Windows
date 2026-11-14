@@ -1,6 +1,8 @@
 ﻿import { describe, expect, it } from 'vitest';
 import {
   ApprovalRequiredPayload,
+  normalizeApprovalRequired,
+  normalizeUserInputRequired,
   CapabilityId,
   CostEvidence,
   EngineCapabilities,
@@ -288,11 +290,39 @@ describe('effective profile', () => {
 });
 
 describe('approval and error contracts', () => {
-  it('validates approval payloads', () => {
+  it('reads an approval request in either wire spelling and requires an id', () => {
     expect(
       ApprovalRequiredPayload.safeParse({ approvalId: 'a1', toolName: 'bash', description: 'run a command' }).success,
     ).toBe(true);
-    expect(ApprovalRequiredPayload.safeParse({ approvalId: 'a1' }).success).toBe(false);
+    // The pinned runtime's own spelling is snake_case; a payload without a tool
+    // name is still readable, because the id is what a reply is addressed to.
+    expect(ApprovalRequiredPayload.safeParse({ approval_id: 'a2', tool_name: 'bash' }).success).toBe(true);
+    expect(ApprovalRequiredPayload.safeParse({ approval_id: 'a3' }).success).toBe(true);
+
+    const normalized = normalizeApprovalRequired({ approval_id: 'a2', tool_name: 'bash', intent_summary: 'x' });
+    expect(normalized).toEqual({
+      approvalId: 'a2',
+      toolName: 'bash',
+      description: 'The runtime is waiting for approval to continue.',
+      intentSummary: 'x',
+    });
+    // An id-less payload is not answerable, so it is refused rather than invented.
+    expect(normalizeApprovalRequired({ description: 'nothing to address' })).toBeNull();
+    expect(ApprovalRequiredPayload.safeParse({ approval_id: 'a1', unknown_field: 1 }).success).toBe(true);
+  });
+
+  it('reads a clarification request from both payload placements', () => {
+    const nested = normalizeUserInputRequired({
+      request_id: 'r1',
+      request: { questions: [{ id: 'q1', header: 'Pick', options: [{ label: 'a' }] }] },
+    });
+    expect(nested?.requestId).toBe('r1');
+    expect(nested?.questions[0]?.id).toBe('q1');
+    const flat = normalizeUserInputRequired({ input_id: 'r2', questions: [{ id: 'q1' }] });
+    expect(flat?.requestId).toBe('r2');
+    // No id or no questions means there is nothing to answer.
+    expect(normalizeUserInputRequired({ request: { questions: [] }, request_id: 'r3' })).toBeNull();
+    expect(normalizeUserInputRequired({ questions: [{ id: 'q1' }] })).toBeNull();
   });
 
   it('builds a typed error result without extra fields', () => {

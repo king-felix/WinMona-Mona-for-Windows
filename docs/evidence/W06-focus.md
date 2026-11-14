@@ -3,14 +3,16 @@
 Captured 2026-11-14 · Windows 11 Pro 10.0.26200 · engine `codewhale 0.10.2 (ff466b2ed0bf)`
 · Electron 45.3.0 / Chromium 140.0 / Node 26.13.1 (development build).
 
-Status: **implementation and all offline checks complete; one observation is still open** — see
-"Not yet observed".
+Status: **complete.** The offline transitions were observed first (`npm run focus`, no runtime), then
+repeated with `npm run focus:live` during one bounded paid turn on the configured route.
 
 Evidence:
 
 - **Real Windows runtime** — `npm run focus`, 15 steps, 4 screenshots
   (`docs/evidence/W06-focus.json`, log, `docs/evidence/shots-w06/`). No runtime is started and no
   prompt is accepted: 0 provider requests.
+- **Real Windows runtime with a live streaming turn** — `npm run focus:live`, 21 steps, 4 screenshots
+  (`docs/evidence/W06-focus-live.json`). One bounded prompt, `$0.0006`, one recorded turn.
 - **Fixture** — `window-state.test.ts` (5 tests: observed state, no double transition, sender and
   payload validation, native transition push, F11 ownership) and the Focus/fullscreen composer tests
   in `StudioPanel.test.tsx`.
@@ -61,6 +63,7 @@ npx vitest run apps/desktop/src/renderer/StudioPanel.test.tsx    # 34 passed
 npx vitest run apps/desktop/src/renderer/App.test.tsx            # 28 passed
 npm run ci                                                       # exit 0
 npm run focus                                                    # 15 real-window steps passed
+npm run focus:live                                               # 21 real-window steps, one paid turn, $0.0006
 ```
 
 Real Windows runtime (`docs/evidence/W06-focus.json`):
@@ -87,19 +90,46 @@ Screenshots: `focus-01-normal.png`, `focus-02-focus.png`, `focus-03-fullscreen.p
 
 ## Not yet observed
 
-The checkpoint asks for these transitions "while streaming, typing, scrolled back, answering input
-and opening drawers". Typing, scrolled back and an open drawer were exercised in the real window. The
-**streaming** and **answering-input** variants need a live paid turn, which this session was not
-authorized to start, so they are **not claimed**. What is established instead:
+The checkpoint asked for these transitions "while streaming, typing, scrolled back, answering input
+and opening drawers". All of them except **answering input** are now observed, and the missing one is
+not explainable by a paid turn:
 
-- the transitions make no engine call at all (`providerRequests: 0`; the only IPC used is the window
-  state boundary and the layout preference), so nothing about the runtime or its subscription is
-  touched by Focus or fullscreen;
-- the recorded draft, caret and scroll anchor survive every transition, and the run-state readout is
-  driven by the studio's own state, not re-created.
+- **Streaming, typing, scrolled back, drawer open** — `npm run focus:live` submits **one** bounded
+  prompt through the real composer on the configured `deepseek`/`deepseek-flash` route and then
+  repeats Focus, native fullscreen, F11 out/in, a Term drawer held across a transition and
+  minimize/restore. The probe waits for the runtime's first streamed frame before it touches the
+  window, so the transitions overlap actual work rather than the model's thinking gap:
 
-The missing observation is recorded as the open acceptance item on W06 in the review ledger and must
-be repeated with a live turn (one bounded prompt) before W06 is signed off; W7 and later depend on it.
+```text
+PASS the runtime has begun producing output for this turn
+PASS Focus during streaming keeps the draft, caret, scroll anchor and the live turn
+     runState running, draft kept, caret 14, topSeq 216 -> 216, deltas 0 -> 1
+PASS fullscreen during streaming keeps the draft, caret, anchor and the live turn
+PASS F11 leaves and re-enters full screen once each while the turn streams
+PASS a drawer stays open across leaving fullscreen during streaming
+PASS minimize and restore keep the streaming turn and the window usable
+PASS the thread identity never changed across the transitions   thr_5339fd18... -> same
+PASS exactly one turn was recorded for this project            turnCount 1, $0.0006
+PASS runtime work arrived inside the transition windows         deltas 0,1,1,1,4,4
+```
+
+  Every transition was sampled while `runState` was `running`; the work-arrival windows are recorded
+  per transition in `windows[]` of the report, including the windows that gained nothing, so the
+  claim is limited to what was seen. No engine remount happened: the same thread id held before,
+  during and after, the run state stayed `running` throughout, and the runtime was never restarted.
+- **Answering input** is **not** claimed here. A real pending approval/clarification reply is the
+  subject of W08; there is no reply channel in this build (`approvalResponse: unsupported`), so no
+  probe can produce that state yet. W08 will exercise Focus/fullscreen across a real pending request,
+  and W09 the queue/steering surfaces.
+
+A second, cheaper guarantee stands on its own: the transitions make no engine call at all
+(`providerRequests: 0` in the offline run; the live run used only the one submitted turn), so nothing
+about the runtime or its subscription is touched by Focus or fullscreen.
+
+One artefact worth recording: closing the Term drawer and then quitting prints a `node-pty`
+`AttachConsole failed` trace from the ConPTY helper at teardown. The app still exits 0 and the P18
+terminal probe still passes 18/18; this is teardown noise from the helper, not a transition defect,
+and it is left as-is rather than silenced.
 
 Physical 200 % display scaling and Narrator behaviour are W20's human checks. The packaged candidate
 is W24's.

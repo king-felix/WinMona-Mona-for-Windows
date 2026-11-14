@@ -13,6 +13,7 @@ export const STUDIO_CHANNELS = {
   resume: 'mona:studio-resume',
   references: 'mona:studio-pick-references',
   export: 'mona:studio-export',
+  respond: 'mona:studio-respond',
   history: 'mona:studio-history',
   search: 'mona:studio-search',
   event: 'mona:studio-event',
@@ -26,7 +27,7 @@ export type StudioProfile = {
   provider: string;
   model: string;
   mode: StudioMode;
-  permissionPosture: 'full_access' | 'workspace_write' | 'read_only' | 'unknown';
+  permissionPosture: 'full_access' | 'workspace_write' | 'ask' | 'read_only' | 'unknown';
   allowShell: boolean;
   trustMode: boolean;
   autoApprove: boolean;
@@ -47,21 +48,55 @@ export type TimelineItem = {
   at: string;
 };
 
+export type StudioQuestionOption = { label: string; description: string | null };
+
+/** One clarification question as the runtime shaped it. */
+export type StudioQuestion = {
+  id: string;
+  header: string | null;
+  question: string | null;
+  multiSelect: boolean;
+  options: StudioQuestionOption[];
+};
+
+/**
+ * A pending human request. `requestId` is the runtime's own identity and is the
+ * only thing a reply may be addressed to; `decisions` is the reply schema that
+ * was recorded when the request arrived, so the UI cannot offer an answer the
+ * service would refuse.
+ */
 export type StudioPending =
   | {
       kind: 'approval';
+      requestId: string;
+      /** Kept for the earlier card shape; equal to `requestId`. */
       approvalId: string;
       toolName: string;
       description: string;
+      intentSummary: string | null;
+      decisions: Array<'allow' | 'deny'>;
       at: string;
     }
   | {
       kind: 'input';
+      requestId: string;
       approvalId: string;
       toolName: string;
       description: string;
+      questions: StudioQuestion[];
+      freeText: boolean;
       at: string;
     };
+
+/** The answer Mona sent, and the acknowledgement the runtime returned. */
+export type StudioHumanAnswer = {
+  requestId: string;
+  status: 'answered';
+  decision: 'allow' | 'deny' | null;
+  answers: Array<{ id: string; label: string; value: string }>;
+  acknowledged: boolean;
+  detail: string;
+};
 
 export type StudioRunState =
   'idle' | 'preparing' | 'running' | 'reconnecting' | 'awaiting_approval' | 'interrupting' | 'failed';
@@ -81,6 +116,30 @@ export type StudioControl = {
   interrupt: { outcome: string; detail: string | null; at: string } | null;
   /** Set when a blocked problem refuses the next dispatch. */
   blockedProblem: { problemId: string; taskId: string | null; detail: string } | null;
+};
+
+/**
+ * Usage for the session on screen, read from the recorded ledger. Nothing here is
+ * estimated: unpriced records stay unknown, and the scope is the session, not the
+ * project or the turn.
+ */
+export type StudioUsage = {
+  scope: 'session';
+  sessionId: string;
+  records: number;
+  knownMicros: number;
+  unknownRecords: number;
+  /** null means the runtime did not report that bucket; it is not zero. */
+  tokens: {
+    input: number | null;
+    output: number | null;
+    cacheHit: number | null;
+    cacheMiss: number | null;
+    reasoning: number | null;
+  };
+  /** True when the runtime reported reasoning tokens inside the output count. */
+  reasoningIncludedInOutput: boolean;
+  capturedAt: string;
 };
 
 export type StudioCapability = { status: 'supported' | 'unsupported'; reason: string | null };
@@ -125,6 +184,7 @@ export type StudioView = {
   run: StudioRun;
   control: StudioControl;
   pending: StudioPending | null;
+  usage: StudioUsage | null;
   diagnostics: string[];
   capabilities: {
     planMode: StudioCapability;
@@ -196,6 +256,20 @@ export type StudioBridge = {
   studioResume(input: { projectId: string }): Promise<IpcResult<{ run: StudioRun; control: StudioControl }>>;
   studioPickReferences(input: { projectId: string }): Promise<IpcResult<StudioReferencePick>>;
   studioExport(input: { projectId: string; sessionId: string; mode?: StudioMode }): Promise<IpcResult<StudioExport>>;
+  /**
+   * Answer the pending runtime request. `decision` answers an approval;
+   * `answers` answers a clarification. Both address the runtime request id and
+   * nothing else, so a stale card cannot decide a newer question.
+   */
+  studioRespond(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+    requestId: string;
+    decision?: 'allow' | 'deny';
+    remember?: boolean;
+    answers?: Array<{ id: string; label: string; value: string }>;
+  }): Promise<IpcResult<StudioHumanAnswer>>;
   /** One cursor page of stored history. Reading history makes no model call. */
   studioHistory(input: StudioHistoryQuery): Promise<IpcResult<StudioHistoryPage>>;
   /** Case-insensitive search over the stored conversation for this thread. */

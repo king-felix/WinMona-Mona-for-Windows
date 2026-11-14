@@ -4,7 +4,7 @@
     {
       "name": "a real project opens through the catalog",
       "ok": true,
-      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w01-composer-mncxwi\\composer-project"
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-w01-composer-tjisuv\\composer-project"
     },
     {
       "name": "the real composer is on screen",
@@ -65,7 +65,7 @@
       "label": "composer-ctrl-enter"
     }
   ],
-  "capturedAt": "2026-11-14T17:12:54.631Z",
+  "capturedAt": "2026-11-14T20:21:38.325Z",
   "providerRequests": 0,
   "limitation": "Physical IME composition is a human check: Chromium cannot be driven into composing state from the main process. Ctrl+Enter and plain Enter were pressed through Electron sendInputEvent in a real window."
 }

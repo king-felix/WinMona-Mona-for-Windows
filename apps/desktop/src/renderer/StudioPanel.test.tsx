@@ -65,6 +65,7 @@ function view(itemCount: number, overrides: Partial<StudioView> = {}): StudioVie
       blockedProblem: null,
     },
     pending: null,
+    usage: null,
     diagnostics: [],
     capabilities: {
       planMode: { status: 'supported', reason: null },
@@ -155,6 +156,17 @@ function installBridge(next: StudioView, overrides: BridgeOverrides = {}): void 
         if (index >= 0) studioHandlers.splice(index, 1);
       };
     },
+    studioRespond: vi.fn(async (input: { requestId: string; decision?: string; answers?: unknown[] }) => ({
+      ok: true as const,
+      data: {
+        requestId: input.requestId,
+        status: 'answered',
+        decision: input.decision ?? null,
+        answers: input.answers ?? [],
+        acknowledged: true,
+        detail: 'The runtime acknowledged the decision.',
+      },
+    })),
     projectSpend: vi.fn(async () => ({ ok: true as const, data: null })),
   };
 }
@@ -204,6 +216,159 @@ async function render(next: StudioView, overrides: BridgeOverrides = {}): Promis
 function renderedItems(): number {
   return container.querySelectorAll('.timeline-item').length;
 }
+
+describe('session usage in the studio strip', () => {
+  it('shows recorded buckets with their scope and says unknown instead of zero', async () => {
+    await render(
+      view(1, {
+        usage: {
+          scope: 'session',
+          sessionId: 'ses_1',
+          records: 2,
+          knownMicros: 2_500,
+          unknownRecords: 1,
+          tokens: { input: 1_000, output: 300, cacheHit: 256, cacheMiss: 744, reasoning: 120 },
+          reasoningIncludedInOutput: true,
+          capturedAt: '2026-11-12T00:00:00.000Z',
+        },
+      }),
+    );
+    const chip = container.querySelector('[data-testid="studio-usage"]');
+    expect(chip).not.toBeNull();
+    expect(chip?.textContent).toContain('$0.0025');
+    expect(chip?.textContent).toContain('unpriced');
+    expect(chip?.textContent).toContain('cache 256');
+    expect(chip?.getAttribute('title')).toContain('Scope: this session (2 recorded turn(s))');
+    expect(chip?.getAttribute('title')).toContain('unknown, not zero');
+  });
+
+  it('says nothing was recorded rather than showing a free turn', async () => {
+    await render(view(0, { usage: null }));
+    const chip = container.querySelector('[data-testid="studio-usage"]');
+    expect(chip?.textContent).toContain('No usage recorded for this session');
+  });
+
+  it('keeps a missing bucket labelled unknown', async () => {
+    await render(
+      view(1, {
+        usage: {
+          scope: 'session',
+          sessionId: 'ses_1',
+          records: 1,
+          knownMicros: 0,
+          unknownRecords: 1,
+          tokens: { input: null, output: null, cacheHit: null, cacheMiss: null, reasoning: null },
+          reasoningIncludedInOutput: true,
+          capturedAt: '2026-11-12T00:00:00.000Z',
+        },
+      }),
+    );
+    const chip = container.querySelector('[data-testid="studio-usage"]');
+    expect(chip?.textContent).toContain('in unknown');
+  });
+});
+
+describe('answering a pending request', () => {
+  const approvalView = (): StudioView =>
+    view(1, {
+      run: {
+        state: 'awaiting_approval',
+        detail: 'The runtime paused for an approval.',
+        turnId: 'turn_1',
+        submission: null,
+        startedAt: null,
+      },
+      pending: {
+        kind: 'approval',
+        requestId: 'appr_1',
+        approvalId: 'appr_1',
+        toolName: 'bash',
+        description: 'rm -rf dist needs approval',
+        intentSummary: 'Remove the build output.',
+        decisions: ['allow', 'deny'],
+        at: '2026-11-12T00:00:00.000Z',
+      },
+    });
+
+  it('sends the decision the human chose and never answers on render', async () => {
+    await render(approvalView());
+    const bridge = (window as unknown as { mona: { studioRespond: ReturnType<typeof vi.fn> } }).mona;
+    expect(bridge.studioRespond).not.toHaveBeenCalled();
+    expect(container.textContent).toContain('rm -rf dist needs approval');
+    expect(container.textContent).toContain('Remove the build output.');
+
+    const deny = container.querySelector('[data-testid="studio-answer-deny"]') as HTMLButtonElement;
+    expect(deny).not.toBeNull();
+    await act(async () => {
+      deny.click();
+    });
+    expect(bridge.studioRespond).toHaveBeenCalledTimes(1);
+    expect(bridge.studioRespond.mock.calls[0]?.[0]).toMatchObject({
+      projectId: 'prj_a',
+      sessionId: 'ses_1',
+      requestId: 'appr_1',
+      decision: 'deny',
+    });
+  });
+
+  it('answers a clarification with the chosen option and refuses an empty answer', async () => {
+    await render(
+      view(1, {
+        run: {
+          state: 'awaiting_approval',
+          detail: 'The runtime asked a question.',
+          turnId: 'turn_1',
+          submission: null,
+          startedAt: null,
+        },
+        pending: {
+          kind: 'input',
+          requestId: 'req_1',
+          approvalId: 'req_1',
+          toolName: 'request_user_input',
+          description: 'Which folder should be removed?',
+          questions: [
+            {
+              id: 'q1',
+              header: 'Folder',
+              question: 'Which folder should be removed?',
+              multiSelect: false,
+              options: [
+                { label: 'dist', description: null },
+                { label: 'build', description: 'the compiled output' },
+              ],
+            },
+          ],
+          freeText: true,
+          at: '2026-11-12T00:00:00.000Z',
+        },
+      }),
+    );
+    const bridge = (window as unknown as { mona: { studioRespond: ReturnType<typeof vi.fn> } }).mona;
+
+    const send = container.querySelector('[data-testid="studio-answer-send"]') as HTMLButtonElement;
+    await act(async () => {
+      send.click();
+    });
+    expect(bridge.studioRespond).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-testid="studio-pending-problem"]')?.textContent).toContain(
+      'Choose an answer',
+    );
+
+    const option = container.querySelector('[data-testid="studio-option-q1-dist"]') as HTMLInputElement;
+    await act(async () => {
+      option.click();
+    });
+    await act(async () => {
+      (container.querySelector('[data-testid="studio-answer-send"]') as HTMLButtonElement).click();
+    });
+    expect(bridge.studioRespond).toHaveBeenCalledTimes(1);
+    expect(bridge.studioRespond.mock.calls[0]?.[0]).toMatchObject({
+      requestId: 'req_1',
+      answers: [{ id: 'q1', label: 'dist', value: 'dist' }],
+    });
+  });
+});
 
 describe('StudioPanel render window', () => {
   it('renders the newest page of a long history, not every loaded row', async () => {

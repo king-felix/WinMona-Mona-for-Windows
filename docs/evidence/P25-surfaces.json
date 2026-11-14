@@ -4,7 +4,7 @@
     {
       "name": "a real project opens through the catalog",
       "ok": true,
-      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p25-surfaces-qkzzt6\\surfaces-project"
+      "detail": "x:\\ai_projects\\qwen3.8-27b\\cache\\temp\\mona-p25-surfaces-57anxu\\surfaces-project"
     },
     {
       "name": "the shell is ready before it is driven",
@@ -75,7 +75,7 @@
       "name": "a budget can be set from the Cost lens",
       "ok": true,
       "detail": {
-        "budgetsText": "Project totallimit $2.5000 · warn $2.0000 · stop $2.5000updated 2026-11-13T08:09:12.209Z"
+        "budgetsText": "Project totallimit $2.5000 · warn $2.0000 · stop $2.5000updated 2026-11-14T20:19:15.106Z"
       }
     },
     {
@@ -119,8 +119,8 @@
           "Ship it"
         ],
         "ids": [
-          "tsk_b787266aef324fa1aa8a2fc77174b9ca",
-          "tsk_e5abe99ad90d4439b3f88bf28c641f99"
+          "tsk_1a1779ba2c0243ac9fb40d5b95ba80e5",
+          "tsk_23e51f77d89443aea51d39f82c93473f"
         ]
       }
     },
@@ -176,7 +176,7 @@
     }
   ],
   "csv": {
-    "path": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p25-surfaces-qKzzT6\\mona-cost-export.csv",
+    "path": "X:\\AI_Projects\\Qwen3.8-27B\\cache\\temp\\mona-p25-surfaces-57anxu\\mona-cost-export.csv",
     "bytes": 749,
     "header": "recorded_at,thread_id,turn_id,task_id,provider,model,cache_hit_tokens,cache_miss_tokens,input_tokens,output_tokens,reasoning_tokens,cost_micros,cost_usd,cost_label,rate_revision,unknown_reason",
     "labels": [
@@ -185,6 +185,6 @@
       "unknown (provider did not report usage)"
     ]
   },
-  "capturedAt": "2026-11-13T08:09:14.500Z",
+  "capturedAt": "2026-11-14T20:19:17.469Z",
   "providerRequests": 0
 }

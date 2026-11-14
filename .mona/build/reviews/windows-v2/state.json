@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "revision": 10,
+  "revision": 17,
   "namespace": "windows-v2",
   "source": {
     "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
@@ -16,7 +16,7 @@
     "ledger": "docs/requirements-windows.json"
   },
   "baseline_utc": "2026-11-14T16:51:28Z",
-  "current_task": "W06",
+  "current_task": "W12",
   "tasks": {
     "W00": {
       "status": "completed",
@@ -64,10 +64,10 @@
         },
         {
           "path": "docs/evidence/W01-composer.json",
-          "sha256": "05e1032c990b3134afc24a0a8dc0bfe3aa99cf23cc9df44fb0648924b7cb0bc8",
+          "sha256": "bb554b35b50d42a47cb4abeb937df183d3b90de5b7586197ab6d892aed2266e0",
           "kind": "document",
-          "recorded_utc": "2026-11-14T17:15:02Z",
-          "commit": "c1c9138722b2002b28dfc847c0857b9954a10e08"
+          "recorded_utc": "2026-11-14T20:27:44Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
         }
       ],
       "problems": [],
@@ -216,31 +216,42 @@
         "W01",
         "W03"
       ],
-      "acceptance_done": [],
+      "acceptance_done": [
+        "Actual Windows tests enter/leave while streaming, typing, scrolled back and with a drawer open: 21-step live probe during one bounded paid turn, no remounted engine or new inference, draft/caret/scroll anchor and thread identity survive every transition",
+        "Alt+Tab, F11/menu exit, minimize/restore and close/quit remain usable; F11 is owned once by the main process and leaves/re-enters fullscreen once each",
+        "Narrow and 200% layouts keep essential controls reachable (offline probe, 15 steps)"
+      ],
       "acceptance_open": [
-        "Actual Windows tests enter/leave while streaming, typing, scrolled back, answering input and opening drawers. No remounted engine or new inference; draft/caret/scroll survives. Alt+Tab, F11/menu exit, minimize/restore and close/quit remain usable. Narrow and 200% layouts keep essential controls reachable."
+        "The answering-input variant: enter/leave Focus and fullscreen while a real pending native approval/clarification request is on screen. There is no reply channel in this build (approvalResponse: unsupported), so no probe can produce that state yet; W08 owns the reply surface and will repeat the transitions across a real pending request."
       ],
       "evidence": [
-        {
-          "path": "docs/evidence/W06-focus.md",
-          "sha256": "65dd656806779e7e39d8d572debc44d14b236e85f43fba5eeaddd97df5c0c8c7",
-          "kind": "document",
-          "recorded_utc": "2026-11-14T19:29:37Z",
-          "commit": "d3a6b4b6641c2cff19125f3df972ebaf54af4a0c"
-        },
         {
           "path": "docs/evidence/W06-focus.json",
           "sha256": "bdeb8447f82361df611b10e3fb3270a8d9424fa474c4d901d2e4e579671cc24b",
           "kind": "document",
           "recorded_utc": "2026-11-14T19:29:37Z",
           "commit": "d3a6b4b6641c2cff19125f3df972ebaf54af4a0c"
+        },
+        {
+          "path": "docs/evidence/W06-focus.md",
+          "sha256": "95ed655d126d6da7e9b267dd1b95f88ee7455f137a1d3a6b33f573fe184ebb22",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T19:56:45Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        },
+        {
+          "path": "docs/evidence/W06-focus-live.json",
+          "sha256": "50416cbf339c83a12d92ef857e002d37f6145af1d55d2a36e915bbe6a320d4ab",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T19:56:45Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
         }
       ],
       "problems": [],
       "original_requirements": [
         "MONA-007"
       ],
-      "next_action": "Repeat the real-window Focus/fullscreen transitions during a live paid turn (authorization needed), then complete W06 and start W07"
+      "next_action": "W08: native approval/clarification replies, then repeat the Focus/fullscreen transitions across a real pending request to close W06"
     },
     "W07": {
       "status": "pending",
@@ -257,19 +268,51 @@
       "next_action": ""
     },
     "W08": {
-      "status": "pending",
+      "status": "verifying",
       "prerequisites": [
         "W01",
         "W03"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Native/fixture request round trip, rejected or expired answer, duplicate click, lost acknowledgement, reconnect and concurrent request IDs. “Delivered” requires an acknowledgement. Dismissing UI does not approve. Text drafts survive. Complete independent display/state work if a native reply capability blocks final verification."
+      "acceptance_done": [
+        "Durable request record, typed reply transport and acknowledgement: 8 new service tests, 2 adapter tests, 1 IPC test, 2 renderer tests, 2 contract tests; approvals and clarifications post to the runtime's own routes",
+        "Rejected or expired answer, duplicate click, lost acknowledgement, reconnect, concurrent request ids and project isolation are all covered by fixtures; a runtime 404 settles the row as expired and nothing is retried",
+        "Dismissing the UI does not approve, and a half-written composer draft survives because the reply controls are separate from the composer",
+        "Live protocol qualification: both reply routes exist on the pinned runtime and answer from their own handlers for ids they do not hold (8 steps, 0 provider requests)"
       ],
-      "evidence": [],
-      "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "acceptance_open": [
+        "Native/fixture request round trip: a real pending approval was never produced on this machine. The saved permission posture (full-access in the engine settings) caps the thread-level ask flags, so the runtime completes a bash tool call without prompting. Needs the Human: switch the saved posture to ask for one bounded probe, then answer the real request."
+      ],
+      "evidence": [
+        {
+          "path": "docs/evidence/W08-replies.md",
+          "sha256": "1789aaa89f110ba26dc37256208fab783c77f997f07ce7067318aa4ab2909022",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:14:32Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        },
+        {
+          "path": "docs/evidence/W08-reply.json",
+          "sha256": "44dd533b852c80c6f757a04a6358f7c3773ea982de617fadd661a5023188ec17",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:14:32Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        },
+        {
+          "path": "docs/evidence/W08-roundtrip.json",
+          "sha256": "01d25e242fc011a821b96feb0792f38a335b356f79a905feaebd1f9613d93d48",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:14:32Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        }
+      ],
+      "problems": [
+        "P-W08-001"
+      ],
+      "original_requirements": [
+        "MONA-007",
+        "MONA-016"
+      ],
+      "next_action": "W10: honest usage HUD and a reusable pre-dispatch budget gate (W08 closes when a live approval is observed)"
     },
     "W09": {
       "status": "pending",
@@ -287,35 +330,71 @@
       "next_action": ""
     },
     "W10": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W00",
         "W03"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "Usage fixtures cover cache hit/miss, inclusive reasoning/output, missing price, parent/child totals, delayed updates, duplicate replay and scope changes. HUD controls work at 200%. Browsing the dashboard causes no provider call; configured gates block the actual dispatch path."
+      "acceptance_done": [
+        "Usage fixtures cover cache hit/miss, inclusive reasoning/output, missing price, duplicate replay and session/project scope in the studio projection; the ledger's own matrix covers parent/child totals, delayed receipts, rate revisions, reservations and day scope",
+        "HUD controls work at 200% (12-step a11y probe including 200% zoom with no horizontal overflow) and the strip shows unknowns as unknown",
+        "Browsing the dashboard causes no provider call: surfaces 26/26 and a11y 12/12 with no runtime started; the zero-inference service test asserts no submission",
+        "Configured gates block the actual dispatch path: the budget gate runs after the dispatch claim and before any thread or prompt, with its own service test"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W10-usage.md",
+          "sha256": "4f71a1a23cf0b60414c92c0b6d1ec77a4e5cccb6dec9d066a9ed5a42dd9000cd",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:19:55Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-013"
+      ],
+      "next_action": "W11: composition, navigation and review conveniences"
     },
     "W11": {
-      "status": "pending",
+      "status": "completed",
       "prerequisites": [
         "W01",
         "W03",
         "W04"
       ],
-      "acceptance_done": [],
-      "acceptance_open": [
-        "No wrong-project insertion; cancellation preserves draft; supported attachment context is shown accurately; invalid/outside-root/reparse cases follow the existing policy; links cannot cross IPC/renderer privilege boundaries. Keyboard, large text and error/cancel states work. Local lookup/copy/search adds no inference."
+      "acceptance_done": [
+        "No wrong-project insertion: references are validated against that project's canonical root after every junction is followed, the thread never learns of a path outside it, and drafts stay per project",
+        "Cancellation preserves the draft: the picker inserts nothing and the composer keeps its text (composer probe 9/9)",
+        "Supported context is shown accurately: a reference is a path list in the prompt, never uploaded content, and the capability row says attachments are unsupported",
+        "Invalid, outside-root and reparse cases follow the policy with tests for absolute, traversing, missing and junction-escaped references",
+        "Links cannot cross the renderer boundary: no anchors or raw HTML in rendered Markdown, and window navigation remains refused",
+        "Keyboard, large text and error/cancel states work (a11y 12/12 incl. 200% zoom); local lookup, copy and search add no inference (0 provider requests)"
       ],
-      "evidence": [],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W11-conveniences.md",
+          "sha256": "14cd7e365d71076db96d369f213270ef737b190bcad167602e94a2e7833ba014",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:22:03Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        },
+        {
+          "path": "docs/evidence/W01-composer.json",
+          "sha256": "bb554b35b50d42a47cb4abeb937df183d3b90de5b7586197ab6d892aed2266e0",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T20:22:03Z",
+          "commit": "4c16b0f9fd4dbe6b7697175a3af9d47405cc580c"
+        }
+      ],
       "problems": [],
-      "original_requirements": [],
-      "next_action": ""
+      "original_requirements": [
+        "MONA-007",
+        "MONA-017"
+      ],
+      "next_action": "W12 next eligible; W06/W08 close on one live approval observation (Needs the Human: saved posture to ask)"
     },
     "W12": {
       "status": "pending",

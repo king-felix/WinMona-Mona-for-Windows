@@ -43,10 +43,12 @@
     "composer": "npm run composer -w @mona/desktop",
     "slash": "npm run slash -w @mona/desktop",
     "focus": "npm run focus -w @mona/desktop",
+    "focus:live": "npm run focus:live -w @mona/desktop",
     "surfaces": "npm run surfaces -w @mona/desktop",
     "assets:icons": "node tools/assets/build-icons.mjs",
     "assets:check": "node tools/assets/build-icons.mjs --check",
-    "assets:test": "node --test tests/assets"
+    "assets:test": "node --test tests/assets",
+    "reply:probe": "node tools/spike/approval-reply.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

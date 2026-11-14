@@ -105,6 +105,54 @@ test('a completed task with an open acceptance item is refused', () => {
   assert.match(refused.stderr, /open acceptance item/);
 });
 
+test('a wrong completion can be corrected by clearing the recorded acceptance', () => {
+  const root = sandbox();
+  assert.equal(run(root, 'init').status, 0);
+  const evidence = path.join(root, 'docs', 'evidence', 'W00.md');
+  fs.mkdirSync(path.dirname(evidence), { recursive: true });
+  fs.writeFileSync(evidence, 'x', 'utf8');
+
+  const overclaimed = run(
+    root,
+    'checkpoint',
+    '--task',
+    'W00',
+    '--status',
+    'completed',
+    '--expected-revision',
+    '1',
+    '--acceptance-done',
+    'everything including the unobserved item',
+    '--clear-acceptance-open',
+    '--evidence',
+    evidence,
+  );
+  assert.equal(overclaimed.status, 0, overclaimed.stderr);
+  assert.deepEqual(state(root).tasks.W00.acceptance_done, ['everything including the unobserved item']);
+
+  // Rewinding to verifying with the claim removed is accepted, and the row keeps
+  // only the acceptance the evidence actually supports.
+  const corrected = run(
+    root,
+    'checkpoint',
+    '--task',
+    'W00',
+    '--status',
+    'verifying',
+    '--expected-revision',
+    '2',
+    '--clear-acceptance-done',
+    '--acceptance-done',
+    'the observed part',
+    '--acceptance-open',
+    'the unobserved part',
+  );
+  assert.equal(corrected.status, 0, corrected.stderr);
+  const row = state(root).tasks.W00;
+  assert.equal(row.status, 'verifying');
+  assert.deepEqual(row.acceptance_done, ['the observed part']);
+  assert.deepEqual(row.acceptance_open, ['the unobserved part']);
+});
 test('the third no-progress attempt stops the problem and a fourth is refused', () => {
   const root = sandbox();
   assert.equal(run(root, 'init').status, 0);

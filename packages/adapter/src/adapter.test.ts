@@ -562,6 +562,81 @@ describe('history, usage, interrupt, capabilities', () => {
     if (!wrongResult.ok) expect(wrongResult.error.code).toBe('thread_mismatch');
   });
 
+  it('posts an approval decision to the runtime route and refuses a mismatched echo', async () => {
+    const transport = new ScriptedTransport().onJson((call) => {
+      expect(call.method).toBe('POST');
+      expect(call.path).toBe('/v1/approvals/appr%2F1');
+      expect(call.body).toEqual({ decision: 'allow', remember: true });
+      return jsonResponse({ approval_id: 'appr/1', decision: 'allow' });
+    });
+    const result = await makeAdapter(transport).respondToApproval({
+      threadId: THREAD as never,
+      approvalId: 'appr/1',
+      decision: 'allow',
+      remember: true,
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.value.decision).toBe('allow');
+      expect(result.value.echoed).toBe(true);
+    }
+
+    // A runtime that names a different approval is not evidence this one was decided.
+    const other = new ScriptedTransport().onJson(() => jsonResponse({ approval_id: 'appr_other', decision: 'allow' }));
+    const mismatch = await makeAdapter(other).respondToApproval({
+      threadId: THREAD as never,
+      approvalId: 'appr_1',
+      decision: 'allow',
+    });
+    expect(mismatch.ok).toBe(false);
+    if (!mismatch.ok) expect(mismatch.error.code).toBe('thread_mismatch');
+
+    // A different recorded decision is a drift, not a success.
+    const drifted = new ScriptedTransport().onJson(() => jsonResponse({ approval_id: 'appr_1', decision: 'deny' }));
+    const drift = await makeAdapter(drifted).respondToApproval({
+      threadId: THREAD as never,
+      approvalId: 'appr_1',
+      decision: 'allow',
+    });
+    expect(drift.ok).toBe(false);
+    if (!drift.ok) expect(drift.error.code).toBe('schema_drift');
+  });
+
+  it('posts a clarification answer to the thread and request it belongs to', async () => {
+    const transport = new ScriptedTransport().onJson((call) => {
+      expect(call.method).toBe('POST');
+      expect(call.path).toBe(`/v1/user-input/${THREAD}/req%201`);
+      expect(call.body).toEqual({ answers: [{ id: 'q1', label: 'dist', value: 'dist' }] });
+      return jsonResponse({ thread_id: THREAD, request_id: 'req 1', accepted: true });
+    });
+    const result = await makeAdapter(transport).respondToUserInput({
+      threadId: THREAD as never,
+      requestId: 'req 1',
+      answers: [{ id: 'q1', label: 'dist', value: 'dist' }],
+    });
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.value.answers).toBe(1);
+
+    const rejected = new ScriptedTransport().onJson(() => jsonResponse({ thread_id: THREAD, accepted: false }));
+    const refused = await makeAdapter(rejected).respondToUserInput({
+      threadId: THREAD as never,
+      requestId: 'req 2',
+      answers: [{ id: 'q1', label: 'dist', value: 'dist' }],
+    });
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) expect(refused.error.code).toBe('invalid_request');
+
+    // An expired request is the runtime's 404; it is surfaced, never retried.
+    const gone = new ScriptedTransport().onJson(() => failure('not_found'));
+    const expired = await makeAdapter(gone).respondToUserInput({
+      threadId: THREAD as never,
+      requestId: 'req 3',
+      answers: [{ id: 'q1', label: 'dist', value: 'dist' }],
+    });
+    expect(expired.ok).toBe(false);
+    if (!expired.ok) expect(expired.error.code).toBe('not_found');
+  });
+
   it('uses the current provider for models.list instead of hard-coding one', async () => {
     const transport = new ScriptedTransport()
       .onJson(() => jsonResponse(runtimeInfo()))

@@ -1,10 +1,12 @@
 import { createHash, randomUUID } from 'node:crypto';
-import { existsSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { WorkQueue, redact, type AdapterStreamEvent, type EngineAdapter } from '@mona/adapter';
 import {
   errorResult,
   newOperationKey,
+  normalizeApprovalRequired,
+  normalizeUserInputRequired,
   ThreadId,
   type EffectiveProfile,
   type ErrorResult,
@@ -22,9 +24,12 @@ import type {
   StudioHistoryPage,
   StudioHistoryWindow,
   StudioMode,
+  StudioHumanAnswer,
   StudioPending,
+  StudioQuestion,
   StudioProfile,
   StudioRun,
+  StudioUsage,
   StudioSearchResult,
   StudioSubmission,
   StudioView,
@@ -87,6 +92,15 @@ export const HISTORY_PAGE = 500;
 export const HISTORY_MAX_PAGE = 2_000;
 const HISTORY_SEARCH_LIMIT = 100;
 const HUMAN_INPUT_TOOLS = new Set(['request_user_input']);
+
+/** One clarification question in the shape Mona records and renders. */
+type HumanQuestionInput = {
+  id: string;
+  header: string | null;
+  question: string | null;
+  multiSelect: boolean;
+  options: Array<{ label: string; description: string | null }>;
+};
 /** Statuses that mean a card will not grow again. */
 const FINAL_ITEM_STATUSES = new Set(['completed', 'interrupted', 'failed', 'cancelled']);
 /** Statuses that still accept streamed text. */
@@ -271,14 +285,16 @@ export class StudioService {
           // A bound thread with a live runtime gets a stream: events that arrived
           // while the window was closed are replayed from the stored cursor.
           this.maybeSubscribe(state, project.canonicalPath);
+          await this.rehydratePending(state, threadRow.id);
         }
       }
       const page = threadRow
         ? await this.store.timelinePage(threadRow.id, { limit: HISTORY_PAGE })
         : EMPTY_TIMELINE_PAGE;
+      const usage = await this.sessionUsage(projectId, sessionId);
       return {
         ok: true,
-        data: this.renderView(state, page.items.map(toTimelineItem), windowOf(page), warning),
+        data: this.renderView(state, page.items.map(toTimelineItem), windowOf(page), warning, usage),
       };
     } catch (error) {
       return { ok: false, error: errorResult('internal', 'The studio state could not be read.', true, slice(error)) };
@@ -362,20 +378,14 @@ export class StudioService {
         error: errorResult('invalid_request', `A prompt must be at most ${MAX_TEXT.toLocaleString()} characters.`),
       };
     }
-    const references = this.boundReferences(input.references);
-    if (!references) {
-      return {
-        ok: false,
-        error: errorResult(
-          'invalid_request',
-          'File references must be project-relative paths, at most 50 of them, without control characters.',
-        ),
-      };
-    }
     const mode: StudioMode = input.mode === 'plan' ? 'plan' : 'agent';
 
     const project = await this.store.getProject(input.projectId);
     if (!project) return { ok: false, error: errorResult('not_found', 'That project is not in the catalog.') };
+    const references = this.boundReferences(input.references, project.canonicalPath);
+    if (!references.ok) {
+      return { ok: false, error: errorResult('invalid_request', references.reason) };
+    }
     if (!existsSync(project.canonicalPath)) {
       return {
         ok: false,
@@ -528,7 +538,7 @@ export class StudioService {
     state.threadId = threadRow.id;
     state.profile = toStudioProfile(profile);
     const threadId = ThreadId.parse(threadRow.id);
-    const prompt = composePrompt(text, references);
+    const prompt = composePrompt(text, references.paths);
     const submitted = await adapter.submitTurn({
       threadId,
       prompt,
@@ -658,6 +668,221 @@ export class StudioService {
     return { ok: true, data: { run: state.run, control: this.controlFor(state) } };
   }
 
+  /**
+   * Answer the pending runtime request.
+   *
+   * The reply is addressed to the runtime request id recorded with the request,
+   * never to "the current card": a stale window, a project switch or a second
+   * click cannot decide a newer question. The right to send is claimed in the
+   * database, so two clicks produce one decision, and the claim is released when
+   * the send fails so the human can try again. Nothing here retries with a new
+   * identity: a lost acknowledgement keeps the card and says so.
+   */
+  async respond(input: {
+    projectId: string;
+    sessionId: string;
+    mode?: StudioMode;
+    requestId: string;
+    decision?: 'allow' | 'deny';
+    remember?: boolean;
+    answers?: Array<{ id: string; label: string; value: string }>;
+  }): Promise<ServiceResult<StudioHumanAnswer>> {
+    const state = this.states.get(`${input.projectId}:${input.sessionId}`);
+    const threadId = state?.threadId ?? null;
+    if (!state || !threadId) {
+      return {
+        ok: false,
+        error: errorResult('not_found', 'No live studio thread is bound to this session, so nothing can be answered.'),
+      };
+    }
+    const records = await this.store.listHumanRequests(input.projectId, { threadId, limit: 50 });
+    const record = records.find((row) => row.engineRequestId === input.requestId) ?? null;
+    if (!record) {
+      return {
+        ok: false,
+        error: errorResult('not_found', 'That request is not one Mona recorded for this thread.'),
+      };
+    }
+    if (record.status === 'answered') {
+      return {
+        ok: false,
+        error: errorResult('conflict', 'That request was already answered. Nothing was sent again.'),
+      };
+    }
+    if (record.status === 'expired' || record.status === 'canceled') {
+      return {
+        ok: false,
+        error: errorResult(
+          'conflict',
+          record.status === 'expired'
+            ? 'The runtime timed this request out. Nothing was sent.'
+            : 'The runtime canceled this request. Nothing was sent.',
+        ),
+      };
+    }
+
+    // Validate the answer against the schema recorded with the request, not the
+    // one the renderer happens to show.
+    let payload: {
+      decision?: 'allow' | 'deny';
+      remember: boolean;
+      answers: Array<{ id: string; label: string; value: string }>;
+    };
+    if (record.kind === 'approval') {
+      const decision = input.decision ?? null;
+      if (decision === null || !record.permitted.decisions.includes(decision)) {
+        return {
+          ok: false,
+          error: errorResult('invalid_request', 'That approval accepts only an allow or deny decision.'),
+        };
+      }
+      payload = { decision, remember: input.remember === true, answers: [] };
+    } else {
+      const questions = record.question.questions;
+      const answers = (input.answers ?? []).map((answer) => ({
+        id: String(answer.id ?? '').slice(0, 200),
+        label: String(answer.label ?? '').slice(0, 200),
+        value: String(answer.value ?? '').slice(0, 2_000),
+      }));
+      const byId = new Map<string, typeof answers>();
+      for (const answer of answers) {
+        if (!answer.id) continue;
+        byId.set(answer.id, [...(byId.get(answer.id) ?? []), answer]);
+      }
+      for (const question of questions) {
+        const given = byId.get(question.id) ?? [];
+        if (given.length === 0) {
+          return {
+            ok: false,
+            error: errorResult('invalid_request', `Question "${question.header ?? question.id}" needs an answer.`),
+          };
+        }
+        if (!question.multiSelect && given.length > 1) {
+          return {
+            ok: false,
+            error: errorResult('invalid_request', `Question "${question.header ?? question.id}" accepts one answer.`),
+          };
+        }
+        const allowed = new Set(question.options.map((option) => option.label));
+        for (const answer of given) {
+          if (answer.label !== 'Other' && !allowed.has(answer.label)) {
+            return { ok: false, error: errorResult('invalid_request', 'That option is not part of this question.') };
+          }
+        }
+      }
+      for (const id of byId.keys()) {
+        if (!questions.some((question) => question.id === id)) {
+          return {
+            ok: false,
+            error: errorResult('invalid_request', 'The answer named a question this request does not have.'),
+          };
+        }
+      }
+      payload = { remember: false, answers };
+    }
+
+    const claimed = await this.store.claimHumanRequest({
+      projectId: input.projectId,
+      threadId,
+      engineRequestId: record.engineRequestId,
+    });
+    if (!claimed) {
+      return { ok: false, error: errorResult('not_found', 'That request is no longer recorded for this thread.') };
+    }
+    if (!claimed.claimed) {
+      return {
+        ok: false,
+        error: errorResult('conflict', 'That answer is already being sent. Wait for the runtime to acknowledge it.'),
+      };
+    }
+
+    const adapter = this.engine.adapter();
+    if (!adapter) {
+      await this.store.releaseHumanRequest({ threadId, engineRequestId: record.engineRequestId });
+      return {
+        ok: false,
+        error: errorResult('engine_unavailable', 'The runtime is not connected, so nothing was sent.', true),
+      };
+    }
+
+    const receipt =
+      record.kind === 'approval'
+        ? await adapter.respondToApproval({
+            threadId,
+            approvalId: record.engineRequestId,
+            decision: payload.decision as 'allow' | 'deny',
+            remember: payload.remember,
+          })
+        : await adapter.respondToUserInput({ threadId, requestId: record.engineRequestId, answers: payload.answers });
+
+    if (!receipt.ok) {
+      await this.store.releaseHumanRequest({ threadId, engineRequestId: record.engineRequestId });
+      this.diagnostic(state, `reply ${record.kind} ${record.engineRequestId}: refused (${receipt.error.code})`);
+      const message =
+        receipt.error.code === 'not_found'
+          ? 'The runtime no longer holds that request. It may have expired or already been answered elsewhere. Nothing was sent again.'
+          : receipt.error.message;
+      const expired = receipt.error.code === 'not_found';
+      if (expired) {
+        await this.store.settleHumanRequest({
+          threadId,
+          engineRequestId: record.engineRequestId,
+          status: 'expired',
+          acknowledgement: { code: receipt.error.code, detail: receipt.error.detail ?? null },
+        });
+        state.pending = null;
+        this.pushState(state);
+      }
+      return { ok: false, error: errorResult(receipt.error.code, message, receipt.error.retryable === true) };
+    }
+
+    const acknowledgement = receipt.value;
+    await this.store.settleHumanRequest({
+      threadId,
+      engineRequestId: record.engineRequestId,
+      status: 'answered',
+      answer: { ...payload },
+      acknowledgement,
+    });
+    state.pending = null;
+    if (state.run.state === 'awaiting_approval') {
+      state.run = {
+        ...state.run,
+        state: 'running',
+        detail:
+          record.kind === 'approval'
+            ? `Decision acknowledged by the runtime (${payload.decision}).`
+            : 'Answer acknowledged by the runtime.',
+      };
+    }
+    await this.pushItem(state, threadId, {
+      seq: this.nextLocalSeq(state),
+      turnId: state.run.turnId,
+      kind: 'status',
+      title: record.kind === 'approval' ? `Approval answered · ${payload.decision}` : 'Answer sent',
+      body:
+        record.kind === 'approval'
+          ? `Mona sent ${payload.decision} for ${record.toolName ?? 'the tool request'} and the runtime acknowledged it.`
+          : `Mona sent ${payload.answers.length} answer(s) and the runtime acknowledged them.`,
+      status: 'completed',
+      truncated: false,
+    });
+    this.pushState(state);
+    return {
+      ok: true,
+      data: {
+        requestId: record.engineRequestId,
+        status: 'answered',
+        decision: record.kind === 'approval' ? (payload.decision as 'allow' | 'deny') : null,
+        answers: payload.answers,
+        acknowledged: true,
+        detail:
+          record.kind === 'approval'
+            ? 'The runtime acknowledged the decision.'
+            : 'The runtime acknowledged the answer.',
+      },
+    };
+  }
   pause(projectId: string): ServiceResult<{ run: StudioRun; control: StudioControl }> {
     const state = this.findState(projectId);
     if (!state) {
@@ -1130,41 +1355,61 @@ export class StudioService {
         return;
       }
       case 'approval.required': {
-        const payload = z
-          .object({
-            approvalId: z.string().min(1),
-            toolName: z.string().min(1),
-            description: z.string().optional(),
-          })
-          .passthrough()
-          .safeParse(envelope.payload);
-        if (!payload.success) {
+        const request = normalizeApprovalRequired(envelope.payload);
+        if (!request) {
           this.diagnostic(state, `approval.required payload unreadable at seq ${seq}`);
           return;
         }
-        state.pending = {
+        await this.recordHumanRequest(state, threadId, seq, envelope.turnId, {
           kind: 'approval',
-          approvalId: payload.data.approvalId,
-          toolName: payload.data.toolName,
-          description: payload.data.description ?? 'The runtime is waiting for approval to continue.',
-          at: this.now().toISOString(),
-        };
-        state.run = {
-          ...state.run,
-          state: 'awaiting_approval',
-          detail:
-            'The runtime paused for an approval. Mona does not send approval decisions in this build; use Interrupt now to stop waiting.',
-        };
-        await this.pushItem(state, threadId, {
-          seq,
-          turnId: envelope.turnId,
-          kind: 'approval',
-          title: `Approval needed · ${payload.data.toolName}`,
-          body: payload.data.description ?? 'No description was provided by the runtime.',
-          status: 'pending',
-          truncated: false,
+          engineRequestId: request.approvalId,
+          toolName: request.toolName,
+          description: request.description,
+          intentSummary: request.intentSummary,
+          questions: [],
         });
-        this.pushState(state);
+        return;
+      }
+      case 'user_input.required': {
+        const request = normalizeUserInputRequired(envelope.payload);
+        if (!request) {
+          this.diagnostic(state, `user_input.required payload unreadable at seq ${seq}`);
+          return;
+        }
+        await this.recordHumanRequest(state, threadId, seq, envelope.turnId, {
+          kind: 'input',
+          engineRequestId: request.requestId,
+          toolName: 'request_user_input',
+          description:
+            request.questions
+              .map((question) => question.question ?? question.header ?? question.id)
+              .join(' · ')
+              .slice(0, 1_000) || 'The runtime asked a question.',
+          intentSummary: null,
+          questions: request.questions.map((question) => ({
+            id: question.id,
+            header: question.header ?? null,
+            question: question.question ?? null,
+            multiSelect: question.multi_select === true,
+            options: (question.options ?? []).map((option) => ({
+              label: option.label,
+              description: option.description ?? null,
+            })),
+          })),
+        });
+        return;
+      }
+      case 'approval.decided':
+      case 'approval.timeout':
+      case 'user_input.answered':
+      case 'user_input.canceled': {
+        await this.settleHumanRequestEvent(
+          state,
+          threadId,
+          parsed.name,
+          envelope.payload,
+          parsed.name === 'approval.timeout' || parsed.name === 'user_input.canceled' ? 'canceled' : 'answered',
+        );
         return;
       }
       case 'turn.completed': {
@@ -1261,11 +1506,15 @@ export class StudioService {
     if (name.startsWith('approval.')) {
       // Never leave an unrecognized approval wait hidden behind a spinner.
       const shape = isRecord(payload) ? payload : {};
+      const fallbackId = typeof shape.approvalId === 'string' ? shape.approvalId : `unknown:${seq}`;
       state.pending = {
         kind: 'approval',
-        approvalId: typeof shape.approvalId === 'string' ? shape.approvalId : `unknown:${seq}`,
+        requestId: fallbackId,
+        approvalId: fallbackId,
         toolName: typeof shape.toolName === 'string' ? shape.toolName : 'unrecognized',
         description: 'The runtime asked for an approval through an event this build does not recognize.',
+        intentSummary: null,
+        decisions: ['allow', 'deny'],
         at: this.now().toISOString(),
       };
       state.run = {
@@ -1284,6 +1533,222 @@ export class StudioService {
       });
       this.pushState(state);
     }
+  }
+
+  /**
+   * Restore the pending request from the database. The engine may not replay it
+   * after a reload, reconnect or restart, and a waiting turn whose card vanished
+   * would silently block the session.
+   */
+  private async rehydratePending(state: ProjectState, threadId: string): Promise<void> {
+    if (state.pending) return;
+    const rows = await this.store.listHumanRequests(state.projectId, { threadId, status: 'pending', limit: 5 });
+    const row = rows[0];
+    if (!row) return;
+    state.pending =
+      row.kind === 'approval'
+        ? {
+            kind: 'approval',
+            requestId: row.engineRequestId,
+            approvalId: row.engineRequestId,
+            toolName: row.toolName ?? 'unknown',
+            description: row.question.description,
+            intentSummary: row.question.intentSummary,
+            decisions: row.permitted.decisions,
+            at: row.createdAt,
+          }
+        : {
+            kind: 'input',
+            requestId: row.engineRequestId,
+            approvalId: row.engineRequestId,
+            toolName: row.toolName ?? 'request_user_input',
+            description: row.question.description,
+            questions: row.question.questions,
+            freeText: row.permitted.freeText,
+            at: row.createdAt,
+          };
+    // A pending request *is* the run state: something is waiting, whatever the
+    // fresh process would otherwise have assumed about the turn.
+    state.run = {
+      ...state.run,
+      state: 'awaiting_approval',
+      detail:
+        'A recorded request is still waiting for an answer. Answer it here; Interrupt now stops waiting without deciding.',
+    };
+    this.diagnostic(state, `restored pending ${row.kind} request ${row.engineRequestId} from local state`);
+  }
+
+  /**
+   * Usage for the session on screen, read from recorded rows only. A session with
+   * nothing recorded reports null rather than a zero that would look like a free
+   * turn, and unpriced records stay counted as unknown.
+   */
+  private async sessionUsage(projectId: string, sessionId: string): Promise<StudioUsage | null> {
+    if (!this.costs) return null;
+    try {
+      const lens = await this.costs.lens(projectId);
+      const session = lens.bySession.find((entry) => entry.sessionId === sessionId);
+      if (!session || session.totals.records === 0) return null;
+      return {
+        scope: 'session',
+        sessionId,
+        records: session.totals.records,
+        knownMicros: session.totals.knownMicros,
+        unknownRecords: session.totals.unknownRecords,
+        tokens: {
+          input: session.totals.tokens.input,
+          output: session.totals.tokens.output,
+          cacheHit: session.totals.tokens.cacheHit,
+          cacheMiss: session.totals.tokens.cacheMiss,
+          reasoning: session.totals.tokens.reasoning,
+        },
+        // The pinned deepseek route reports reasoning inside the output count
+        // (D-0014); the label says so instead of implying a separate bucket.
+        reasoningIncludedInOutput: true,
+        capturedAt: this.now().toISOString(),
+      };
+    } catch {
+      // Usage is a readout, not a gate: a failed read must not break the studio.
+      return null;
+    }
+  }
+
+  /**
+   * Record a pending human request durably, then project it. The database row is
+   * what makes the card survive a reload, a reconnect or a restart: the engine
+   * may not replay the request, and a card that only lives in memory would leave
+   * a waiting turn unanswered.
+   */
+  private async recordHumanRequest(
+    state: ProjectState,
+    threadId: string,
+    seq: number,
+    turnId: string | null,
+    input: {
+      kind: 'approval' | 'input';
+      engineRequestId: string;
+      toolName: string;
+      description: string;
+      intentSummary: string | null;
+      questions: HumanQuestionInput[];
+    },
+  ): Promise<void> {
+    const questions = input.questions;
+    let recorded: Awaited<ReturnType<ProjectStore['recordHumanRequest']>>;
+    try {
+      recorded = await this.store.recordHumanRequest({
+        projectId: state.projectId,
+        threadId,
+        turnId,
+        kind: input.kind,
+        engineRequestId: input.engineRequestId,
+        toolName: input.toolName,
+        question: { description: input.description, intentSummary: input.intentSummary, questions },
+        permitted: { decisions: ['allow', 'deny'], freeText: true },
+      });
+    } catch (error) {
+      this.diagnostic(state, `human request ${input.engineRequestId} could not be recorded: ${slice(error)}`);
+      return;
+    }
+    if (recorded.request.status !== 'pending') {
+      this.diagnostic(
+        state,
+        `request ${input.engineRequestId} is already ${recorded.request.status}; the card is not shown again`,
+      );
+      return;
+    }
+    state.pending =
+      input.kind === 'approval'
+        ? {
+            kind: 'approval',
+            requestId: input.engineRequestId,
+            approvalId: input.engineRequestId,
+            toolName: input.toolName,
+            description: input.description,
+            intentSummary: input.intentSummary,
+            decisions: recorded.request.permitted.decisions,
+            at: recorded.request.createdAt,
+          }
+        : {
+            kind: 'input',
+            requestId: input.engineRequestId,
+            approvalId: input.engineRequestId,
+            toolName: input.toolName,
+            description: input.description,
+            questions,
+            freeText: recorded.request.permitted.freeText,
+            at: recorded.request.createdAt,
+          };
+    state.run = {
+      ...state.run,
+      state: 'awaiting_approval',
+      detail:
+        input.kind === 'approval'
+          ? 'The runtime paused for an approval. Answer it here; Interrupt now stops waiting without deciding.'
+          : 'The runtime asked a question. Answer it here; Interrupt now stops waiting without answering.',
+    };
+    if (recorded.created) {
+      await this.pushItem(state, threadId, {
+        seq,
+        turnId,
+        kind: 'approval',
+        title:
+          input.kind === 'approval'
+            ? `Approval needed · ${input.toolName}`
+            : `Input needed · ${questions.length} question(s)`,
+        body: input.description,
+        status: 'pending',
+        truncated: false,
+      });
+    }
+    this.pushState(state);
+  }
+
+  /**
+   * Project the runtime's own terminal event for a request Mona may be showing.
+   * The durable row settles either way, so a decision Mona did not send (another
+   * client, a timeout) cannot leave a card that still looks answerable.
+   */
+  private async settleHumanRequestEvent(
+    state: ProjectState,
+    threadId: string,
+    name: string,
+    payload: unknown,
+    status: 'answered' | 'canceled',
+  ): Promise<void> {
+    const shape = isRecord(payload) ? payload : {};
+    const id = [shape.approval_id, shape.approvalId, shape.request_id, shape.input_id, shape.id].find(
+      (value): value is string => typeof value === 'string' && value.length > 0,
+    );
+    if (!id) {
+      this.diagnostic(state, `${name} carried no request id; nothing was settled`);
+      return;
+    }
+    const settled = await this.store.settleHumanRequest({
+      threadId,
+      engineRequestId: id,
+      status: status === 'canceled' ? 'canceled' : 'answered',
+      acknowledgement: { source: name },
+    });
+    if (!settled) {
+      this.diagnostic(state, `${name} for ${id}, which Mona has no record of`);
+      return;
+    }
+    if (state.pending?.requestId === id) {
+      state.pending = null;
+      if (state.run.state === 'awaiting_approval') {
+        state.run = {
+          ...state.run,
+          state: 'running',
+          detail:
+            status === 'canceled'
+              ? 'The runtime ended that request without an answer from Mona.'
+              : 'The runtime reported that request answered.',
+        };
+      }
+    }
+    this.diagnostic(state, `${name}: request ${id} settled as ${settled.status}`);
+    this.pushState(state);
   }
 
   private async projectItem(
@@ -1305,17 +1770,28 @@ export class StudioService {
     }
     const toolName = item.metadata?.tool_name;
     if (toolName && HUMAN_INPUT_TOOLS.has(toolName) && !completed) {
+      // A request_user_input tool call is the second way the runtime announces a
+      // clarification. The item carries the questions as JSON; the item id is the
+      // only identity this event offers, so a refusal from the runtime is
+      // reported as such rather than retried under a guessed id.
+      const asked = parseAskedQuestions(item.metadata?.tool_input);
       state.pending = {
         kind: 'input',
+        requestId: item.id,
         approvalId: item.id,
         toolName,
         description: truncate(item.detail ?? item.summary ?? 'The runtime is waiting for input.', 1_000),
+        questions: asked.questions,
+        freeText: true,
         at: this.now().toISOString(),
       };
       state.run = {
         ...state.run,
         state: 'awaiting_approval',
-        detail: 'The runtime asked for input Mona cannot provide in this build. Use Interrupt now to stop waiting.',
+        detail:
+          asked.questions.length > 0
+            ? 'The runtime asked a question. Answer it here; Interrupt now stops waiting without answering.'
+            : 'The runtime asked for input Mona cannot shape into an answer. Use Interrupt now to stop waiting.',
       };
     }
     if (toolName && HUMAN_INPUT_TOOLS.has(toolName) && completed && state.pending?.kind === 'input') {
@@ -1818,22 +2294,47 @@ export class StudioService {
     };
   }
 
-  private boundReferences(references: unknown): string[] | null {
-    if (references === undefined) return [];
-    if (!Array.isArray(references) || references.length > MAX_REFERENCES) return null;
+  /**
+   * Validate the file references a submit carries.
+   *
+   * A reference is a *path in the prompt*, never attached content, so the checks
+   * are about honesty: the path must be project-relative, it must still exist,
+   * and it must resolve inside the project after every link and junction is
+   * followed. A path that escapes through a reparse point is refused rather than
+   * sent as if it were part of this project.
+   */
+  private boundReferences(
+    references: unknown,
+    projectRoot?: string,
+  ): { ok: true; paths: string[] } | { ok: false; reason: string } {
+    if (references === undefined) return { ok: true, paths: [] };
+    if (!Array.isArray(references) || references.length > MAX_REFERENCES) {
+      return { ok: false, reason: `At most ${MAX_REFERENCES} file references can be sent.` };
+    }
     const out: string[] = [];
     for (const raw of references) {
-      if (typeof raw !== 'string') return null;
+      if (typeof raw !== 'string') return { ok: false, reason: 'A file reference must be a path string.' };
       const value = raw.trim();
-      if (!value || value.length > MAX_REFERENCE_CHARS) return null;
-      if (value.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(value) || value.split(/[\\/]/).includes('..')) return null;
+      if (!value || value.length > MAX_REFERENCE_CHARS) {
+        return { ok: false, reason: 'A file reference is empty or too long.' };
+      }
+      if (value.startsWith('/') || /^[a-zA-Z]:[\\/]/.test(value) || value.split(/[\\/]/).includes('..')) {
+        return { ok: false, reason: `"${value}" is not a project-relative path.` };
+      }
       for (const character of value) {
         const code = character.codePointAt(0) ?? 0;
-        if (code < 0x20 || code === 0x7f) return null;
+        if (code < 0x20 || code === 0x7f) {
+          return { ok: false, reason: 'A file reference contains a control character.' };
+        }
       }
-      out.push(value.split(path.sep).join('/'));
+      const normalized = value.split(path.sep).join('/');
+      if (projectRoot) {
+        const verdict = referenceOnDisk(projectRoot, normalized);
+        if (!verdict.ok) return verdict;
+      }
+      out.push(normalized);
     }
-    return [...new Set(out)];
+    return { ok: true, paths: [...new Set(out)] };
   }
 
   private diagnostic(state: ProjectState, line: string): void {
@@ -1875,6 +2376,7 @@ export class StudioService {
     items: TimelineItem[],
     history: StudioHistoryWindow,
     warning: string | null,
+    usage: StudioUsage | null,
   ): StudioView {
     return {
       projectId: state.projectId,
@@ -1885,6 +2387,7 @@ export class StudioService {
       run: { ...state.run },
       control: this.controlFor(state),
       pending: state.pending ? { ...state.pending } : null,
+      usage,
       diagnostics: [...state.diagnostics],
       capabilities: {
         planMode: {
@@ -1892,9 +2395,9 @@ export class StudioService {
           reason: 'Thread mode is chosen when the engine thread is created; switching modes starts a new thread.',
         },
         approvalResponse: {
-          status: 'unsupported',
+          status: 'supported',
           reason:
-            'The pinned runtime emits approval events, but Mona does not yet send approval decisions. A waiting approval is shown with Interrupt now.',
+            'Approvals go to POST /v1/approvals/{approval_id} and clarifications to POST /v1/user-input/{thread_id}/{request_id} on the connected runtime; every reply needs the runtime\u2019s acknowledgement before the card closes.',
         },
         attachments: {
           status: 'unsupported',
@@ -1969,6 +2472,35 @@ export function toStudioProfile(profile: EffectiveProfile): StudioProfile {
   };
 }
 
+/**
+ * Resolve one project-relative reference against the real filesystem.
+ *
+ * Missing files are refused: a prompt that lists a path the project does not have
+ * would ask the agent to read something that is not there. Containment is checked
+ * on the resolved path, so a junction or symlink cannot smuggle an outside file
+ * into the reference list.
+ */
+function referenceOnDisk(root: string, reference: string): { ok: true } | { ok: false; reason: string } {
+  const absolute = path.resolve(root, reference);
+  let resolvedRoot: string;
+  let resolvedFile: string;
+  try {
+    resolvedRoot = realpathSync.native(root);
+  } catch {
+    return { ok: false, reason: 'The project folder cannot be resolved, so references cannot be checked.' };
+  }
+  try {
+    resolvedFile = realpathSync.native(absolute);
+  } catch {
+    return { ok: false, reason: `"${reference}" is not a file in this project.` };
+  }
+  const relative = path.relative(resolvedRoot, resolvedFile);
+  if (relative.startsWith('..') || path.isAbsolute(relative)) {
+    return { ok: false, reason: `"${reference}" resolves outside this project and was not sent.` };
+  }
+  return { ok: true };
+}
+
 export function composePrompt(text: string, references: string[]): string {
   if (references.length === 0) return text;
   const lines = references.map((reference) => `- ${reference}`).join('\n');
@@ -1997,6 +2529,48 @@ function windowOf(page: TimelinePage): StudioHistoryWindow {
 function boundPageLimit(limit: number | undefined): number {
   if (typeof limit !== 'number' || !Number.isFinite(limit)) return HISTORY_PAGE;
   return Math.max(1, Math.min(HISTORY_MAX_PAGE, Math.trunc(limit)));
+}
+
+/**
+ * Read clarification questions out of a request_user_input tool call. The tool
+ * input is a JSON string in the runtime's own vocabulary; only the fields Mona
+ * can render and validate are taken, and an unreadable payload yields no
+ * questions rather than invented ones.
+ */
+function parseAskedQuestions(raw: string | undefined): { questions: StudioQuestion[] } {
+  if (!raw || raw.length > 64 * 1024) return { questions: [] };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return { questions: [] };
+  }
+  const shape = isRecord(parsed) ? parsed : {};
+  const list = Array.isArray(shape.questions) ? shape.questions : [];
+  const questions: StudioQuestion[] = [];
+  for (const entry of list.slice(0, 20)) {
+    const row = isRecord(entry) ? entry : {};
+    const id = typeof row.id === 'string' && row.id ? row.id : null;
+    if (!id) continue;
+    const options = Array.isArray(row.options) ? row.options : [];
+    questions.push({
+      id,
+      header: typeof row.header === 'string' ? row.header : null,
+      question: typeof row.question === 'string' ? row.question : null,
+      multiSelect: row.multi_select === true,
+      options: options
+        .slice(0, 20)
+        .map((option) => (isRecord(option) ? option : {}))
+        .filter(
+          (option): option is Record<string, unknown> => typeof option.label === 'string' && option.label.length > 0,
+        )
+        .map((option) => ({
+          label: String(option.label).slice(0, 200),
+          description: typeof option.description === 'string' ? option.description.slice(0, 400) : null,
+        })),
+    });
+  }
+  return { questions };
 }
 
 function formatToolInput(rawInput: string | undefined, detail: string | undefined): string {

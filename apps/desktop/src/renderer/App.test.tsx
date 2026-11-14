@@ -356,6 +356,7 @@ function emptyStudio(): StudioView {
     run: { state: 'idle', detail: 'Ready. Nothing has been sent.', turnId: null, submission: null, startedAt: null },
     control: { pauseRequested: false, queueState: 'idle', lastOutcome: null, interrupt: null, blockedProblem: null },
     pending: null,
+    usage: null,
     diagnostics: [],
     capabilities: {
       planMode: { status: 'supported', reason: null },
@@ -1819,9 +1820,12 @@ describe('Mona shell', () => {
           },
           pending: {
             kind: 'approval',
+            requestId: 'appr_1',
             approvalId: 'appr_1',
             toolName: 'bash',
             description: 'rm -rf dist needs approval',
+            intentSummary: null,
+            decisions: ['allow', 'deny'],
             at: '2026-11-12T00:00:00.000Z',
           },
         });
