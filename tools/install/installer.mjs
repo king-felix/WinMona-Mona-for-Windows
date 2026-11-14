@@ -286,7 +286,7 @@ function pngChunk(type, data) {
   return Buffer.concat([length, body, crc]);
 }
 
-/** A solid-colour RGBA PNG. Generated here so the build needs no image tool. */
+/** A solid-colour RGBA PNG. Kept for fixture tests; product artwork never uses it. */
 export function pngSolid(width, height, [red, green, blue] = [99, 70, 223]) {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
@@ -307,6 +307,65 @@ export function pngSolid(width, height, [red, green, blue] = [99, 70, 223]) {
     pngChunk('IDAT', zlib.deflateSync(raw)),
     pngChunk('IEND', Buffer.alloc(0)),
   ]);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Brand artwork                                                              */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * Package images the identity manifest declares. Windows reads exactly these
+ * names, so the size is part of the contract rather than a preference.
+ */
+export const PACKAGE_IMAGES = [
+  { file: 'StoreLogo.png', size: 50 },
+  { file: 'Square44x44Logo.png', size: 44 },
+  { file: 'Square150x150Logo.png', size: 150 },
+];
+
+/**
+ * Locate the generated brand images from either the repository or an installed
+ * copy. The installed installer carries its own copy of the artwork, so the
+ * repository is not required at install time.
+ *
+ * Returns null when neither location has them; the caller must refuse rather
+ * than substitute different artwork.
+ */
+export function findBrandAssets(layout, installerDir = here) {
+  const candidates = [
+    path.join(layout.repoRoot, 'assets', 'brand', 'generated'),
+    path.join(installerDir, 'assets', 'brand', 'generated'),
+  ];
+  return candidates.find((dir) => existsSync(path.join(dir, 'Square44x44Logo.png'))) ?? null;
+}
+
+/** Read width/height from a PNG IHDR without decoding the image. */
+export function pngSize(buffer) {
+  if (buffer.length < 24 || buffer.subarray(1, 4).toString('latin1') !== 'PNG') {
+    throw new Error('not a PNG');
+  }
+  return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+}
+
+/** Copy the declared package images, refusing a missing file or wrong size. */
+export function installPackageImages(assetsDir, targetAssetsDir) {
+  if (!assetsDir) {
+    throw new Error(
+      'brand artwork is absent. Run `npm run assets:icons` so assets/brand/generated exists; the identity package will not ship placeholder logos.',
+    );
+  }
+  for (const { file, size } of PACKAGE_IMAGES) {
+    const source = path.join(assetsDir, file);
+    if (!existsSync(source)) {
+      throw new Error(`brand artwork is missing ${file} in ${assetsDir}. Run \`npm run assets:icons\`.`);
+    }
+    const actual = pngSize(readFileSync(source));
+    if (actual.width !== size || actual.height !== size) {
+      throw new Error(`${file} is ${actual.width}x${actual.height}; the manifest declares ${size}x${size}.`);
+    }
+    cpSync(source, path.join(targetAssetsDir, file));
+  }
+  return PACKAGE_IMAGES.map((image) => image.file);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -427,6 +486,15 @@ export async function buildStage(layout, options = {}) {
   );
   writeFileSync(path.join(installerDir, 'package.ps1'), PACKAGE_PS1, 'utf8');
   writeFileSync(path.join(stage, 'uninstall.cmd'), UNINSTALL_CMD, 'ascii');
+  // The installed installer rebuilds the identity package on upgrade, so it
+  // carries the same artwork bytes the repository built.
+  const brandSource = findBrandAssets(layout);
+  if (!brandSource) {
+    throw new Error(
+      'brand artwork is absent. Run `npm run assets:icons` before staging; the package will not ship placeholder logos.',
+    );
+  }
+  cpSync(brandSource, path.join(installerDir, 'assets', 'brand', 'generated'), { recursive: true });
 
   // 5. Identity package source (manifest, logos, and the COM server the
   // manifest declares). Carrying the DLL with the manifest means the package can
@@ -435,9 +503,7 @@ export async function buildStage(layout, options = {}) {
   const identity = path.join(stage, 'identity');
   mkdirSync(path.join(identity, 'Assets'), { recursive: true });
   writeFileSync(path.join(identity, 'AppxManifest.xml'), renderManifest({ version: layout.version }), 'utf8');
-  writeFileSync(path.join(identity, 'Assets', 'StoreLogo.png'), pngSolid(50, 50));
-  writeFileSync(path.join(identity, 'Assets', 'Square44x44Logo.png'), pngSolid(44, 44));
-  writeFileSync(path.join(identity, 'Assets', 'Square150x150Logo.png'), pngSolid(150, 150));
+  installPackageImages(findBrandAssets(layout), path.join(identity, 'Assets'));
   cpSync(menuDll, path.join(identity, MENU_DLL_FILE));
   const missingPayload = missingComServerPayloads(identity);
   if (missingPayload.length > 0) {

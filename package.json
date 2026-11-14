@@ -22,13 +22,13 @@
     "native:build": "node native/windows-shell/build.mjs",
     "native:test": "node --test tests/native",
     "tools:fetch": "node tools/install/fetch-tools.mjs",
-    "test": "vitest run && npm run bootstrap:test && npm run launch:test && npm run install:test && npm run spike:test",
+    "test": "vitest run && npm run assets:test && npm run bootstrap:test && npm run launch:test && npm run install:test && npm run spike:test",
     "build": "npm run build -w @mona/contracts && npm run build -w @mona/adapter && npm run build -w @mona/project-state && npm run build -w @mona/ui && npm run build -w @mona/desktop",
     "typecheck": "npm run build -w @mona/contracts && npm run typecheck -w @mona/adapter && npm run typecheck -w @mona/project-state && npm run typecheck -w @mona/ui && npm run typecheck -w @mona/desktop",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "ci": "npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
+    "ci": "npm run assets:check && npm run format:check && npm run lint && npm run typecheck && npm test && npm run build",
     "smoke": "npm run smoke -w @mona/desktop",
     "launch": "npm run launch -w @mona/desktop",
     "polish": "npm run polish -w @mona/desktop",
@@ -40,7 +40,10 @@
     "mona:status": "node tools/install/cli.mjs status",
     "qa": "npm run qa -w @mona/desktop",
     "appearance": "npm run appearance -w @mona/desktop",
-    "surfaces": "npm run surfaces -w @mona/desktop"
+    "surfaces": "npm run surfaces -w @mona/desktop",
+    "assets:icons": "node tools/assets/build-icons.mjs",
+    "assets:check": "node tools/assets/build-icons.mjs --check",
+    "assets:test": "node --test tests/assets"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

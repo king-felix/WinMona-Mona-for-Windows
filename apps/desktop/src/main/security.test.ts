@@ -60,4 +60,12 @@ describe('window isolation', () => {
     expect(options.webPreferences?.webviewTag).toBe(false);
     expect(options.webPreferences?.devTools).toBe(false);
   });
+
+  it('sets a window icon only when a built brand image exists', () => {
+    expect(windowOptions('preload.cjs', { isDev: false }).icon).toBeUndefined();
+    expect(windowOptions('preload.cjs', { isDev: false, icon: null }).icon).toBeUndefined();
+    expect(windowOptions('preload.cjs', { isDev: false, icon: 'C:\\icons\\mona.ico' }).icon).toBe(
+      'C:\\icons\\mona.ico',
+    );
+  });
 });

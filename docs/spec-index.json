@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_utc": "2026-11-12T01:16:47Z",
-  "purpose": "Deterministic section/requirement/prompt index for Mona_Project.md and Mona_PROMPTS.md. Regenerate with `node tools/build/cli.mjs index`.",
+  "generated_utc": "2026-11-14T16:33:59Z",
+  "purpose": "Deterministic section/requirement/prompt index for Mona_Project.md and Mona_PROMPTS.md, plus the Windows improvement supplement when present. Regenerate with `node tools/build/cli.mjs index`.",
   "files": [
     {
       "path": "Mona_Project.md",
@@ -45,7 +45,9 @@
         "P01",
         "P23"
       ],
+      "supplement_prompt_ids": [],
       "prompt_sections": [],
+      "supplement_prompt_sections": [],
       "sections": [
         {
           "level": 1,
@@ -469,6 +471,7 @@
         "P22",
         "P23"
       ],
+      "supplement_prompt_ids": [],
       "prompt_sections": [
         {
           "id": "P00",
@@ -591,6 +594,7 @@
           "start_line": 572
         }
       ],
+      "supplement_prompt_sections": [],
       "sections": [
         {
           "level": 1,
@@ -899,6 +903,615 @@
           "start_line": 651,
           "end_line": 658,
           "sha256": "670dae9a520d10fe56899f121ac3c0e5143b287cc025a5bc38ba29b22b5445ff"
+        }
+      ]
+    },
+    {
+      "path": "Mona_Windows_Improvements_Project.md",
+      "sha256": "adf8ab55ae00b79549dbd436d3d96b178ffd54c20ce8a7be8ac3aa48a24f4555",
+      "bytes": 32295,
+      "lines": 239,
+      "requirement_ids": [
+        "MONA-027",
+        "MONA-028"
+      ],
+      "prompt_ids": [
+        "P00",
+        "P23"
+      ],
+      "supplement_prompt_ids": [
+        "W00",
+        "W01",
+        "W02",
+        "W03",
+        "W04",
+        "W05",
+        "W06",
+        "W07",
+        "W08",
+        "W09",
+        "W10",
+        "W11",
+        "W12",
+        "W13",
+        "W14",
+        "W15",
+        "W16",
+        "W17",
+        "W18",
+        "W19",
+        "W20",
+        "W21",
+        "W22",
+        "W23",
+        "W24",
+        "W25"
+      ],
+      "prompt_sections": [],
+      "supplement_prompt_sections": [],
+      "sections": [
+        {
+          "level": 1,
+          "heading": "Mona Windows — Studio, reliability and Prompt Runner improvements",
+          "start_line": 1,
+          "end_line": 239,
+          "sha256": "adf8ab55ae00b79549dbd436d3d96b178ffd54c20ce8a7be8ac3aa48a24f4555"
+        },
+        {
+          "level": 2,
+          "heading": "S00 — Status and evidence boundaries",
+          "start_line": 5,
+          "end_line": 30,
+          "sha256": "9a7af66098ca0e271019813b5ddf5ef5913bfc372428d0cdc8387a60f42bc7ae"
+        },
+        {
+          "level": 2,
+          "heading": "S01 — Scope, ownership and continuity",
+          "start_line": 31,
+          "end_line": 46,
+          "sha256": "f11c095f9895c6c5ca5d7f3eead7707f037e4503781789c637d1816e86969990"
+        },
+        {
+          "level": 2,
+          "heading": "S02 — Reliable conversations and state",
+          "start_line": 47,
+          "end_line": 66,
+          "sha256": "f510a5cf2b1c62a4605a294134ea1dfc28b861f9cc0728cbf32e86736f862ef7"
+        },
+        {
+          "level": 3,
+          "heading": "Drafts and submissions",
+          "start_line": 49,
+          "end_line": 56,
+          "sha256": "75acc549ab5b53ccccd1b82f62f12a892dcc6ef41be2104094c0b75f7dc515d7"
+        },
+        {
+          "level": 3,
+          "heading": "History, rendering and export",
+          "start_line": 57,
+          "end_line": 66,
+          "sha256": "c0e6b761fe246137e416470d9aeee337050d5c1b92039de2cb098894056c057d"
+        },
+        {
+          "level": 2,
+          "heading": "S03 — Commands and a complete Studio",
+          "start_line": 67,
+          "end_line": 86,
+          "sha256": "8fc1496018388e7c8d317029e5f99750948102de3773390ed183be9405341049"
+        },
+        {
+          "level": 3,
+          "heading": "Descriptive slash autocomplete",
+          "start_line": 69,
+          "end_line": 78,
+          "sha256": "8718664cf16cf0c98210c94487c9272f95e41996ddc96e0e1a7e3bd2a071e88f"
+        },
+        {
+          "level": 3,
+          "heading": "Focus and Windows fullscreen",
+          "start_line": 79,
+          "end_line": 86,
+          "sha256": "510add6724744c074513019b0d2fdb505628f562ed750b5c85a1317c515d617b"
+        },
+        {
+          "level": 2,
+          "heading": "S04 — Aurora appearance and application identity",
+          "start_line": 87,
+          "end_line": 104,
+          "sha256": "9c5fbf7a5313729b06835d5d5502960a92bf7b79de2420e5b5ff8f6e4f0ae486"
+        },
+        {
+          "level": 2,
+          "heading": "S05 — Watching agents and communicating with them",
+          "start_line": 105,
+          "end_line": 120,
+          "sha256": "485e1c6c41262d141d26cdbc44452db9198b97d99581c3aff4da129af7873eec"
+        },
+        {
+          "level": 2,
+          "heading": "S06 — Prompt Runner product contract",
+          "start_line": 121,
+          "end_line": 162,
+          "sha256": "f377537cea369433cb7841f3192837fde47957e7acc6274270f4e6ef5d1e16b8"
+        },
+        {
+          "level": 3,
+          "heading": "Import and authorization",
+          "start_line": 123,
+          "end_line": 130,
+          "sha256": "654463c75f7e794248dc39ae48eae480cd314cb89db713d774f85dfa265c5609"
+        },
+        {
+          "level": 3,
+          "heading": "Execution and continuity",
+          "start_line": 131,
+          "end_line": 144,
+          "sha256": "08801d401d92d0cb37bf2556e54789dcbe476a24c8c95af3e51ad1fc52b63144"
+        },
+        {
+          "level": 3,
+          "heading": "Completion and human work",
+          "start_line": 145,
+          "end_line": 154,
+          "sha256": "e79c9027202c032f4f2a9f865736403c51d51a4a9cd5753aee5ecad5033d67ac"
+        },
+        {
+          "level": 3,
+          "heading": "Runner experience and lifecycle",
+          "start_line": 155,
+          "end_line": 162,
+          "sha256": "542bee6582edc15d73b93c6cd56172044dc4ec8f69f071907b332f0aa5a11690"
+        },
+        {
+          "level": 2,
+          "heading": "S07 — Economics, metrics and performance",
+          "start_line": 163,
+          "end_line": 176,
+          "sha256": "8308888763274a02ac37d0dfd6b9c685da984be7e1dd6b05b43842489ca653d3"
+        },
+        {
+          "level": 2,
+          "heading": "S08 — Windows accessibility and native qualification",
+          "start_line": 177,
+          "end_line": 184,
+          "sha256": "b4f232773358a1a73e5ac7772af6288d7234cb2ff6ba058f19c375955f59e5ff"
+        },
+        {
+          "level": 2,
+          "heading": "S09 — Modern Explorer menu, installer and sharing",
+          "start_line": 185,
+          "end_line": 202,
+          "sha256": "bdfdb12ff5779b7ffffb80cfe88376d21a2066b20c989259c7f816ae20b1ccb8"
+        },
+        {
+          "level": 2,
+          "heading": "S10 — Enhancement traceability and completion",
+          "start_line": 203,
+          "end_line": 229,
+          "sha256": "f2a8c1a58c7b4b5e0d8176bc553919a8ad4b802b68ed8d97c4f330feebf0b2b8"
+        },
+        {
+          "level": 2,
+          "heading": "Reference notes",
+          "start_line": 230,
+          "end_line": 239,
+          "sha256": "69be40780e8d82c1950f3da44adbfe0f179787e9191978e60ccf0a1d7c3d9df0"
+        }
+      ]
+    },
+    {
+      "path": "Mona_Windows_Improvements_PROMPTS.md",
+      "sha256": "56aa94793944cfada235bd23cc182762ff95d166af53acee42ed8eb61aa9bb1a",
+      "bytes": 54932,
+      "lines": 504,
+      "requirement_ids": [
+        "MONA-007",
+        "MONA-027",
+        "MONA-028"
+      ],
+      "prompt_ids": [
+        "P00",
+        "P23"
+      ],
+      "supplement_prompt_ids": [
+        "W00",
+        "W01",
+        "W02",
+        "W03",
+        "W04",
+        "W05",
+        "W06",
+        "W07",
+        "W08",
+        "W09",
+        "W10",
+        "W11",
+        "W12",
+        "W13",
+        "W14",
+        "W15",
+        "W16",
+        "W17",
+        "W18",
+        "W19",
+        "W20",
+        "W21",
+        "W22",
+        "W23",
+        "W24",
+        "W25"
+      ],
+      "prompt_sections": [],
+      "supplement_prompt_sections": [
+        {
+          "id": "W00",
+          "heading": "W00 — Establish the actual Windows baseline",
+          "start_line": 108
+        },
+        {
+          "id": "W01",
+          "heading": "W01 — Make drafts, navigation and keyboard submission lossless",
+          "start_line": 122
+        },
+        {
+          "id": "W02",
+          "heading": "W02 — Preserve state integrity and finish export qualification",
+          "start_line": 134
+        },
+        {
+          "id": "W03",
+          "heading": "W03 — Make history complete and streaming identity-correct",
+          "start_line": 146
+        },
+        {
+          "id": "W04",
+          "heading": "W04 — Add useful descriptions to native command autocomplete",
+          "start_line": 158
+        },
+        {
+          "id": "W05",
+          "heading": "W05 — Execute commands correctly and qualify a real new conversation",
+          "start_line": 170
+        },
+        {
+          "id": "W06",
+          "heading": "W06 — Deliver Focus Studio and true Windows fullscreen",
+          "start_line": 182
+        },
+        {
+          "id": "W07",
+          "heading": "W07 — Make Aurora Studio visibly more expressive",
+          "start_line": 194
+        },
+        {
+          "id": "W08",
+          "heading": "W08 — Let the human answer actual agent requests",
+          "start_line": 206
+        },
+        {
+          "id": "W09",
+          "heading": "W09 — Make watching and communicating with agents enjoyable",
+          "start_line": 218
+        },
+        {
+          "id": "W10",
+          "heading": "W10 — Put honest usage and controls in the slim dashboard",
+          "start_line": 230
+        },
+        {
+          "id": "W11",
+          "heading": "W11 — Add everyday composition, navigation and review conveniences",
+          "start_line": 242
+        },
+        {
+          "id": "W12",
+          "heading": "W12 — Apply the approved Mona icon across Windows",
+          "start_line": 254
+        },
+        {
+          "id": "W13",
+          "heading": "W13 — Define Prompt Runner ownership and result contracts",
+          "start_line": 266
+        },
+        {
+          "id": "W14",
+          "heading": "W14 — Import numbered prompt files into a clear, inert plan",
+          "start_line": 280
+        },
+        {
+          "id": "W15",
+          "heading": "W15 — Run the selected sequence automatically and durably",
+          "start_line": 292
+        },
+        {
+          "id": "W16",
+          "heading": "W16 — Gate progress on evidence and collect Needs the Human",
+          "start_line": 306
+        },
+        {
+          "id": "W17",
+          "heading": "W17 — Integrate the runner into Studio and Windows lifecycle",
+          "start_line": 320
+        },
+        {
+          "id": "W18",
+          "heading": "W18 — Qualify Prompt Runner failures and document its use",
+          "start_line": 334
+        },
+        {
+          "id": "W19",
+          "heading": "W19 — Profile memory and repair demonstrated performance problems",
+          "start_line": 348
+        },
+        {
+          "id": "W20",
+          "heading": "W20 — Complete Windows accessibility and real scaling checks",
+          "start_line": 360
+        },
+        {
+          "id": "W21",
+          "heading": "W21 — Reconcile regressions and evidence against final source",
+          "start_line": 372
+        },
+        {
+          "id": "W22",
+          "heading": "W22 — Resolve modern Explorer menu and trust honestly",
+          "start_line": 386
+        },
+        {
+          "id": "W23",
+          "heading": "W23 — Produce an installer that a recipient can use",
+          "start_line": 400
+        },
+        {
+          "id": "W24",
+          "heading": "W24 — Qualify the packaged candidate and release claims",
+          "start_line": 414
+        },
+        {
+          "id": "W25",
+          "heading": "W25 — Leave a complete, honest handoff",
+          "start_line": 428
+        }
+      ],
+      "sections": [
+        {
+          "level": 1,
+          "heading": "Mona Windows — improvement and fix execution prompts",
+          "start_line": 1,
+          "end_line": 504,
+          "sha256": "56aa94793944cfada235bd23cc182762ff95d166af53acee42ed8eb61aa9bb1a"
+        },
+        {
+          "level": 2,
+          "heading": "1. Start and resume",
+          "start_line": 9,
+          "end_line": 52,
+          "sha256": "57d4bbd437355f3a70d3160a08b23d01b179efa2433fe4dc262b8938e4fd18c5"
+        },
+        {
+          "level": 2,
+          "heading": "2. Operating contract for every W prompt",
+          "start_line": 53,
+          "end_line": 70,
+          "sha256": "42bfd89bbf420a241275b919d09bfe77929875fa836887ccbb13b8f6a072faf1"
+        },
+        {
+          "level": 2,
+          "heading": "3. Dependency and coverage map",
+          "start_line": 71,
+          "end_line": 105,
+          "sha256": "87ad36a1eb41b6e882f8c73f84cb47bd791365e8f0c554851c893bf6b83486ef"
+        },
+        {
+          "level": 2,
+          "heading": "4. Numbered execution prompts",
+          "start_line": 106,
+          "end_line": 441,
+          "sha256": "8ac2f63f0759a9f9812a38fcf39fd6ba93c664409aa6a88aa5b911eab29794de"
+        },
+        {
+          "level": 3,
+          "heading": "W00 — Establish the actual Windows baseline",
+          "start_line": 108,
+          "end_line": 121,
+          "sha256": "7d3e11dfbf53e1dd3649f04e7063127a890ee56107088b78ba06b0caf9dd072a"
+        },
+        {
+          "level": 3,
+          "heading": "W01 — Make drafts, navigation and keyboard submission lossless",
+          "start_line": 122,
+          "end_line": 133,
+          "sha256": "5e57f2e586c0144f499c8feecd8a35c47a16925317c259d8a7eb385720986daa"
+        },
+        {
+          "level": 3,
+          "heading": "W02 — Preserve state integrity and finish export qualification",
+          "start_line": 134,
+          "end_line": 145,
+          "sha256": "c930b5316a69d46c67e255a8f2f37966e8be0122fc4580c29b790d95e36aa740"
+        },
+        {
+          "level": 3,
+          "heading": "W03 — Make history complete and streaming identity-correct",
+          "start_line": 146,
+          "end_line": 157,
+          "sha256": "d11d92d7bc3697400d33ce250587f68fd14f507555aa764b77ac3c67f205b73e"
+        },
+        {
+          "level": 3,
+          "heading": "W04 — Add useful descriptions to native command autocomplete",
+          "start_line": 158,
+          "end_line": 169,
+          "sha256": "1440219c99d5c0b63d76e975531e9807d7beb779679bf53769747f842404b23a"
+        },
+        {
+          "level": 3,
+          "heading": "W05 — Execute commands correctly and qualify a real new conversation",
+          "start_line": 170,
+          "end_line": 181,
+          "sha256": "09ecc92d1ab9c145e1de8e8544f1de86f18d8eacc9a4b1d7e1c98163dff6c817"
+        },
+        {
+          "level": 3,
+          "heading": "W06 — Deliver Focus Studio and true Windows fullscreen",
+          "start_line": 182,
+          "end_line": 193,
+          "sha256": "29897348962ca22ccd544c8a6c6af8d3ff50091f4b5cd7587c4b87ab97d47c10"
+        },
+        {
+          "level": 3,
+          "heading": "W07 — Make Aurora Studio visibly more expressive",
+          "start_line": 194,
+          "end_line": 205,
+          "sha256": "b658ea559f9a0dd29ccc3b1815531d33734c2882a90061a40d8edbe921a895a2"
+        },
+        {
+          "level": 3,
+          "heading": "W08 — Let the human answer actual agent requests",
+          "start_line": 206,
+          "end_line": 217,
+          "sha256": "ee3e4370f2813c7aabf019c77bebd4f56b1982d1642d19c2632e0ab65921edc4"
+        },
+        {
+          "level": 3,
+          "heading": "W09 — Make watching and communicating with agents enjoyable",
+          "start_line": 218,
+          "end_line": 229,
+          "sha256": "fbffeb57e9d2d7885afdee816e59a0c9acdcaaaf83f7dcf0bad0f8fddcb65b88"
+        },
+        {
+          "level": 3,
+          "heading": "W10 — Put honest usage and controls in the slim dashboard",
+          "start_line": 230,
+          "end_line": 241,
+          "sha256": "c346c88a926de68297d61c4366600b5f993ee23e3ffea5ad9ccc0d29ef2f8be8"
+        },
+        {
+          "level": 3,
+          "heading": "W11 — Add everyday composition, navigation and review conveniences",
+          "start_line": 242,
+          "end_line": 253,
+          "sha256": "b391a61e786dc95853a21aec6d76294223df3d0d2727d5cc4d43ceb4e4444154"
+        },
+        {
+          "level": 3,
+          "heading": "W12 — Apply the approved Mona icon across Windows",
+          "start_line": 254,
+          "end_line": 265,
+          "sha256": "283525e0b7fd0c46493b2690b6beb1310dc1010ebb2010b66c0655e0e19453d0"
+        },
+        {
+          "level": 3,
+          "heading": "W13 — Define Prompt Runner ownership and result contracts",
+          "start_line": 266,
+          "end_line": 279,
+          "sha256": "abfe04fbc5931af0e883126c858c18d11f9f48d07c4dd86e72ed1ae229d2622d"
+        },
+        {
+          "level": 3,
+          "heading": "W14 — Import numbered prompt files into a clear, inert plan",
+          "start_line": 280,
+          "end_line": 291,
+          "sha256": "99a0f4336a35051d2074883a378e18e8034f81debd406950e2aed2d3d4c4dbdf"
+        },
+        {
+          "level": 3,
+          "heading": "W15 — Run the selected sequence automatically and durably",
+          "start_line": 292,
+          "end_line": 305,
+          "sha256": "bd3d977aac476e21f8331c3b274589ae25a1548391a943a8d8141a0847dce41b"
+        },
+        {
+          "level": 3,
+          "heading": "W16 — Gate progress on evidence and collect Needs the Human",
+          "start_line": 306,
+          "end_line": 319,
+          "sha256": "2b5dd5ea7a0379465868798f66501509821b9b00709de05af1ebc1dfe729f487"
+        },
+        {
+          "level": 3,
+          "heading": "W17 — Integrate the runner into Studio and Windows lifecycle",
+          "start_line": 320,
+          "end_line": 333,
+          "sha256": "0bea9960d5cd6adbfc60b83587a14926d177e86139b10bce370534ebadb360a2"
+        },
+        {
+          "level": 3,
+          "heading": "W18 — Qualify Prompt Runner failures and document its use",
+          "start_line": 334,
+          "end_line": 347,
+          "sha256": "9f519c5cab14ed63c692718ecc9846d84f3f949ac19f755a40d8c97c55f0424c"
+        },
+        {
+          "level": 3,
+          "heading": "W19 — Profile memory and repair demonstrated performance problems",
+          "start_line": 348,
+          "end_line": 359,
+          "sha256": "ad320246b5201130a161e6fc5179b5f86de08ac658e58ffa328168362ed9ac53"
+        },
+        {
+          "level": 3,
+          "heading": "W20 — Complete Windows accessibility and real scaling checks",
+          "start_line": 360,
+          "end_line": 371,
+          "sha256": "883b3da4001a486bb9aa499940932897c34d196791d5b504e862a7c37eb0da4c"
+        },
+        {
+          "level": 3,
+          "heading": "W21 — Reconcile regressions and evidence against final source",
+          "start_line": 372,
+          "end_line": 385,
+          "sha256": "927ac9fde6df91cf2442617dc252834f6a150e55a374d2fe480f0e55fa028eba"
+        },
+        {
+          "level": 3,
+          "heading": "W22 — Resolve modern Explorer menu and trust honestly",
+          "start_line": 386,
+          "end_line": 399,
+          "sha256": "1c890b176d60c88a5f6d230e166439d41ab83b309a98de0928817c5d837d8b8e"
+        },
+        {
+          "level": 3,
+          "heading": "W23 — Produce an installer that a recipient can use",
+          "start_line": 400,
+          "end_line": 413,
+          "sha256": "a2484e47f2e7c55734d0632fe94d7533cdf80ee010ad40c882f9efa085003859"
+        },
+        {
+          "level": 3,
+          "heading": "W24 — Qualify the packaged candidate and release claims",
+          "start_line": 414,
+          "end_line": 427,
+          "sha256": "4d21e5a34ebac0985cf6de589b53fc2e9dd973584837d61f347a43a0ab17af5c"
+        },
+        {
+          "level": 3,
+          "heading": "W25 — Leave a complete, honest handoff",
+          "start_line": 428,
+          "end_line": 441,
+          "sha256": "0047f11a4409787eba710ad837b3b2a3a32434f8fcbecc179dac639bbb03a6f6"
+        },
+        {
+          "level": 2,
+          "heading": "5. Minimal durable records",
+          "start_line": 442,
+          "end_line": 452,
+          "sha256": "222d9d666a0feab8b53eb8c6d23ebf9885c0853655ca52db98c9d2ef087712eb"
+        },
+        {
+          "level": 2,
+          "heading": "6. Generated Prompt Runner task instruction",
+          "start_line": 453,
+          "end_line": 489,
+          "sha256": "bfad0c8feb74ad63ff387ce4821bed68c059bf44c3c2053062a77fb6f16f5173"
+        },
+        {
+          "level": 2,
+          "heading": "7. End-of-run report template",
+          "start_line": 490,
+          "end_line": 504,
+          "sha256": "7900985a77ef1146c937adf3e00cee649631718f9831e9db3c27fac9ffd3906a"
         }
       ]
     }

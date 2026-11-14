@@ -14,6 +14,7 @@ import {
   type Tone,
 } from '@mona/ui';
 import { ENGINE_STATUS_LABEL } from '../shared/engine-status.js';
+import monaMark from './assets/mona-mark.png';
 import { StudioPanel } from './StudioPanel.js';
 import { AgentsPanel } from './AgentsPanel.js';
 import { ExtensionsPanel } from './ExtensionsPanel.js';
@@ -990,9 +991,7 @@ export function App(): React.JSX.Element {
     <div className={focusMode ? 'app-shell mona-root focus-mode' : 'app-shell mona-root'}>
       <header className="topbar">
         <div className="brand">
-          <span className="brand-mark" aria-hidden="true">
-            M
-          </span>
+          <img className="brand-mark" src={monaMark} alt="" aria-hidden="true" />
           <div>
             <h1>Mona</h1>
             <p className="brand-sub">{selected ? selected.label : 'Local workbench for Codewhale'}</p>

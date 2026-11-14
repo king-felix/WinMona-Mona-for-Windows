@@ -1,0 +1,73 @@
+{
+  "pipeline": "tools/assets/build-icons.mjs",
+  "pipeline_version": 1,
+  "source": {
+    "path": "assets/brand/MidnightMona.png",
+    "sha256": "cebc871741323a49e556d633fbf0e656a6134bb4c6c4b839ce13a67963df41be",
+    "width": 1254,
+    "height": 1254
+  },
+  "crop": {
+    "width": 1134,
+    "height": 1134,
+    "padding_ratio": 0.02,
+    "alpha_floor": 8
+  },
+  "files": [
+    {
+      "name": "mona-128.png",
+      "bytes": 34055,
+      "sha256": "d4e1b39f3ea0a03377716a16654f7b69296797ae7be810394e65cfc6f2175d2a"
+    },
+    {
+      "name": "mona-16.png",
+      "bytes": 975,
+      "sha256": "9a06999248ae55930552972ac4be09e9167e4c704d117b86115d8cf9aaefd423"
+    },
+    {
+      "name": "mona-24.png",
+      "bytes": 1891,
+      "sha256": "e5ec758d36578d3b00bdc104b9b328a9e242b7099ead75410baa102e0ec8ff25"
+    },
+    {
+      "name": "mona-256.png",
+      "bytes": 115379,
+      "sha256": "46ab3b8050a9e32803dc578c011df2573737132e68cf1bb29742b8834bfb7e41"
+    },
+    {
+      "name": "mona-32.png",
+      "bytes": 3125,
+      "sha256": "a006489c6ab00744ce99c80129558914f8e0e157b155cd88d5d3e164d83eee49"
+    },
+    {
+      "name": "mona-48.png",
+      "bytes": 6180,
+      "sha256": "5fb99d7b1b09ec53b2624af0b9d0b9f82efcd732f7ea7c8b96695c6557290262"
+    },
+    {
+      "name": "mona-64.png",
+      "bytes": 10062,
+      "sha256": "9ea188d001406faa403d556005a9c765363f08056421adf8567775975ded93f7"
+    },
+    {
+      "name": "mona.ico",
+      "bytes": 171785,
+      "sha256": "c70638dd6bbae54cd9ec62b9bc30f0fddc90959934ab8a2c907bd5e4766cc25b"
+    },
+    {
+      "name": "Square150x150Logo.png",
+      "bytes": 44528,
+      "sha256": "f53e3650ef855b40918cafb3f126fad35914a7821dd1de95f8c8aa99e0c7d4ed"
+    },
+    {
+      "name": "Square44x44Logo.png",
+      "bytes": 5276,
+      "sha256": "49f2c83eba161f13ec517fc55ba04ec81706756bc64db177798769b9f5c2ed8e"
+    },
+    {
+      "name": "StoreLogo.png",
+      "bytes": 6675,
+      "sha256": "0dfc448234833b79a7e8acfe03e5295a84bb5ee8a4cfcf2440a5347f5aa789e7"
+    }
+  ]
+}

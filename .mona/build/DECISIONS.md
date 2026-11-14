@@ -1499,3 +1499,46 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   an amount, never a computed state.
 - **Verified by:** the IPC tests asserting the service verdict is preserved, and the live probe
   asserting a dependency-blocked task shows the service reason.
+
+## D-0116 - The Windows improvement supplement is a second validated ledger, not an extension of the first
+
+- **Decision:** `Mona_Windows_Improvements_Project.md` and `Mona_Windows_Improvements_PROMPTS.md`
+  are registered in `docs/requirements-windows.json` against
+  `tools/build/schema/requirements-windows.schema.json`. The supplement owns the id spaces
+  `W00-W25` (prompts) and `WX-01-WX-18` (requirements). `docs/requirements.json` keeps its own
+  `Pnn` / `MONA-nnn` schema untouched.
+- **Why:** the original gate is deliberately narrow - prompt ids must match `^P[0-9]{2}$` and the
+  root object admits no extra keys. Widening it to hold a second namespace would have weakened the
+  check that protects the P00-P23 sequence in order to add a queue. Two ledgers, two schemas, one
+  `validate` command: the supplement gets the same evidence discipline without eroding the
+  original.
+- **Constrains:** `node tools/build/cli.mjs validate` now also checks the supplement: document
+  hashes, the complete W00-W25 and WX-01-WX-18 sets, that every recorded title still matches its
+  `### Wnn` heading, dependency cycles, symmetric ownership, that every prompt is claimed by at
+  least one WX row, and that no prompt is `completed` without evidence or `verified` requirement
+  without an original-ledger mapping (S10 requires that mapping). `status` reports the supplement
+  queue separately. `docs/spec-index.json` now indexes all four documents.
+- **Verified by:** `tests/bootstrap/windows-supplement.test.mjs` (7 cases, including deliberate
+  title drift, an unclaimed prompt, a completion without evidence and a verification without a
+  mapping), and `node tools/build/cli.mjs validate` returning OK on the real tree.
+
+## D-0117 - One approved icon source, generated deterministically, with absence treated as failure
+
+- **Decision:** `assets/brand/MidnightMona.png` is the only icon source. `tools/assets/build-icons.mjs`
+  decodes it, crops to a centred square around its alpha bounds and resamples with a
+  coverage-weighted box filter in premultiplied alpha, emitting `mona-16..256.png`, a multi-size
+  `mona.ico`, and the three package images `AppxManifest.xml` declares. The output is byte-stable;
+  `npm run assets:check` (part of `ci`) proves the committed files still match the source.
+- **Why:** the repository carries no image dependency, so the pipeline decodes and re-encodes PNG
+  itself and the only inputs are the source bytes and the script. Premultiplied resampling avoids
+  the grey fringe straight-RGBA averaging leaves on an anti-aliased mark. A missing source or a
+  wrong image size now fails the build with the exact path and command, because silently drawing
+  a different logo is worse than shipping no icon.
+- **Constrains:** the installer builds its identity package from those files and refuses a missing
+  file or a size that disagrees with the manifest; the previous solid-colour placeholder is gone
+  from the product path (kept only as a test fixture). Two gaps are recorded rather than hidden:
+  at 16 px the ribbon detail collapses, and the packaged `Mona.exe` still carries Electron's
+  embedded icon resources because no PE resource editor is part of this repository.
+- **Verified by:** `tests/assets/icon-pipeline.test.mjs` (11 cases: sizes, ICO directory vs payload,
+  transparent corners, byte stability, `--check`), `tests/install/installer.test.mjs` package
+  artwork cases, and the desktop build emitting `mona-mark-*.png` into the renderer.

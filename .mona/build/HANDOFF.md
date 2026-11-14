@@ -1,8 +1,22 @@
 # Mona build handoff
 
-**Current prompt:** P23 — release candidate and final handoff. **Status: completed**, plus the
-elevated, layout and surfaces rounds. State revision 83; ledger revision 361. All 24 prompts are
-delivered; there is no next eligible prompt.
+**Current prompt:** P23 in `.mona/build/state.json` (revision 83). **But the tree is past it:**
+commits P24 (collapsible Inspector, Ctrl +/-/0 scaling) and P25 (Cost lens and Work board) are
+recorded inside P23's task row, and `state.json` was never checkpointed forward. `validate`
+passes because it checks schema, hashes, graph and evidence — not whether the ledger matches git
+history. The next session must reconcile the ledger to P25 with a `checkpoint` at the correct
+`--expected-revision` before treating P23 as the resume point.
+
+**New pending queue (2026-11-14):** the Windows improvement supplement is registered in
+`docs/requirements-windows.json` — **26 prompts W00–W25, 18 requirements WX-01–WX-18, all
+pending**, with `W00` the only eligible one. It is a separate, validated id space (D-0116); it
+does not reopen or extend the P00–P23 sequence. The supplement documents were written against a
+P23-era report, so W00's first job is to reconcile them with the P24/P25 work already committed.
+
+**Brand artwork (2026-11-14):** `assets/brand/MidnightMona.png` is the approved icon source and
+now drives the window icon, tray, in-app header and the three declared package images through a
+deterministic pipeline (D-0117). Two W12 gaps remain open: 16 px legibility and the Electron icon
+still embedded in `Mona.exe`.
 
 **The claim that stands is "Core usable release candidate 0.1.0".** Not 1.0 complete: MONA-027's
 `modern-menu` criterion is registered but not seen (a human right-click is owed), MONA-028 is
@@ -18,8 +32,9 @@ closed for testing; re-running the launcher is idempotent.
 Nothing was published: no remote, no package feed, no certificate purchase, no public repo.
 Local commits only. The license decision is deliberately unresolved.
 
-Verify before trusting this file: `node tools/build/cli.mjs validate` (expect OK, 0 warnings)
-and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
+Verify before trusting this file: `node tools/build/cli.mjs validate` (expect OK, 0 warnings),
+`node tools/build/cli.mjs status` (expect the `windows_supplement` block: 26 pending, W00
+eligible) and `node tools/install/cli.mjs verify` (expect `checks.ok: true`).
 
 ## Layout round result
 

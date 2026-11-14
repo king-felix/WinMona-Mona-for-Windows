@@ -1,0 +1,942 @@
+{
+  "schema_version": 1,
+  "revision": 6,
+  "spec": {
+    "file": "Mona_Windows_Improvements_Project.md",
+    "companion_file": "Mona_Windows_Improvements_PROMPTS.md",
+    "version": "1.0",
+    "sha256": "adf8ab55ae00b79549dbd436d3d96b178ffd54c20ce8a7be8ac3aa48a24f4555",
+    "companion_sha256": "56aa94793944cfada235bd23cc182762ff95d166af53acee42ed8eb61aa9bb1a"
+  },
+  "purpose": "Pending registry for the Windows improvement supplement (W00-W25, WX-01-WX-18). Separate from docs/requirements.json so the original P00-P23 id space keeps its own schema. Regenerate with `node tools/build/seed-windows-ledger.mjs`.",
+  "prompts": [
+    {
+      "id": "W00",
+      "title": "Establish the actual Windows baseline",
+      "deliverable": "Reconcile Windows baseline and seed review state",
+      "prerequisites": [],
+      "spec_sections": [
+        "S00",
+        "S01",
+        "S10"
+      ],
+      "acceptance": "Current source/engine/platform and baseline checks recorded; W tasks indexed with no falsely completed statuses; real existing features preserved; evidence/attempt counts survive validation; no production behavior changed without a targeted finding.",
+      "checkpoint": "W00 assessment table, source map, current evidence limitations and next eligible prompt. Do not say this document itself constituted a Windows code review.",
+      "requirements": [
+        "WX-01"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W01",
+      "title": "Make drafts, navigation and keyboard submission lossless",
+      "deliverable": "Lossless drafts, async navigation, Ctrl+Enter",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S02"
+      ],
+      "acceptance": "Deterministic deferred-promise tests cover send→type more, send→switch project/thread, out-of-order saves, duplicate button/shortcut events, uncertain/rejected send and restart. Newer and other-project drafts remain; empty/blocked submissions send nothing; exactly one accepted request occurs for the same user action. Native Windows keyboard smoke covers IME and Ctrl+Enter in the real composer.",
+      "checkpoint": "Reproduction and repair evidence or already-satisfied evidence, changed contracts and focused test results for WX-02.",
+      "requirements": [
+        "WX-02"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W02",
+      "title": "Preserve state integrity and finish export qualification",
+      "deliverable": "State cleanup, restore discipline and export dialog",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S02"
+      ],
+      "acceptance": "Replacement import/export tests cover associated-row cleanup and unrelated-data preservation; fault injection preserves usable prior state or a recoverable checkpoint; all writers participate in maintenance; dialog cancellation leaves state intact; no model calls from import/export UI.",
+      "checkpoint": "WX-03 evidence, any original MONA-007 impact, and exact native checks still pending. Existing working features must remain intact.",
+      "requirements": [
+        "WX-03"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W03",
+      "title": "Make history complete and streaming identity-correct",
+      "deliverable": "Complete history and stable streaming",
+      "prerequisites": [
+        "W01",
+        "W02"
+      ],
+      "spec_sections": [
+        "S02"
+      ],
+      "acceptance": "Fixtures include >10,000 stored events, >2,000 frames in one turn, interleaved threads/items, heartbeat between deltas, duplicate replay and genuine gaps. Old content remains reachable; no ALPHA/BETA cross-thread merge; no duplicated completed card; scrolling while reading is not hijacked. Paging makes no provider calls.",
+      "checkpoint": "WX-04 projection/paging contract, bounded rendering observations and Windows long-session smoke.",
+      "requirements": [
+        "WX-04"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W04",
+      "title": "Add useful descriptions to native command autocomplete",
+      "deliverable": "Descriptive slash-command catalog/autocomplete",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S03"
+      ],
+      "acceptance": "A coverage fixture reconciles every pinned registry row and alias; no unexplained omission or invented route. Test keyboard/IME, cursor replacement, multiline paste, literal text, Narrator semantics and large scaling. Filtering/help makes zero inference calls.",
+      "checkpoint": "WX-05 versioned catalog and provenance, coverage matrix, actual composer captures and routing work left for W05.",
+      "requirements": [
+        "WX-05"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W05",
+      "title": "Execute commands correctly and qualify a real new conversation",
+      "deliverable": "Native command dispatch and real `/new`",
+      "prerequisites": [
+        "W01",
+        "W03",
+        "W04"
+      ],
+      "spec_sections": [
+        "S03"
+      ],
+      "acceptance": "Positive/negative dispatch for every executable route; argument injection refused; `/new` idle/busy/disconnected/response-lost/restart/project-switch cases; old histories/drafts remain accessible; chosen provider and permission posture unchanged. Unsupported native semantics are a recorded blocker, not hidden by keystroke automation.",
+      "checkpoint": "WX-05 command-to-native matrix with receipts and old/new identities; a shared new-conversation operation ready for Prompt Runner.",
+      "requirements": [
+        "WX-05"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W06",
+      "title": "Deliver Focus Studio and true Windows fullscreen",
+      "deliverable": "Focus and native Windows fullscreen Studio",
+      "prerequisites": [
+        "W01",
+        "W03"
+      ],
+      "spec_sections": [
+        "S03"
+      ],
+      "acceptance": "Actual Windows tests enter/leave while streaming, typing, scrolled back, answering input and opening drawers. No remounted engine or new inference; draft/caret/scroll survives. Alt+Tab, F11/menu exit, minimize/restore and close/quit remain usable. Narrow and 200% layouts keep essential controls reachable.",
+      "checkpoint": "WX-06 native state trace and normal/focus/fullscreen screenshots; separate any real-monitor check still unavailable.",
+      "requirements": [
+        "WX-06"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W07",
+      "title": "Make Aurora Studio visibly more expressive",
+      "deliverable": "Aurora appearance and Vivid/Quiet",
+      "prerequisites": [
+        "W06"
+      ],
+      "spec_sections": [
+        "S04"
+      ],
+      "acceptance": "Inspect actual rendered before/after screenshots for both themes/intensities, normal/fullscreen, long content, tool failures, Needs the Human, empty state and narrow/200% layouts. Measure contrast on real foreground/background pairs. No idle animation CPU regression, hidden focus or inaccessible status color.",
+      "checkpoint": "WX-07 visual evidence, token decisions and performance observations. A stylesheet diff alone is not visual verification.",
+      "requirements": [
+        "WX-07"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W08",
+      "title": "Let the human answer actual agent requests",
+      "deliverable": "Native approval and clarification replies",
+      "prerequisites": [
+        "W01",
+        "W03"
+      ],
+      "spec_sections": [
+        "S05"
+      ],
+      "acceptance": "Native/fixture request round trip, rejected or expired answer, duplicate click, lost acknowledgement, reconnect and concurrent request IDs. “Delivered” requires an acknowledgement. Dismissing UI does not approve. Text drafts survive. Complete independent display/state work if a native reply capability blocks final verification.",
+      "checkpoint": "WX-08 actual route/evidence and a reusable structured request surface for Needs the Human.",
+      "requirements": [
+        "WX-08"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W09",
+      "title": "Make watching and communicating with agents enjoyable",
+      "deliverable": "Agent observatory, follow-ups and steering",
+      "prerequisites": [
+        "W05",
+        "W08"
+      ],
+      "spec_sections": [
+        "S05"
+      ],
+      "acceptance": "Completion during typing, cancellation at dispatch boundary, thread/project switch, reconnect, uncertain send, paused queue and child-agent cases. Exactly one dispatcher controls the workspace; queued and delivered are distinct; no accidental spend from browsing activity. Windows notifications are quiet/deduplicated under existing settings.",
+      "checkpoint": "WX-08 message-intention contract, event provenance and actual Studio walkthrough.",
+      "requirements": [
+        "WX-08"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W10",
+      "title": "Put honest usage and controls in the slim dashboard",
+      "deliverable": "Factual slim dashboard, costs and budgets",
+      "prerequisites": [
+        "W00",
+        "W03"
+      ],
+      "spec_sections": [
+        "S07"
+      ],
+      "acceptance": "Usage fixtures cover cache hit/miss, inclusive reasoning/output, missing price, parent/child totals, delayed updates, duplicate replay and scope changes. HUD controls work at 200%. Browsing the dashboard causes no provider call; configured gates block the actual dispatch path.",
+      "checkpoint": "WX-09 cost provenance/coverage and focused mathematical/dispatch tests.",
+      "requirements": [
+        "WX-09"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W11",
+      "title": "Add everyday composition, navigation and review conveniences",
+      "deliverable": "Composition, navigation and review conveniences",
+      "prerequisites": [
+        "W01",
+        "W03",
+        "W04"
+      ],
+      "spec_sections": [
+        "S05"
+      ],
+      "acceptance": "No wrong-project insertion; cancellation preserves draft; supported attachment context is shown accurately; invalid/outside-root/reparse cases follow the existing policy; links cannot cross IPC/renderer privilege boundaries. Keyboard, large text and error/cancel states work. Local lookup/copy/search adds no inference.",
+      "checkpoint": "WX-10 before/after workflow evidence and any concrete unsupported capability still open.",
+      "requirements": [
+        "WX-10"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W12",
+      "title": "Apply the approved Mona icon across Windows",
+      "deliverable": "Windows app/icon identity",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S04"
+      ],
+      "acceptance": "Inspect installed icons at small/large sizes and high DPI; the packaged binary carries the correct artwork; shortcuts bind the intended executable/app identity; no stretched, white-matted or missing images.",
+      "checkpoint": "WX-11 asset provenance, generated sizes and actual installed captures; preserve any missing-source blocker.",
+      "requirements": [
+        "WX-11"
+      ],
+      "status": "pending",
+      "evidence": [
+        {
+          "path": "assets/brand/generated/manifest.json",
+          "sha256": "4adb7a343b71f66d22744dd9e21dd777e9028e47063f617df597fd099a66660d",
+          "kind": "generated",
+          "note": "Source hash, crop geometry and every generated size; window, tray, header and package images derive from it."
+        },
+        {
+          "path": "assets/brand/README.md",
+          "sha256": "820757efeacc7651b61a804784774d0487d94e55f79fdd96838fbbfd2a3746d9",
+          "kind": "document",
+          "note": "Asset provenance, display surfaces and the two known gaps (16px legibility, embedded exe icon)."
+        },
+        {
+          "path": "tools/assets/build-icons.mjs",
+          "sha256": "4742cb6b58627ca9e9fa057f05b85302cd662adf6e11172a7441eb113ae86915",
+          "kind": "document",
+          "note": "Deterministic pipeline; --check proves committed bytes still match the source."
+        },
+        {
+          "path": "docs/evidence/brand-icons.md",
+          "sha256": "59b0e437131cc907cfa87ff97c618acedfb15b6099b6431fe811c022e483047b",
+          "kind": "document",
+          "note": "What was replaced, how it was generated, and the four recorded gaps."
+        },
+        {
+          "path": "docs/evidence/brand-icons/app-header.png",
+          "sha256": "0cb2c054ce0609355ba3bae91b9c55f9b2621cf28822a234b4d74d9b77f9f97a",
+          "kind": "real",
+          "note": "Live Electron capture: the new mark renders in the app header at 38 px."
+        }
+      ],
+      "notes": "Partially delivered 2026-11-14 under an explicit user request: the approved artwork now drives the window icon, tray, in-app header and the three declared package images. Still open for full W12 acceptance: installed-icon inspection at small/large sizes and high DPI, and the packaged exe still carries Electron embedded icon resources."
+    },
+    {
+      "id": "W13",
+      "title": "Define Prompt Runner ownership and result contracts",
+      "deliverable": "Prompt Runner contract and state model",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S06"
+      ],
+      "acceptance": "State/schema tests reject stale/mismatched/partial reports and distinguish acceptance, turn completion and evidence verification. Migration/backup approach preserves existing project state. No new paid orchestration layer.",
+      "checkpoint": "WX-12 contract and decision note; portable scheduling logic with Windows integrations at existing boundaries.",
+      "requirements": [
+        "WX-12"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W14",
+      "title": "Import numbered prompt files into a clear, inert plan",
+      "deliverable": "Numbered Markdown importer and preview",
+      "prerequisites": [
+        "W13"
+      ],
+      "spec_sections": [
+        "S06"
+      ],
+      "acceptance": "Real-file fixtures and synthetic cases cover headings in fenced code, multiple prefixes, shared rules, Unicode/spaced paths, missing dependencies and reimports. Preview text matches what will be submitted. Importing/selecting does not create a thread, invoke a model or execute imported instructions.",
+      "checkpoint": "WX-12 parser/manifest contract, exact preview screenshots and accepted source-format limitations.",
+      "requirements": [
+        "WX-12"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W15",
+      "title": "Run the selected sequence automatically and durably",
+      "deliverable": "Durable automatic sequential execution",
+      "prerequisites": [
+        "W01",
+        "W05",
+        "W10",
+        "W13",
+        "W14"
+      ],
+      "spec_sections": [
+        "S06"
+      ],
+      "acceptance": "Fake runtime proves three prompts run in order in distinct threads, with one accepted send per dispatch and no extra task afterward. Duplicate events, double Start, response loss, concurrent UI/manual dispatch and restart do not duplicate work. A busy native workflow or uncertain active turn prevents another mutating task.",
+      "checkpoint": "WX-12 transition traces and durable submission/recovery evidence. Do not launch the real development sequence with this runner until W18 qualifies it.",
+      "requirements": [
+        "WX-12"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W16",
+      "title": "Gate progress on evidence and collect Needs the Human",
+      "deliverable": "Verification, blockers and Needs the Human",
+      "prerequisites": [
+        "W08",
+        "W15"
+      ],
+      "spec_sections": [
+        "S06"
+      ],
+      "acceptance": "Third no-progress attempt, dependent/independent branches, stale evidence, native request still holding a turn, malformed report, human-only check, expired/duplicate answer and explicit skip all have correct outcomes. Unanswered required work is never complete. Reports distinguish all verified from finished with blockers.",
+      "checkpoint": "WX-13 inbox and completion provenance, actual state transitions and unresolved engine reply limits.",
+      "requirements": [
+        "WX-13"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W17",
+      "title": "Integrate the runner into Studio and Windows lifecycle",
+      "deliverable": "Runner UI, spending and lifecycle controls",
+      "prerequisites": [
+        "W06",
+        "W07",
+        "W09",
+        "W10",
+        "W16"
+      ],
+      "spec_sections": [
+        "S06",
+        "S07"
+      ],
+      "acceptance": "Native Windows/fixture tests cover stop races, view/thread switches, minimize/restore, sleep recovery, close confirmation, power-request cleanup and late usage. UI operations make zero inference calls. Keyboard/fullscreen/200% layouts retain the controls.",
+      "checkpoint": "WX-14 lifecycle/action semantics, actual UI captures and precise platform limits.",
+      "requirements": [
+        "WX-14"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W18",
+      "title": "Qualify Prompt Runner failures and document its use",
+      "deliverable": "Runner fault qualification and user guide",
+      "prerequisites": [
+        "W02",
+        "W03",
+        "W15",
+        "W16",
+        "W17"
+      ],
+      "spec_sections": [
+        "S06",
+        "S08"
+      ],
+      "acceptance": "Every matrix row has evidence or a precise blocker; no duplicate model effects, lost attempts or false task completion. Runner tests work without development-only paths in the recipient package. The feature is not called fully qualified if native/reply tests remain unavailable.",
+      "checkpoint": "WX-12/WX-13/WX-14 qualification and usable guide; authorize future real queues only through the user's explicit selection/start action.",
+      "requirements": [
+        "WX-14"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W19",
+      "title": "Profile memory and repair demonstrated performance problems",
+      "deliverable": "Memory profile and performance repairs",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S07"
+      ],
+      "acceptance": "Comparable before/after measurements and relevant regression checks; no loss of features, accessibility or inference parity. Report current target pass/miss with practical remaining options. If still above target, retain the performance criterion open pending repair or an explicit release exception. CPU and long-history interaction are also measured.",
+      "checkpoint": "WX-15 reproducible method/results, source/artifact identity and any unresolved D-0104 decision. Repeat final measurements only if later changes materially affect them.",
+      "requirements": [
+        "WX-15"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W20",
+      "title": "Complete Windows accessibility and real scaling checks",
+      "deliverable": "Narrator, physical DPI and accessibility",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S08"
+      ],
+      "acceptance": "Required native/human observations have real evidence; otherwise retain exact unverified criteria and a short checklist with expected results. Do not claim Narrator passed from DOM attributes or physical DPI passed from emulated zoom. Fix observed defects and rerun affected paths.",
+      "checkpoint": "WX-16 and original MONA-028 traceability, observed configuration, outstanding human tests and accessible screenshots where relevant.",
+      "requirements": [
+        "WX-16"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W21",
+      "title": "Reconcile regressions and evidence against final source",
+      "deliverable": "Whole-change regression/evidence reconciliation",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S01",
+        "S08",
+        "S10"
+      ],
+      "acceptance": "Required checks on the actual candidate pass or remain explicit release blockers. No claimed Windows-native result is supported only by a foreign host/mock. Original and enhancement ledgers agree about completed, stale, partial and blocked work.",
+      "checkpoint": "WX-01 regression/economics/security evidence summary with exact source identity. Later code changes invalidate only relevant evidence and require the corresponding final check.",
+      "requirements": [
+        "WX-01"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W22",
+      "title": "Resolve modern Explorer menu and trust honestly",
+      "deliverable": "Modern Explorer menu and signing/trust qualification",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S09"
+      ],
+      "acceptance": "Modern-menu invocation is observed under the declared trust state. Test trust is not production distribution. Failed trust/registration remains MONA-027 blocked; classic success does not close it. Installer/uninstaller remove only their own registration.",
+      "checkpoint": "WX-17 exact native/trust evidence and the smallest actionable human prerequisite, with all independent engineering work complete.",
+      "requirements": [
+        "WX-17"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W23",
+      "title": "Produce an installer that a recipient can use",
+      "deliverable": "Installer, upgrade, uninstall and clean recipient",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S09"
+      ],
+      "acceptance": "Local/test candidate has a demonstrable recipient installation path and lifecycle evidence on its actual bytes. W22 signing/trust or licensing gaps remain explicit release gates; do not call an untrusted package frictionless friend-ready distribution. Installer work can complete without pretending those external decisions are made.",
+      "checkpoint": "WX-18 exact installer filename, architecture, dependency/network story, lifecycle results and unresolved distribution prerequisites.",
+      "requirements": [
+        "WX-18"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W24",
+      "title": "Qualify the packaged candidate and release claims",
+      "deliverable": "Packaged workflows, timings and release gate",
+      "prerequisites": [
+        "W21",
+        "W23"
+      ],
+      "spec_sections": [
+        "S07",
+        "S08",
+        "S09"
+      ],
+      "acceptance": "Actual packaged timings/workflows and artifact identity are recorded. A development smoke or a source checkout is not substituted. Signed-distribution readiness is claimed only for the final validated package and resolved mandatory gates; full 1.0 still requires the original complete scope.",
+      "checkpoint": "WX-15/WX-18 release gate matrix, final artifact path/hash and precise remaining actions.",
+      "requirements": [
+        "WX-15",
+        "WX-18"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    },
+    {
+      "id": "W25",
+      "title": "Leave a complete, honest handoff",
+      "deliverable": "Final maintainable handoff and disposition",
+      "prerequisites": [
+        "W00"
+      ],
+      "spec_sections": [
+        "S10"
+      ],
+      "acceptance": "Every task accounted for; docs match behavior; no falsely green requirement; no leaked secrets; the next session can resume without rediscovering context. A closure prompt may finish with an accurate blocked-task report; it does not mark the blocked tasks complete.",
+      "checkpoint": null,
+      "requirements": [
+        "WX-01",
+        "WX-18"
+      ],
+      "status": "pending",
+      "evidence": [],
+      "notes": ""
+    }
+  ],
+  "requirements": [
+    {
+      "id": "WX-01",
+      "title": "Evidence-led adoption; durable review state",
+      "owning_prompts": [
+        "W00",
+        "W21",
+        "W25"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Evidence-led adoption; durable review state",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-02",
+      "title": "Lossless drafts, async navigation and Ctrl+Enter",
+      "owning_prompts": [
+        "W01"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Lossless drafts, async navigation and Ctrl+Enter",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-03",
+      "title": "Transactional imports/restores and real export workflow",
+      "owning_prompts": [
+        "W02"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Transactional imports/restores and real export workflow",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-04",
+      "title": "Complete, stable and efficient history",
+      "owning_prompts": [
+        "W03"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Complete, stable and efficient history",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-05",
+      "title": "Descriptive native command catalog and correct execution",
+      "owning_prompts": [
+        "W04",
+        "W05"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Descriptive native command catalog and correct execution",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-06",
+      "title": "Focus/native fullscreen Studio",
+      "owning_prompts": [
+        "W06"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Focus/native fullscreen Studio",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-07",
+      "title": "Aurora themes/intensity and accessible polish",
+      "owning_prompts": [
+        "W07"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Aurora themes/intensity and accessible polish",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-08",
+      "title": "Native human requests and agent communication",
+      "owning_prompts": [
+        "W08",
+        "W09"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Native human requests and agent communication",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-09",
+      "title": "Factual HUD, usage, costs and budgets",
+      "owning_prompts": [
+        "W10"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Factual HUD, usage, costs and budgets",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-10",
+      "title": "Composition/navigation/file-context conveniences",
+      "owning_prompts": [
+        "W11"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Composition/navigation/file-context conveniences",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-11",
+      "title": "Approved icon throughout Windows distribution",
+      "owning_prompts": [
+        "W12"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Approved icon throughout Windows distribution",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-12",
+      "title": "Numbered-file import and deterministic Prompt Runner",
+      "owning_prompts": [
+        "W13",
+        "W14",
+        "W15"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Numbered-file import and deterministic Prompt Runner",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-13",
+      "title": "Evidence-gated progression and Needs the Human",
+      "owning_prompts": [
+        "W16"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Evidence-gated progression and Needs the Human",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-14",
+      "title": "Runner UI, economics, lifecycle and recovery",
+      "owning_prompts": [
+        "W17",
+        "W18"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Runner UI, economics, lifecycle and recovery",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-15",
+      "title": "Measured memory/performance with unchanged targets",
+      "owning_prompts": [
+        "W19",
+        "W24"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Measured memory/performance with unchanged targets",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-16",
+      "title": "Narrator, real DPI and keyboard qualification",
+      "owning_prompts": [
+        "W20"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Narrator, real DPI and keyboard qualification",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-17",
+      "title": "Modern Explorer integration and trust",
+      "owning_prompts": [
+        "W22"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Modern Explorer integration and trust",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    },
+    {
+      "id": "WX-18",
+      "title": "Installable/shareable candidate and honest handoff",
+      "owning_prompts": [
+        "W23",
+        "W24",
+        "W25"
+      ],
+      "status": "pending",
+      "criteria": [
+        {
+          "id": "outcome",
+          "description": "Installable/shareable candidate and honest handoff",
+          "status": "pending",
+          "evidence": []
+        }
+      ],
+      "verified_commit": null,
+      "tested_environment": null,
+      "open_issue_ids": [],
+      "original_requirements": []
+    }
+  ]
+}

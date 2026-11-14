@@ -81,7 +81,7 @@ import { registerAppearanceIpc } from './appearance-ipc.js';
 import { registerBriefingIpc } from './briefing-ipc.js';
 import { MemoryService } from './memory-service.js';
 import { registerMemoryIpc } from './memory-ipc.js';
-import { TRAY_ICON_DATA_URL } from './tray-icon.js';
+import { brandIconPath } from './icons.js';
 import { cspFor, isTrustedSenderFrame, isTrustedAppUrl, windowOptions } from './security.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -451,7 +451,13 @@ function updateTray(): void {
 function createTray(): void {
   if (tray && !tray.isDestroyed()) return;
   try {
-    const image = nativeImage.createFromDataURL(TRAY_ICON_DATA_URL);
+    // The tray mark is the same artwork as the window icon, rendered at the
+    // size Windows asks for. A missing file is reported as an unavailable tray
+    // rather than replaced by a different logo.
+    const trayIconPath = brandIconPath(here, 'mona-32.png');
+    if (!trayIconPath) throw new Error('brand icon mona-32.png was not built');
+    const image = nativeImage.createFromPath(trayIconPath);
+    if (image.isEmpty()) throw new Error(`brand icon did not decode: ${trayIconPath}`);
     tray = new Tray(image);
     tray.on('click', () => {
       if (mainWindow && mainWindow.isVisible() && mainWindow.isFocused()) mainWindow.hide();
@@ -1607,7 +1613,7 @@ if (!app.requestSingleInstanceLock(singleInstanceData)) {
 }
 
 function createMainWindow(): BrowserWindow {
-  const window = new BrowserWindow(windowOptions(preloadPath, { isDev }));
+  const window = new BrowserWindow(windowOptions(preloadPath, { isDev, icon: brandIconPath(here, 'mona.ico') }));
   // Scale first, then show: a window that opens at one size and jumps to another
   // is worse than a slightly later paint.
   window.webContents.setZoomFactor(zoomFactor);

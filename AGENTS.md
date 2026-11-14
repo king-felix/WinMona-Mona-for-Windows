@@ -83,6 +83,7 @@ blocked | skipped`. `skipped` requires an explicit recorded decision by Victor.
 Mona_Project.md / Mona_PROMPTS.md   authoritative specification + prompts
 AGENTS.md                           this file
 docs/requirements.json              requirement + prompt traceability ledger
+docs/requirements-windows.json      Windows supplement registry (W00-W25, WX-01-WX-18)
 docs/spec-index.json                section/ID index and hashes (generated)
 docs/codewhale-capabilities.json    pinned-engine capability coverage ledger
 docs/discovery-report.md            P00 environment/engine discovery
@@ -93,6 +94,8 @@ docs/evidence/                      evidence artifacts referenced by the ledger
 .mona/build/BLOCKERS.md             blockers and required human help
 .mona/build/attempts.jsonl          append-only attempt ledger
 .mona/build/checkpoints.jsonl       append-only checkpoint journal
+assets/brand/                       approved icon source + generated derivatives
+tools/assets/                       deterministic icon pipeline (build-icons.mjs)
 tools/build/                        bootstrap utility, schemas, seeders, tests
 tests/bootstrap/                    P00 utility tests
 ```

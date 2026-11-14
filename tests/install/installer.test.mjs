@@ -5,18 +5,21 @@
 // the upgrade gate, and the exact registry surface the installer owns. The real
 // install/uninstall run is recorded in docs/evidence/P21-windows.md.
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import {
   IDENTITY_NAME,
   PACKAGE_CLSID_BARE,
+  PACKAGE_IMAGES,
   buildChecksumManifest,
   decideUpgrade,
+  installPackageImages,
   installRegistryOps,
   packageVersion,
   pidAlive,
+  pngSize,
   pngSolid,
   missingComServerPayloads,
   renderManifest,
@@ -122,11 +125,47 @@ describe('checksums', () => {
     }
   });
 
-  it('produces a valid PNG header for the package logos', () => {
+  it('produces a valid PNG header for fixtures', () => {
     const png = pngSolid(44, 44);
     assert.deepEqual([...png.subarray(0, 8)], [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-    assert.equal(png.readUInt32BE(16), 44);
-    assert.equal(png.readUInt32BE(20), 44);
+    assert.deepEqual(pngSize(png), { width: 44, height: 44 });
+  });
+});
+
+describe('package artwork', () => {
+  const generated = path.resolve('assets', 'brand', 'generated');
+
+  it('ships the artwork at exactly the sizes the manifest declares', () => {
+    const target = temporary('mona-assets-');
+    try {
+      const installed = installPackageImages(generated, target);
+      assert.deepEqual(
+        installed,
+        PACKAGE_IMAGES.map((image) => image.file),
+      );
+      for (const { file, size } of PACKAGE_IMAGES) {
+        const image = readFileSync(path.join(target, file));
+        assert.deepEqual(pngSize(image), { width: size, height: size }, file);
+      }
+    } finally {
+      rmSync(target, { recursive: true, force: true, maxRetries: 3 });
+    }
+  });
+
+  it('refuses to substitute artwork when the generated set is absent', () => {
+    assert.throws(() => installPackageImages(null, temporary('mona-assets-none-')), /assets:icons/);
+  });
+
+  it('refuses an image whose size disagrees with the manifest', () => {
+    const source = temporary('mona-assets-wrong-');
+    const target = temporary('mona-assets-out-');
+    try {
+      writeFileSync(path.join(source, 'StoreLogo.png'), pngSolid(51, 51));
+      assert.throws(() => installPackageImages(source, target), /manifest declares 50x50/);
+    } finally {
+      rmSync(source, { recursive: true, force: true, maxRetries: 3 });
+      rmSync(target, { recursive: true, force: true, maxRetries: 3 });
+    }
   });
 });
 

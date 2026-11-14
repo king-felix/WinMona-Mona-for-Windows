@@ -62,7 +62,10 @@ export function cspFor(options: { devServerUrl?: string | undefined }): string {
  * Renderer isolation: sandboxed, context-isolated, no Node integration, no
  * webviews, no remote module, and a single narrow preload.
  */
-export function windowOptions(preloadPath: string, options: { isDev: boolean }): BrowserWindowConstructorOptions {
+export function windowOptions(
+  preloadPath: string,
+  options: { isDev: boolean; icon?: string | null },
+): BrowserWindowConstructorOptions {
   return {
     width: 1280,
     height: 800,
@@ -71,6 +74,9 @@ export function windowOptions(preloadPath: string, options: { isDev: boolean }):
     show: false,
     backgroundColor: '#F7F8FC',
     title: 'Mona',
+    // Only set when a built brand image exists; Electron would otherwise draw
+    // its own default window icon, which is not Mona's artwork.
+    ...(options.icon ? { icon: options.icon } : {}),
     webPreferences: {
       preload: preloadPath,
       sandbox: true,

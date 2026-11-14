@@ -22,6 +22,12 @@ import Ajv from 'ajv';
 const DEFAULT_ROOT = path.resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const STATE_SCHEMA = 'tools/build/schema/state.schema.json';
 const LEDGER_SCHEMA = 'tools/build/schema/requirements.schema.json';
+// The Windows improvement supplement is a second, independent id space. Keeping
+// it in its own ledger lets the original P00-P23 gate stay exactly as strict.
+const WINDOWS_LEDGER = 'docs/requirements-windows.json';
+const WINDOWS_SCHEMA = 'tools/build/schema/requirements-windows.schema.json';
+const WINDOWS_PROJECT_DOC = 'Mona_Windows_Improvements_Project.md';
+const WINDOWS_PROMPTS_DOC = 'Mona_Windows_Improvements_PROMPTS.md';
 
 const EXIT = { ok: 0, usage: 2, invalid: 3, conflict: 4, io: 5 };
 
@@ -111,6 +117,13 @@ function readLedger(root) {
   return { file, ledger: readJson(file) };
 }
 
+/** The supplement ledger, or null when the project does not carry one. */
+function readWindowsLedger(root) {
+  const file = path.join(root, WINDOWS_LEDGER);
+  if (!fs.existsSync(file)) return { file, ledger: null };
+  return { file, ledger: readJson(file) };
+}
+
 function lockOwnerAlive(lock) {
   try {
     const pid = Number(fs.readFileSync(lock, 'utf8').trim().split(/\s+/)[0]);
@@ -166,6 +179,7 @@ function compiler(root) {
   return {
     state: ajv.compile(readJson(path.join(root, STATE_SCHEMA))),
     ledger: ajv.compile(readJson(path.join(root, LEDGER_SCHEMA))),
+    windows: ajv.compile(readJson(path.join(root, WINDOWS_SCHEMA))),
     describe() {
       return Object.entries(ajv.errors ?? {}).map(([k, v]) => `${k}: ${v}`).join('; ');
     },
@@ -208,7 +222,7 @@ function headingSections(text) {
 }
 
 function buildSpecIndex(root) {
-  const files = ['Mona_Project.md', 'Mona_PROMPTS.md'].map((name) => {
+  const indexOne = (name) => {
     const file = path.join(root, name);
     const text = fs.readFileSync(file, 'utf8');
     const sections = headingSections(text);
@@ -219,18 +233,29 @@ function buildSpecIndex(root) {
       lines: text.split(/\r?\n/).length,
       requirement_ids: specIds(text),
       prompt_ids: [...new Set(text.match(/\bP\d{2}\b/g) ?? [])].sort(),
+      supplement_prompt_ids: [...new Set(text.match(/\bW\d{2}\b/g) ?? [])].sort(),
+      // The W headings carry no `###` prefix requirement of their own; the same
+      // heading parser covers both documents.
       prompt_sections: sections
         .filter((s) => /^P\d{2}\b/.test(s.heading))
         .map((s) => ({ id: s.heading.slice(0, 3), heading: s.heading, start_line: s.start_line })),
+      supplement_prompt_sections: sections
+        .filter((s) => /^W\d{2}\b/.test(s.heading))
+        .map((s) => ({ id: s.heading.slice(0, 3), heading: s.heading, start_line: s.start_line })),
       sections,
     };
-  });
+  };
+  // The supplement documents are indexed only when the project carries them, so
+  // an upgrade of the original sequence is not forced to adopt the supplement.
+  const supplementDocs = [WINDOWS_PROJECT_DOC, WINDOWS_PROMPTS_DOC].filter((name) =>
+    fs.existsSync(path.join(root, name)),
+  );
   return {
     schema_version: 1,
     generated_utc: utcNow(),
     purpose:
-      'Deterministic section/requirement/prompt index for Mona_Project.md and Mona_PROMPTS.md. Regenerate with `node tools/build/cli.mjs index`.',
-    files,
+      'Deterministic section/requirement/prompt index for Mona_Project.md and Mona_PROMPTS.md, plus the Windows improvement supplement when present. Regenerate with `node tools/build/cli.mjs index`.',
+    files: ['Mona_Project.md', 'Mona_PROMPTS.md', ...supplementDocs].map(indexOne),
   };
 }
 
@@ -332,7 +357,7 @@ function validateAll(root, { verbose = false } = {}) {
 
   if (ledger && !schemas.ledger(ledger)) add(`ledger schema: ${fmtAjv(schemas.ledger.errors)}`);
   if (state && !schemas.state(state)) add(`state schema: ${fmtAjv(schemas.state.errors)}`);
-  if (problems.length) return { problems, warnings, ledger, state, index };
+  if (problems.length) return { problems, warnings, ledger, state, index, windows: null };
 
   // Specification hashes and indexing.
   const forFile = (name) => path.join(root, name);
@@ -466,6 +491,132 @@ function validateAll(root, { verbose = false } = {}) {
     }
   }
 
+  // Windows improvement supplement (W00-W25, WX-01-WX-18). Separate id space,
+  // same evidence discipline: a row may not claim more than its evidence shows.
+  let windows = null;
+  const windowsLedgerFile = path.join(root, WINDOWS_LEDGER);
+  const windowsProjectDoc = path.join(root, WINDOWS_PROJECT_DOC);
+  const windowsPromptsDoc = path.join(root, WINDOWS_PROMPTS_DOC);
+  const supplementDocsPresent = fs.existsSync(windowsProjectDoc) && fs.existsSync(windowsPromptsDoc);
+  if (fs.existsSync(windowsLedgerFile)) {
+    try {
+      windows = readJson(windowsLedgerFile);
+    } catch (err) {
+      add(`Windows supplement ledger unreadable: ${err.message}`);
+    }
+  } else if (supplementDocsPresent) {
+    add(
+      'Windows supplement documents are present but docs/requirements-windows.json is missing (run `node tools/build/seed-windows-ledger.mjs`)',
+    );
+  }
+  if (windows && !supplementDocsPresent) {
+    add('docs/requirements-windows.json exists but the supplement documents are missing');
+  }
+  if (windows && !schemas.windows(windows)) {
+    add(`Windows supplement schema: ${fmtAjv(schemas.windows.errors)}`);
+  } else if (windows && supplementDocsPresent) {
+    if (sha256File(windowsProjectDoc) !== windows.spec.sha256) {
+      add(
+        `Windows supplement spec.sha256 does not match ${WINDOWS_PROJECT_DOC} (re-seed with \`node tools/build/seed-windows-ledger.mjs\`)`,
+      );
+    }
+    if (sha256File(windowsPromptsDoc) !== windows.spec.companion_sha256) {
+      add(`Windows supplement spec.companion_sha256 does not match ${WINDOWS_PROMPTS_DOC}`);
+    }
+
+    const expectedW = Array.from({ length: 26 }, (_, i) => `W${String(i).padStart(2, '0')}`);
+    const wIds = windows.prompts.map((p) => p.id);
+    const missingW = expectedW.filter((id) => !wIds.includes(id));
+    const extraW = wIds.filter((id) => !expectedW.includes(id));
+    if (missingW.length) add(`Windows supplement missing prompt ids: ${missingW.join(', ')}`);
+    if (extraW.length) add(`Windows supplement unknown prompt ids: ${extraW.join(', ')}`);
+    if (new Set(wIds).size !== wIds.length) add('Windows supplement has duplicate prompt ids');
+
+    const expectedWx = Array.from({ length: 18 }, (_, i) => `WX-${String(i + 1).padStart(2, '0')}`);
+    const wxIds = windows.requirements.map((r) => r.id);
+    const missingWx = expectedWx.filter((id) => !wxIds.includes(id));
+    if (missingWx.length) add(`Windows supplement missing requirements: ${missingWx.join(', ')}`);
+    if (new Set(wxIds).size !== wxIds.length) add('Windows supplement has duplicate requirement ids');
+
+    // Every recorded prompt must still match a real section in the prompts doc,
+    // so the registry cannot drift away from the document it claims to track.
+    const promptsText = fs.readFileSync(windowsPromptsDoc, 'utf8');
+    const headings = [...promptsText.matchAll(/^### (W\d{2})\s*[—–-]\s*(.+)$/gm)].map((m) => ({
+      id: m[1],
+      title: m[2].trim(),
+    }));
+    const headingById = new Map(headings.map((h) => [h.id, h.title]));
+    for (const prompt of windows.prompts) {
+      if (!headingById.has(prompt.id)) {
+        add(`Windows supplement prompt ${prompt.id} has no section in ${WINDOWS_PROMPTS_DOC}`);
+      } else if (headingById.get(prompt.id) !== prompt.title) {
+        add(`Windows supplement prompt ${prompt.id} title is stale: "${prompt.title}" != "${headingById.get(prompt.id)}"`);
+      }
+    }
+    if (headings.length !== windows.prompts.length) {
+      add(
+        `Windows supplement records ${windows.prompts.length} prompts but the document has ${headings.length} sections`,
+      );
+    }
+
+    const wById = new Map(windows.prompts.map((p) => [p.id, p]));
+    for (const prompt of windows.prompts) {
+      for (const dep of prompt.prerequisites) {
+        if (!wById.has(dep)) add(`${prompt.id} has unknown prerequisite ${dep}`);
+        else if (dep === prompt.id) add(`${prompt.id} depends on itself`);
+      }
+      for (const requirementId of prompt.requirements) {
+        if (!wxIds.includes(requirementId)) {
+          add(`${prompt.id} references unknown requirement ${requirementId}`);
+        }
+      }
+      if (prompt.status === 'completed' && prompt.evidence.length === 0) {
+        add(`${prompt.id} is completed without evidence`);
+      }
+      for (const evidence of prompt.evidence) {
+        const evidencePath = path.join(root, evidence.path);
+        if (!fs.existsSync(evidencePath)) add(`${prompt.id} evidence path missing: ${evidence.path}`);
+        else if (evidence.sha256 && evidence.sha256 !== sha256File(evidencePath)) {
+          warnings.push(`${prompt.id} evidence hash stale: ${evidence.path}`);
+        }
+      }
+    }
+    for (const cycle of findCycles(windows.prompts)) add(`Windows supplement dependency cycle: ${cycle}`);
+
+    const claimed = new Set(windows.requirements.flatMap((r) => r.owning_prompts));
+    for (const id of expectedW) {
+      if (!claimed.has(id)) add(`${id} is not claimed by any WX requirement`);
+    }
+    for (const requirement of windows.requirements) {
+      for (const ownerId of requirement.owning_prompts) {
+        const owner = wById.get(ownerId);
+        if (!owner) add(`${requirement.id} owned by unknown prompt ${ownerId}`);
+        else if (!owner.requirements.includes(requirement.id)) {
+          add(`${requirement.id} claims owner ${ownerId} but ${ownerId} does not list it`);
+        }
+      }
+      if (requirement.status === 'verified') {
+        const unproven = requirement.criteria.filter(
+          (c) => c.status !== 'passed' && c.status !== 'not_applicable',
+        );
+        if (unproven.length) {
+          add(
+            `${requirement.id} is verified but criteria are not passed: ${unproven.map((c) => c.id).join(', ')}`,
+          );
+        }
+        if (!requirement.verified_commit) add(`${requirement.id} is verified without verified_commit`);
+        if (requirement.original_requirements.length === 0) {
+          add(`${requirement.id} is verified without an original-ledger mapping (S10 requires one)`);
+        }
+      }
+      for (const criterion of requirement.criteria) {
+        if (criterion.status === 'passed' && criterion.evidence.length === 0) {
+          add(`${requirement.id}/${criterion.id} is marked passed without evidence`);
+        }
+      }
+    }
+  }
+
   // No committed secrets.
   for (const hit of scanTrackedForSecrets(root)) add(`possible secret in ${hit.file} (${hit.pattern})`);
 
@@ -474,7 +625,7 @@ function validateAll(root, { verbose = false } = {}) {
       `counts: prompts=${ledger.prompts.length} requirements=${ledger.requirements.length} criteria=${ledger.requirements.reduce((n, r) => n + r.criteria.length, 0)} tasks=${taskIds.length}`,
     );
   }
-  return { problems, warnings, ledger, state, index };
+  return { problems, warnings, ledger, state, index, windows };
 }
 
 // ---------------------------------------------------------------- commands
@@ -836,6 +987,37 @@ function cmdStatus(root) {
   for (const t of Object.values(state.tasks)) byStatus[t.status] = (byStatus[t.status] ?? 0) + 1;
   const reqByStatus = {};
   for (const r of ledger.requirements) reqByStatus[r.status] = (reqByStatus[r.status] ?? 0) + 1;
+
+  // The Windows supplement reports its own pending queue. Eligibility mirrors
+  // the original rule: an unfinished prompt whose prerequisites are completed.
+  const { ledger: windows } = readWindowsLedger(root);
+  let windowsSummary = null;
+  if (windows) {
+    const windowsStatus = {};
+    for (const prompt of windows.prompts) {
+      windowsStatus[prompt.status] = (windowsStatus[prompt.status] ?? 0) + 1;
+    }
+    const windowsReqStatus = {};
+    for (const requirement of windows.requirements) {
+      windowsReqStatus[requirement.status] = (windowsReqStatus[requirement.status] ?? 0) + 1;
+    }
+    const statusById = new Map(windows.prompts.map((p) => [p.id, p.status]));
+    const eligible = windows.prompts
+      .filter(
+        (prompt) =>
+          prompt.status !== 'completed' &&
+          prompt.status !== 'skipped' &&
+          prompt.status !== 'blocked' &&
+          prompt.prerequisites.every((dep) => statusById.get(dep) === 'completed'),
+      )
+      .map((prompt) => prompt.id);
+    windowsSummary = {
+      revision: windows.revision,
+      prompts: windowsStatus,
+      eligible,
+      requirements: windowsReqStatus,
+    };
+  }
   console.log(
     JSON.stringify(
       {
@@ -845,6 +1027,7 @@ function cmdStatus(root) {
         eligible: state.next_eligible_prompts,
         requirements: reqByStatus,
         last_checkpoint_utc: state.last_checkpoint_utc,
+        windows_supplement: windowsSummary,
       },
       null,
       2,
@@ -857,7 +1040,7 @@ function usage() {
   console.log(`mona build utility (P00)
 usage: node tools/build/cli.mjs <command> [--root DIR]
 
-  index        hash + index Mona_Project.md and Mona_PROMPTS.md -> docs/spec-index.json
+  index        hash + index the spec documents -> docs/spec-index.json
   init         create .mona/build/state.json from docs/requirements.json [--force]
   validate     schema/semantic validation [--verbose] [--json]
   checkpoint   --prompt P00 --status completed --expected-revision N
