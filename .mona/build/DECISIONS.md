@@ -1574,3 +1574,39 @@ Product-behavior decisions that change `Mona_Project.md` need Victor's agreement
   pushed to `origin/main` under this grant, verified by matching `git ls-remote origin
   refs/heads/main` against local `HEAD`.
 
+## D-0119 - The supervisor restart fixture waits for readiness instead of racing it
+
+- **Decision:** `packages/adapter/src/supervisor.test.ts` sets `FAKE_CRASH_MS` to 6 000 ms (it was
+  2 500 ms). Every assertion in that test is unchanged: readiness must succeed, the runtime crashes,
+  the supervisor restarts it at most twice, three unexpected exits are observed, and the state ends
+  `failed`.
+- **Why:** on this machine node spawn plus the first successful health probe now measures
+  2 821-2 948 ms across three runs. With a 2 500 ms crash timer the fake runtime died before
+  readiness, so `start()` returned `engine_unavailable` and the test failed for a reason unrelated
+  to what it tests. The crash delay is a setup parameter, not the criterion.
+- **What was NOT done:** no assertion was relaxed, no test was removed, and the readiness poll
+  interval (150 ms) was not tuned to make the old number pass. The measurement is recorded here so
+  a future reader can tell a fixture adjustment from a behaviour change.
+- **Constrains:** the restarted runtime inherits the same environment, so each restart also lives
+  6 s; the test now takes about 19 s and its 40 s timeout still holds on this machine.
+
+## D-0120 - The Windows improvement review keeps its own revision-checked ledger
+
+- **Decision:** W00-W25 live in `.mona/build/reviews/windows-v2/state.json` plus an append-only
+  `attempts.jsonl`, written by `tools/build/windows-review.mjs`. The P00-P23 state in
+  `.mona/build/state.json` is untouched, because `cli.mjs` deliberately refuses `Wnn` ids and
+  loosening its schema to admit a second namespace would weaken the gate that protects the first.
+- **Why:** S01 requires a subordinate enhancement ledger with atomic revision-checked writes; the
+  supplement is a separate id space by design (D-0116). Owning the gate in a second small utility
+  is cheaper and safer than teaching the original validator a second dialect.
+- **Mechanism, so the guarantees are not just prose:** `checkpoint` requires
+  `--expected-revision` and refuses a stale writer; a `completed` task without evidence or with an
+  open acceptance item is refused; a blocked task must name a problem id; prerequisites are read
+  from the supplement document on every seed so a stale local copy cannot disagree with the
+  dependency map; `attempt` refuses a fourth row after three consecutive no-progress attempts and
+  resets the counter only on recorded material progress. `tests/bootstrap/windows-review.test.mjs`
+  proves each refusal.
+- **Constrains:** the review ledger is developer build state. Prompt Runner and the product must
+  never depend on `windows-review.mjs`; it is excluded from the product path the same way the P00
+  bootstrap CLI is.
+

@@ -51,7 +51,7 @@ npm run lint                        # ESLint flat config
 - **Commit and push standing authorization (D-0118, granted 2026-11-14).** Victor
   authorized, in advance and for all future turns: commit coherent verified work
   locally, then push it to `origin` (`https://github.com/king-felix/
-  WinMona-Mona-for-Windows`, branch `main`). Do not stop to ask for that approval
+WinMona-Mona-for-Windows`, branch `main`). Do not stop to ask for that approval
   again at the end of a turn that introduced changes. Do it, then report the
   commit SHA and the push result with verification.
   **This grant is narrow.** It covers `git add` of your own coherent change set,

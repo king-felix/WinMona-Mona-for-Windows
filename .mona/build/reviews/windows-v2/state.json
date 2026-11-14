@@ -1,0 +1,440 @@
+{
+  "schema_version": 1,
+  "revision": 4,
+  "namespace": "windows-v2",
+  "source": {
+    "head": "c1c9138722b2002b28dfc847c0857b9954a10e08",
+    "engine": "codewhale 0.10.2 (ff466b2ed0bf)",
+    "platform": "Windows 11 Pro 10.0.26200 (x64)",
+    "electron": "45.3.0 (Chromium 156, Node 24.22)"
+  },
+  "spec": {
+    "project_file": "Mona_Windows_Improvements_Project.md",
+    "project_sha256": "adf8ab55ae00b79549dbd436d3d96b178ffd54c20ce8a7be8ac3aa48a24f4555",
+    "prompts_file": "Mona_Windows_Improvements_PROMPTS.md",
+    "prompts_sha256": "56aa94793944cfada235bd23cc182762ff95d166af53acee42ed8eb61aa9bb1a",
+    "ledger": "docs/requirements-windows.json"
+  },
+  "baseline_utc": "2026-11-14T16:51:28Z",
+  "current_task": "W02",
+  "tasks": {
+    "W00": {
+      "status": "completed",
+      "prerequisites": [],
+      "acceptance_done": [
+        "Current source/engine/platform and baseline checks recorded",
+        "W tasks indexed with no falsely completed statuses",
+        "Real existing features preserved; no production behaviour changed",
+        "Evidence and attempt counts survive validation"
+      ],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W00-baseline.md",
+          "sha256": "6cdd63644cdff4198132d162d3f7b18e31c5fe9fe49922869f016fc1e92047d5",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T16:55:24Z",
+          "commit": "c1c9138722b2002b28dfc847c0857b9954a10e08"
+        }
+      ],
+      "problems": [],
+      "original_requirements": [
+        "MONA-001"
+      ],
+      "next_action": "W01: reproduce and fix draft loss, late navigation, duplicate submit"
+    },
+    "W01": {
+      "status": "completed",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [
+        "Deterministic deferred-promise tests cover send→type more, send→switch project/thread, out-of-order saves, duplicate button/shortcut events, uncertain/rejected send and restart",
+        "Newer and other-project drafts remain; empty/blocked submissions send nothing; exactly one accepted request occurs for the same user action",
+        "Native Windows keyboard smoke covers Ctrl+Enter and the IME guard in the real composer (physical IME remains a human check)"
+      ],
+      "acceptance_open": [],
+      "evidence": [
+        {
+          "path": "docs/evidence/W01-drafts.md",
+          "sha256": "63b0bc553bc8f5a397b5b0b86e50ca64f4c6c06ff973f083320fb05d08fefff7",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T17:15:02Z",
+          "commit": "c1c9138722b2002b28dfc847c0857b9954a10e08"
+        },
+        {
+          "path": "docs/evidence/W01-composer.json",
+          "sha256": "05e1032c990b3134afc24a0a8dc0bfe3aa99cf23cc9df44fb0648924b7cb0bc8",
+          "kind": "document",
+          "recorded_utc": "2026-11-14T17:15:02Z",
+          "commit": "c1c9138722b2002b28dfc847c0857b9954a10e08"
+        }
+      ],
+      "problems": [],
+      "original_requirements": [
+        "MONA-007",
+        "MONA-016"
+      ],
+      "next_action": "W02: replacement-import cleanup, maintenance coverage, native export dialog"
+    },
+    "W02": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Replacement import/export tests cover associated-row cleanup and unrelated-data preservation; fault injection preserves usable prior state or a recoverable checkpoint; all writers participate in maintenance; dialog cancellation leaves state intact; no model calls from import/export UI."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W03": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W02"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Fixtures include >10,000 stored events, >2,000 frames in one turn, interleaved threads/items, heartbeat between deltas, duplicate replay and genuine gaps. Old content remains reachable; no ALPHA/BETA cross-thread merge; no duplicated completed card; scrolling while reading is not hijacked. Paging makes no provider calls."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W04": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "A coverage fixture reconciles every pinned registry row and alias; no unexplained omission or invented route. Test keyboard/IME, cursor replacement, multiline paste, literal text, Narrator semantics and large scaling. Filtering/help makes zero inference calls."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W05": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W03",
+        "W04"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Positive/negative dispatch for every executable route; argument injection refused; `/new` idle/busy/disconnected/response-lost/restart/project-switch cases; old histories/drafts remain accessible; chosen provider and permission posture unchanged. Unsupported native semantics are a recorded blocker, not hidden by keystroke automation."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W06": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W03"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Actual Windows tests enter/leave while streaming, typing, scrolled back, answering input and opening drawers. No remounted engine or new inference; draft/caret/scroll survives. Alt+Tab, F11/menu exit, minimize/restore and close/quit remain usable. Narrow and 200% layouts keep essential controls reachable."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W07": {
+      "status": "pending",
+      "prerequisites": [
+        "W06"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Inspect actual rendered before/after screenshots for both themes/intensities, normal/fullscreen, long content, tool failures, Needs the Human, empty state and narrow/200% layouts. Measure contrast on real foreground/background pairs. No idle animation CPU regression, hidden focus or inaccessible status color."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W08": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W03"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Native/fixture request round trip, rejected or expired answer, duplicate click, lost acknowledgement, reconnect and concurrent request IDs. “Delivered” requires an acknowledgement. Dismissing UI does not approve. Text drafts survive. Complete independent display/state work if a native reply capability blocks final verification."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W09": {
+      "status": "pending",
+      "prerequisites": [
+        "W05",
+        "W08"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Completion during typing, cancellation at dispatch boundary, thread/project switch, reconnect, uncertain send, paused queue and child-agent cases. Exactly one dispatcher controls the workspace; queued and delivered are distinct; no accidental spend from browsing activity. Windows notifications are quiet/deduplicated under existing settings."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W10": {
+      "status": "pending",
+      "prerequisites": [
+        "W00",
+        "W03"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Usage fixtures cover cache hit/miss, inclusive reasoning/output, missing price, parent/child totals, delayed updates, duplicate replay and scope changes. HUD controls work at 200%. Browsing the dashboard causes no provider call; configured gates block the actual dispatch path."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W11": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W03",
+        "W04"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "No wrong-project insertion; cancellation preserves draft; supported attachment context is shown accurately; invalid/outside-root/reparse cases follow the existing policy; links cannot cross IPC/renderer privilege boundaries. Keyboard, large text and error/cancel states work. Local lookup/copy/search adds no inference."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W12": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Inspect installed icons at small/large sizes and high DPI; the packaged binary carries the correct artwork; shortcuts bind the intended executable/app identity; no stretched, white-matted or missing images."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W13": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "State/schema tests reject stale/mismatched/partial reports and distinguish acceptance, turn completion and evidence verification. Migration/backup approach preserves existing project state. No new paid orchestration layer."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W14": {
+      "status": "pending",
+      "prerequisites": [
+        "W13"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Real-file fixtures and synthetic cases cover headings in fenced code, multiple prefixes, shared rules, Unicode/spaced paths, missing dependencies and reimports. Preview text matches what will be submitted. Importing/selecting does not create a thread, invoke a model or execute imported instructions."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W15": {
+      "status": "pending",
+      "prerequisites": [
+        "W01",
+        "W05",
+        "W10",
+        "W13",
+        "W14"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Fake runtime proves three prompts run in order in distinct threads, with one accepted send per dispatch and no extra task afterward. Duplicate events, double Start, response loss, concurrent UI/manual dispatch and restart do not duplicate work. A busy native workflow or uncertain active turn prevents another mutating task."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W16": {
+      "status": "pending",
+      "prerequisites": [
+        "W08",
+        "W15"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Third no-progress attempt, dependent/independent branches, stale evidence, native request still holding a turn, malformed report, human-only check, expired/duplicate answer and explicit skip all have correct outcomes. Unanswered required work is never complete. Reports distinguish all verified from finished with blockers."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W17": {
+      "status": "pending",
+      "prerequisites": [
+        "W06",
+        "W07",
+        "W09",
+        "W10",
+        "W16"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Native Windows/fixture tests cover stop races, view/thread switches, minimize/restore, sleep recovery, close confirmation, power-request cleanup and late usage. UI operations make zero inference calls. Keyboard/fullscreen/200% layouts retain the controls."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W18": {
+      "status": "pending",
+      "prerequisites": [
+        "W02",
+        "W03",
+        "W15",
+        "W16",
+        "W17"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Every matrix row has evidence or a precise blocker; no duplicate model effects, lost attempts or false task completion. Runner tests work without development-only paths in the recipient package. The feature is not called fully qualified if native/reply tests remain unavailable."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W19": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Comparable before/after measurements and relevant regression checks; no loss of features, accessibility or inference parity. Report current target pass/miss with practical remaining options. If still above target, retain the performance criterion open pending repair or an explicit release exception. CPU and long-history interaction are also measured."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W20": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Required native/human observations have real evidence; otherwise retain exact unverified criteria and a short checklist with expected results. Do not claim Narrator passed from DOM attributes or physical DPI passed from emulated zoom. Fix observed defects and rerun affected paths."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W21": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Required checks on the actual candidate pass or remain explicit release blockers. No claimed Windows-native result is supported only by a foreign host/mock. Original and enhancement ledgers agree about completed, stale, partial and blocked work."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W22": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Modern-menu invocation is observed under the declared trust state. Test trust is not production distribution. Failed trust/registration remains MONA-027 blocked; classic success does not close it. Installer/uninstaller remove only their own registration."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W23": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Local/test candidate has a demonstrable recipient installation path and lifecycle evidence on its actual bytes. W22 signing/trust or licensing gaps remain explicit release gates; do not call an untrusted package frictionless friend-ready distribution. Installer work can complete without pretending those external decisions are made."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W24": {
+      "status": "pending",
+      "prerequisites": [
+        "W21",
+        "W23"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Actual packaged timings/workflows and artifact identity are recorded. A development smoke or a source checkout is not substituted. Signed-distribution readiness is claimed only for the final validated package and resolved mandatory gates; full 1.0 still requires the original complete scope."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    },
+    "W25": {
+      "status": "pending",
+      "prerequisites": [
+        "W00"
+      ],
+      "acceptance_done": [],
+      "acceptance_open": [
+        "Every task accounted for; docs match behavior; no falsely green requirement; no leaked secrets; the next session can resume without rediscovering context. A closure prompt may finish with an accurate blocked-task report; it does not mark the blocked tasks complete."
+      ],
+      "evidence": [],
+      "problems": [],
+      "original_requirements": [],
+      "next_action": ""
+    }
+  }
+}
